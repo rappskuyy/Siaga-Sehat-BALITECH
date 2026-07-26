@@ -1,0 +1,4 @@
+# Used by `npx wrangler dev` / `npx vite preview` (Cloudflare local dev).
+# Copy this file to .dev.vars and fill in your real key. Never commit .dev.vars.
+# For production, set it with: npx wrangler secret put ANTHROPIC_API_KEY
+ANTHROPIC_API_KEY=
