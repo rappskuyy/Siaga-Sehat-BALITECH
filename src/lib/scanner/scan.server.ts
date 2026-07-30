@@ -1,7 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import Anthropic from "@anthropic-ai/sdk";
 import { SCAN_RESULT_JSON_SCHEMA, type ScanResult } from "./types";
+
+// Catatan: sengaja panggil REST API OpenAI/Gemini langsung via fetch (bukan lewat SDK resmi
+// mereka), karena SDK Node mereka membawa dependency yang tidak selalu kompatibel dengan
+// runtime Cloudflare Workers yang dipakai app ini saat deploy. fetch murni aman di Workers.
 
 const ALLOWED_MEDIA_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 
@@ -22,65 +25,205 @@ Aturan penting:
 - Jangan pernah membuat diagnosis pasti 100% — gunakan bahasa "kemungkinan", "berdasarkan gambar terlihat seperti", dsb.
 - Keluarkan HANYA data terstruktur sesuai skema yang diberikan, tanpa teks tambahan di luar skema.`;
 
-export const analyzeHealthImage = createServerFn({ method: "POST" })
-  .validator((data: unknown) => scanInputSchema.parse(data))
-  .handler(async ({ data }): Promise<ScanResult> => {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      throw new Error(
-        "ANTHROPIC_API_KEY belum dikonfigurasi di server. Tambahkan API key Anthropic ke file .env untuk mengaktifkan fitur scan AI.",
-      );
-    }
+const USER_PROMPT =
+  "Analisis foto ini dan berikan hasil skrining kesehatan awal sesuai skema yang telah ditentukan.";
 
-    const client = new Anthropic({ apiKey });
+/**
+ * Provider aktif dipilih lewat env var AI_PROVIDER ("openai" | "gemini").
+ * Default ke "openai" jika tidak diset.
+ */
+function getProvider(): "openai" | "gemini" {
+  const provider = (process.env.AI_PROVIDER ?? "openai").toLowerCase();
+  if (provider !== "openai" && provider !== "gemini") {
+    throw new Error(
+      `AI_PROVIDER="${provider}" tidak dikenal. Gunakan "openai" atau "gemini".`,
+    );
+  }
+  return provider;
+}
 
-    const response = await client.messages.create({
-      model: "claude-opus-4-8",
-      max_tokens: 3000,
-      thinking: { type: "adaptive" },
-      output_config: {
-        effort: "high",
-        format: {
-          type: "json_schema",
-          schema: SCAN_RESULT_JSON_SCHEMA,
-        },
-      },
-      system: SYSTEM_PROMPT,
+async function analyzeWithOpenAI(data: {
+  imageBase64: string;
+  mediaType: string;
+}): Promise<ScanResult> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "OPENAI_API_KEY belum dikonfigurasi di server. Tambahkan API key OpenAI ke file .env (untuk `npm run dev`) atau .dev.vars (untuk `wrangler dev`/preview), lalu restart server.",
+    );
+  }
+
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "gpt-5.4",
       messages: [
+        { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
           content: [
             {
-              type: "image",
-              source: {
-                type: "base64",
-                media_type: data.mediaType,
-                data: data.imageBase64,
-              },
+              type: "image_url",
+              image_url: { url: `data:${data.mediaType};base64,${data.imageBase64}` },
             },
-            {
-              type: "text",
-              text: "Analisis foto ini dan berikan hasil skrining kesehatan awal sesuai skema yang telah ditentukan.",
-            },
+            { type: "text", text: USER_PROMPT },
           ],
         },
       ],
-    });
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "scan_result",
+          strict: true,
+          schema: SCAN_RESULT_JSON_SCHEMA,
+        },
+      },
+    }),
+  });
 
-    if (response.stop_reason === "refusal") {
-      throw new Error(
-        "AI menolak menganalisis gambar ini. Coba unggah foto yang lebih jelas dan relevan dengan kondisi kesehatan.",
-      );
+  if (!res.ok) {
+    const errText = await res.text().catch(() => "");
+    throw new Error(
+      `Gagal menghubungi OpenAI (status ${res.status}). ${errText.slice(0, 300)}`,
+    );
+  }
+
+  const payload = (await res.json()) as {
+    choices?: Array<{ message?: { content?: string | null; refusal?: string | null } }>;
+  };
+
+  const message = payload.choices?.[0]?.message;
+  if (message?.refusal) {
+    throw new Error(
+      "AI menolak menganalisis gambar ini. Coba unggah foto yang lebih jelas dan relevan dengan kondisi kesehatan.",
+    );
+  }
+
+  const text = message?.content;
+  if (!text) {
+    throw new Error("AI tidak mengembalikan hasil analisis yang valid.");
+  }
+
+  try {
+    return JSON.parse(text) as ScanResult;
+  } catch {
+    throw new Error("Gagal membaca hasil analisis dari AI. Silakan coba lagi.");
+  }
+}
+
+/**
+ * Skema Gemini pakai subset OpenAPI yang lebih terbatas dari JSON Schema biasa —
+ * field seperti "additionalProperties" tidak dikenali dan bikin request ditolak (400).
+ * Fungsi ini membuang field-field yang tidak didukung secara rekursif.
+ */
+function toGeminiSchema(schema: unknown): unknown {
+  if (Array.isArray(schema)) {
+    return schema.map(toGeminiSchema);
+  }
+  if (schema !== null && typeof schema === "object") {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(schema)) {
+      if (key === "additionalProperties") continue;
+      result[key] = toGeminiSchema(value);
+    }
+    return result;
+  }
+  return schema;
+}
+
+const GEMINI_RESULT_SCHEMA = toGeminiSchema(SCAN_RESULT_JSON_SCHEMA);
+
+async function analyzeWithGemini(data: {
+  imageBase64: string;
+  mediaType: string;
+}): Promise<ScanResult> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "GEMINI_API_KEY belum dikonfigurasi di server. Tambahkan API key Gemini ke file .env (untuk `npm run dev`) atau .dev.vars (untuk `wrangler dev`/preview), lalu restart server.",
+    );
+  }
+
+  const model = "gemini-3.5-flash";
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                inlineData: {
+                  mimeType: data.mediaType,
+                  data: data.imageBase64,
+                },
+              },
+              { text: USER_PROMPT },
+            ],
+          },
+        ],
+        systemInstruction: {
+          role: "system",
+          parts: [{ text: SYSTEM_PROMPT }],
+        },
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: GEMINI_RESULT_SCHEMA,
+        },
+      }),
+    },
+  );
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => "");
+    throw new Error(
+      `Gagal menghubungi Gemini (status ${res.status}). ${errText.slice(0, 300)}`,
+    );
+  }
+
+  const payload = (await res.json()) as {
+    candidates?: Array<{
+      content?: { parts?: Array<{ text?: string }> };
+      finishReason?: string;
+    }>;
+  };
+
+  if (payload.candidates?.[0]?.finishReason === "SAFETY") {
+    throw new Error(
+      "AI menolak menganalisis gambar ini. Coba unggah foto yang lebih jelas dan relevan dengan kondisi kesehatan.",
+    );
+  }
+
+  const text = payload.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("");
+  if (!text) {
+    throw new Error("AI tidak mengembalikan hasil analisis yang valid.");
+  }
+
+  try {
+    return JSON.parse(text) as ScanResult;
+  } catch {
+    throw new Error("Gagal membaca hasil analisis dari AI. Silakan coba lagi.");
+  }
+}
+
+export const analyzeHealthImage = createServerFn({ method: "POST" })
+  .validator((data: unknown) => scanInputSchema.parse(data))
+  .handler(async ({ data }): Promise<ScanResult> => {
+    const provider = getProvider();
+
+    if (provider === "gemini") {
+      return analyzeWithGemini(data);
     }
 
-    const textBlock = response.content.find((block) => block.type === "text");
-    if (!textBlock || textBlock.type !== "text") {
-      throw new Error("AI tidak mengembalikan hasil analisis yang valid.");
-    }
-
-    try {
-      return JSON.parse(textBlock.text) as ScanResult;
-    } catch {
-      throw new Error("Gagal membaca hasil analisis dari AI. Silakan coba lagi.");
-    }
+    return analyzeWithOpenAI(data);
   });

@@ -1,4 +1,13 @@
 # Used by `npx wrangler dev` / `npx vite preview` (Cloudflare local dev).
-# Copy this file to .dev.vars and fill in your real key. Never commit .dev.vars.
-# For production, set it with: npx wrangler secret put ANTHROPIC_API_KEY
-ANTHROPIC_API_KEY=
+# Copy this file to .dev.vars and fill in your real key(s). Never commit .dev.vars.
+# For production, set them with:
+#   npx wrangler secret put AI_PROVIDER
+#   npx wrangler secret put OPENAI_API_KEY
+#   npx wrangler secret put GEMINI_API_KEY
+
+# Pilih provider AI untuk fitur scan: "openai" atau "gemini"
+AI_PROVIDER=openai
+
+# Isi salah satu sesuai AI_PROVIDER yang dipilih di atas
+OPENAI_API_KEY=
+GEMINI_API_KEY=
