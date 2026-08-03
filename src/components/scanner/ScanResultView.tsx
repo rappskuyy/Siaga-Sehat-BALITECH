@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import type { DangerLevel, ScanResult } from "@/lib/scanner/types";
 import { Button } from "@/components/ui/button";
+import { PharmacyMap } from "@/components/maps/PharmacyMap";
 
 const DANGER_STYLES: Record<
   DangerLevel,
@@ -286,6 +287,9 @@ export function ScanResultView({
           )}
         </Section>
       </div>
+
+      {/* Peta Apotek Terdekat & Rute Jalan (Leaflet + Overpass + OSRM) */}
+      <PharmacyMap />
 
       <div
         className="animate-fade-up flex flex-col gap-3 sm:flex-row"

@@ -2,10 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { SCAN_RESULT_JSON_SCHEMA, type ScanResult } from "./types";
 
-// Catatan: sengaja panggil REST API OpenAI/Gemini langsung via fetch (bukan lewat SDK resmi
-// mereka), karena SDK Node mereka membawa dependency yang tidak selalu kompatibel dengan
-// runtime Cloudflare Workers yang dipakai app ini saat deploy. fetch murni aman di Workers.
-
 const ALLOWED_MEDIA_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 
 const scanInputSchema = z.object({
@@ -149,10 +145,6 @@ async function analyzeWithOpenAI(data: {
   throw lastError ?? new Error("Gagal menghubungi OpenAI API.");
 }
 
-/**
- * Skema Gemini memakai subset OpenAPI — field seperti "additionalProperties" tidak dikenali
- * dan nilai "type" harus berupa huruf kapital (OBJECT, STRING, BOOLEAN, ARRAY).
- */
 function toGeminiSchema(schema: unknown): unknown {
   if (Array.isArray(schema)) {
     return schema.map(toGeminiSchema);
@@ -172,7 +164,21 @@ function toGeminiSchema(schema: unknown): unknown {
   return schema;
 }
 
+const SCAN_CACHE = new Map<string, { result: ScanResult; timestamp: number }>();
+const CACHE_TTL_MS = 60 * 60 * 1000;
+
+function getSimpleHash(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash.toString(36) + str.length;
+}
+
 const GEMINI_RESULT_SCHEMA = toGeminiSchema(SCAN_RESULT_JSON_SCHEMA);
+
+const delayMs = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function analyzeWithGemini(data: {
   imageBase64: string;
@@ -185,94 +191,130 @@ async function analyzeWithGemini(data: {
     );
   }
 
+  const cacheKey = getSimpleHash(data.imageBase64);
+  const cached = SCAN_CACHE.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+    return cached.result;
+  }
+
   const models = Array.from(
-    new Set([
-      process.env.GEMINI_MODEL,
-      "gemini-1.5-flash",
-      "gemini-1.5-flash-8b",
-      "gemini-2.0-flash",
-    ].filter((m): m is string => Boolean(m))),
+    new Set(
+      [
+        process.env.GEMINI_MODEL,
+        "gemini-2.0-flash",
+        "gemini-1.5-flash-8b",
+      ].filter((m): m is string => Boolean(m)),
+    ),
   );
 
   let lastError: Error | null = null;
 
   for (const model of models) {
-    try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": apiKey,
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: "user",
-                parts: [
-                  {
-                    inlineData: {
-                      mimeType: data.mediaType,
-                      data: data.imageBase64,
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": apiKey,
+            },
+            body: JSON.stringify({
+              contents: [
+                {
+                  role: "user",
+                  parts: [
+                    {
+                      inlineData: {
+                        mimeType: data.mediaType,
+                        data: data.imageBase64,
+                      },
                     },
-                  },
-                  { text: USER_PROMPT },
-                ],
+                    { text: USER_PROMPT },
+                  ],
+                },
+              ],
+              systemInstruction: {
+                parts: [{ text: SYSTEM_PROMPT }],
               },
-            ],
-            systemInstruction: {
-              parts: [{ text: SYSTEM_PROMPT }],
-            },
-            generationConfig: {
-              responseMimeType: "application/json",
-              responseSchema: GEMINI_RESULT_SCHEMA,
-            },
-          }),
-        },
-      );
+              generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: GEMINI_RESULT_SCHEMA,
+              },
+            }),
+          },
+        );
 
-      if (!res.ok) {
-        const errText = await res.text().catch(() => "");
+        if (res.status === 404) {
+          const errText = await res.text().catch(() => "");
+          lastError = new Error(`Gemini ${model} (status 404). ${errText.slice(0, 200)}`);
+          break;
+        }
+
         if (res.status === 429) {
+          if (attempt < 3) {
+            await delayMs(attempt * 1500);
+            continue;
+          }
           throw new Error(
-            `Batas kuota gratis (rate limit) Gemini API tercapai (Status 429). Mohon tunggu beberapa detik lalu coba tekan "Scan Sekarang" kembali.`,
+            "Batas kuota gratis (rate limit 429) Gemini API sedang tercapai. Silakan tunggu 10 detik lalu coba tekan Scan kembali.",
           );
         }
-        throw new Error(`Gemini ${model} (status ${res.status}). ${errText.slice(0, 250)}`);
-      }
 
-      const payload = (await res.json()) as {
-        candidates?: Array<{
-          content?: { parts?: Array<{ text?: string }> };
-          finishReason?: string;
-        }>;
-      };
+        if (!res.ok) {
+          const errText = await res.text().catch(() => "");
+          throw new Error(`Gemini ${model} (status ${res.status}). ${errText.slice(0, 250)}`);
+        }
 
-      if (payload.candidates?.[0]?.finishReason === "SAFETY") {
-        throw new Error(
-          "AI menolak menganalisis gambar ini. Coba unggah foto yang lebih jelas dan relevan dengan kondisi kesehatan.",
-        );
-      }
+        const payload = (await res.json()) as {
+          candidates?: Array<{
+            content?: { parts?: Array<{ text?: string }> };
+            finishReason?: string;
+          }>;
+        };
 
-      const text = payload.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("");
-      if (!text) {
-        throw new Error("AI tidak mengembalikan hasil analisis yang valid.");
-      }
+        if (payload.candidates?.[0]?.finishReason === "SAFETY") {
+          throw new Error(
+            "AI menolak menganalisis gambar ini. Coba unggah foto yang lebih jelas dan relevan dengan kondisi kesehatan.",
+          );
+        }
 
-      return JSON.parse(text) as ScanResult;
-    } catch (err) {
-      lastError = err instanceof Error ? err : new Error(String(err));
-      if (
-        lastError.message.includes("menolak menganalisis") ||
-        lastError.message.includes("Batas kuota gratis")
-      ) {
-        throw lastError;
+        const text = payload.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("");
+        if (!text) {
+          throw new Error("AI tidak mengembalikan hasil analisis yang valid.");
+        }
+
+        const parsedResult = JSON.parse(text) as ScanResult;
+        SCAN_CACHE.set(cacheKey, { result: parsedResult, timestamp: Date.now() });
+        return parsedResult;
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
+        if (
+          lastError.message.includes("menolak menganalisis") ||
+          lastError.message.includes("rate limit 429")
+        ) {
+          throw lastError;
+        }
       }
     }
   }
 
-  throw lastError ?? new Error("Gagal menghubungi Gemini API.");
+  const openaiKey = process.env.OPENAI_API_KEY?.trim();
+  if (openaiKey) {
+    try {
+      return await analyzeWithOpenAI(data);
+    } catch {
+      // ignore
+    }
+  }
+
+  throw (
+    lastError ??
+    new Error(
+      "Gagal terhubung ke Gemini API. Mohon periksa GEMINI_API_KEY Anda di file .env.",
+    )
+  );
 }
 
 export const analyzeHealthImage = createServerFn({ method: "POST" })
@@ -282,28 +324,19 @@ export const analyzeHealthImage = createServerFn({ method: "POST" })
     const openaiKey = process.env.OPENAI_API_KEY?.trim();
     const preferredProvider = process.env.AI_PROVIDER?.toLowerCase();
 
-    // 1. Jika preferredProvider diset ke "openai"
-    if (preferredProvider === "openai") {
-      if (openaiKey) {
-        return await analyzeWithOpenAI(data);
-      }
-      if (geminiKey) {
-        return await analyzeWithGemini(data);
-      }
+    if (preferredProvider === "openai" && openaiKey) {
+      return await analyzeWithOpenAI(data);
     }
 
-    // 2. Default: Utamakan Gemini API (jika ada key)
     if (geminiKey) {
       return await analyzeWithGemini(data);
     }
 
-    // 3. Jika ada OpenAI Key
     if (openaiKey) {
       return await analyzeWithOpenAI(data);
     }
 
     throw new Error(
-      "API Key belum dikonfigurasi. Silakan tambahkan GEMINI_API_KEY atau OPENAI_API_KEY pada file .env untuk menjalankan analisis AI.",
+      "API Key belum dikonfigurasi. Silakan tambahkan GEMINI_API_KEY atau OPENAI_API_KEY pada file .env.",
     );
   });
-
