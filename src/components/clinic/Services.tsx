@@ -20,7 +20,7 @@ const SERVICES: Service[] = [
   },
   {
     number: "02",
-    title: "Konsultasi Suara",
+    title: "Konsultasi",
     description:
       "Jelaskan gejala Anda dengan mudah melalui speech-to-text untuk diagnosis lebih akurat.",
     price: "Tersedia",

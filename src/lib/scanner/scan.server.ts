@@ -13,112 +13,145 @@ const scanInputSchema = z.object({
   mediaType: z.enum(ALLOWED_MEDIA_TYPES),
 });
 
-const SYSTEM_PROMPT = `Kamu adalah asisten skrining kesehatan berbasis AI bernama "SiagaSehat Scanner". Tugasmu menganalisis foto kondisi kulit/tubuh yang diunggah pengguna dan memberikan informasi edukatif awal — BUKAN diagnosis medis resmi.
+const SYSTEM_PROMPT = `Kamu adalah asisten skrining kesehatan berbasis AI bernama "SiagaSehat Scanner". Tugasmu menganalisis foto kondisi kulit/tubuh yang diunggah pengguna dan memberikan hasil analisis edukatif awal berdasarkan DATASET INFORMASI PENYAKIT & KESEHATAN INDONESIA.
 
-Aturan penting:
-- Selalu jawab dalam Bahasa Indonesia yang jelas dan mudah dipahami orang awam.
-- Jika gambar tidak menunjukkan kondisi kesehatan/kulit yang bisa dianalisis (misalnya foto tidak relevan, buram, atau bukan bagian tubuh), set "gambar_dapat_dianalisis" ke false dan jelaskan di "ringkasan" apa yang perlu difoto ulang. Isi field array dengan array kosong dan field lain dengan nilai netral.
-- "tingkat_bahaya": "tinggi" untuk kondisi yang berpotensi serius/butuh penanganan cepat, "sedang" untuk kondisi yang perlu diperhatikan tapi tidak darurat, "rendah" untuk kondisi ringan/umum.
-- Jika "tingkat_bahaya" adalah "tinggi", WAJIB set "harus_ke_dokter" ke true dan jelaskan alasannya dengan tegas namun tidak menakut-nakuti.
-- "obat_rekomendasi" HANYA boleh berisi obat bebas/bebas terbatas (OTC) yang umum dijual di apotek Indonesia (contoh: parasetamol, salep antiseptik, antihistamin topikal, dsb) dengan dosis dewasa umum. JANGAN merekomendasikan obat keras/resep. Selalu tambahkan di "catatan" bahwa dosis perlu disesuaikan dan sebaiknya dikonfirmasi ke apoteker/dokter, terutama untuk anak-anak, ibu hamil/menyusui, dan penderita penyakit kronis.
-- "obat_herbal" berisi bahan alami umum (misalnya jahe, kunyit, lidah buaya) beserta cara pakainya secara singkat dan aman.
+DATASET INFORMASI PENYAKIT ACUAN:
+1. Dermatitis Kontak & Eksim (Atopik / Iritan / Alergi):
+   - Gejala: Kulit kemerahan, gatal, bersisik, kering, atau melepuh kecil.
+   - Obat OTC: Krim Hydrocortisone 1%, Pelembap Hypoallergenic, Lotion Kalamin.
+   - Obat Herbal: Gel Lidah Buaya (Aloe Vera), Kompres Minyak Zaitun.
+2. Tinea & Infeksi Jamur Kulit (Panu, Kadas, Kurap, Tinea Pedis):
+   - Gejala: Bercak berbatas tegas, bersisik halus, gatal terutama saat berkeringat.
+   - Obat OTC: Krim Mikonazol 2%, Ketokonazol 2%, Salep 2-4.
+   - Obat Herbal: Ekstrak Daun Sirih, Minyak Kelapa Murni (VCO).
+3. Acne Vulgaris & Peradangan Kelenjar (Jerawat Papul, Pustul, Komedo):
+   - Gejala: Bintil merah peradangan, bintik bernanah, komedo hitam/putih.
+   - Obat OTC: Asam Salisilat topikal, Benzoil Peroksida 2.5%, Gel Sulfur.
+   - Obat Herbal: Tea Tree Oil (Minyak Pohon Teh), Masker Kunyit & Madu.
+4. Urtikaria & Reaksi Alergi Kulit (Biduran / Kaligata):
+   - Gejala: Bentol kemerahan menimbul (wheal), gatal intens, timbul hilang cepat.
+   - Obat OTC: Antihistamin Oral (Cetirizine 10mg / Loratadine 10mg), Lotion Kalamin.
+   - Obat Herbal: Air Kelapa Hijau, Kompres Air Dingin, Ekstrak Jahe.
+5. Scabies & Infeksi Parasit Kulit (Kudis):
+   - Gejala: Bintil gatal hebat terutama malam hari di sela jari, pergelangan, lipatan.
+   - Obat OTC / Tindakan: Bersihkan pakaian/sprei dengan air panas. Butuh salep khusus dari dokter (Permethrin 5%).
+   - Obat Herbal: Minyak Mimba (Neem Oil), Minyak Cengkeh terencerkan.
+6. Impetigo & Infeksi Bakteri Kulit (Bisul / Folikulitis):
+   - Gejala: Bintil berair/bernanah yang pecah membentuk keropeng kuning keemasan.
+   - Obat OTC: Salep Antiseptik Povidone Iodine, Pembersih Antiseptik Chlorhexidine.
+   - Obat Herbal: Ekstrak Bawang Putih terencerkan, Air Seduhan Daun Sirih.
+7. Herpes Zoster & Virus Kulit (Cacar Ular / Cacar Air):
+   - Gejala: Gelembung bintil berair berkelompok sesuai alur saraf, panas, nyeri menusuk.
+   - Obat OTC: Parasetamol 500mg (pereda nyeri), Bedak Salisil (mengeringkan bintil). Butuh konfirmasi dokter untuk antivirus.
+   - Obat Herbal: Kompres Dingin Air Antiseptik Alami.
+8. Psoriasis & Gangguan Inflamasi Kronis:
+   - Gejala: Plak kemerahan menebal dilapisi sisik tebal berwarna perak.
+   - Obat OTC: Pelembap Tebal (Petroleum Jelly/Ceramide), Salep Asam Salisilat.
+   - Obat Herbal: Gel Lidah Buaya Murni, Mandi Garam Epsom.
+9. Gigitan Serangga & Dermatitis Venenata (Contoh: Tomcat/Serangga):
+   - Gejala: Ruam melepuh memanjang seperti luka bakar, perih dan panas.
+   - Obat OTC: Salep Hydrocortisone, Kompres Dingin NaCl/Air Bersih.
+   - Obat Herbal: Gel Aloe Vera pendingin.
+
+ATURAN ANALISIS INFORMASI PENYAKIT:
+- Selalu jawab dalam Bahasa Indonesia yang jelas dan mudah dipahami.
+- Jika gambar tidak menunjukkan kondisi kesehatan/kulit (buram, foto benda, dsb), set "gambar_dapat_dianalisis" ke false dan berikan petunjuk di "ringkasan".
+- Klasifikasikan "tingkat_bahaya" ("rendah", "sedang", "tinggi") secara akurat. Jika "tinggi", set "harus_ke_dokter" ke true.
+- "obat_rekomendasi": Hanya cantumkan obat bebas/OTC umum di Indonesia beserta dosis aman.
+- "obat_herbal": Cantumkan tanaman obat / cara alami tradisional aman.
 - Jangan pernah membuat diagnosis pasti 100% — gunakan bahasa "kemungkinan", "berdasarkan gambar terlihat seperti", dsb.
-- Keluarkan HANYA data terstruktur sesuai skema yang diberikan, tanpa teks tambahan di luar skema.`;
+- Keluarkan HANYA data terstruktur sesuai skema JSON tanpa teks tambahan di luar skema.`;
 
 const USER_PROMPT =
   "Analisis foto ini dan berikan hasil skrining kesehatan awal sesuai skema yang telah ditentukan.";
-
-/**
- * Provider aktif dipilih lewat env var AI_PROVIDER ("openai" | "gemini").
- * Default ke "openai" jika tidak diset.
- */
-function getProvider(): "openai" | "gemini" {
-  const provider = (process.env.AI_PROVIDER ?? "openai").toLowerCase();
-  if (provider !== "openai" && provider !== "gemini") {
-    throw new Error(
-      `AI_PROVIDER="${provider}" tidak dikenal. Gunakan "openai" atau "gemini".`,
-    );
-  }
-  return provider;
-}
 
 async function analyzeWithOpenAI(data: {
   imageBase64: string;
   mediaType: string;
 }): Promise<ScanResult> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) {
     throw new Error(
-      "OPENAI_API_KEY belum dikonfigurasi di server. Tambahkan API key OpenAI ke file .env (untuk `npm run dev`) atau .dev.vars (untuk `wrangler dev`/preview), lalu restart server.",
+      "OPENAI_API_KEY belum dikonfigurasi di server. Tambahkan API key OpenAI ke file .env lalu restart server.",
     );
   }
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: "gpt-5.4",
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        {
-          role: "user",
-          content: [
+  const models = Array.from(
+    new Set([process.env.OPENAI_MODEL, "gpt-4o", "gpt-4o-mini"].filter((m): m is string => Boolean(m))),
+  );
+
+  let lastError: Error | null = null;
+
+  for (const model of models) {
+    try {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
             {
-              type: "image_url",
-              image_url: { url: `data:${data.mediaType};base64,${data.imageBase64}` },
+              role: "user",
+              content: [
+                {
+                  type: "image_url",
+                  image_url: { url: `data:${data.mediaType};base64,${data.imageBase64}` },
+                },
+                { type: "text", text: USER_PROMPT },
+              ],
             },
-            { type: "text", text: USER_PROMPT },
           ],
-        },
-      ],
-      response_format: {
-        type: "json_schema",
-        json_schema: {
-          name: "scan_result",
-          strict: true,
-          schema: SCAN_RESULT_JSON_SCHEMA,
-        },
-      },
-    }),
-  });
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "scan_result",
+              strict: true,
+              schema: SCAN_RESULT_JSON_SCHEMA,
+            },
+          },
+        }),
+      });
 
-  if (!res.ok) {
-    const errText = await res.text().catch(() => "");
-    throw new Error(
-      `Gagal menghubungi OpenAI (status ${res.status}). ${errText.slice(0, 300)}`,
-    );
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        throw new Error(`OpenAI ${model} (status ${res.status}). ${errText.slice(0, 250)}`);
+      }
+
+      const payload = (await res.json()) as {
+        choices?: Array<{ message?: { content?: string | null; refusal?: string | null } }>;
+      };
+
+      const message = payload.choices?.[0]?.message;
+      if (message?.refusal) {
+        throw new Error(
+          "AI menolak menganalisis gambar ini. Coba unggah foto yang lebih jelas dan relevan dengan kondisi kesehatan.",
+        );
+      }
+
+      const text = message?.content;
+      if (!text) {
+        throw new Error("AI tidak mengembalikan hasil analisis yang valid.");
+      }
+
+      return JSON.parse(text) as ScanResult;
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      if (lastError.message.includes("menolak menganalisis")) {
+        throw lastError;
+      }
+    }
   }
 
-  const payload = (await res.json()) as {
-    choices?: Array<{ message?: { content?: string | null; refusal?: string | null } }>;
-  };
-
-  const message = payload.choices?.[0]?.message;
-  if (message?.refusal) {
-    throw new Error(
-      "AI menolak menganalisis gambar ini. Coba unggah foto yang lebih jelas dan relevan dengan kondisi kesehatan.",
-    );
-  }
-
-  const text = message?.content;
-  if (!text) {
-    throw new Error("AI tidak mengembalikan hasil analisis yang valid.");
-  }
-
-  try {
-    return JSON.parse(text) as ScanResult;
-  } catch {
-    throw new Error("Gagal membaca hasil analisis dari AI. Silakan coba lagi.");
-  }
+  throw lastError ?? new Error("Gagal menghubungi OpenAI API.");
 }
 
 /**
- * Skema Gemini pakai subset OpenAPI yang lebih terbatas dari JSON Schema biasa —
- * field seperti "additionalProperties" tidak dikenali dan bikin request ditolak (400).
- * Fungsi ini membuang field-field yang tidak didukung secara rekursif.
+ * Skema Gemini memakai subset OpenAPI — field seperti "additionalProperties" tidak dikenali
+ * dan nilai "type" harus berupa huruf kapital (OBJECT, STRING, BOOLEAN, ARRAY).
  */
 function toGeminiSchema(schema: unknown): unknown {
   if (Array.isArray(schema)) {
@@ -128,7 +161,11 @@ function toGeminiSchema(schema: unknown): unknown {
     const result: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(schema)) {
       if (key === "additionalProperties") continue;
-      result[key] = toGeminiSchema(value);
+      if (key === "type" && typeof value === "string") {
+        result[key] = value.toUpperCase();
+      } else {
+        result[key] = toGeminiSchema(value);
+      }
     }
     return result;
   }
@@ -141,89 +178,132 @@ async function analyzeWithGemini(data: {
   imageBase64: string;
   mediaType: string;
 }): Promise<ScanResult> {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) {
     throw new Error(
-      "GEMINI_API_KEY belum dikonfigurasi di server. Tambahkan API key Gemini ke file .env (untuk `npm run dev`) atau .dev.vars (untuk `wrangler dev`/preview), lalu restart server.",
+      "GEMINI_API_KEY belum dikonfigurasi di server. Tambahkan API key Gemini ke file .env lalu restart server.",
     );
   }
 
-  const model = "gemini-3.5-flash";
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": apiKey,
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [
-              {
-                inlineData: {
-                  mimeType: data.mediaType,
-                  data: data.imageBase64,
-                },
-              },
-              { text: USER_PROMPT },
-            ],
-          },
-        ],
-        systemInstruction: {
-          role: "system",
-          parts: [{ text: SYSTEM_PROMPT }],
-        },
-        generationConfig: {
-          responseMimeType: "application/json",
-          responseSchema: GEMINI_RESULT_SCHEMA,
-        },
-      }),
-    },
+  const models = Array.from(
+    new Set([
+      process.env.GEMINI_MODEL,
+      "gemini-1.5-flash",
+      "gemini-1.5-flash-8b",
+      "gemini-2.0-flash",
+    ].filter((m): m is string => Boolean(m))),
   );
 
-  if (!res.ok) {
-    const errText = await res.text().catch(() => "");
-    throw new Error(
-      `Gagal menghubungi Gemini (status ${res.status}). ${errText.slice(0, 300)}`,
-    );
+  let lastError: Error | null = null;
+
+  for (const model of models) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey,
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: "user",
+                parts: [
+                  {
+                    inlineData: {
+                      mimeType: data.mediaType,
+                      data: data.imageBase64,
+                    },
+                  },
+                  { text: USER_PROMPT },
+                ],
+              },
+            ],
+            systemInstruction: {
+              parts: [{ text: SYSTEM_PROMPT }],
+            },
+            generationConfig: {
+              responseMimeType: "application/json",
+              responseSchema: GEMINI_RESULT_SCHEMA,
+            },
+          }),
+        },
+      );
+
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        if (res.status === 429) {
+          throw new Error(
+            `Batas kuota gratis (rate limit) Gemini API tercapai (Status 429). Mohon tunggu beberapa detik lalu coba tekan "Scan Sekarang" kembali.`,
+          );
+        }
+        throw new Error(`Gemini ${model} (status ${res.status}). ${errText.slice(0, 250)}`);
+      }
+
+      const payload = (await res.json()) as {
+        candidates?: Array<{
+          content?: { parts?: Array<{ text?: string }> };
+          finishReason?: string;
+        }>;
+      };
+
+      if (payload.candidates?.[0]?.finishReason === "SAFETY") {
+        throw new Error(
+          "AI menolak menganalisis gambar ini. Coba unggah foto yang lebih jelas dan relevan dengan kondisi kesehatan.",
+        );
+      }
+
+      const text = payload.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("");
+      if (!text) {
+        throw new Error("AI tidak mengembalikan hasil analisis yang valid.");
+      }
+
+      return JSON.parse(text) as ScanResult;
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      if (
+        lastError.message.includes("menolak menganalisis") ||
+        lastError.message.includes("Batas kuota gratis")
+      ) {
+        throw lastError;
+      }
+    }
   }
 
-  const payload = (await res.json()) as {
-    candidates?: Array<{
-      content?: { parts?: Array<{ text?: string }> };
-      finishReason?: string;
-    }>;
-  };
-
-  if (payload.candidates?.[0]?.finishReason === "SAFETY") {
-    throw new Error(
-      "AI menolak menganalisis gambar ini. Coba unggah foto yang lebih jelas dan relevan dengan kondisi kesehatan.",
-    );
-  }
-
-  const text = payload.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("");
-  if (!text) {
-    throw new Error("AI tidak mengembalikan hasil analisis yang valid.");
-  }
-
-  try {
-    return JSON.parse(text) as ScanResult;
-  } catch {
-    throw new Error("Gagal membaca hasil analisis dari AI. Silakan coba lagi.");
-  }
+  throw lastError ?? new Error("Gagal menghubungi Gemini API.");
 }
 
 export const analyzeHealthImage = createServerFn({ method: "POST" })
   .validator((data: unknown) => scanInputSchema.parse(data))
   .handler(async ({ data }): Promise<ScanResult> => {
-    const provider = getProvider();
+    const geminiKey = process.env.GEMINI_API_KEY?.trim();
+    const openaiKey = process.env.OPENAI_API_KEY?.trim();
+    const preferredProvider = process.env.AI_PROVIDER?.toLowerCase();
 
-    if (provider === "gemini") {
-      return analyzeWithGemini(data);
+    // 1. Jika preferredProvider diset ke "openai"
+    if (preferredProvider === "openai") {
+      if (openaiKey) {
+        return await analyzeWithOpenAI(data);
+      }
+      if (geminiKey) {
+        return await analyzeWithGemini(data);
+      }
     }
 
-    return analyzeWithOpenAI(data);
+    // 2. Default: Utamakan Gemini API (jika ada key)
+    if (geminiKey) {
+      return await analyzeWithGemini(data);
+    }
+
+    // 3. Jika ada OpenAI Key
+    if (openaiKey) {
+      return await analyzeWithOpenAI(data);
+    }
+
+    throw new Error(
+      "API Key belum dikonfigurasi. Silakan tambahkan GEMINI_API_KEY atau OPENAI_API_KEY pada file .env untuk menjalankan analisis AI.",
+    );
   });
+
