@@ -18,7 +18,7 @@ const MINI_STATS = [
 
 export function Hero() {
   return (
-    <section className="relative w-full bg-white px-6 pt-3 pb-8 md:px-8 md:pt-4 md:pb-12 lg:px-10 lg:pt-5 lg:pb-16">
+    <section className="relative w-full bg-white px-6 pt-0 pb-5 md:px-8 md:pt-1 md:pb-8 lg:px-10 lg:pt-2 lg:pb-10">
       {/* Header */}
       <header className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
@@ -76,23 +76,23 @@ export function Hero() {
       </header>
 
       {/* Body */}
-      <div className="relative mt-6 grid gap-8 lg:mt-8 lg:grid-cols-[1.05fr_1.1fr_0.85fr] lg:gap-5">
+      <div className="relative mt-3 grid gap-8 lg:mt-5 lg:grid-cols-[1.05fr_1.1fr_0.85fr] lg:gap-5">
         {/* Left column: headline + CTA + proof card */}
-        <div className="relative z-10 flex flex-col justify-center">
-          <h1 className="font-display text-[68px] font-extrabold leading-[0.88] tracking-tight text-[color:var(--color-clinic-ink)] md:text-[84px] lg:text-[96px]">
+        <div className="relative z-10 flex flex-col justify-start">
+          <h1 className="font-display text-[56px] font-extrabold leading-[0.88] tracking-tight text-[color:var(--color-clinic-ink)] md:text-[68px] lg:text-[76px]">
             Siaga
             <br />
             Sehat
           </h1>
 
-          <p className="mt-6 max-w-[320px] text-sm leading-relaxed text-[color:var(--color-clinic-muted)]">
+          <p className="mt-4 max-w-[320px] text-sm leading-relaxed text-[color:var(--color-clinic-muted)]">
             <span className="font-semibold text-[color:var(--color-clinic-ink)]">
               Kami tidak hanya mengobati gejala
             </span>{" "}
             — kami peduli dengan setiap orang, didukung skrining AI yang cepat dan akurat.
           </p>
 
-          <div className="mt-6 flex flex-wrap items-center gap-2">
+          <div className="mt-5 flex flex-wrap items-center gap-2">
             <a
               href="#doctors"
               className="group inline-flex items-center gap-2 rounded-full bg-[color:var(--color-clinic-blue)] py-1.5 pl-5 pr-1.5 text-sm font-medium text-white shadow-lg shadow-[color:var(--color-clinic-blue)]/30 transition hover:bg-[color:var(--color-clinic-blue-dark)]"
@@ -113,7 +113,7 @@ export function Hero() {
             </Link>
           </div>
 
-          <div className="mt-10 flex items-stretch gap-3 md:mt-14">
+          <div className="mt-8 flex items-stretch gap-3 md:mt-12">
             <button
               type="button"
               className="group relative hidden h-24 w-32 shrink-0 overflow-hidden rounded-2xl shadow-[var(--shadow-clinic)] md:block"
@@ -154,7 +154,7 @@ export function Hero() {
 
         {/* Center column: doctor photo, no card background */}
         <div className="relative order-first flex justify-center lg:order-none">
-          <div className="relative inline-flex h-[500px] items-end md:h-[600px] lg:h-[700px]">
+          <div className="relative inline-flex h-[420px] items-end md:h-[520px] lg:h-[620px]">
             <img
               src={fotodokter2}
               alt="Dokter dengan stetoskop"
@@ -194,7 +194,7 @@ export function Hero() {
         </div>
 
         {/* Right column: supporting text */}
-        <div className="relative z-10 flex flex-col justify-center">
+        <div className="relative z-10 flex flex-col justify-start">
           <div className="max-w-xs">
             <h3 className="font-display text-2xl font-extrabold leading-tight text-[color:var(--color-clinic-ink)]">
               Dengan Teknologi
