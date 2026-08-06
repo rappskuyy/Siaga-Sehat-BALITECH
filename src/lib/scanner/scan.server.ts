@@ -320,23 +320,5 @@ async function analyzeWithGemini(data: {
 export const analyzeHealthImage = createServerFn({ method: "POST" })
   .validator((data: unknown) => scanInputSchema.parse(data))
   .handler(async ({ data }): Promise<ScanResult> => {
-    const geminiKey = process.env.GEMINI_API_KEY?.trim();
-    const openaiKey = process.env.OPENAI_API_KEY?.trim();
-    const preferredProvider = process.env.AI_PROVIDER?.toLowerCase();
-
-    if (preferredProvider === "openai" && openaiKey) {
-      return await analyzeWithOpenAI(data);
-    }
-
-    if (geminiKey) {
-      return await analyzeWithGemini(data);
-    }
-
-    if (openaiKey) {
-      return await analyzeWithOpenAI(data);
-    }
-
-    throw new Error(
-      "API Key belum dikonfigurasi. Silakan tambahkan GEMINI_API_KEY atau OPENAI_API_KEY pada file .env.",
-    );
+    return analyzeWithGemini(data);
   });
