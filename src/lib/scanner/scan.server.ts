@@ -197,15 +197,7 @@ async function analyzeWithGemini(data: {
     return cached.result;
   }
 
-  const models = Array.from(
-    new Set(
-      [
-        process.env.GEMINI_MODEL,
-        "gemini-2.0-flash",
-        "gemini-1.5-flash-8b",
-      ].filter((m): m is string => Boolean(m)),
-    ),
-  );
+  const models = ["gemini-2.5-flash"];
 
   let lastError: Error | null = null;
 
