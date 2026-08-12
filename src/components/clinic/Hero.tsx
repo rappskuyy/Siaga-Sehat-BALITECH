@@ -1,4 +1,5 @@
-import { ArrowUpRight, Bell, Phone, Play, ScanLine, User } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight, Bell, Menu, Phone, Play, ScanLine, User, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { FloatingBadge } from "./FloatingBadge";
 import fotodokter1 from "@/assets/fotodokter(1).png?url";
@@ -16,7 +17,11 @@ const MINI_STATS = [
   { n: "100%", l: "diagnostik digital" },
 ];
 
+const NAV_ITEMS = ["Tentang Kami", "Layanan", "Dokter", "Hubungi"];
+
 export function Hero() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <section className="relative w-full bg-white px-6 pt-0 pb-5 md:px-8 md:pt-1 md:pb-8 lg:px-10 lg:pt-2 lg:pb-10">
       {/* Header */}
@@ -31,7 +36,7 @@ export function Hero() {
         </div>
 
         <nav className="hidden items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2 py-1.5 text-sm text-[color:var(--color-clinic-ink)] lg:flex">
-          {["Tentang Kami", "Layanan", "Dokter", "Hubungi"].map((l) => (
+          {NAV_ITEMS.map((l) => (
             <a
               key={l}
               href={`#${l.toLowerCase().replace(/\s/g, "")}`}
@@ -67,13 +72,47 @@ export function Hero() {
             <Bell className="h-4 w-4" />
           </button>
           <button
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-clinic-ink)] text-white transition hover:bg-black/80"
-            aria-label="Account"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-clinic-ink)] text-white transition hover:bg-black/80 lg:hidden"
+            aria-label="Akun"
           >
             <User className="h-4 w-4" />
           </button>
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)]/10 lg:hidden"
+            aria-label="Buka menu"
+            aria-expanded={isMenuOpen}
+          >
+            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
       </header>
+
+      {isMenuOpen && (
+        <div className="mt-3 rounded-2xl border border-black/5 bg-white p-3 shadow-[var(--shadow-clinic)] lg:hidden">
+          <nav className="flex flex-col gap-1">
+            {NAV_ITEMS.map((l) => (
+              <a
+                key={l}
+                href={`#${l.toLowerCase().replace(/\s/g, "")}`}
+                onClick={() => setIsMenuOpen(false)}
+                className="rounded-xl px-3 py-2 text-sm font-medium text-[color:var(--color-clinic-ink)] transition hover:bg-[color:var(--color-clinic-blue-soft)]"
+              >
+                {l}
+              </a>
+            ))}
+            <Link
+              to="/scanner"
+              onClick={() => setIsMenuOpen(false)}
+              className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[color:var(--color-clinic-blue)] px-3 py-2.5 text-sm font-medium text-white"
+            >
+              <ScanLine className="h-4 w-4" />
+              Scan AI
+            </Link>
+          </nav>
+        </div>
+      )}
 
       {/* Body */}
       <div className="relative mt-3 grid gap-8 lg:mt-5 lg:grid-cols-[1.05fr_1.1fr_0.85fr] lg:gap-5">
