@@ -197,7 +197,7 @@ async function analyzeWithGemini(data: {
     return cached.result;
   }
 
-  const models = ["gemini-2.5-flash"];
+  const models = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-2.5-flash"];
 
   let lastError: Error | null = null;
 

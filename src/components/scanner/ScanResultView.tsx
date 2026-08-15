@@ -41,66 +41,7 @@ const DANGER_STYLES: Record<
   },
 };
 
-function mapsSearchUrl(query: string, coords: GeolocationCoordinates | null) {
-  const encoded = encodeURIComponent(query);
-  if (coords) {
-    return `https://www.google.com/maps/search/${encoded}/@${coords.latitude},${coords.longitude},15z`;
-  }
-  return `https://www.google.com/maps/search/?api=1&query=${encoded}`;
-}
 
-function LocateButton({
-  label,
-  query,
-  icon: Icon,
-}: {
-  label: string;
-  query: string;
-  icon: typeof Building2;
-}) {
-  const [loading, setLoading] = useState(false);
-
-  const handleClick = () => {
-    if (loading) return;
-    if (!navigator.geolocation) {
-      window.open(mapsSearchUrl(query, null), "_blank", "noopener,noreferrer");
-      return;
-    }
-    setLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLoading(false);
-        window.open(mapsSearchUrl(query, pos.coords), "_blank", "noopener,noreferrer");
-      },
-      () => {
-        setLoading(false);
-        window.open(mapsSearchUrl(query, null), "_blank", "noopener,noreferrer");
-      },
-      { timeout: 8000 },
-    );
-  };
-
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className="group flex flex-1 items-center gap-3 rounded-2xl border border-[color:var(--color-clinic-blue)]/20 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-    >
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] transition group-hover:scale-105">
-        <Icon className="h-5 w-5" />
-      </span>
-      <span className="flex-1">
-        <span className="block text-sm font-semibold text-[color:var(--color-clinic-ink)]">
-          {label}
-        </span>
-        <span className="block text-xs text-[color:var(--color-clinic-muted)]">
-          {loading ? "Mencari lokasi kamu..." : "Buka di Google Maps"}
-        </span>
-      </span>
-      <MapPin className="h-4 w-4 text-[color:var(--color-clinic-blue)] opacity-0 transition group-hover:opacity-100" />
-    </button>
-  );
-}
 
 function Section({
   title,
@@ -288,20 +229,8 @@ export function ScanResultView({
         </Section>
       </div>
 
-      {/* Peta Apotek Terdekat & Rute Jalan (Leaflet + Overpass + OSRM) */}
+      {/* Peta Apotek Terdekat & Rute Jalan */}
       <PharmacyMap />
-
-      <div
-        className="animate-fade-up flex flex-col gap-3 sm:flex-row"
-        style={{ animationDelay: "0.3s" }}
-      >
-        <LocateButton label="Rumah Sakit Terdekat" query="rumah sakit terdekat" icon={Building2} />
-        <LocateButton
-          label="Apotek Terdekat (Antar Obat)"
-          query="apotek antar obat terdekat"
-          icon={Pill}
-        />
-      </div>
 
       {result.catatan_tambahan && (
         <p

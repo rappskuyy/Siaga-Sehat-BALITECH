@@ -1,4 +1,5 @@
-import { ExternalLink, Navigation, Pill, Phone, Star, Clock, Car, Bike, X } from "lucide-react";
+import { useState } from "react";
+import { ExternalLink, Navigation, Pill, Phone, Star, Clock, Car, Bike, X, Filter } from "lucide-react";
 import type { PharmacyNode, RouteInfo, TransportMode } from "./maps.service";
 
 interface PharmacyListProps {
@@ -14,11 +15,18 @@ export function PharmacyList({
   selectedPharmacy,
   onSelectPharmacy,
 }: PharmacyListProps) {
+  const [maxRadius, setMaxRadius] = useState<number | null>(null);
+
+  const filteredPharmacies = pharmacies.filter((p) => {
+    if (maxRadius === null) return true;
+    return p.distanceKm <= maxRadius;
+  });
+
   return (
     <div className="flex flex-col gap-3 max-h-[520px] overflow-y-auto pr-1">
       <div className="flex items-center justify-between sticky top-0 bg-white py-1 z-10">
         <h4 className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-clinic-muted)]">
-          Daftar Apotek Terdekat ({pharmacies.length})
+          Daftar Apotek Terdekat ({filteredPharmacies.length})
         </h4>
         {selectedPharmacy && (
           <button
@@ -31,19 +39,72 @@ export function PharmacyList({
         )}
       </div>
 
+      {/* Filter Radius Bertahap */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px]">
+        <button
+          type="button"
+          onClick={() => setMaxRadius(null)}
+          className={`rounded-full px-2.5 py-0.5 font-medium transition ${
+            maxRadius === null
+              ? "bg-[color:var(--color-clinic-blue)] text-white shadow-2xs"
+              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+          }`}
+        >
+          Semua ({pharmacies.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setMaxRadius(1)}
+          className={`rounded-full px-2.5 py-0.5 font-medium transition ${
+            maxRadius === 1
+              ? "bg-[color:var(--color-clinic-blue)] text-white shadow-2xs"
+              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+          }`}
+        >
+          ≤ 1 km ({pharmacies.filter((p) => p.distanceKm <= 1).length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setMaxRadius(3)}
+          className={`rounded-full px-2.5 py-0.5 font-medium transition ${
+            maxRadius === 3
+              ? "bg-[color:var(--color-clinic-blue)] text-white shadow-2xs"
+              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+          }`}
+        >
+          ≤ 3 km ({pharmacies.filter((p) => p.distanceKm <= 3).length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setMaxRadius(5)}
+          className={`rounded-full px-2.5 py-0.5 font-medium transition ${
+            maxRadius === 5
+              ? "bg-[color:var(--color-clinic-blue)] text-white shadow-2xs"
+              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+          }`}
+        >
+          ≤ 5 km ({pharmacies.filter((p) => p.distanceKm <= 5).length})
+        </button>
+      </div>
+
       {loadingPharmacies ? (
         <div className="space-y-2">
+          <div className="text-center py-2 text-xs text-blue-600 font-medium animate-pulse">
+            Mencari apotek di titik baru...
+          </div>
           {[1, 2, 3].map((n) => (
             <div key={n} className="h-20 animate-pulse rounded-xl bg-slate-100 p-3" />
           ))}
         </div>
-      ) : pharmacies.length === 0 ? (
+      ) : filteredPharmacies.length === 0 ? (
         <div className="rounded-xl border border-dashed border-slate-200 p-6 text-center text-xs text-slate-500">
-          Tidak ada data apotek ditemukan di sekitar lokasi ini.
+          {maxRadius
+            ? `Tidak ada apotek dalam radius ≤ ${maxRadius} km. Coba pilih radius yang lebih besar.`
+            : "Tidak ada data apotek ditemukan di sekitar lokasi ini."}
         </div>
       ) : (
         <div className="space-y-2.5">
-          {pharmacies.map((pharm) => {
+          {filteredPharmacies.map((pharm) => {
             const isSelected = selectedPharmacy?.id === pharm.id;
             return (
               <button
