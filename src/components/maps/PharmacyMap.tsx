@@ -1,5 +1,13 @@
-import { useEffect, useState, useCallback, useRef } from "react";
-import { Compass, MapPin, RefreshCw, Layers, Search, CheckCircle2 } from "lucide-react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import {
+  Compass,
+  MapPin,
+  RefreshCw,
+  Search,
+  CheckCircle2,
+  AlertTriangle,
+  WifiOff,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
@@ -16,7 +24,7 @@ import {
   type TransportMode,
 } from "./maps.service";
 import { PharmacyList, RouteOverlayCard } from "./PharmacyList";
-import { LeafletMap } from "./LeafletMap";
+import { SourceSummaryBar } from "./SourceBadge";
 
 const containerStyle = {
   width: "100%",
@@ -114,11 +122,11 @@ export function PharmacyMap() {
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
 
   const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
-  const [mapProvider, setMapProvider] = useState<"leaflet" | "google">("google");
+  const [mapProvider] = useState<"leaflet" | "google">("google");
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
 
-  const { isLoaded, loadError } = useJsApiLoader({
+  const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: googleApiKey,
     libraries: GOOGLE_MAPS_LIBRARIES,
@@ -168,7 +176,7 @@ export function PharmacyMap() {
       loadPharmacies(coords[0], coords[1], addressName);
     };
 
-    // Ambil perkiraan lokasi IP secara instan agar lokasi pertama yang ditunjukkan adalah lokasi tempat kita berada saat ini
+    // Ambil perkiraan lokasi IP secara instan
     let hasFastLocation = false;
     fetchIPLocation().then((ipCoords) => {
       if (ipCoords && !hasFastLocation) {
@@ -223,7 +231,6 @@ export function PharmacyMap() {
       const results = await searchLocationByAddress(searchQuery);
       setSearchResults(results);
       if (results && results.length > 0) {
-        // Otomatis pindahkan peta ke lokasi pertama hasil pencarian & cari apotek terdekat di sana
         handleSelectSearchResult(results[0]);
       } else {
         setShowSearchResults(true);
@@ -346,7 +353,7 @@ export function PharmacyMap() {
     };
 
     try {
-      if (mapProvider === "google" && window.google && window.google.maps) {
+      if (googleApiKey && window.google && window.google.maps && window.google.maps.DirectionsService) {
         const directionsService = new window.google.maps.DirectionsService();
         const googleTravelMode = window.google.maps.TravelMode.DRIVING;
 
@@ -379,11 +386,27 @@ export function PharmacyMap() {
       } else {
         await useOSRMRoute();
       }
-    } catch (err) {
-      console.error("Google Directions Error, falling back to OSRM:", err);
+    } catch {
       await useOSRMRoute();
     }
   };
+
+  // Calculate Data Sources Breakdown
+  const sourceStats = useMemo(() => {
+    let google = 0;
+    let osm = 0;
+    let gemini = 0;
+    let cache = 0;
+
+    for (const p of pharmacies) {
+      if (p._dataSource === "google") google++;
+      else if (p._dataSource === "osm") osm++;
+      else if (p._dataSource === "gemini") gemini++;
+      else if (p._dataSource === "cache") cache++;
+    }
+
+    return { google, osm, gemini, cache, total: pharmacies.length };
+  }, [pharmacies]);
 
   const mapCenter = userLocation
     ? { lat: userLocation[0], lng: userLocation[1] }
@@ -402,7 +425,7 @@ export function PharmacyMap() {
             </h3>
           </div>
           <p className="mt-1 text-xs text-[color:var(--color-clinic-muted)]">
-            Cari alamat, klik pada peta, atau izinkan GPS untuk mendapatkan titik lokasi presisi Anda.
+            Data terverifikasi langsung dari Google Places API, OpenStreetMap, & sistem apotek resmi.
           </p>
         </div>
 
@@ -421,19 +444,23 @@ export function PharmacyMap() {
       </div>
 
       {/* Baris Pencarian Alamat & Penanda Lokasi Presisi */}
-      <div className="relative mb-4">
+      <div className="relative mb-3">
         <form onSubmit={handleAddressSearch} className="flex items-center gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input
               type="text"
-              placeholder="Cari lokasi Anda (misal: Tajur Bogor, Surabaya, Jl. Sudirman)..."
+              placeholder="Cari lokasi Anda (misal: Denpasar Bali, Bogor, Surabaya, Jl. Sudirman)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 text-xs rounded-xl border-slate-200"
             />
           </div>
-          <Button type="submit" size="sm" className="rounded-xl text-xs bg-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue-dark)]">
+          <Button
+            type="submit"
+            size="sm"
+            className="rounded-xl text-xs bg-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue-dark)]"
+          >
             {isSearching ? "Mencari..." : "Cari Alamat"}
           </Button>
         </form>
@@ -462,37 +489,67 @@ export function PharmacyMap() {
         )}
       </div>
 
-      {/* Info Status Akurasi Lokasi */}
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-50 px-3 py-2 text-[11px] text-slate-600 border border-slate-100">
-        <div className="flex items-center gap-1.5 font-medium">
-          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-          <span>Posisi Aktif: <strong className="text-slate-900">{locationSource}</strong></span>
+      {/* Info Status Akurasi Lokasi & Source Summary */}
+      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-1.5 font-medium text-[11px] text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+          <span>
+            Posisi Aktif: <strong className="text-slate-900">{locationSource}</strong>
+          </span>
           {userLocation && (
-            <span className="text-slate-400 font-mono text-[10px]">({userLocation[0].toFixed(5)}, {userLocation[1].toFixed(5)})</span>
+            <span className="text-slate-400 font-mono text-[10px]">
+              ({userLocation[0].toFixed(4)}, {userLocation[1].toFixed(4)})
+            </span>
           )}
         </div>
-        <span className="text-slate-400">💡 <em>Klik pada peta atau geser pin hijau untuk geser titik lokasi presisi</em></span>
+
+        <SourceSummaryBar sources={sourceStats} />
       </div>
 
       {locationError && (
-        <div className="mb-4 flex items-center gap-2 rounded-xl bg-amber-50 p-3 text-xs text-amber-800">
-          <MapPin className="h-4 w-4 shrink-0" />
+        <div className="mb-4 flex items-center gap-2 rounded-xl bg-amber-50 p-3 text-xs text-amber-800 border border-amber-200">
+          <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600" />
           <span>{locationError}</span>
         </div>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
-        <div className="relative min-h-[380px] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-inner md:min-h-[460px]">
-          {mapProvider === "leaflet" ? (
-            <LeafletMap
-              userLocation={userLocation}
-              pharmacies={pharmacies}
-              selectedPharmacy={selectedPharmacy}
-              routeInfo={routeInfo}
-              onSelectPharmacy={handleSelectPharmacy}
-              onLocationChange={handleManualLocationChange}
-            />
-          ) : isLoaded ? (
+      {/* OFFLINE / EMPTY STATE UI (Prompt 3: No dummy fake data) */}
+      {!loadingPharmacies && pharmacies.length === 0 && (
+        <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50/50 p-6 text-center animate-fade-up">
+          <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-amber-100 text-amber-700 mb-3">
+            <WifiOff className="h-6 w-6" />
+          </div>
+          <h4 className="text-sm font-bold text-slate-900 mb-1">
+            Data Apotek Tidak Ditemukan di Titik Ini
+          </h4>
+          <p className="text-xs text-slate-600 max-w-md mx-auto mb-4">
+            Semua sumber data online & offline belum menemukan fasilitas apotek terdaftar pada koordinat ini. Pastikan koneksi internet stabil atau geser ke pusat kota terdekat.
+          </p>
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <Button
+              size="sm"
+              onClick={() => userLocation && loadPharmacies(userLocation[0], userLocation[1])}
+              className="gap-1.5 rounded-xl text-xs bg-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue-dark)]"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Coba Lagi
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={getUserGeolocation}
+              className="gap-1.5 rounded-xl text-xs border-slate-300"
+            >
+              <MapPin className="h-3.5 w-3.5 text-emerald-600" />
+              Gunakan GPS Presisi
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
+        <div className="relative min-h-[380px] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-inner md:min-h-[480px]">
+          {isLoaded ? (
             <GoogleMap
               mapContainerStyle={containerStyle}
               center={mapCenter}
@@ -538,16 +595,23 @@ export function PharmacyMap() {
                         setShowCard(false);
                       }}
                     >
-                      <div className="p-1.5 font-sans text-xs max-w-[200px]">
+                      <div className="p-1.5 font-sans text-xs max-w-[220px]">
                         <strong className="block font-bold text-slate-900">{pharm.name}</strong>
-                        {pharm.rating && (
-                          <span className="block text-amber-600 font-semibold mt-0.5">
-                            ⭐ {pharm.rating} ({pharm.userRatingsTotal || 0})
+                        <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                          {pharm.rating && (
+                            <span className="text-amber-600 font-semibold">
+                              ⭐ {pharm.rating} ({pharm.userRatingsTotal || 0})
+                            </span>
+                          )}
+                          <span className="text-slate-500">• ~{pharm.distanceKm} km</span>
+                        </div>
+                        {pharm.openingHoursText && (
+                          <span className="block text-emerald-700 font-medium mt-1">
+                            🕒 {pharm.openingHoursText}
                           </span>
                         )}
-                        <span className="block text-slate-500 mt-0.5">Jarak: ~{pharm.distanceKm} km</span>
                         {pharm.address && (
-                          <span className="block text-[11px] text-slate-400 mt-0.5 line-clamp-2">
+                          <span className="block text-[11px] text-slate-500 mt-1 line-clamp-2">
                             {pharm.address}
                           </span>
                         )}
@@ -567,7 +631,7 @@ export function PharmacyMap() {
           )}
         </div>
 
-        <div className="flex flex-col gap-3 max-h-[460px] overflow-y-auto pr-1">
+        <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto pr-1">
           <RouteOverlayCard
             selectedPharmacy={showCard ? selectedPharmacy : null}
             routeInfo={routeInfo}
