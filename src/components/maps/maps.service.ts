@@ -12,6 +12,8 @@ import {
 export const DEFAULT_CENTER: [number, number] = [-6.2088, 106.8456]; // Jakarta Pusat
 
 export type TransportMode = "driving" | "motorcycle";
+export type FacilityType = "pharmacy" | "hospital" | "clinic";
+export type DangerLevelType = "rendah" | "sedang" | "tinggi";
 
 export interface PharmacyNode {
   id: number | string;
@@ -30,6 +32,7 @@ export interface PharmacyNode {
   operatingHours?: OperatingHours;
   phone?: string;
   whatsappNumber?: string;
+  facilityType?: FacilityType;
   _dataSource?: "google" | "osm" | "gemini" | "cache" | "unknown";
   _dataSourceLabel?: string;
   _trustScore?: number;
@@ -49,11 +52,44 @@ export interface GeocodeResult {
   lon: number;
 }
 
+export function detectFacilityType(name: string, typeTag = ""): FacilityType {
+  const lower = (name + " " + typeTag).toLowerCase();
+  if (
+    lower.includes("rumah sakit") ||
+    lower.includes("rsud") ||
+    lower.includes("rs ") ||
+    lower.includes("rs.") ||
+    lower.includes("hospital") ||
+    lower.includes("igd") ||
+    lower.includes("siloam") ||
+    lower.includes("hermina") ||
+    lower.includes("mayapada") ||
+    lower.includes("mitra keluarga") ||
+    lower.includes("advent") ||
+    lower.includes("bhayangkara")
+  ) {
+    return "hospital";
+  }
+  if (
+    lower.includes("klinik") ||
+    lower.includes("clinic") ||
+    lower.includes("puskesmas") ||
+    lower.includes("praktek dokter") ||
+    lower.includes("balai pengobatan")
+  ) {
+    return "clinic";
+  }
+  return "pharmacy";
+}
+
 export async function searchLocationByAddress(query: string): Promise<GeocodeResult[]> {
   if (!query || query.trim().length < 2) return [];
 
-  // 1. Coba Google Maps Geocoder jika API sudah termuat di client
+  const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
+
+  // 1. Coba Google Maps Geocoder jika API Key tersedia
   if (
+    googleApiKey &&
     typeof window !== "undefined" &&
     window.google &&
     window.google.maps &&
@@ -82,7 +118,7 @@ export async function searchLocationByAddress(query: string): Promise<GeocodeRes
         }));
       }
     } catch {
-      // Fallback to Nominatim
+      // fallback to OSM Nominatim
     }
   }
 
@@ -151,10 +187,19 @@ export async function reverseGeocode(lat: number, lon: number): Promise<string |
 export async function fetchNominatimPharmacies(
   lat: number,
   lon: number,
+  dangerLevel: DangerLevelType = "rendah"
 ): Promise<PharmacyNode[]> {
-  console.log(`[OSM NOMINATIM] Fetching real pharmacies for coords: [${lat}, ${lon}]`);
-  const QUERIES = ["apotek", "pharmacy", "kimia farma", "k-24", "guardian", "century"];
-  const DELTA_STEPS = [0.04, 0.1, 0.2];
+  console.log(`[OSM NOMINATIM] Fetching real facilities for coords: [${lat}, ${lon}] (Triage: ${dangerLevel})`);
+
+  let QUERIES = ["apotek", "pharmacy", "kimia farma", "k-24", "guardian", "century"];
+  if (dangerLevel === "tinggi") {
+    QUERIES = ["rumah sakit", "rsud", "hospital", "igd", "puskesmas", "klinik", "apotek 24 jam", "k-24"];
+  } else if (dangerLevel === "sedang") {
+    QUERIES = ["apotek", "klinik", "puskesmas", "rumah sakit", "k-24", "kimia farma"];
+  }
+
+  const DELTA_STEPS = [0.05, 0.12, 0.22];
+  const allResults: PharmacyNode[] = [];
 
   for (const delta of DELTA_STEPS) {
     const viewbox = `${lon - delta},${lat + delta},${lon + delta},${lat - delta}`;
@@ -174,18 +219,19 @@ export async function fetchNominatimPharmacies(
         const data = await res.json();
         if (!Array.isArray(data) || data.length === 0) continue;
 
-        const pharmacies: PharmacyNode[] = data
+        const nodes: PharmacyNode[] = data
           .map((item: any, index: number): PharmacyNode | null => {
             const pLat = parseFloat(item.lat);
             const pLon = parseFloat(item.lon);
             if (isNaN(pLat) || isNaN(pLon)) return null;
 
             const distanceKm = haversineDistance([lat, lon], [pLat, pLon]);
-            if (distanceKm > 35) return null;
+            if (distanceKm > 40) return null;
 
             const nameParts = (item.display_name || "").split(",");
-            const rawCleanName = item.name || nameParts[0] || `Apotek ${index + 1}`;
+            const rawCleanName = item.name || nameParts[0] || `Fasilitas Kesehatan ${index + 1}`;
             const address = nameParts.slice(1, 4).join(", ").trim() || item.display_name;
+            const facilityType = detectFacilityType(rawCleanName, item.type || "");
 
             return {
               id: `nom-${item.place_id || index}`,
@@ -196,23 +242,51 @@ export async function fetchNominatimPharmacies(
               distanceKm: Number(distanceKm.toFixed(2)),
               isOpenNow: true,
               openingStatus: "open",
-              openingHoursText: "Buka",
+              openingHoursText: facilityType === "hospital" ? "Buka 24 Jam (IGD)" : "Buka",
+              facilityType,
               _dataSource: "osm",
-              _dataSourceLabel: "OpenStreetMap (Real API)",
+              _dataSourceLabel: facilityType === "hospital" ? "Rumah Sakit (Real OSM)" : "Apotek (Real OSM)",
               _trustScore: 8,
             };
           })
           .filter((p): p is PharmacyNode => p !== null);
 
-        if (pharmacies.length > 0) {
-          pharmacies.sort((a, b) => a.distanceKm - b.distanceKm);
-          console.log(`[OSM NOMINATIM] Successfully returned ${pharmacies.length} real pharmacies from OpenStreetMap.`);
-          return pharmacies.slice(0, 10);
+        for (const n of nodes) {
+          const isDuplicate = allResults.some(
+            (u) => haversineDistance([u.lat, u.lon], [n.lat, n.lon]) < 0.05 || u.name.toLowerCase() === n.name.toLowerCase()
+          );
+          if (!isDuplicate) {
+            allResults.push(n);
+          }
+        }
+
+        if (allResults.length >= 8) {
+          break;
         }
       } catch {
-        // continue to next query
+        // continue
       }
     }
+
+    if (allResults.length >= 6) {
+      break;
+    }
+  }
+
+  if (allResults.length > 0) {
+    // Sort according to priority:
+    // If high danger: prioritize hospitals & clinics first, then pharmacies
+    if (dangerLevel === "tinggi") {
+      allResults.sort((a, b) => {
+        const aScore = a.facilityType === "hospital" ? 0 : a.facilityType === "clinic" ? 1 : 2;
+        const bScore = b.facilityType === "hospital" ? 0 : b.facilityType === "clinic" ? 1 : 2;
+        if (aScore !== bScore) return aScore - bScore;
+        return a.distanceKm - b.distanceKm;
+      });
+    } else {
+      allResults.sort((a, b) => a.distanceKm - b.distanceKm);
+    }
+    return allResults.slice(0, 12);
   }
 
   return [];
@@ -224,8 +298,16 @@ export async function fetchNominatimPharmacies(
 export async function fetchOverpassPharmacies(
   lat: number,
   lon: number,
+  dangerLevel: DangerLevelType = "rendah"
 ): Promise<PharmacyNode[]> {
-  const query = `[out:json][timeout:6];(node["amenity"="pharmacy"](around:5000,${lat},${lon});node["healthcare"="pharmacy"](around:5000,${lat},${lon});node["name"~"Apotek|Kimia Farma|K-24|Guardian|Century",i](around:5000,${lat},${lon}););out center 15;`;
+  const amenityFilter =
+    dangerLevel === "tinggi"
+      ? 'node["amenity"="hospital"](around:8000,${lat},${lon});node["amenity"="clinic"](around:8000,${lat},${lon});node["amenity"="pharmacy"](around:8000,${lat},${lon});'
+      : dangerLevel === "sedang"
+      ? 'node["amenity"="pharmacy"](around:6000,${lat},${lon});node["amenity"="clinic"](around:6000,${lat},${lon});node["amenity"="hospital"](around:6000,${lat},${lon});'
+      : 'node["amenity"="pharmacy"](around:5000,${lat},${lon});node["healthcare"="pharmacy"](around:5000,${lat},${lon});';
+
+  const query = `[out:json][timeout:6];(${amenityFilter.replace(/\$\{lat\}/g, String(lat)).replace(/\$\{lon\}/g, String(lon))});out center 15;`;
   const endpoint = "https://overpass-api.de/api/interpreter";
 
   try {
@@ -244,13 +326,14 @@ export async function fetchOverpassPharmacies(
         const distanceKm = haversineDistance([lat, lon], [pLat, pLon]);
         const tags = el.tags || {};
         const rawName = tags.name || tags["name:id"] || tags.brand || tags.operator;
-        const name = rawName ? rawName : `Apotek Terdekat ${index + 1}`;
+        const name = rawName ? rawName : `Fasilitas Kesehatan ${index + 1}`;
 
         const street = tags["addr:street"] || tags["addr:full"] || "";
         const suburb = tags["addr:subdistrict"] || tags["addr:city"] || "";
         const address = [street, suburb].filter(Boolean).join(", ") || `Jl. Sekitar (${pLat.toFixed(4)}, ${pLon.toFixed(4)})`;
 
         const parsedHours = parseOpeningHours(undefined, tags.opening_hours);
+        const facilityType = detectFacilityType(name, tags.amenity || tags.healthcare || "");
 
         return {
           id: `osm-${el.id || index}`,
@@ -262,12 +345,13 @@ export async function fetchOverpassPharmacies(
           rating: tags.stars ? parseFloat(tags.stars) : undefined,
           isOpenNow: parsedHours.isOpenNow,
           openingStatus: parsedHours.openingStatus,
-          openingHoursText: parsedHours.openingHoursText,
+          openingHoursText: facilityType === "hospital" ? "Buka 24 Jam (IGD)" : parsedHours.openingHoursText,
           hoursUntilClose: parsedHours.hoursUntilClose,
           operatingHours: parsedHours.operatingHours,
           phone: tags.phone || tags["contact:phone"],
+          facilityType,
           _dataSource: "osm" as const,
-          _dataSourceLabel: "OpenStreetMap (Overpass)",
+          _dataSourceLabel: facilityType === "hospital" ? "Rumah Sakit (Overpass)" : "Apotek (Overpass)",
           _trustScore: 8,
         };
       })
@@ -281,25 +365,21 @@ export async function fetchOverpassPharmacies(
 }
 
 /**
- * Modern Real Data Pipeline for Nearby Pharmacies:
- * 1. OpenStreetMap Nominatim POI Search (PRIMARY REAL DATA - Fast & Reliable)
- * 2. OpenStreetMap Overpass API (SECONDARY REAL DATA)
- * 3. Local Storage Offline Cache (< 6 hours old)
- * 4. Google Places API (If API key provided)
- * 5. Gemini AI Search (Supplemental Fallback)
- * 6. Clean Empty State (NO DUMMY DATA)
+ * Modern Real Data Pipeline for Nearby Facilities:
+ * Adapts search based on illness danger level (Apotek vs Rumah Sakit & Klinik)
  */
 export async function fetchNearbyPharmacies(
   lat: number,
   lon: number,
   mapInstance?: google.maps.Map,
   address?: string,
+  dangerLevel: DangerLevelType = "rendah"
 ): Promise<PharmacyNode[]> {
-  console.log(`[MAPS PIPELINE] Initiating real pharmacy search for [${lat}, ${lon}] (${address || "Tanpa Alamat"})`);
+  console.log(`[MAPS PIPELINE] Initiating real facility search for [${lat}, ${lon}] (${address || "Tanpa Alamat"}) - Triage: ${dangerLevel}`);
 
-  // 1. PRIMARY: OpenStreetMap Nominatim POI Search (Instant Real Data in Indonesia)
+  // 1. PRIMARY: OpenStreetMap Nominatim POI Search (Instant Real Data)
   try {
-    const nominatimResults = await fetchNominatimPharmacies(lat, lon);
+    const nominatimResults = await fetchNominatimPharmacies(lat, lon, dangerLevel);
     if (nominatimResults && nominatimResults.length > 0) {
       savePharmaciesToCache(lat, lon, nominatimResults, address);
       return nominatimResults;
@@ -310,7 +390,7 @@ export async function fetchNearbyPharmacies(
 
   // 2. SECONDARY: OpenStreetMap Overpass API
   try {
-    const overpassResults = await fetchOverpassPharmacies(lat, lon);
+    const overpassResults = await fetchOverpassPharmacies(lat, lon, dangerLevel);
     if (overpassResults && overpassResults.length > 0) {
       savePharmaciesToCache(lat, lon, overpassResults, address);
       return overpassResults;
@@ -325,7 +405,7 @@ export async function fetchNearbyPharmacies(
     return cachedPharmacies;
   }
 
-  // 4. TERTIARY: Google Places API (jika API key terpasang di .env)
+  // 4. TERTIARY: Google Places API (if API key available)
   try {
     const googlePlacesResults = await searchPharmaciesViaGooglePlaces({
       data: { lat, lon, radius: 5000, address },
@@ -349,7 +429,7 @@ export async function fetchNearbyPharmacies(
     // skip
   }
 
-  // 6. NO DUMMY DATA
+  // 6. Clean Empty State (NO DUMMY DATA)
   return [];
 }
 

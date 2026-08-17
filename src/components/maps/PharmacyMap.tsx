@@ -7,6 +7,11 @@ import {
   CheckCircle2,
   AlertTriangle,
   WifiOff,
+  Building2,
+  ShieldAlert,
+  ShieldCheck,
+  ShieldQuestion,
+  Pill,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +27,7 @@ import {
   type PharmacyNode,
   type RouteInfo,
   type TransportMode,
+  type DangerLevelType,
 } from "./maps.service";
 import { PharmacyList, RouteOverlayCard } from "./PharmacyList";
 import { SourceSummaryBar } from "./SourceBadge";
@@ -100,7 +106,15 @@ function MapRouteRenderer({
   return null;
 }
 
-export function PharmacyMap() {
+interface PharmacyMapProps {
+  dangerLevel?: DangerLevelType;
+  conditionName?: string;
+}
+
+export function PharmacyMap({
+  dangerLevel = "rendah",
+  conditionName,
+}: PharmacyMapProps) {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [loadingLocation, setLoadingLocation] = useState<boolean>(false);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -122,7 +136,6 @@ export function PharmacyMap() {
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
 
   const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
-  const [mapProvider] = useState<"leaflet" | "google">("google");
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
 
@@ -136,7 +149,7 @@ export function PharmacyMap() {
     setMap(mapInstance);
     if (userLocation) {
       mapInstance.panTo({ lat: userLocation[0], lng: userLocation[1] });
-      mapInstance.setZoom(15);
+      mapInstance.setZoom(14);
     }
   }, [userLocation]);
 
@@ -162,7 +175,7 @@ export function PharmacyMap() {
       setLoadingLocation(false);
       if (map) {
         map.panTo({ lat: coords[0], lng: coords[1] });
-        map.setZoom(15);
+        map.setZoom(14);
       }
       let addressName = "";
       try {
@@ -170,7 +183,7 @@ export function PharmacyMap() {
         if (addressName) {
           setSearchQuery(addressName);
         }
-      } catch (e) {
+      } catch {
         // ignore
       }
       loadPharmacies(coords[0], coords[1], addressName);
@@ -253,7 +266,7 @@ export function PharmacyMap() {
 
     if (map) {
       map.panTo({ lat: result.lat, lng: result.lon });
-      map.setZoom(15);
+      map.setZoom(14);
     }
     await loadPharmacies(coords[0], coords[1], result.displayname);
   };
@@ -292,7 +305,7 @@ export function PharmacyMap() {
     setLoadingPharmacies(true);
     try {
       const currentAddress = addressName || searchQuery;
-      const nodes = await fetchNearbyPharmacies(lat, lon, map || undefined, currentAddress);
+      const nodes = await fetchNearbyPharmacies(lat, lon, map || undefined, currentAddress, dangerLevel);
       setPharmacies(nodes);
     } catch (err) {
       console.error("Fetch Pharmacies Error:", err);
@@ -414,6 +427,7 @@ export function PharmacyMap() {
 
   return (
     <div className="animate-fade-up mt-6 rounded-2xl bg-white p-5 shadow-[var(--shadow-clinic-lg)]">
+      {/* Header Utama Maps */}
       <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <div className="flex items-center gap-2">
@@ -421,11 +435,15 @@ export function PharmacyMap() {
               <Compass className="h-4 w-4" />
             </span>
             <h3 className="font-display text-base font-bold text-[color:var(--color-clinic-ink)]">
-              Peta Apotek Terdekat & Rute Real-Time
+              {dangerLevel === "tinggi"
+                ? "Peta Rujukan Rumah Sakit & Fasilitas Kesehatan"
+                : dangerLevel === "sedang"
+                ? "Peta Apotek & Rekomendasi Klinik Terdekat"
+                : "Peta Apotek Terdekat & Rute Real-Time"}
             </h3>
           </div>
           <p className="mt-1 text-xs text-[color:var(--color-clinic-muted)]">
-            Data terverifikasi langsung dari Google Places API, OpenStreetMap, & sistem apotek resmi.
+            Data terverifikasi komunitas OpenStreetMap resmi & sistem navigasi rute terpadu.
           </p>
         </div>
 
@@ -442,6 +460,51 @@ export function PharmacyMap() {
           </Button>
         </div>
       </div>
+
+      {/* Triage Recommendation Banner Berdasarkan Tingkat Bahaya */}
+      {dangerLevel === "tinggi" ? (
+        <div className="mb-4 flex items-start gap-3 rounded-2xl border-2 border-red-300 bg-red-50/90 p-4 animate-pulse">
+          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-red-600 text-white">
+            <ShieldAlert className="h-5 w-5" />
+          </div>
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-red-800">
+              🚨 PERINGATAN DARURAT: Segera ke Rumah Sakit / IGD Terdekat!
+            </h4>
+            <p className="mt-1 text-xs text-red-700/90 leading-relaxed">
+              Kondisi <strong>{conditionName || "ini"}</strong> tergolong berbahaya dan membutuhkan penanganan medis segera oleh dokter profesional. Peta memprioritaskan rute tercepat menuju <strong>Instalasi Gawat Darurat (IGD) & Rumah Sakit Terdekat</strong>.
+            </p>
+          </div>
+        </div>
+      ) : dangerLevel === "sedang" ? (
+        <div className="mb-4 flex items-start gap-3 rounded-2xl border border-amber-300 bg-amber-50/80 p-4">
+          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-amber-500 text-white">
+            <ShieldQuestion className="h-5 w-5" />
+          </div>
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-amber-800">
+              ⚠️ Perlu Diperhatikan: Apotek & Rekomendasi Klinik / RS
+            </h4>
+            <p className="mt-1 text-xs text-amber-700/90 leading-relaxed">
+              Kondisi <strong>{conditionName || "ini"}</strong> memerlukan kewaspadaan. Anda dapat membeli obat yang dianjurkan di apotek terdekat, namun <strong>sangat disarankan memeriksakan diri ke Klinik atau Rumah Sakit terdekat</strong> jika keluhan tidak mereda dalam 1-2 hari.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="mb-4 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-3.5">
+          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-emerald-600 text-white">
+            <ShieldCheck className="h-5 w-5" />
+          </div>
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+              🟢 Kondisi Aman: Disarankan Mengunjungi Apotek Terdekat
+            </h4>
+            <p className="mt-0.5 text-xs text-emerald-700/90 leading-relaxed">
+              Kondisi <strong>{conditionName || "ini"}</strong> tergolong aman untuk perawatan mandiri. Anda disarankan mengunjungi apotek terdekat untuk mendapatkan obat bebas atau suplemen yang direkomendasikan.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Baris Pencarian Alamat & Penanda Lokasi Presisi */}
       <div className="relative mb-3">
@@ -513,17 +576,17 @@ export function PharmacyMap() {
         </div>
       )}
 
-      {/* OFFLINE / EMPTY STATE UI (Prompt 3: No dummy fake data) */}
+      {/* OFFLINE / EMPTY STATE UI */}
       {!loadingPharmacies && pharmacies.length === 0 && (
         <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50/50 p-6 text-center animate-fade-up">
           <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-amber-100 text-amber-700 mb-3">
             <WifiOff className="h-6 w-6" />
           </div>
           <h4 className="text-sm font-bold text-slate-900 mb-1">
-            Data Apotek Tidak Ditemukan di Titik Ini
+            Data Fasilitas Kesehatan Tidak Ditemukan di Titik Ini
           </h4>
           <p className="text-xs text-slate-600 max-w-md mx-auto mb-4">
-            Semua sumber data online & offline belum menemukan fasilitas apotek terdaftar pada koordinat ini. Pastikan koneksi internet stabil atau geser ke pusat kota terdekat.
+            Semua sumber data online & offline belum menemukan fasilitas terdaftar pada koordinat ini. Pastikan koneksi internet stabil atau geser ke pusat kota terdekat.
           </p>
           <div className="flex items-center justify-center gap-2 flex-wrap">
             <Button
@@ -581,57 +644,72 @@ export function PharmacyMap() {
                 />
               )}
 
-              {pharmacies.map((pharm) => (
-                <Marker
-                  key={pharm.id}
-                  position={{ lat: pharm.lat, lng: pharm.lon }}
-                  onClick={() => handleSelectPharmacy(pharm)}
-                >
-                  {activeMarker === pharm.id && (
-                    <InfoWindow
-                      position={{ lat: pharm.lat, lng: pharm.lon }}
-                      onCloseClick={() => {
-                        setActiveMarker(null);
-                        setShowCard(false);
-                      }}
-                    >
-                      <div className="p-1.5 font-sans text-xs max-w-[220px]">
-                        <strong className="block font-bold text-slate-900">{pharm.name}</strong>
-                        <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-                          {pharm.rating && (
-                            <span className="text-amber-600 font-semibold">
-                              ⭐ {pharm.rating} ({pharm.userRatingsTotal || 0})
+              {pharmacies.map((pharm) => {
+                const isHospital = pharm.facilityType === "hospital";
+                const isClinic = pharm.facilityType === "clinic";
+                const markerIconUrl = isHospital
+                  ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                  : isClinic
+                  ? "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                  : "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+
+                return (
+                  <Marker
+                    key={pharm.id}
+                    position={{ lat: pharm.lat, lng: pharm.lon }}
+                    onClick={() => handleSelectPharmacy(pharm)}
+                    icon={{ url: markerIconUrl }}
+                  >
+                    {activeMarker === pharm.id && (
+                      <InfoWindow
+                        position={{ lat: pharm.lat, lng: pharm.lon }}
+                        onCloseClick={() => {
+                          setActiveMarker(null);
+                          setShowCard(false);
+                        }}
+                      >
+                        <div className="p-1.5 font-sans text-xs max-w-[220px]">
+                          <strong className="block font-bold text-slate-900">{pharm.name}</strong>
+                          <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                            <span className={`font-bold px-1.5 py-0.2 rounded-sm text-[9px] ${
+                              isHospital
+                                ? "bg-red-100 text-red-700"
+                                : isClinic
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-emerald-100 text-emerald-700"
+                            }`}>
+                              {isHospital ? "🏥 Rumah Sakit" : isClinic ? "🩺 Klinik" : "💊 Apotek"}
+                            </span>
+                            <span className="text-slate-500">• ~{pharm.distanceKm} km</span>
+                          </div>
+                          {pharm.openingHoursText && (
+                            <span className={`block font-medium mt-1 ${isHospital ? "text-red-700" : "text-emerald-700"}`}>
+                              🕒 {pharm.openingHoursText}
                             </span>
                           )}
-                          <span className="text-slate-500">• ~{pharm.distanceKm} km</span>
+                          {pharm.address && (
+                            <span className="block text-[11px] text-slate-500 mt-1 line-clamp-2">
+                              {pharm.address}
+                            </span>
+                          )}
                         </div>
-                        {pharm.openingHoursText && (
-                          <span className="block text-emerald-700 font-medium mt-1">
-                            🕒 {pharm.openingHoursText}
-                          </span>
-                        )}
-                        {pharm.address && (
-                          <span className="block text-[11px] text-slate-500 mt-1 line-clamp-2">
-                            {pharm.address}
-                          </span>
-                        )}
-                      </div>
-                    </InfoWindow>
-                  )}
-                </Marker>
-              ))}
+                      </InfoWindow>
+                    )}
+                  </Marker>
+                );
+              })}
 
               <MapRouteRenderer map={map} routeInfo={routeInfo} />
             </GoogleMap>
           ) : (
             <div className="flex h-full min-h-[340px] flex-col items-center justify-center gap-2 text-xs text-slate-500">
               <RefreshCw className="h-5 w-5 animate-spin text-blue-600" />
-              <span>Memuat Google Maps...</span>
+              <span>Memuat Peta Fasilitas Kesehatan...</span>
             </div>
           )}
         </div>
 
-        <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto pr-1">
+        <div className="flex flex-col gap-3 min-w-0">
           <RouteOverlayCard
             selectedPharmacy={showCard ? selectedPharmacy : null}
             routeInfo={routeInfo}
@@ -649,6 +727,7 @@ export function PharmacyMap() {
             pharmacies={pharmacies}
             loadingPharmacies={loadingPharmacies}
             selectedPharmacy={selectedPharmacy}
+            dangerLevel={dangerLevel}
             onSelectPharmacy={handleSelectPharmacy}
           />
         </div>

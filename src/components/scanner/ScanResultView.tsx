@@ -229,8 +229,11 @@ export function ScanResultView({
         </Section>
       </div>
 
-      {/* Peta Apotek Terdekat & Rute Jalan */}
-      <PharmacyMap />
+      {/* Peta Fasilitas Kesehatan / Apotek / Rumah Sakit Terdekat */}
+      <PharmacyMap
+        dangerLevel={result.tingkat_bahaya}
+        conditionName={result.nama_penyakit}
+      />
 
       {result.catatan_tambahan && (
         <p
