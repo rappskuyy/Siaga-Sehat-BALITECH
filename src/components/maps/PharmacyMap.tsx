@@ -157,11 +157,34 @@ export function PharmacyMap({
     setMap(null);
   }, []);
 
+  const SAVED_LOCATION_KEY = "siaga_user_chosen_location";
+
   useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(SAVED_LOCATION_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed.coords) && parsed.coords.length === 2) {
+          setUserLocation(parsed.coords);
+          setLocationSource(parsed.source || "Titik Pilihan Anda");
+          if (parsed.address) setSearchQuery(parsed.address);
+          loadPharmacies(parsed.coords[0], parsed.coords[1], parsed.address);
+          return;
+        }
+      }
+    } catch {
+      // ignore
+    }
     getUserGeolocation();
   }, []);
 
-  const getUserGeolocation = async () => {
+  const getUserGeolocation = async (isManualClick = false) => {
+    if (isManualClick) {
+      try {
+        sessionStorage.removeItem(SAVED_LOCATION_KEY);
+      } catch {}
+    }
+
     setLoadingLocation(true);
     setLocationError(null);
     setSearchResults([]);
@@ -189,19 +212,10 @@ export function PharmacyMap({
       loadPharmacies(coords[0], coords[1], addressName);
     };
 
-    // Ambil perkiraan lokasi IP secara instan
-    let hasFastLocation = false;
-    fetchIPLocation().then((ipCoords) => {
-      if (ipCoords && !hasFastLocation) {
-        updateLocation(ipCoords, "Perkiraan Lokasi Anda (Jaringan/IP)");
-      }
-    });
-
     if (!navigator.geolocation) {
       const ipCoords = await fetchIPLocation();
       if (ipCoords) {
-        hasFastLocation = true;
-        await updateLocation(ipCoords, "Lokasi IP");
+        await updateLocation(ipCoords, "Lokasi Jaringan (IP)");
       } else {
         await updateLocation(DEFAULT_CENTER, "Lokasi Default (Jakarta)");
       }
@@ -210,7 +224,6 @@ export function PharmacyMap({
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        hasFastLocation = true;
         const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
         await updateLocation(coords, "GPS Presisi (Lokasi Anda)");
       },
@@ -218,7 +231,6 @@ export function PharmacyMap({
         console.warn("Geolocation API error, trying IP location fallback:", err);
         const ipCoords = await fetchIPLocation();
         if (ipCoords) {
-          hasFastLocation = true;
           await updateLocation(ipCoords, "Lokasi Jaringan (IP)");
           setLocationError(
             "GPS browser tidak merespons. Menggunakan perkiraan lokasi IP. Anda dapat mengklik peta untuk menggeser ke titik presisi."
@@ -264,6 +276,13 @@ export function PharmacyMap({
     setSelectedPharmacy(null);
     setRouteInfo(null);
 
+    try {
+      sessionStorage.setItem(
+        SAVED_LOCATION_KEY,
+        JSON.stringify({ coords, source: `Alamat (${result.displayname.slice(0, 30)}...)`, address: result.displayname })
+      );
+    } catch {}
+
     if (map) {
       map.panTo({ lat: result.lat, lng: result.lon });
       map.setZoom(14);
@@ -292,6 +311,17 @@ export function PharmacyMap({
       setLocationSource(`Pin Manual (${coords[0].toFixed(4)}, ${coords[1].toFixed(4)})`);
     }
 
+    try {
+      sessionStorage.setItem(
+        SAVED_LOCATION_KEY,
+        JSON.stringify({
+          coords,
+          source: newAddress ? `Pin (${newAddress.slice(0, 30)}...)` : `Pin Manual (${coords[0].toFixed(4)}, ${coords[1].toFixed(4)})`,
+          address: newAddress,
+        })
+      );
+    } catch {}
+
     await loadPharmacies(coords[0], coords[1], newAddress);
   };
 
@@ -307,6 +337,22 @@ export function PharmacyMap({
       const currentAddress = addressName || searchQuery;
       const nodes = await fetchNearbyPharmacies(lat, lon, map || undefined, currentAddress, dangerLevel);
       setPharmacies(nodes);
+
+      if (nodes.length > 0) {
+        let bestMatch: PharmacyNode | null = null;
+        if (dangerLevel === "tinggi") {
+          bestMatch = nodes.find((p) => p.facilityType === "hospital") || nodes[0];
+        } else {
+          bestMatch = nodes[0];
+        }
+
+        if (bestMatch) {
+          setSelectedPharmacy(bestMatch);
+          setActiveMarker(bestMatch.id);
+          setShowCard(true);
+          selectPharmacyAndRoute(bestMatch, transportMode, [lat, lon]);
+        }
+      }
     } catch (err) {
       console.error("Fetch Pharmacies Error:", err);
     } finally {
@@ -449,7 +495,7 @@ export function PharmacyMap({
 
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           <Button
-            onClick={getUserGeolocation}
+            onClick={() => getUserGeolocation(true)}
             variant="outline"
             size="sm"
             disabled={loadingLocation}
@@ -600,7 +646,7 @@ export function PharmacyMap({
             <Button
               size="sm"
               variant="outline"
-              onClick={getUserGeolocation}
+              onClick={() => getUserGeolocation(true)}
               className="gap-1.5 rounded-xl text-xs border-slate-300"
             >
               <MapPin className="h-3.5 w-3.5 text-emerald-600" />
