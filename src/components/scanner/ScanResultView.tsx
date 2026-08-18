@@ -17,6 +17,7 @@ import type { DangerLevel, ScanResult } from "@/lib/scanner/types";
 import { Button } from "@/components/ui/button";
 import { PharmacyMap } from "@/components/maps/PharmacyMap";
 import type { PlaceType } from "@/components/maps/maps.service";
+import { AiConsultation } from "./AiConsultation";
 
 const DANGER_STYLES: Record<
   DangerLevel,
@@ -246,14 +247,19 @@ export function ScanResultView({
       )}
 
       <div className="flex justify-center pt-2">
-        <Button
-          onClick={onReset}
-          variant="outline"
-          className="gap-2 rounded-full border-[color:var(--color-clinic-blue)]/30"
-        >
-          <RotateCcw className="h-4 w-4" />
-          Scan Foto Lain
-        </Button>
+        <div className="flex gap-3">
+          <AiConsultation
+            initialContext={`Nama kondisi: ${result.nama_penyakit}\nRingkasan: ${result.ringkasan}\nTingkat keyakinan: ${result.tingkat_keyakinan}`}
+          />
+          <Button
+            onClick={onReset}
+            variant="outline"
+            className="gap-2 rounded-full border-[color:var(--color-clinic-blue)]/30"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Scan Foto Lain
+          </Button>
+        </div>
       </div>
 
       <p className="flex items-center justify-center gap-1.5 text-center text-[11px] text-[color:var(--color-clinic-muted)]">

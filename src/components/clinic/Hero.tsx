@@ -46,6 +46,12 @@ export function Hero() {
             </a>
           ))}
           <Link
+            to="/consultation"
+            className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
+          >
+            Konsultasi
+          </Link>
+          <Link
             to="/scanner"
             className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue)] px-4 py-1.5 text-white transition hover:bg-[color:var(--color-clinic-blue-dark)]"
           >
@@ -109,6 +115,13 @@ export function Hero() {
             >
               <ScanLine className="h-4 w-4" />
               Scan AI
+            </Link>
+            <Link
+              to="/consultation"
+              onClick={() => setIsMenuOpen(false)}
+              className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-white/80 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
+            >
+              Konsultasi
             </Link>
           </nav>
         </div>
