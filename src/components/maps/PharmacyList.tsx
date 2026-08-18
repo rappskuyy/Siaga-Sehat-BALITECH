@@ -93,7 +93,7 @@ export function PharmacyList({
     : filteredPharmacies.slice(0, INITIAL_DISPLAY_COUNT);
 
   return (
-    <div className="flex flex-col gap-3 min-w-0 w-full">
+    <div className="flex flex-col gap-2.5 min-w-0 w-full h-full flex-1 overflow-hidden">
       {/* Header List */}
       <div className="flex items-center justify-between shrink-0 py-0.5">
         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
@@ -237,7 +237,7 @@ export function PharmacyList({
       )}
 
       {/* Daftar Fasilitas Scrollable */}
-      <div className="flex flex-col gap-2.5 max-h-[460px] overflow-y-auto pr-1">
+      <div className="flex flex-col gap-2.5 max-h-[460px] lg:max-h-none flex-1 min-h-0 overflow-y-auto pr-1">
         {loadingPharmacies ? (
           <div className="space-y-2">
             <div className="text-center py-2 text-xs text-blue-600 font-medium animate-pulse">

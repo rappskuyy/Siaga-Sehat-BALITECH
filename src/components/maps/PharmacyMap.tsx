@@ -37,7 +37,6 @@ import { SourceSummaryBar } from "./SourceBadge";
 const containerStyle = {
   width: "100%",
   height: "100%",
-  minHeight: "320px",
 };
 
 interface ExtendedRouteInfo extends RouteInfo {
@@ -712,8 +711,9 @@ export function PharmacyMap({
         </div>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
-        <div className="relative min-h-[380px] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-inner md:min-h-[480px]">
+      <div className="grid gap-5 items-start lg:grid-cols-[1fr_370px]">
+        {/* Frame Map dengan ukuran konsisten dan tidak berubah-ubah */}
+        <div className="relative h-[440px] sm:h-[500px] lg:h-[560px] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-inner">
           {isLoaded ? (
             <GoogleMap
               mapContainerStyle={containerStyle}
@@ -724,6 +724,7 @@ export function PharmacyMap({
               options={{
                 mapTypeControl: false,
                 streetViewControl: false,
+                fullscreenControl: true,
               }}
               onClick={(e) => {
                 if (e.latLng) {
@@ -811,7 +812,8 @@ export function PharmacyMap({
           )}
         </div>
 
-        <div className="flex flex-col gap-3 min-w-0">
+        {/* Sidebar Kanan dengan batas tinggi yang sama pada desktop */}
+        <div className="flex flex-col gap-3 min-w-0 w-full lg:h-[560px] lg:max-h-[560px] overflow-hidden">
           <RouteOverlayCard
             selectedPlace={showCard ? selectedPlace : null}
             routeInfo={routeInfo}
@@ -825,13 +827,15 @@ export function PharmacyMap({
             }}
           />
 
-          <PharmacyList
-            pharmacies={pharmacies}
-            loadingPharmacies={loadingPharmacies}
-            selectedPharmacy={selectedPharmacy}
-            dangerLevel={dangerLevel}
-            onSelectPharmacy={handleSelectPharmacy}
-          />
+          <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+            <PharmacyList
+              pharmacies={pharmacies}
+              loadingPharmacies={loadingPharmacies}
+              selectedPharmacy={selectedPharmacy}
+              dangerLevel={dangerLevel}
+              onSelectPharmacy={handleSelectPharmacy}
+            />
+          </div>
         </div>
       </div>
     </div>
