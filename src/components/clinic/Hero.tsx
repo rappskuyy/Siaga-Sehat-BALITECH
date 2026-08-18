@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { ArrowUpRight, Bell, Menu, Phone, Play, ScanLine, User, X } from "lucide-react";
+import { ArrowUpRight, Bell, LogIn, Menu, Play, ScanLine, User, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { FloatingBadge } from "./FloatingBadge";
 import fotodokter1 from "@/assets/fotodokter(1).png?url";
 import fotodokter2 from "@/assets/fotodokter(2).png?url";
+import { useAuth } from "@/lib/auth/auth-context";
 
 const AVATARS = [
   "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=faces",
@@ -21,6 +22,7 @@ const NAV_ITEMS = ["Tentang Kami", "Layanan", "Dokter", "Hubungi"];
 
 export function Hero() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, profile } = useAuth();
 
   return (
     <section className="relative w-full bg-white px-6 pt-0 pb-5 md:px-8 md:pt-1 md:pb-8 lg:px-10 lg:pt-2 lg:pb-10">
@@ -30,9 +32,6 @@ export function Hero() {
           <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue)]">
             <span className="h-2.5 w-2.5 rounded-full bg-white" />
           </div>
-          <span className="font-display text-lg font-bold tracking-tight text-[color:var(--color-clinic-ink)]">
-            SiagaSehat
-          </span>
         </div>
 
         <nav className="hidden items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2 py-1.5 text-sm text-[color:var(--color-clinic-ink)] lg:flex">
@@ -61,28 +60,58 @@ export function Hero() {
         </nav>
 
         <div className="flex items-center gap-3">
+          {!user ? (
+            <Link
+              to="/login"
+              className="hidden items-center gap-2 rounded-full bg-[color:var(--color-clinic-blue)] px-4 py-2 text-sm font-medium text-white shadow-lg shadow-[color:var(--color-clinic-blue)]/20 transition hover:bg-[color:var(--color-clinic-blue-dark)] md:inline-flex"
+            >
+              <LogIn className="h-4 w-4" />
+              Masuk
+            </Link>
+          ) : (
+            <div className="hidden items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm font-medium text-[color:var(--color-clinic-muted)] opacity-50 md:inline-flex">
+              <User className="h-4 w-4" />
+              Profil
+            </div>
+          )}
+
           <div className="hidden text-right text-xs leading-tight text-[color:var(--color-clinic-muted)] md:block">
             <div>Indonesia, Jawa Barat</div>
             <div>Kota Bogor</div>
           </div>
-          <button
-            className="hidden h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-clinic-ink)] text-white transition hover:bg-black/80 md:inline-flex"
-            aria-label="Call"
-          >
-            <Phone className="h-4 w-4" />
-          </button>
+
+          {user ? (
+            <Link
+              to="/profile"
+              className="hidden h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-clinic-ink)] text-white transition hover:bg-black/80 md:inline-flex"
+              aria-label="Profil"
+            >
+              <User className="h-4 w-4" />
+            </Link>
+          ) : (
+            <div className="hidden h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-muted)] opacity-50 md:inline-flex" aria-hidden="true">
+              <User className="h-4 w-4" />
+            </div>
+          )}
           <button
             className="hidden h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)]/20 md:inline-flex"
             aria-label="Notifikasi"
           >
             <Bell className="h-4 w-4" />
           </button>
-          <button
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-clinic-ink)] text-white transition hover:bg-black/80 lg:hidden"
-            aria-label="Akun"
-          >
-            <User className="h-4 w-4" />
-          </button>
+          {user ? (
+            <Link
+              to="/profile"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-clinic-ink)] text-white transition hover:bg-black/80 lg:hidden"
+              aria-label="Akun"
+            >
+              <User className="h-4 w-4" />
+            </Link>
+          ) : (
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-muted)] opacity-50 lg:hidden" aria-hidden="true">
+              <User className="h-4 w-4" />
+            </div>
+          )}
           <button
             type="button"
             onClick={() => setIsMenuOpen((open) => !open)}
@@ -123,6 +152,25 @@ export function Hero() {
             >
               Konsultasi
             </Link>
+            {user ? (
+              <Link
+                to="/profile"
+                onClick={() => setIsMenuOpen(false)}
+                className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl border border-black/10 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
+              >
+                <User className="h-4 w-4" />
+                Profil Saya
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setIsMenuOpen(false)}
+                className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[color:var(--color-clinic-blue)] px-3 py-2.5 text-sm font-medium text-white"
+              >
+                <LogIn className="h-4 w-4" />
+                Masuk
+              </Link>
+            )}
           </nav>
         </div>
       )}

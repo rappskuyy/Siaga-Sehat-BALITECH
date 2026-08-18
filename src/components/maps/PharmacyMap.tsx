@@ -18,12 +18,14 @@ import { Input } from "@/components/ui/input";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
 import {
   DEFAULT_CENTER,
+  fetchNearbyPharmacies,
   fetchNearbyPlaces,
   fetchOSRMRoute,
   fetchIPLocation,
   searchLocationByAddress,
   reverseGeocode,
   type GeocodeResult,
+  type PlaceNode,
   type PharmacyNode,
   type RouteInfo,
   type TransportMode,
@@ -122,7 +124,10 @@ export function PharmacyMap({
 
   const [places, setPlaces] = useState<PlaceNode[]>([]);
   const [loadingPlaces, setLoadingPlaces] = useState<boolean>(false);
+  const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(false);
+  const [pharmacies, setPharmacies] = useState<PharmacyNode[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<PlaceNode | null>(null);
+  const [selectedPharmacy, setSelectedPharmacy] = useState<PharmacyNode | null>(null);
   const [activeMarker, setActiveMarker] = useState<number | string | null>(null);
 
   const [transportMode, setTransportMode] = useState<TransportMode>("driving");
@@ -273,6 +278,7 @@ export function PharmacyMap({
     setLocationSource(`Alamat (${result.displayname.slice(0, 30)}...)`);
     setShowSearchResults(false);
     setSearchQuery(result.displayname);
+    setSelectedPlace(null);
     setSelectedPharmacy(null);
     setRouteInfo(null);
 
@@ -341,12 +347,36 @@ export function PharmacyMap({
       if (nodes.length > 0) {
         let bestMatch: PharmacyNode | null = null;
         if (dangerLevel === "tinggi") {
-          bestMatch = nodes.find((p) => p.facilityType === "hospital") || nodes[0];
+          bestMatch = nodes.find((p: PharmacyNode) => p.facilityType === "hospital") || nodes[0];
         } else {
           bestMatch = nodes[0];
         }
 
         if (bestMatch) {
+          const matchedPlace: PlaceNode = {
+            id: bestMatch.id,
+            placeType: bestMatch.facilityType === "hospital" ? "hospital" : "pharmacy",
+            lat: bestMatch.lat,
+            lon: bestMatch.lon,
+            name: bestMatch.name,
+            address: bestMatch.address,
+            distanceKm: bestMatch.distanceKm,
+            rating: bestMatch.rating,
+            userRatingsTotal: bestMatch.userRatingsTotal,
+            openingHoursText: bestMatch.openingHoursText,
+            isOpenNow: bestMatch.isOpenNow,
+            openingStatus: bestMatch.openingStatus,
+            operatingHours: bestMatch.operatingHours,
+            phone: bestMatch.phone,
+            whatsappNumber: bestMatch.whatsappNumber,
+            facilityType: bestMatch.facilityType,
+            _dataSource: bestMatch._dataSource,
+            _dataSourceLabel: bestMatch._dataSourceLabel,
+            _trustScore: bestMatch._trustScore,
+            _cacheAge: bestMatch._cacheAge,
+          };
+
+          setSelectedPlace(matchedPlace);
           setSelectedPharmacy(bestMatch);
           setActiveMarker(bestMatch.id);
           setShowCard(true);
@@ -356,33 +386,59 @@ export function PharmacyMap({
     } catch (err) {
       console.error("Fetch Places Error:", err);
     } finally {
+      setLoadingPharmacies(false);
       setLoadingPlaces(false);
     }
   };
 
   const [showCard, setShowCard] = useState<boolean>(false);
 
-  const handleSelectPlace = (place: PlaceNode | null) => {
-    if (!place) {
+  const handleSelectPharmacy = (pharmacy: PharmacyNode | null) => {
+    if (!pharmacy) {
       setShowCard(false);
       setActiveMarker(null);
+      setSelectedPlace(null);
       setSelectedPharmacy(null);
       setRouteInfo(null);
       return;
     }
 
+    const place: PlaceNode = {
+      id: pharmacy.id,
+      placeType: pharmacy.facilityType === "hospital" ? "hospital" : "pharmacy",
+      lat: pharmacy.lat,
+      lon: pharmacy.lon,
+      name: pharmacy.name,
+      address: pharmacy.address,
+      distanceKm: pharmacy.distanceKm,
+      rating: pharmacy.rating,
+      userRatingsTotal: pharmacy.userRatingsTotal,
+      openingHoursText: pharmacy.openingHoursText,
+      isOpenNow: pharmacy.isOpenNow,
+      openingStatus: pharmacy.openingStatus,
+      operatingHours: pharmacy.operatingHours,
+      phone: pharmacy.phone,
+      whatsappNumber: pharmacy.whatsappNumber,
+      facilityType: pharmacy.facilityType,
+      _dataSource: pharmacy._dataSource,
+      _dataSourceLabel: pharmacy._dataSourceLabel,
+      _trustScore: pharmacy._trustScore,
+      _cacheAge: pharmacy._cacheAge,
+    };
+
+    setSelectedPlace(place);
     setSelectedPharmacy(pharmacy);
     setActiveMarker(pharmacy.id);
     setShowCard(true);
     setRouteInfo(null);
 
-    selectPlaceAndRoute(place, transportMode);
+    selectPharmacyAndRoute(pharmacy, transportMode, userLocation || undefined);
   };
 
   const handleTransportModeChange = (newMode: TransportMode) => {
     setTransportMode(newMode);
-    if (selectedPlace) {
-      selectPlaceAndRoute(selectedPlace, newMode);
+    if (selectedPharmacy) {
+      selectPharmacyAndRoute(selectedPharmacy, newMode, userLocation || undefined);
     }
   };
 
@@ -396,7 +452,7 @@ export function PharmacyMap({
 
     const useOSRMRoute = async () => {
       try {
-        const osrmData = await fetchOSRMRoute(startLoc, place, mode);
+        const osrmData = await fetchOSRMRoute(startLoc, pharmacy, mode);
         setRouteInfo({
           coordinates: osrmData.coordinates,
           distanceKm: osrmData.distanceKm,
@@ -419,7 +475,7 @@ export function PharmacyMap({
         directionsService.route(
           {
             origin: new window.google.maps.LatLng(startLoc[0], startLoc[1]),
-            destination: new window.google.maps.LatLng(place.lat, place.lon),
+            destination: new window.google.maps.LatLng(pharmacy.lat, pharmacy.lon),
             travelMode: googleTravelMode,
           },
           async (result, status) => {

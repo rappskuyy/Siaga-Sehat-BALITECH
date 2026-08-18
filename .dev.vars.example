@@ -11,3 +11,9 @@ AI_PROVIDER=openai
 # Isi salah satu sesuai AI_PROVIDER yang dipilih di atas
 OPENAI_API_KEY=
 GEMINI_API_KEY=
+
+# Supabase (WAJIB untuk fitur login, register, profil, dan riwayat scan)
+# Ambil dari Project Settings > API di dashboard Supabase.
+# Catatan: variabel berprefix VITE_ akan otomatis di-inject ke client oleh Vite.
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=

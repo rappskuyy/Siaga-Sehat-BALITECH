@@ -17,7 +17,7 @@ import {
   Stethoscope,
   Pill,
 } from "lucide-react";
-import type { PharmacyNode, RouteInfo, TransportMode, DangerLevelType } from "./maps.service";
+import type { PlaceNode, PharmacyNode, RouteInfo, TransportMode, DangerLevelType } from "./maps.service";
 import { SourceBadge } from "./SourceBadge";
 
 interface PharmacyListProps {
@@ -99,7 +99,7 @@ export function PharmacyList({
         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
           {dangerLevel === "tinggi" ? "🏥 Faskes & RS Terdekat" : "💊 Apotek & Faskes Terdekat"} ({filteredPharmacies.length})
         </h4>
-        {selectedPlace && (
+        {selectedPharmacy && (
           <button
             type="button"
             onClick={() => onSelectPharmacy(null)}
@@ -260,9 +260,9 @@ export function PharmacyList({
 
             return (
               <button
-                key={place.id}
+                key={pharm.id}
                 type="button"
-                onClick={() => onSelectPlace(isSelected ? null : place)}
+                onClick={() => onSelectPharmacy(isSelected ? null : pharm)}
                 className={`group w-full rounded-2xl p-3.5 text-left transition border ${
                   isSelected
                     ? isHospital
@@ -329,8 +329,8 @@ export function PharmacyList({
                             <Star className="h-3 w-3 fill-amber-400 text-amber-400 inline" />
                           </span>
                         )}
-                        {place.user_ratings_total && (
-                          <span className="text-slate-400">({place.user_ratings_total})</span>
+                        {pharm.userRatingsTotal && (
+                          <span className="text-slate-400">({pharm.userRatingsTotal})</span>
                         )}
                         {pharm.rating && <span>•</span>}
 
@@ -355,7 +355,7 @@ export function PharmacyList({
                       </div>
 
                       <p className="mt-1 text-[11px] text-slate-500 line-clamp-1">
-                        {place.address}
+                        {pharm.address}
                       </p>
                     </div>
                   </div>
@@ -415,7 +415,7 @@ export function PharmacyList({
                     <span className="font-bold text-slate-800 block mb-1">
                       📅 Jam Operasional Lengkap:
                     </span>
-                    {pharm.operatingHours.weekdayText.map((text, i) => (
+                    {(pharm.operatingHours?.weekdayText ?? []).map((text: string, i: number) => (
                       <div key={i} className="flex items-center justify-between">
                         <span>{text}</span>
                       </div>
@@ -475,8 +475,8 @@ export function RouteOverlayCard({
 
   const label = selectedPlace.placeType === "hospital" ? "RUMAH SAKIT TERPILIH" : "APOTEK TERPILIH";
 
-  const isHospital = selectedPharmacy.facilityType === "hospital";
-  const isClinic = selectedPharmacy.facilityType === "clinic";
+  const isHospital = selectedPlace.facilityType === "hospital";
+  const isClinic = selectedPlace.facilityType === "clinic";
 
   return (
     <div className="animate-fade-up flex flex-col gap-2.5 rounded-2xl bg-white p-4 shadow-sm border border-slate-200 w-full shrink-0">
@@ -489,8 +489,8 @@ export function RouteOverlayCard({
               {isHospital ? "RUMAH SAKIT TERPILIH" : isClinic ? "KLINIK TERPILIH" : "APOTEK TERPILIH"}
             </span>
             <SourceBadge
-              dataSource={selectedPharmacy._dataSource}
-              trustScore={selectedPharmacy._trustScore}
+              dataSource={selectedPlace._dataSource}
+              trustScore={selectedPlace._trustScore}
             />
           </div>
           <h4 className="line-clamp-1 text-sm font-extrabold text-slate-900">
@@ -499,16 +499,16 @@ export function RouteOverlayCard({
           <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-slate-500">
             {selectedPlace.rating && (
               <span className="flex items-center gap-0.5 font-bold text-amber-600">
-                {selectedPharmacy.rating}{" "}
+                {selectedPlace.rating}{" "}
                 <Star className="h-3 w-3 fill-amber-400 text-amber-400 inline" />
               </span>
             )}
-            {selectedPlace.user_ratings_total && (
-              <span className="text-slate-400">({selectedPlace.user_ratings_total})</span>
+            {selectedPlace.userRatingsTotal && (
+              <span className="text-slate-400">({selectedPlace.userRatingsTotal})</span>
             )}
-            {selectedPharmacy.rating && <span>•</span>}
+            {selectedPlace.rating && <span>•</span>}
             <span className={`font-semibold ${isHospital ? "text-red-700" : "text-emerald-700"}`}>
-              {isHospital ? "Pelayanan IGD 24 Jam" : (selectedPharmacy.openingHoursText || "Buka")}
+              {isHospital ? "Pelayanan IGD 24 Jam" : (selectedPlace.openingHoursText || "Buka")}
             </span>
           </div>
         </div>

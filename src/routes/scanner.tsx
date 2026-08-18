@@ -10,6 +10,8 @@ import { ScanningOverlay, SCAN_STEPS } from "@/components/scanner/ScanningOverla
 import { ScanResultView } from "@/components/scanner/ScanResultView";
 import { Button } from "@/components/ui/button";
 import fotodokter2 from "@/assets/fotodokter(2).png?url";
+import { useAuth } from "@/lib/auth/auth-context";
+import { supabase } from "@/lib/supabase/client";
 
 export const Route = createFileRoute("/scanner")({
   head: () => ({
@@ -32,6 +34,7 @@ type Stage = "idle" | "scanning" | "result" | "error";
 
 function ScannerPage() {
   const analyze = useServerFn(analyzeHealthImage);
+  const { user } = useAuth();
 
   const [image, setImage] = useState<SelectedImage | null>(null);
   const [stage, setStage] = useState<Stage>("idle");
@@ -69,6 +72,28 @@ function ScannerPage() {
       if (intervalRef.current) clearInterval(intervalRef.current);
       setResult(data);
       setStage("result");
+
+      if (user) {
+        supabase
+          .from("scan_history")
+          .insert({
+            user_id: user.id,
+            nama_penyakit: data.nama_penyakit,
+            ringkasan: data.ringkasan,
+            tingkat_bahaya: data.tingkat_bahaya,
+            tingkat_keyakinan: data.tingkat_keyakinan,
+            harus_ke_dokter: data.harus_ke_dokter,
+            penyebab: data.penyebab,
+            pencegahan_mandiri: data.pencegahan_mandiri,
+            obat_rekomendasi: data.obat_rekomendasi,
+            obat_herbal: data.obat_herbal,
+            catatan_tambahan: data.catatan_tambahan,
+            image_preview: null,
+          })
+          .then(({ error: insertError }) => {
+            if (insertError) console.error("Gagal menyimpan riwayat scan:", insertError.message);
+          });
+      }
     } catch (err) {
       if (intervalRef.current) clearInterval(intervalRef.current);
       setErrorMessage(

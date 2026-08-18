@@ -24,7 +24,7 @@ export type PlaceType = "pharmacy" | "hospital";
 export interface PlaceNode {
   id: number | string;
   placeId?: string;
-  placeType: PlaceType;
+  placeType?: PlaceType;
   lat: number;
   lon: number;
   name: string;
@@ -45,6 +45,8 @@ export interface PlaceNode {
   _trustScore?: number;
   _cacheAge?: string;
 }
+
+export type PharmacyNode = PlaceNode;
 
 export interface RouteInfo {
   coordinates: [number, number][];
@@ -221,6 +223,8 @@ export async function fetchNearbyPharmacies(
   // 5. Clean Empty State (NO DUMMY DATA)
   return [];
 }
+
+export const fetchNearbyPlaces = fetchNearbyPharmacies;
 
 export async function fetchOSRMRoute(
   start: [number, number],

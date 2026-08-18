@@ -13,6 +13,16 @@ export const chatWithAI = createServerFn({ method: "POST" })
     const openaiKey = process.env.OPENAI_API_KEY?.trim();
     const geminiKey = process.env.GEMINI_API_KEY?.trim();
 
+    const SYSTEM_PROMPT =
+      'Kamu adalah asisten kesehatan virtual bernama "SiagaSehat AI". Kamu melakukan konsultasi kesehatan interaktif dalam Bahasa Indonesia yang jelas, singkat, dan mudah dipahami.\n\n' +
+      "ATURAN PERCAKAPAN:\n" +
+      "- Jika pengguna baru menyebutkan gejala atau bagian tubuh yang sakit, gali informasi penting SATU per SATU (jangan tanya semua sekaligus): usia, sudah berapa lama gejala dirasakan, seberapa parah, gejala penyerta, riwayat penyakit/alergi/obat yang sedang dikonsumsi.\n" +
+      '- Setelah informasi cukup (idealnya setelah 2-4 pertanyaan), berikan ringkasan terstruktur dengan judul: "Preliminary Analysis", "Risk Assessment", dan "Health Recommendation".\n' +
+      "- Pada Health Recommendation, sertakan saran obat umum/OTC dan alternatif herbal yang aman bila relevan, serta kapan harus segera ke dokter/IGD.\n" +
+      '- Jangan pernah membuat diagnosis pasti 100% — gunakan bahasa "kemungkinan", "bisa jadi", "perlu dipastikan oleh dokter".\n' +
+      "- Jika ada tanda bahaya (nyeri dada hebat, sesak napas berat, pendarahan hebat, penurunan kesadaran, dll), segera sarankan ke IGD tanpa menunggu info lain.\n" +
+      "- Jawaban singkat, ramah, dan empatik.";
+
     if (openaiKey) {
       const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
       const res = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -24,7 +34,7 @@ export const chatWithAI = createServerFn({ method: "POST" })
         body: JSON.stringify({
           model,
           messages: [
-            { role: "system", content: "Kamu adalah asisten kesehatan bernama SiagaSehat. Jawab singkat, jelas, dan aman dalam Bahasa Indonesia." },
+            { role: "system", content: SYSTEM_PROMPT },
             { role: "user", content: prompt },
           ],
           max_tokens: 800,
@@ -52,7 +62,7 @@ export const chatWithAI = createServerFn({ method: "POST" })
               "x-goog-api-key": geminiKey,
             },
             body: JSON.stringify({
-              systemInstruction: { parts: [{ text: "Kamu adalah asisten kesehatan bernama SiagaSehat. Jawab singkat, jelas, dan aman dalam Bahasa Indonesia." }] },
+              systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
               contents: [{ role: "user", parts: [{ text: prompt }] }],
               generationConfig: { maxOutputTokens: 800 },
             }),
@@ -66,11 +76,16 @@ export const chatWithAI = createServerFn({ method: "POST" })
         }
 
         const payload = await res.json();
-        const text = payload.candidates?.[0]?.content?.parts?.map((p: any) => p.text ?? "").join("") || "";
+        const text =
+          payload.candidates?.[0]?.content?.parts
+            ?.map((p: { text?: string }) => p.text ?? "")
+            .join("") || "";
         return { reply: text };
       }
       throw new Error("Gemini API tidak dapat dihubungi");
     }
 
-    throw new Error("Tidak ada API key AI yang dikonfigurasi. Tambahkan OPENAI_API_KEY atau GEMINI_API_KEY di .env");
+    throw new Error(
+      "Tidak ada API key AI yang dikonfigurasi. Tambahkan OPENAI_API_KEY atau GEMINI_API_KEY di .env",
+    );
   });
