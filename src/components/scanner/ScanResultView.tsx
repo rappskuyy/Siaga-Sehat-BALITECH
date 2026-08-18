@@ -16,6 +16,7 @@ import {
 import type { DangerLevel, ScanResult } from "@/lib/scanner/types";
 import { Button } from "@/components/ui/button";
 import { PharmacyMap } from "@/components/maps/PharmacyMap";
+import type { PlaceType } from "@/components/maps/maps.service";
 
 const DANGER_STYLES: Record<
   DangerLevel,

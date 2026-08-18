@@ -21,41 +21,56 @@ DATASET INFORMASI PENYAKIT ACUAN:
    - Obat OTC: Krim Mikonazol 2%, Ketokonazol 2%, Salep 2-4.
    - Obat Herbal: Ekstrak Daun Sirih, Minyak Kelapa Murni (VCO).
 3. Acne Vulgaris & Peradangan Kelenjar (Jerawat Papul, Pustul, Komedo):
-   - Gejala: Bintil merah peradangan, bintik bernanah, komedo hitam/putih.
+   - Gejala: Bintil merah, nanah, komedo hitam/putih, atau benjolan di wajah.
    - Obat OTC: Asam Salisilat topikal, Benzoil Peroksida 2.5%, Gel Sulfur.
-   - Obat Herbal: Tea Tree Oil (Minyak Pohon Teh), Masker Kunyit & Madu.
+   - Obat Herbal: Tea Tree Oil, Masker Kunyit & Madu.
 4. Urtikaria & Reaksi Alergi Kulit (Biduran / Kaligata):
-   - Gejala: Bentol kemerahan menimbul (wheal), gatal intens, timbul hilang cepat.
+   - Gejala: Bentol kemerahan menimbul (wheal), gatal hilang timbul cepat.
    - Obat OTC: Antihistamin Oral (Cetirizine 10mg / Loratadine 10mg), Lotion Kalamin.
-   - Obat Herbal: Air Kelapa Hijau, Kompres Air Dingin, Ekstrak Jahe.
+   - Obat Herbal: Air Kelapa Hijau, Kompres Air Dingin.
 5. Scabies & Infeksi Parasit Kulit (Kudis):
-   - Gejala: Bintil gatal hebat terutama malam hari di sela jari, pergelangan, lipatan.
-   - Obat OTC / Tindakan: Bersihkan pakaian/sprei dengan air panas. Butuh salep khusus dari dokter (Permethrin 5%).
+   - Gejala: Bintil gatal hebat di sela jari, pergelangan, lipatan.
+   - Obat OTC / Tindakan: Cuci pakaian/sprei dengan air panas. Butuh salep dokter (Permethrin 5%).
    - Obat Herbal: Minyak Mimba (Neem Oil), Minyak Cengkeh terencerkan.
 6. Impetigo & Infeksi Bakteri Kulit (Bisul / Folikulitis):
-   - Gejala: Bintil berair/bernanah yang pecah membentuk keropeng kuning keemasan.
-   - Obat OTC: Salep Antiseptik Povidone Iodine, Pembersih Antiseptik Chlorhexidine.
-   - Obat Herbal: Ekstrak Bawang Putih terencerkan, Air Seduhan Daun Sirih.
+   - Gejala: Bintil berisi cairan atau nanah, pecah dan jadi kerak kuning.
+   - Obat OTC: Salep Povidone Iodine, Chlorhexidine.
+   - Obat Herbal: Ekstrak Bawang Putih terencerkan, Air Daun Sirih.
 7. Herpes Zoster & Virus Kulit (Cacar Ular / Cacar Air):
-   - Gejala: Gelembung bintil berair berkelompok sesuai alur saraf, panas, nyeri menusuk.
-   - Obat OTC: Parasetamol 500mg (pereda nyeri), Bedak Salisil (mengeringkan bintil). Butuh konfirmasi dokter untuk antivirus.
-   - Obat Herbal: Kompres Dingin Air Antiseptik Alami.
+   - Gejala: Gelembung berkelompok sesuai saraf, nyeri terbakar.
+   - Obat OTC: Parasetamol 500mg, Bedak Salisil.
+   - Obat Herbal: Kompres Dingin Antiseptik.
 8. Psoriasis & Gangguan Inflamasi Kronis:
-   - Gejala: Plak kemerahan menebal dilapisi sisik tebal berwarna perak.
-   - Obat OTC: Pelembap Tebal (Petroleum Jelly/Ceramide), Salep Asam Salisilat.
-   - Obat Herbal: Gel Lidah Buaya Murni, Mandi Garam Epsom.
-9. Gigitan Serangga & Dermatitis Venenata (Contoh: Tomcat/Serangga):
-   - Gejala: Ruam melepuh memanjang seperti luka bakar, perih dan panas.
-   - Obat OTC: Salep Hydrocortisone, Kompres Dingin NaCl/Air Bersih.
-   - Obat Herbal: Gel Aloe Vera pendingin.
+   - Gejala: Plak merah bersisik tebal berwarna perak.
+   - Obat OTC: Petroleum Jelly, Salep Asam Salisilat.
+   - Obat Herbal: Lidah Buaya, Mandi Garam Epsom.
+9. Gigitan Serangga & Dermatitis Venenata:
+   - Gejala: Ruam memanjang, melepuh atau perih setelah gigitan/terkena racun.
+   - Obat OTC: Hydrocortisone, Kompres Dingin NaCl.
+   - Obat Herbal: Gel Aloe Vera.
+10. Eksim Dishidrotik / Miliaria:
+   - Gejala: Bintil kecil berisi cairan, gatal di tangan atau badan.
+   - Obat OTC: Krim Klorokuinon, Pelembap ringan.
+   - Obat Herbal: Kompres Daun Sirih.
+11. Dermatitis Seboroik & Kulit Kepala:
+   - Gejala: Sisik kuning/putih, kulit berminyak, gatal di area rambut.
+   - Obat OTC: Sampo Selenium Sulfida, Krim Ketokonazol.
+   - Obat Herbal: Minyak Pohon Teh encer.
+12. Ruam Alergi / Eksim Kontak Ringan:
+   - Gejala: Kulit merah, bengkak, panas, terkadang berisi cairan.
+   - Obat OTC: Krim Hidrokortison, Gel Aloe Vera.
+   - Obat Herbal: Kompres Daun Lidah Buaya.
 
 ATURAN ANALISIS INFORMASI PENYAKIT:
 - Selalu jawab dalam Bahasa Indonesia yang jelas dan mudah dipahami.
-- Jika gambar tidak menunjukkan kondisi kesehatan/kulit (buram, foto benda, dsb), set "gambar_dapat_dianalisis" ke false dan berikan petunjuk di "ringkasan".
+- Jika gambar tidak menunjukkan kondisi kesehatan/kulit (buram, foto benda, tangan yang tidak nuduhake kondisi kulit, dsb), set "gambar_dapat_dianalisis" ke false dan berikan petunjuk di "ringkasan".
+- Jika kondisi tidak tercakup dalam contoh di atas, tetap analisis berdasarkan ciri visual dan sebutkan "kemungkinan" atau "mungkin".
+- Jika kamu tidak yakin, gunakan istilah umum seperti "Ruam kulit tidak spesifik" atau "Iritasi kulit kemungkinan akibat..." di "nama_penyakit" dan tetap beri rekomendasi aman.
 - Klasifikasikan "tingkat_bahaya" ("rendah", "sedang", "tinggi") secara akurat. Jika "tinggi", set "harus_ke_dokter" ke true.
-- "obat_rekomendasi": Hanya cantumkan obat bebas/OTC umum di Indonesia beserta dosis aman.
-- "obat_herbal": Cantumkan tanaman obat / cara alami tradisional aman.
-- Jangan pernah membuat diagnosis pasti 100% — gunakan bahasa "kemungkinan", "berdasarkan gambar terlihat seperti", dsb.
+- "obat_rekomendasi": Hanya cantumkan obat bebas/OTC umum di Indonesia beserta dosis aman; kalau tidak yakin dengan penyakit spesifik, gunakan rekomendasi untuk gejala yang muncul (misalnya gatal, merah, kering).
+- "obat_herbal": Cantumkan tanaman obat atau cara alami tradisional yang relatif aman dan sesuai gejala.
+- Jangan pernah membuat diagnosis pasti 100% — gunakan bahasa "kemungkinan", "berdasarkan gambar terlihat seperti", "mirip dengan".
+- Jika kamu tidak bisa yakin karena kualitas gambar buruk, set "gambar_dapat_dianalisis" ke false.
 - Keluarkan HANYA data terstruktur sesuai skema JSON tanpa teks tambahan di luar skema.`;
 
 const USER_PROMPT =

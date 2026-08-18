@@ -99,7 +99,7 @@ export function PharmacyList({
         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
           {dangerLevel === "tinggi" ? "🏥 Faskes & RS Terdekat" : "💊 Apotek & Faskes Terdekat"} ({filteredPharmacies.length})
         </h4>
-        {selectedPharmacy && (
+        {selectedPlace && (
           <button
             type="button"
             onClick={() => onSelectPharmacy(null)}
@@ -260,9 +260,9 @@ export function PharmacyList({
 
             return (
               <button
-                key={pharm.id}
+                key={place.id}
                 type="button"
-                onClick={() => onSelectPharmacy(isSelected ? null : pharm)}
+                onClick={() => onSelectPlace(isSelected ? null : place)}
                 className={`group w-full rounded-2xl p-3.5 text-left transition border ${
                   isSelected
                     ? isHospital
@@ -329,8 +329,8 @@ export function PharmacyList({
                             <Star className="h-3 w-3 fill-amber-400 text-amber-400 inline" />
                           </span>
                         )}
-                        {pharm.userRatingsTotal && (
-                          <span className="text-slate-400">({pharm.userRatingsTotal})</span>
+                        {place.user_ratings_total && (
+                          <span className="text-slate-400">({place.user_ratings_total})</span>
                         )}
                         {pharm.rating && <span>•</span>}
 
@@ -355,7 +355,7 @@ export function PharmacyList({
                       </div>
 
                       <p className="mt-1 text-[11px] text-slate-500 line-clamp-1">
-                        {pharm.address}
+                        {place.address}
                       </p>
                     </div>
                   </div>
@@ -453,7 +453,7 @@ export function PharmacyList({
 }
 
 interface RouteOverlayProps {
-  selectedPharmacy: PharmacyNode | null;
+  selectedPlace: PlaceNode | null;
   routeInfo: RouteInfo | null;
   loadingRoute: boolean;
   transportMode: TransportMode;
@@ -463,7 +463,7 @@ interface RouteOverlayProps {
 }
 
 export function RouteOverlayCard({
-  selectedPharmacy,
+  selectedPlace,
   routeInfo,
   loadingRoute,
   transportMode,
@@ -471,7 +471,9 @@ export function RouteOverlayCard({
   onTransportModeChange,
   onClose,
 }: RouteOverlayProps) {
-  if (!selectedPharmacy) return null;
+  if (!selectedPlace) return null;
+
+  const label = selectedPlace.placeType === "hospital" ? "RUMAH SAKIT TERPILIH" : "APOTEK TERPILIH";
 
   const isHospital = selectedPharmacy.facilityType === "hospital";
   const isClinic = selectedPharmacy.facilityType === "clinic";
@@ -492,17 +494,17 @@ export function RouteOverlayCard({
             />
           </div>
           <h4 className="line-clamp-1 text-sm font-extrabold text-slate-900">
-            {selectedPharmacy.name}
+            {selectedPlace.name}
           </h4>
           <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-slate-500">
-            {selectedPharmacy.rating && (
+            {selectedPlace.rating && (
               <span className="flex items-center gap-0.5 font-bold text-amber-600">
                 {selectedPharmacy.rating}{" "}
                 <Star className="h-3 w-3 fill-amber-400 text-amber-400 inline" />
               </span>
             )}
-            {selectedPharmacy.userRatingsTotal && (
-              <span className="text-slate-400">({selectedPharmacy.userRatingsTotal})</span>
+            {selectedPlace.user_ratings_total && (
+              <span className="text-slate-400">({selectedPlace.user_ratings_total})</span>
             )}
             {selectedPharmacy.rating && <span>•</span>}
             <span className={`font-semibold ${isHospital ? "text-red-700" : "text-emerald-700"}`}>
@@ -522,10 +524,9 @@ export function RouteOverlayCard({
       </div>
 
       <p className="text-[11px] text-slate-600 line-clamp-2">
-        📍 {selectedPharmacy.address}
+        📍 {selectedPlace.address}
       </p>
 
-      {/* Transport Mode Switcher */}
       <div className="flex items-center gap-1.5 rounded-xl bg-slate-100 p-1">
         <button
           type="button"
@@ -565,7 +566,7 @@ export function RouteOverlayCard({
                 {transportMode === "motorcycle" ? "motor" : "mobil"})
               </span>
             ) : (
-              `~${selectedPharmacy.distanceKm} km`
+              `~${selectedPlace.distanceKm} km`
             )}
           </span>
         </div>
@@ -576,10 +577,10 @@ export function RouteOverlayCard({
         if (userLocation) {
           mapsUrl += `&origin=${userLocation[0]},${userLocation[1]}`;
         }
-        if (selectedPharmacy.placeId) {
-          mapsUrl += `&destination=${encodeURIComponent(selectedPharmacy.name)}&destination_place_id=${selectedPharmacy.placeId}`;
+        if (selectedPlace.placeId) {
+          mapsUrl += `&destination=${encodeURIComponent(selectedPlace.name)}&destination_place_id=${selectedPlace.placeId}`;
         } else {
-          mapsUrl += `&destination=${encodeURIComponent(`${selectedPharmacy.name}, ${selectedPharmacy.address || ""}`)}`;
+          mapsUrl += `&destination=${encodeURIComponent(`${selectedPlace.name}, ${selectedPlace.address || ""}`)}`;
         }
         mapsUrl += `&travelmode=${transportMode === "motorcycle" ? "two_wheeler" : "driving"}`;
 

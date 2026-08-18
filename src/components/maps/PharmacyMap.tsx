@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
 import {
   DEFAULT_CENTER,
-  fetchNearbyPharmacies,
+  fetchNearbyPlaces,
   fetchOSRMRoute,
   fetchIPLocation,
   searchLocationByAddress,
@@ -120,9 +120,9 @@ export function PharmacyMap({
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locationSource, setLocationSource] = useState<string>("GPS Presisi (Lokasi Anda)");
 
-  const [pharmacies, setPharmacies] = useState<PharmacyNode[]>([]);
-  const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(false);
-  const [selectedPharmacy, setSelectedPharmacy] = useState<PharmacyNode | null>(null);
+  const [places, setPlaces] = useState<PlaceNode[]>([]);
+  const [loadingPlaces, setLoadingPlaces] = useState<boolean>(false);
+  const [selectedPlace, setSelectedPlace] = useState<PlaceNode | null>(null);
   const [activeMarker, setActiveMarker] = useState<number | string | null>(null);
 
   const [transportMode, setTransportMode] = useState<TransportMode>("driving");
@@ -354,16 +354,16 @@ export function PharmacyMap({
         }
       }
     } catch (err) {
-      console.error("Fetch Pharmacies Error:", err);
+      console.error("Fetch Places Error:", err);
     } finally {
-      setLoadingPharmacies(false);
+      setLoadingPlaces(false);
     }
   };
 
   const [showCard, setShowCard] = useState<boolean>(false);
 
-  const handleSelectPharmacy = (pharmacy: PharmacyNode | null) => {
-    if (!pharmacy) {
+  const handleSelectPlace = (place: PlaceNode | null) => {
+    if (!place) {
       setShowCard(false);
       setActiveMarker(null);
       setSelectedPharmacy(null);
@@ -376,13 +376,13 @@ export function PharmacyMap({
     setShowCard(true);
     setRouteInfo(null);
 
-    selectPharmacyAndRoute(pharmacy, transportMode);
+    selectPlaceAndRoute(place, transportMode);
   };
 
   const handleTransportModeChange = (newMode: TransportMode) => {
     setTransportMode(newMode);
-    if (selectedPharmacy) {
-      selectPharmacyAndRoute(selectedPharmacy, newMode);
+    if (selectedPlace) {
+      selectPlaceAndRoute(selectedPlace, newMode);
     }
   };
 
@@ -396,7 +396,7 @@ export function PharmacyMap({
 
     const useOSRMRoute = async () => {
       try {
-        const osrmData = await fetchOSRMRoute(startLoc, pharmacy, mode);
+        const osrmData = await fetchOSRMRoute(startLoc, place, mode);
         setRouteInfo({
           coordinates: osrmData.coordinates,
           distanceKm: osrmData.distanceKm,
@@ -419,7 +419,7 @@ export function PharmacyMap({
         directionsService.route(
           {
             origin: new window.google.maps.LatLng(startLoc[0], startLoc[1]),
-            destination: new window.google.maps.LatLng(pharmacy.lat, pharmacy.lon),
+            destination: new window.google.maps.LatLng(place.lat, place.lon),
             travelMode: googleTravelMode,
           },
           async (result, status) => {
@@ -757,7 +757,7 @@ export function PharmacyMap({
 
         <div className="flex flex-col gap-3 min-w-0">
           <RouteOverlayCard
-            selectedPharmacy={showCard ? selectedPharmacy : null}
+            selectedPlace={showCard ? selectedPlace : null}
             routeInfo={routeInfo}
             loadingRoute={loadingRoute}
             transportMode={transportMode}

@@ -19,9 +19,12 @@ export type TransportMode = "driving" | "motorcycle";
 export type FacilityType = "pharmacy" | "hospital" | "clinic";
 export type DangerLevelType = "rendah" | "sedang" | "tinggi";
 
-export interface PharmacyNode {
+export type PlaceType = "pharmacy" | "hospital";
+
+export interface PlaceNode {
   id: number | string;
   placeId?: string;
+  placeType: PlaceType;
   lat: number;
   lon: number;
   name: string;
@@ -221,7 +224,7 @@ export async function fetchNearbyPharmacies(
 
 export async function fetchOSRMRoute(
   start: [number, number],
-  end: PharmacyNode,
+  end: PlaceNode,
   mode: TransportMode = "driving"
 ): Promise<RouteInfo> {
   try {
