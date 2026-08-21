@@ -12,8 +12,13 @@ AI_PROVIDER=openai
 OPENAI_API_KEY=
 GEMINI_API_KEY=
 
+# Google Maps & Places API
+VITE_GOOGLE_MAPS_API_KEY=
+GOOGLE_PLACES_API_KEY=
+
 # Supabase (WAJIB untuk fitur login, register, profil, dan riwayat scan)
 # Ambil dari Project Settings > API di dashboard Supabase.
 # Catatan: variabel berprefix VITE_ akan otomatis di-inject ke client oleh Vite.
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
+

@@ -75,8 +75,8 @@ function MapRouteRenderer({
         suppressMarkers: true,
         polylineOptions: {
           strokeColor: "#2563eb",
-          strokeWeight: 5,
-          strokeOpacity: 0.8,
+          strokeWeight: 6,
+          strokeOpacity: 0.85,
         },
       });
       directionsRendererRef.current = renderer;
@@ -86,10 +86,17 @@ function MapRouteRenderer({
         map: map,
         path: path,
         strokeColor: "#2563eb",
-        strokeWeight: 5,
-        strokeOpacity: 0.8,
+        strokeWeight: 6,
+        strokeOpacity: 0.85,
       });
       polylineRef.current = polyline;
+
+      // Auto fit bounds jika ada rute
+      if (window.google && window.google.maps && path.length > 1) {
+        const bounds = new window.google.maps.LatLngBounds();
+        path.forEach((pt) => bounds.extend(pt));
+        map.fitBounds(bounds, 60);
+      }
     }
 
     return () => {
@@ -742,7 +749,7 @@ export function PharmacyMap({
                     }
                   }}
                   icon={{
-                    url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+                    url: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
                   }}
                 />
               )}
@@ -751,10 +758,10 @@ export function PharmacyMap({
                 const isHospital = pharm.facilityType === "hospital";
                 const isClinic = pharm.facilityType === "clinic";
                 const markerIconUrl = isHospital
-                  ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                  ? "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
                   : isClinic
-                  ? "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-                  : "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+                  ? "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                  : "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
 
                 return (
                   <Marker

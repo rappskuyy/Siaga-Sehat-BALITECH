@@ -1,4 +1,5 @@
 import {
+  searchFacilitiesFromLocalDataset,
   searchPharmaciesWithAI,
   searchPharmaciesViaGooglePlaces,
   searchFacilitiesViaOSMServer,
@@ -177,7 +178,21 @@ export async function fetchNearbyPharmacies(
 ): Promise<PharmacyNode[]> {
   console.log(`[MAPS PIPELINE] Initiating real facility search for [${lat}, ${lon}] (${address || "Tanpa Alamat"}) - Triage: ${dangerLevel}`);
 
-  // 1. PRIMARY: OpenStreetMap Server Function (Server-side Overpass & Nominatim with 0 CORS)
+  // 0. PRIMARY: Local Scraped Google Maps Dataset (Zero API Key & Instant Offline Support)
+  try {
+    const localResults = await searchFacilitiesFromLocalDataset({
+      data: { lat, lon, dangerLevel, maxDistanceKm: 30 },
+    });
+    if (localResults && localResults.length > 0) {
+      console.log(`[MAPS PIPELINE] Found ${localResults.length} facilities from Local Scraped Dataset.`);
+      savePharmaciesToCache(lat, lon, localResults, address);
+      return localResults;
+    }
+  } catch (localErr) {
+    console.warn("[MAPS PIPELINE] Local dataset search error:", localErr);
+  }
+
+  // 1. SECONDARY: OpenStreetMap Server Function (Server-side Overpass & Nominatim with 0 CORS)
   try {
     const osmResults = await searchFacilitiesViaOSMServer({
       data: { lat, lon, dangerLevel },
@@ -232,17 +247,15 @@ export async function fetchOSRMRoute(
   mode: TransportMode = "driving"
 ): Promise<RouteInfo> {
   try {
-    const url = `https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end.lon},${end.lat}?overview=full&geometries=geojson`;
+    const url = `https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end.lon},${end.lat}?overview=full&geometries=geojson&steps=false`;
     const res = await fetch(url);
     if (!res.ok) throw new Error("OSRM request failed");
     const data = await res.json();
     if (data.routes && data.routes.length > 0) {
       const route = data.routes[0];
       const coords: [number, number][] = route.geometry.coordinates.map(
-        (c: [number, number]) => [c[1], c[0]],
+        (c: [number, number]) => [c[1], c[0]]
       );
-
-      const fullCoords: [number, number][] = [start, ...coords, [end.lat, end.lon]];
 
       let durationMin = Math.ceil(route.duration / 60);
       if (mode === "motorcycle") {
@@ -250,7 +263,7 @@ export async function fetchOSRMRoute(
       }
 
       return {
-        coordinates: fullCoords,
+        coordinates: coords && coords.length > 0 ? coords : [start, [end.lat, end.lon]],
         distanceKm: Number((route.distance / 1000).toFixed(2)),
         durationMin: durationMin,
         mode: mode,
