@@ -113,7 +113,7 @@ function ScannerPage() {
   return (
     <main className="min-h-screen bg-[#f7f4ee] pb-16 font-sans">
       <div className="hex-pattern relative overflow-hidden bg-[color:var(--color-clinic-blue)] px-6 pb-24 pt-6 md:px-10 md:pt-8">
-        <header className="relative z-10 flex items-center justify-between gap-4">
+        <header className="relative z-10 flex items-center justify-between gap-4 max-w-[1600px] mx-auto">
           <Link to="/" className="flex items-center gap-2">
             <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white">
               <span className="h-2.5 w-2.5 rounded-full bg-[color:var(--color-clinic-blue)]" />
@@ -152,7 +152,7 @@ function ScannerPage() {
         </div>
       </div>
 
-      <div className="relative z-20 mx-auto -mt-14 max-w-5xl px-4 md:px-8">
+      <div className="relative z-20 mx-auto -mt-14 max-w-[1600px] w-full px-4 sm:px-6 md:px-8">
         {stage !== "result" && (
           <div className="grid gap-5 rounded-[28px] bg-white p-5 shadow-[var(--shadow-clinic-lg)] md:grid-cols-2 md:p-8">
             {/* Left: capture area */}

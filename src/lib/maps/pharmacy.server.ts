@@ -39,13 +39,18 @@ function getCacheKey(lat: number, lon: number, radius: number): string {
 }
 
 export function detectFacilityType(name: string, typeTag = ""): FacilityType {
-  const lower = (name + " " + typeTag).toLowerCase();
+  const t = typeTag.toLowerCase();
+  const n = name.toLowerCase();
+  const lower = `${n} ${t}`;
+
   if (
+    t === "hospital" ||
+    t.includes("hospital") ||
     lower.includes("rumah sakit") ||
     lower.includes("rsud") ||
     lower.includes("rsup") ||
-    lower.includes("rsad") ||
     lower.includes("rsia") ||
+    lower.includes("rsad") ||
     lower.includes("rsu ") ||
     lower.includes("rs ") ||
     lower.includes("rs.") ||
@@ -65,21 +70,32 @@ export function detectFacilityType(name: string, typeTag = ""): FacilityType {
     lower.includes("wangaya") ||
     lower.includes("mayapada") ||
     lower.includes("mitra keluarga") ||
-    lower.includes("bhayangkara")
+    lower.includes("bhayangkara") ||
+    lower.includes("pmi") ||
+    lower.includes("azra") ||
+    lower.includes("salak") ||
+    lower.includes("bmc")
   ) {
     return "hospital";
   }
+
   if (
+    t === "clinic" ||
+    t === "doctors" ||
+    t.includes("clinic") ||
     lower.includes("klinik") ||
     lower.includes("clinic") ||
     lower.includes("puskesmas") ||
     lower.includes("praktek dokter") ||
+    lower.includes("praktek") ||
     lower.includes("balai pengobatan") ||
     lower.includes("medical centre") ||
-    lower.includes("medical center")
+    lower.includes("medical center") ||
+    lower.includes("poliklinik")
   ) {
     return "clinic";
   }
+
   return "pharmacy";
 }
 
@@ -287,7 +303,7 @@ export const searchFacilitiesViaOSMServer = createServerFn({ method: "POST" })
   .validator((data: unknown) => osmSearchSchema.parse(data))
   .handler(async ({ data }): Promise<PharmacyNode[]> => {
     const { lat, lon, dangerLevel = "rendah" } = data;
-    const radius = dangerLevel === "tinggi" ? 8000 : 6000;
+    const radius = dangerLevel === "tinggi" ? 15000 : 10000;
     const cacheKey = `osm_${lat.toFixed(3)}_${lon.toFixed(3)}_${dangerLevel}`;
 
     const cached = osmServerCache.get(cacheKey);
@@ -302,9 +318,10 @@ export const searchFacilitiesViaOSMServer = createServerFn({ method: "POST" })
       "https://overpass-api.de/api/interpreter",
       "https://overpass.kumi.systems/api/interpreter",
       "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+      "https://overpass.openstreetmap.ru/api/interpreter",
     ];
 
-    const overpassQuery = `[out:json][timeout:10];(
+    const overpassQuery = `[out:json][timeout:12];(
       node["amenity"="hospital"](around:${radius},${lat},${lon});
       way["amenity"="hospital"](around:${radius},${lat},${lon});
       relation["amenity"="hospital"](around:${radius},${lat},${lon});
@@ -315,12 +332,12 @@ export const searchFacilitiesViaOSMServer = createServerFn({ method: "POST" })
       node["amenity"="pharmacy"](around:${radius},${lat},${lon});
       way["amenity"="pharmacy"](around:${radius},${lat},${lon});
       node["healthcare"="pharmacy"](around:${radius},${lat},${lon});
-    );out center 35;`;
+    );out center 60;`;
 
     for (const endpoint of OVERPASS_ENDPOINTS) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 6000);
+        const timeoutId = setTimeout(() => controller.abort(), 7000);
 
         const res = await fetch(`${endpoint}?data=${encodeURIComponent(overpassQuery)}`, {
           signal: controller.signal,
@@ -369,7 +386,7 @@ export const searchFacilitiesViaOSMServer = createServerFn({ method: "POST" })
               phone: tags.phone || tags["contact:phone"],
               facilityType,
               _dataSource: "osm" as const,
-              _dataSourceLabel: facilityType === "hospital" ? "Rumah Sakit (OpenStreetMap)" : "Apotek (OpenStreetMap)",
+              _dataSourceLabel: facilityType === "hospital" ? "Rumah Sakit (OpenStreetMap)" : facilityType === "clinic" ? "Klinik (OpenStreetMap)" : "Apotek (OpenStreetMap)",
               _trustScore: 8,
             };
           })
@@ -386,7 +403,7 @@ export const searchFacilitiesViaOSMServer = createServerFn({ method: "POST" })
           if (!isDup) unique.push(f);
         }
 
-        // Sort by distance (and prioritize hospitals for tinggi)
+        // Sort by distance (and prioritize hospitals for triage tinggi)
         unique.sort((a, b) => {
           if (dangerLevel === "tinggi") {
             const aIsHosp = a.facilityType === "hospital" || a.facilityType === "clinic" ? 0 : 1;
@@ -398,70 +415,67 @@ export const searchFacilitiesViaOSMServer = createServerFn({ method: "POST" })
 
         if (unique.length > 0) {
           osmServerCache.set(cacheKey, { timestamp: Date.now(), data: unique });
-          console.log(`[OSM SERVER] Overpass success! Returned ${unique.length} facilities (Closest: ${unique[0]?.name} - ${unique[0]?.distanceKm} km).`);
-          return unique.slice(0, 16);
+          console.log(`[OSM SERVER] Overpass success! Returned ${unique.length} facilities.`);
+          return unique.slice(0, 30);
         }
       } catch (e) {
         console.warn(`[OSM SERVER] Overpass endpoint warning (${endpoint}):`, e);
       }
     }
 
-    // 2. Server-side Nominatim Fallback
+    // 2. Server-side Nominatim Multi-query Fallback (Hospitals & Pharmacies)
     try {
-      const delta = 0.08;
+      const delta = 0.12;
       const viewbox = `${lon - delta},${lat + delta},${lon + delta},${lat - delta}`;
-      const q = dangerLevel === "tinggi" ? "rumah sakit" : "apotek";
-      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&viewbox=${viewbox}&bounded=1&limit=12&countrycodes=id`;
-      
-      const nomRes = await fetch(url, {
-        headers: {
-          "Accept-Language": "id,en",
-          "User-Agent": "SiagaSehatServer/1.0",
-        },
-      });
+      const queries = ["rumah sakit", "apotek", "klinik"];
+      const nominatimFacilities: PharmacyNode[] = [];
 
-      if (nomRes.ok) {
-        const nomData = await nomRes.json();
-        if (Array.isArray(nomData) && nomData.length > 0) {
-          const nomResults: PharmacyNode[] = nomData
-            .map((item: any, idx: number): PharmacyNode | null => {
+      for (const q of queries) {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&viewbox=${viewbox}&bounded=1&limit=10&countrycodes=id`;
+        const nomRes = await fetch(url, {
+          headers: {
+            "Accept-Language": "id,en",
+            "User-Agent": "SiagaSehatServer/1.0",
+          },
+        });
+
+        if (nomRes.ok) {
+          const nomData = await nomRes.json();
+          if (Array.isArray(nomData)) {
+            for (const item of nomData) {
               const pLat = parseFloat(item.lat);
               const pLon = parseFloat(item.lon);
-              if (isNaN(pLat) || isNaN(pLon)) return null;
+              const distanceKm = haversineDistance([lat, lon], [pLat, pLon]);
+              const facilityType = detectFacilityType(item.display_name, item.type || item.class || "");
 
-              const distanceKm = Number(haversineDistance([lat, lon], [pLat, pLon]).toFixed(2));
-              const nameParts = (item.display_name || "").split(",");
-              const name = item.name || nameParts[0] || `Fasilitas ${idx + 1}`;
-              const address = nameParts.slice(1, 4).join(", ").trim() || item.display_name;
-              const facilityType = detectFacilityType(name, item.type || "");
-
-              return {
-                id: `nom-${item.place_id || idx}`,
+              nominatimFacilities.push({
+                id: `nom-${item.place_id}`,
                 lat: pLat,
                 lon: pLon,
-                name: name,
-                address: address,
-                distanceKm: distanceKm,
+                name: item.display_name.split(",")[0] || item.name || "Fasilitas Kesehatan",
+                address: item.display_name,
+                distanceKm: Number(distanceKm.toFixed(2)),
+                facilityType,
                 isOpenNow: true,
                 openingStatus: "open",
                 openingHoursText: facilityType === "hospital" ? "Buka 24 Jam (IGD)" : "Buka",
-                facilityType: facilityType,
                 _dataSource: "osm",
-                _dataSourceLabel: facilityType === "hospital" ? "Rumah Sakit (Nominatim)" : "Apotek (Nominatim)",
-                _trustScore: 8,
-              };
-            })
-            .filter((p): p is PharmacyNode => p !== null);
-
-          nomResults.sort((a, b) => a.distanceKm - b.distanceKm);
-          if (nomResults.length > 0) {
-            osmServerCache.set(cacheKey, { timestamp: Date.now(), data: nomResults });
-            return nomResults;
+                _dataSourceLabel: `${facilityType === "hospital" ? "Rumah Sakit" : "Apotek"} (OSM Nominatim)`,
+                _trustScore: 7,
+              });
+            }
           }
         }
       }
-    } catch {
-      // ignore
+
+      if (nominatimFacilities.length > 0) {
+        nominatimFacilities.sort((a, b) => a.distanceKm - b.distanceKm);
+        const finalResults = nominatimFacilities.slice(0, 25);
+        osmServerCache.set(cacheKey, { timestamp: Date.now(), data: finalResults });
+        return finalResults;
+      }
+    } catch (nomErr) {
+      console.warn("[OSM SERVER] Nominatim fallback error:", nomErr);
     }
 
     return [];
@@ -483,7 +497,7 @@ export const searchPharmaciesWithAI = createServerFn({ method: "POST" })
     const apiKey = process.env.GEMINI_API_KEY?.trim();
     if (!apiKey) return [];
 
-    const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+    const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"];
     const systemPrompt = `Anda adalah sistem direktori apotek dan fasilitas kesehatan lokal di Indonesia. 
 Berikan daftar 8 fasilitas kesehatan (Apotek / Klinik / RS) terdekat nyata di sekitar koordinat [${lat}, ${lon}] (${address || "Indonesia"}).
 Kembalikan HANYA JSON array dengan struktur:

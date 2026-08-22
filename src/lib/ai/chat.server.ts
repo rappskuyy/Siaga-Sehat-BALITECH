@@ -51,38 +51,43 @@ export const chatWithAI = createServerFn({ method: "POST" })
     }
 
     if (geminiKey) {
-      const models = ["gemini-2.5-flash", "gemini-1.5"];
+      const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"];
+      let lastErrText = "";
       for (const model of models) {
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-goog-api-key": geminiKey,
+        try {
+          const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": geminiKey,
+              },
+              body: JSON.stringify({
+                systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: { maxOutputTokens: 800 },
+              }),
             },
-            body: JSON.stringify({
-              systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-              contents: [{ role: "user", parts: [{ text: prompt }] }],
-              generationConfig: { maxOutputTokens: 800 },
-            }),
-          },
-        );
+          );
 
-        if (!res.ok) {
-          const txt = await res.text().catch(() => "");
-          // try next model
-          continue;
+          if (!res.ok) {
+            const txt = await res.text().catch(() => "");
+            lastErrText = `Model ${model} status ${res.status}: ${txt.slice(0, 150)}`;
+            continue;
+          }
+
+          const payload = await res.json();
+          const text =
+            payload.candidates?.[0]?.content?.parts
+              ?.map((p: { text?: string }) => p.text ?? "")
+              .join("") || "";
+          if (text) return { reply: text };
+        } catch (err) {
+          lastErrText = err instanceof Error ? err.message : String(err);
         }
-
-        const payload = await res.json();
-        const text =
-          payload.candidates?.[0]?.content?.parts
-            ?.map((p: { text?: string }) => p.text ?? "")
-            .join("") || "";
-        return { reply: text };
       }
-      throw new Error("Gemini API tidak dapat dihubungi");
+      throw new Error(`Gemini API tidak dapat dihubungi (${lastErrText || "semua model sibuk/error"})`);
     }
 
     throw new Error(

@@ -7,10 +7,7 @@ import {
   detectFacilityType,
 } from "@/lib/maps/pharmacy.server";
 import { parseOpeningHours, type OperatingHours } from "@/lib/maps/parseOpeningHours";
-import {
-  getCachedPharmacies,
-  savePharmaciesToCache,
-} from "@/lib/maps/offlinePharmacyHandler";
+import { getCachedPharmacies, savePharmaciesToCache } from "@/lib/maps/offlinePharmacyHandler";
 
 export { haversineDistance, detectFacilityType };
 
@@ -67,31 +64,31 @@ export async function searchLocationByAddress(query: string): Promise<GeocodeRes
 
   const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
 
-  // 1. Coba Google Maps Geocoder jika API Key tersedia
+  // 1. Google Maps Geocoder (if available)
   if (
     googleApiKey &&
     typeof window !== "undefined" &&
-    window.google &&
-    window.google.maps &&
-    window.google.maps.Geocoder
+    (window as any).google &&
+    (window as any).google.maps &&
+    (window as any).google.maps.Geocoder
   ) {
     try {
-      const geocoder = new window.google.maps.Geocoder();
-      const response = await new Promise<google.maps.GeocoderResult[]>((resolve) => {
+      const geocoder = new (window as any).google.maps.Geocoder();
+      const response = await new Promise<any[]>((resolve) => {
         geocoder.geocode(
           { address: query, componentRestrictions: { country: "ID" } },
-          (results, status) => {
+          (results: any[], status: string) => {
             if (status === "OK" && results) {
               resolve(results);
             } else {
               resolve([]);
             }
-          }
+          },
         );
       });
 
       if (response && response.length > 0) {
-        return response.map((item) => ({
+        return response.map((item: any) => ({
           displayname: item.formatted_address,
           lat: item.geometry.location.lat(),
           lon: item.geometry.location.lng(),
@@ -172,49 +169,78 @@ export async function reverseGeocode(lat: number, lon: number): Promise<string |
 export async function fetchNearbyPharmacies(
   lat: number,
   lon: number,
-  mapInstance?: google.maps.Map,
+  mapInstance?: any,
   address?: string,
-  dangerLevel: DangerLevelType = "rendah"
+  dangerLevel: DangerLevelType = "rendah",
 ): Promise<PharmacyNode[]> {
-  console.log(`[MAPS PIPELINE] Initiating real facility search for [${lat}, ${lon}] (${address || "Tanpa Alamat"}) - Triage: ${dangerLevel}`);
+  console.log(
+    `[MAPS PIPELINE] Initiating real facility search for [${lat}, ${lon}] (${address || "Tanpa Alamat"}) - Triage: ${dangerLevel}`,
+  );
 
-  // 0. PRIMARY: Local Scraped Google Maps Dataset (Zero API Key & Instant Offline Support)
-  try {
-    const localResults = await searchFacilitiesFromLocalDataset({
-      data: { lat, lon, dangerLevel, maxDistanceKm: 30 },
-    });
-    if (localResults && localResults.length > 0) {
-      console.log(`[MAPS PIPELINE] Found ${localResults.length} facilities from Local Scraped Dataset.`);
-      savePharmaciesToCache(lat, lon, localResults, address);
-      return localResults;
-    }
-  } catch (localErr) {
-    console.warn("[MAPS PIPELINE] Local dataset search error:", localErr);
-  }
+  const combinedResults: PharmacyNode[] = [];
 
-  // 1. SECONDARY: OpenStreetMap Server Function (Server-side Overpass & Nominatim with 0 CORS)
+  // 1. PRIMARY: OpenStreetMap Overpass & Nominatim Server (Real-time live health facilities)
   try {
     const osmResults = await searchFacilitiesViaOSMServer({
       data: { lat, lon, dangerLevel },
     });
     if (osmResults && osmResults.length > 0) {
-      savePharmaciesToCache(lat, lon, osmResults, address);
-      return osmResults;
+      console.log(
+        `[MAPS PIPELINE] Found ${osmResults.length} facilities via OpenStreetMap Overpass.`,
+      );
+      combinedResults.push(...osmResults);
     }
   } catch (osmErr) {
-    console.warn("[MAPS PIPELINE] OSM Server error, falling back to cache:", osmErr);
+    console.warn("[MAPS PIPELINE] OSM Server error:", osmErr);
   }
 
-  // 2. Local Storage Offline Cache
+  // 2. SUPPLEMENT: Local Verified Dataset (Enrichment)
+  try {
+    const localResults = await searchFacilitiesFromLocalDataset({
+      data: { lat, lon, dangerLevel, maxDistanceKm: 30 },
+    });
+    if (localResults && localResults.length > 0) {
+      for (const loc of localResults) {
+        const isDuplicate = combinedResults.some(
+          (c) =>
+            haversineDistance([c.lat, c.lon], [loc.lat, loc.lon]) < 0.1 ||
+            c.name.toLowerCase().includes(loc.name.toLowerCase()) ||
+            loc.name.toLowerCase().includes(c.name.toLowerCase()),
+        );
+        if (!isDuplicate) {
+          combinedResults.push(loc);
+        }
+      }
+    }
+  } catch (localErr) {
+    console.warn("[MAPS PIPELINE] Local dataset search error:", localErr);
+  }
+
+  // If we have live or merged results, save to cache and return sorted by distance
+  if (combinedResults.length > 0) {
+    combinedResults.sort((a, b) => {
+      if (dangerLevel === "tinggi") {
+        const aH = a.facilityType === "hospital" ? 0 : 1;
+        const bH = b.facilityType === "hospital" ? 0 : 1;
+        if (aH !== bH) return aH - bH;
+      }
+      return a.distanceKm - b.distanceKm;
+    });
+
+    savePharmaciesToCache(lat, lon, combinedResults, address);
+    return combinedResults;
+  }
+
+  // 3. OFFLINE CACHE FALLBACK
   const cachedPharmacies = getCachedPharmacies(lat, lon);
   if (cachedPharmacies && cachedPharmacies.length > 0) {
     return cachedPharmacies;
   }
 
-  // 3. TERTIARY: Google Places API (if API key available)
+  // 4. TERTIARY: Google Places API (if API key available)
   try {
     const googlePlacesResults = await searchPharmaciesViaGooglePlaces({
-      data: { lat, lon, radius: 5000, address },
+      data: { lat, lon, radius: 8000, address },
     });
     if (googlePlacesResults && googlePlacesResults.length > 0) {
       savePharmaciesToCache(lat, lon, googlePlacesResults, address);
@@ -224,7 +250,7 @@ export async function fetchNearbyPharmacies(
     // skip
   }
 
-  // 4. Gemini AI Search (Supplemental Fallback)
+  // 5. Gemini AI Search (Supplemental Fallback)
   try {
     const aiResults = await searchPharmaciesWithAI({ data: { lat, lon, address } });
     if (aiResults && aiResults.length > 0) {
@@ -235,7 +261,6 @@ export async function fetchNearbyPharmacies(
     // skip
   }
 
-  // 5. Clean Empty State (NO DUMMY DATA)
   return [];
 }
 
@@ -244,7 +269,7 @@ export const fetchNearbyPlaces = fetchNearbyPharmacies;
 export async function fetchOSRMRoute(
   start: [number, number],
   end: PlaceNode,
-  mode: TransportMode = "driving"
+  mode: TransportMode = "driving",
 ): Promise<RouteInfo> {
   try {
     const url = `https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end.lon},${end.lat}?overview=full&geometries=geojson&steps=false`;
@@ -253,9 +278,21 @@ export async function fetchOSRMRoute(
     const data = await res.json();
     if (data.routes && data.routes.length > 0) {
       const route = data.routes[0];
-      const coords: [number, number][] = route.geometry.coordinates.map(
-        (c: [number, number]) => [c[1], c[0]]
-      );
+      const coords: [number, number][] = route.geometry.coordinates.map((c: [number, number]) => [
+        c[1],
+        c[0],
+      ]);
+
+      // Snap start and end to exact marker coordinates so polyline connects cleanly to pin icons
+      if (coords && coords.length > 0) {
+        if (coords[0][0] !== start[0] || coords[0][1] !== start[1]) {
+          coords.unshift([start[0], start[1]]);
+        }
+        const lastIdx = coords.length - 1;
+        if (coords[lastIdx][0] !== end.lat || coords[lastIdx][1] !== end.lon) {
+          coords.push([end.lat, end.lon]);
+        }
+      }
 
       let durationMin = Math.ceil(route.duration / 60);
       if (mode === "motorcycle") {
@@ -274,7 +311,8 @@ export async function fetchOSRMRoute(
   }
 
   const baseDuration = Math.ceil(end.distanceKm * 4);
-  const durationMin = mode === "motorcycle" ? Math.max(1, Math.ceil(baseDuration * 0.75)) : baseDuration;
+  const durationMin =
+    mode === "motorcycle" ? Math.max(1, Math.ceil(baseDuration * 0.75)) : baseDuration;
 
   return {
     coordinates: [start, [end.lat, end.lon]],

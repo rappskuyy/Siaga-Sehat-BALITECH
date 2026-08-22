@@ -212,7 +212,7 @@ async function analyzeWithGemini(data: {
     return cached.result;
   }
 
-  const models = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-2.5-flash"];
+  const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"];
 
   let lastError: Error | null = null;
 
@@ -259,19 +259,30 @@ async function analyzeWithGemini(data: {
           break;
         }
 
+        if (res.status === 503 || res.status === 500 || res.status === 502 || res.status === 504) {
+          const errText = await res.text().catch(() => "");
+          lastError = new Error(
+            `Gemini API (${model}) sedang mengalami lonjakan beban (status ${res.status}).`,
+          );
+          // High demand or server error on this specific model -> skip to next model immediately
+          break;
+        }
+
         if (res.status === 429) {
           if (attempt < 3) {
             await delayMs(attempt * 1500);
             continue;
           }
-          throw new Error(
-            "Batas kuota gratis (rate limit 429) Gemini API sedang tercapai. Silakan tunggu 10 detik lalu coba tekan Scan kembali.",
+          lastError = new Error(
+            "Batas kuota gratis (rate limit 429) Gemini API sedang tercapai. Silakan tunggu beberapa detik lalu coba kembali.",
           );
+          break;
         }
 
         if (!res.ok) {
           const errText = await res.text().catch(() => "");
-          throw new Error(`Gemini ${model} (status ${res.status}). ${errText.slice(0, 250)}`);
+          lastError = new Error(`Gemini ${model} (status ${res.status}). ${errText.slice(0, 250)}`);
+          break;
         }
 
         const payload = (await res.json()) as {
@@ -298,8 +309,7 @@ async function analyzeWithGemini(data: {
       } catch (err) {
         lastError = err instanceof Error ? err : new Error(String(err));
         if (
-          lastError.message.includes("menolak menganalisis") ||
-          lastError.message.includes("rate limit 429")
+          lastError.message.includes("menolak menganalisis")
         ) {
           throw lastError;
         }

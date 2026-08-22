@@ -30,43 +30,43 @@ export function SourceBadge({
     }
   > = {
     google: {
-      icon: <CheckCircle2 className="h-3 w-3 text-emerald-600" />,
-      label: "Google Places",
-      bgColor: "bg-emerald-50",
-      textColor: "text-emerald-700",
-      borderColor: "border-emerald-200",
-      tooltip: "Data langsung terverifikasi dari Google Maps Places API",
+      icon: <CheckCircle2 className="h-3 w-3 text-[#379FD2]" />,
+      label: "Google Maps",
+      bgColor: "bg-[#ABE2FE]/20",
+      textColor: "text-[#379FD2]",
+      borderColor: "border-[#5BB4E0]/40",
+      tooltip: "Data terverifikasi dari dataset Google Maps",
     },
     osm: {
-      icon: <Info className="h-3 w-3 text-blue-600" />,
+      icon: <Info className="h-3 w-3 text-[#379FD2]" />,
       label: "OpenStreetMap",
-      bgColor: "bg-blue-50",
-      textColor: "text-blue-700",
-      borderColor: "border-blue-200",
+      bgColor: "bg-[#ABE2FE]/20",
+      textColor: "text-[#379FD2]",
+      borderColor: "border-[#5BB4E0]/40",
       tooltip: "Data geospasial komunitas OpenStreetMap resmi",
     },
     gemini: {
-      icon: <Sparkles className="h-3 w-3 text-amber-600" />,
-      label: "AI Gemini",
-      bgColor: "bg-amber-50",
-      textColor: "text-amber-800",
-      borderColor: "border-amber-200",
-      tooltip: "Pencarian cerdas basis data apotek lokal via AI Gemini",
+      icon: <Sparkles className="h-3 w-3 text-[#5BB4E0]" />,
+      label: "AI Terverifikasi",
+      bgColor: "bg-[#F7F9FB]",
+      textColor: "text-[#379FD2]",
+      borderColor: "border-[#E5E7EB]",
+      tooltip: "Pencarian cerdas basis data fasilitas kesehatan",
     },
     cache: {
-      icon: <Database className="h-3 w-3 text-slate-600" />,
+      icon: <Database className="h-3 w-3 text-[#6B7280]" />,
       label: "Tersimpan",
-      bgColor: "bg-slate-100",
-      textColor: "text-slate-700",
-      borderColor: "border-slate-300",
-      tooltip: "Data riwayat apotek tersimpan di perangkat (Mode Offline)",
+      bgColor: "bg-[#F7F9FB]",
+      textColor: "text-[#6B7280]",
+      borderColor: "border-[#E5E7EB]",
+      tooltip: "Data riwayat tersimpan di perangkat (Mode Offline)",
     },
     unknown: {
-      icon: <Info className="h-3 w-3 text-slate-500" />,
+      icon: <Info className="h-3 w-3 text-[#6B7280]" />,
       label: "Terverifikasi",
-      bgColor: "bg-slate-50",
-      textColor: "text-slate-600",
-      borderColor: "border-slate-200",
+      bgColor: "bg-[#F7F9FB]",
+      textColor: "text-[#6B7280]",
+      borderColor: "border-[#E5E7EB]",
       tooltip: "Data fasilitas kesehatan lokal",
     },
   };
@@ -77,19 +77,19 @@ export function SourceBadge({
   return (
     <span
       title={cfg.tooltip}
-      className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[9px] font-bold border transition shrink-0 ${cfg.bgColor} ${cfg.textColor} ${cfg.borderColor} ${className}`}
+      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-semibold border transition shrink-0 ${cfg.bgColor} ${cfg.textColor} ${cfg.borderColor} ${className}`}
     >
       {cfg.icon}
       <span>{displayLabel}</span>
       {showScore && trustScore !== undefined && (
-        <span className="opacity-75 font-mono">({trustScore}/10)</span>
+        <span className="opacity-80 font-mono text-[8px]">({trustScore}/10)</span>
       )}
     </span>
   );
 }
 
 /**
- * Summary badge bar showing breakdown across all returned pharmacies
+ * Summary badge bar showing breakdown across all returned facilities in blue gradient style
  */
 export function SourceSummaryBar({
   sources,
@@ -99,30 +99,30 @@ export function SourceSummaryBar({
   if (sources.total === 0) return null;
 
   return (
-    <div className="flex items-center gap-2 flex-wrap rounded-xl bg-slate-50/80 px-2.5 py-1 text-[10px] text-slate-600 border border-slate-100">
-      <span className="font-semibold text-slate-700">Sumber Data:</span>
+    <div className="flex items-center gap-2 flex-wrap rounded-full bg-[#F7F9FB] px-3 py-1 text-[10px] text-[#6B7280] border border-[#E5E7EB]">
+      <span className="font-semibold text-[#111111]">Sumber Data:</span>
       {sources.google > 0 && (
-        <span className="flex items-center gap-0.5 text-emerald-700 font-medium">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block" />
+        <span className="flex items-center gap-1 text-[#379FD2] font-medium">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#379FD2] inline-block" />
           Google ({Math.round((sources.google / sources.total) * 100)}%)
         </span>
       )}
       {sources.osm > 0 && (
-        <span className="flex items-center gap-0.5 text-blue-700 font-medium">
-          <span className="h-1.5 w-1.5 rounded-full bg-blue-500 inline-block" />
+        <span className="flex items-center gap-1 text-[#5BB4E0] font-medium">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#5BB4E0] inline-block" />
           OSM ({Math.round((sources.osm / sources.total) * 100)}%)
         </span>
       )}
       {sources.gemini > 0 && (
-        <span className="flex items-center gap-0.5 text-amber-700 font-medium">
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-500 inline-block" />
+        <span className="flex items-center gap-1 text-[#379FD2] font-medium">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#ABE2FE] inline-block" />
           AI ({Math.round((sources.gemini / sources.total) * 100)}%)
         </span>
       )}
       {sources.cache > 0 && (
-        <span className="flex items-center gap-0.5 text-slate-700 font-medium">
-          <span className="h-1.5 w-1.5 rounded-full bg-slate-500 inline-block" />
-          Offline Cache ({sources.cache})
+        <span className="flex items-center gap-1 text-[#6B7280] font-medium">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#E5E7EB] inline-block" />
+          Offline ({sources.cache})
         </span>
       )}
     </div>
