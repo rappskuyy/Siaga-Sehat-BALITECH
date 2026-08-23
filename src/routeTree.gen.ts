@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AnatomyRouteImport } from './routes/anatomy'
 import { Route as ConsultationRouteImport } from './routes/consultation'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -19,6 +20,11 @@ import { Route as ScannerRouteImport } from './routes/scanner'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnatomyRoute = AnatomyRouteImport.update({
+  id: '/anatomy',
+  path: '/anatomy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsultationRoute = ConsultationRouteImport.update({
@@ -49,6 +55,7 @@ const ScannerRoute = ScannerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/anatomy': typeof AnatomyRoute
   '/consultation': typeof ConsultationRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/anatomy': typeof AnatomyRoute
   '/consultation': typeof ConsultationRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/anatomy': typeof AnatomyRoute
   '/consultation': typeof ConsultationRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
@@ -75,12 +84,26 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/consultation' | '/login' | '/profile' | '/register' | '/scanner'
+    | '/'
+    | '/anatomy'
+    | '/consultation'
+    | '/login'
+    | '/profile'
+    | '/register'
+    | '/scanner'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/consultation' | '/login' | '/profile' | '/register' | '/scanner'
+  to:
+    | '/'
+    | '/anatomy'
+    | '/consultation'
+    | '/login'
+    | '/profile'
+    | '/register'
+    | '/scanner'
   id:
     | '__root__'
     | '/'
+    | '/anatomy'
     | '/consultation'
     | '/login'
     | '/profile'
@@ -90,6 +113,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnatomyRoute: typeof AnatomyRoute
   ConsultationRoute: typeof ConsultationRoute
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
@@ -104,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/anatomy': {
+      id: '/anatomy'
+      path: '/anatomy'
+      fullPath: '/anatomy'
+      preLoaderRoute: typeof AnatomyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/consultation': {
@@ -146,6 +177,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnatomyRoute: AnatomyRoute,
   ConsultationRoute: ConsultationRoute,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
