@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import {
   AlertTriangle,
   Building2,
@@ -16,7 +17,6 @@ import {
 import type { DangerLevel, ScanResult } from "@/lib/scanner/types";
 import { Button } from "@/components/ui/button";
 import { PharmacyMap } from "@/components/maps/PharmacyMap";
-import type { PlaceType } from "@/components/maps/maps.service";
 import { AiConsultation } from "./AiConsultation";
 
 const DANGER_STYLES: Record<
@@ -43,36 +43,31 @@ const DANGER_STYLES: Record<
   },
 };
 
-
-
-function Section({
-  title,
-  icon: Icon,
+const BounceCard = ({
+  className,
   children,
-  delay,
 }: {
-  title: string;
-  icon: typeof Pill;
+  className?: string;
   children: React.ReactNode;
-  delay: string;
-}) {
+}) => {
   return (
-    <div
-      className="animate-fade-up rounded-2xl bg-white p-5 shadow-[var(--shadow-clinic)]"
-      style={{ animationDelay: delay }}
+    <motion.div
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.2 }}
+      className={`group relative min-h-[310px] cursor-pointer overflow-hidden rounded-2xl bg-slate-50 p-7 border border-slate-200 shadow-sm hover:shadow-md transition-shadow ${className}`}
     >
-      <div className="mb-3 flex items-center gap-2">
-        <span className="grid h-8 w-8 place-items-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
-          <Icon className="h-4 w-4" />
-        </span>
-        <h3 className="font-display text-sm font-bold text-[color:var(--color-clinic-ink)]">
-          {title}
-        </h3>
-      </div>
       {children}
-    </div>
+    </motion.div>
   );
-}
+};
+
+const CardTitle = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <h3 className="mx-auto text-center text-2xl font-bold text-slate-800 font-display">
+      {children}
+    </h3>
+  );
+};
 
 export function ScanResultView({
   result,
@@ -110,42 +105,46 @@ export function ScanResultView({
   const DangerIcon = danger.icon;
 
   return (
-    <div className="flex flex-col gap-5">
-      <p className="text-center font-display text-lg font-bold uppercase tracking-wide text-[color:var(--color-clinic-blue)]">
-        Hasil
-      </p>
+    <div className="w-full flex flex-col gap-6">
+      <div className="flex items-center justify-between">
+        <p className="font-display text-lg font-bold uppercase tracking-wide text-[color:var(--color-clinic-blue)]">
+          Hasil Skrining AI
+        </p>
+      </div>
 
       {/* Header card: photo + disease identity */}
-      <div className="animate-fade-up grid gap-5 rounded-[24px] bg-white p-5 shadow-[var(--shadow-clinic-lg)] md:grid-cols-[220px_1fr]">
+      <div className="animate-fade-up grid gap-6 rounded-[28px] bg-white p-6 shadow-[var(--shadow-clinic-lg)] md:grid-cols-[280px_1fr] lg:grid-cols-[320px_1fr] md:p-8 w-full">
         <div className="relative overflow-hidden rounded-2xl">
           <img
             src={previewUrl}
             alt="Foto yang dianalisis"
-            className="aspect-square w-full object-cover"
+            className="aspect-square w-full object-cover max-h-[340px] md:max-h-none"
           />
           <span
-            className={`absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br text-white shadow-md ${danger.ring}`}
+            className={`absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br text-white shadow-md ${danger.ring}`}
           >
-            <DangerIcon className="h-4 w-4" />
+            <DangerIcon className="h-5 w-5" />
           </span>
         </div>
 
         <div className="flex flex-col justify-center">
           <span
-            className={`inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${danger.badge}`}
+            className={`inline-flex w-fit items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold ${danger.badge}`}
           >
-            <DangerIcon className="h-3.5 w-3.5" />
+            <DangerIcon className="h-4 w-4" />
             {danger.label}
           </span>
-          <h2 className="mt-3 font-display text-2xl font-extrabold text-[color:var(--color-clinic-ink)] md:text-3xl">
+          <h2 className="mt-3 font-display text-2xl font-extrabold text-[color:var(--color-clinic-ink)] md:text-3xl lg:text-4xl">
             {result.nama_penyakit}
           </h2>
-          <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-clinic-muted)]">
+          <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-clinic-muted)] md:text-base">
             {result.ringkasan}
           </p>
-          <p className="mt-3 text-xs text-[color:var(--color-clinic-muted)]">
+          <p className="mt-4 text-xs text-[color:var(--color-clinic-muted)] md:text-sm">
             Tingkat keyakinan analisis:{" "}
-            <span className="font-semibold">{result.tingkat_keyakinan}</span>
+            <span className="font-semibold text-[color:var(--color-clinic-ink)]">
+              {result.tingkat_keyakinan}
+            </span>
           </p>
         </div>
       </div>
@@ -163,72 +162,99 @@ export function ScanResultView({
         </div>
       )}
 
-      <div className="grid gap-5 md:grid-cols-2">
-        <Section title="Kemungkinan Penyebab" icon={Stethoscope} delay="0.1s">
-          <ul className="space-y-2 text-sm text-[color:var(--color-clinic-muted)]">
-            {result.penyebab.map((item, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--color-clinic-blue)]" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </Section>
+      {/* Bouncy Cards Results Features Section */}
+      <div className="mb-4 grid grid-cols-12 gap-4">
+        {/* Card 1: Kemungkinan Penyebab */}
+        <BounceCard className="col-span-12 md:col-span-4">
+          <CardTitle>Kemungkinan Penyebab</CardTitle>
+          <div className="absolute bottom-0 left-4 right-4 top-24 translate-y-6 rounded-t-2xl bg-gradient-to-br from-[#379FD2] to-[#5BB4E0] p-4 transition-transform duration-[250ms] group-hover:-translate-y-2 text-white flex flex-col items-start gap-2 overflow-y-auto max-h-[220px] shadow-md">
+            <Stethoscope className="w-7 h-7 shrink-0 text-cyan-100" />
+            <ul className="space-y-1.5 text-xs sm:text-sm font-medium text-white leading-relaxed w-full">
+              {result.penyebab.map((item, i) => (
+                <li key={i} className="flex items-start gap-2 bg-white/15 rounded-xl p-2">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-200" />
+                  <span className="text-xs sm:text-sm font-semibold">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </BounceCard>
 
-        <Section title="Pencegahan Mandiri" icon={CheckCircle2} delay="0.15s">
-          <ul className="space-y-2 text-sm text-[color:var(--color-clinic-muted)]">
-            {result.pencegahan_mandiri.map((item, i) => (
-              <li key={i} className="flex gap-2">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </Section>
+        {/* Card 2: Pencegahan Mandiri */}
+        <BounceCard className="col-span-12 md:col-span-8">
+          <CardTitle>Pencegahan Mandiri</CardTitle>
+          <div className="absolute bottom-0 left-4 right-4 top-24 translate-y-6 rounded-t-2xl bg-gradient-to-br from-[#379FD2] via-[#5BB4E0] to-[#ABE2FE] p-4 transition-transform duration-[250ms] group-hover:-translate-y-2 text-slate-900 flex flex-col items-start gap-2 overflow-y-auto max-h-[220px] shadow-md">
+            <CheckCircle2 className="w-7 h-7 shrink-0 text-[#11354A]" />
+            <div className="grid gap-2 text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed sm:grid-cols-2 w-full">
+              {result.pencegahan_mandiri.map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-2 bg-white/40 rounded-xl p-2 border border-white/30"
+                >
+                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#379FD2]" />
+                  <span className="text-xs sm:text-sm text-[#0C2A3C]">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </BounceCard>
+      </div>
 
-        <Section title="Rekomendasi Obat" icon={Pill} delay="0.2s">
-          {result.obat_rekomendasi.length === 0 ? (
-            <p className="text-sm text-[color:var(--color-clinic-muted)]">
-              Tidak ada rekomendasi obat bebas untuk kondisi ini — sebaiknya konsultasi ke
-              dokter/apoteker.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {result.obat_rekomendasi.map((med, i) => (
-                <div key={i} className="rounded-xl bg-[color:var(--color-clinic-blue-soft)]/50 p-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-semibold text-[color:var(--color-clinic-ink)]">
-                      {med.nama}
-                    </span>
-                    <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-[color:var(--color-clinic-blue)]">
-                      {med.dosis}
-                    </span>
+      <div className="grid grid-cols-12 gap-4">
+        {/* Card 3: Rekomendasi Obat */}
+        <BounceCard className="col-span-12 md:col-span-8">
+          <CardTitle>Rekomendasi Obat & Medis</CardTitle>
+          <div className="absolute bottom-0 left-4 right-4 top-24 translate-y-6 rounded-t-2xl bg-gradient-to-br from-[#5BB4E0] to-[#ABE2FE] p-4 transition-transform duration-[250ms] group-hover:-translate-y-2 text-slate-900 flex flex-col items-start gap-2 overflow-y-auto max-h-[220px] shadow-md">
+            <Pill className="w-7 h-7 shrink-0 text-[#0C2A3C]" />
+            {result.obat_rekomendasi.length === 0 ? (
+              <span className="text-xs sm:text-sm font-semibold text-[#0C2A3C]">
+                Tidak ada saran obat bebas untuk kondisi ini — konsultasikan ke dokter/apoteker.
+              </span>
+            ) : (
+              <div className="grid gap-2 text-xs sm:text-sm font-semibold text-slate-900 sm:grid-cols-2 w-full">
+                {result.obat_rekomendasi.map((med, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-col gap-0.5 bg-white/50 rounded-xl p-2.5 border border-white/40 shadow-2xs"
+                  >
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-bold text-[#092231] text-xs sm:text-sm">{med.nama}</span>
+                      <span className="rounded-full bg-[#379FD2] px-2 py-0.5 text-[11px] font-bold text-white">
+                        {med.dosis}
+                      </span>
+                    </div>
+                    <span className="text-xs text-[#143B52]">{med.catatan}</span>
                   </div>
-                  <p className="mt-1 text-xs text-[color:var(--color-clinic-muted)]">
-                    {med.catatan}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </Section>
+                ))}
+              </div>
+            )}
+          </div>
+        </BounceCard>
 
-        <Section title="Obat Herbal Alami" icon={Leaf} delay="0.25s">
-          {result.obat_herbal.length === 0 ? (
-            <p className="text-sm text-[color:var(--color-clinic-muted)]">
-              Tidak ada saran herbal spesifik.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {result.obat_herbal.map((herb, i) => (
-                <div key={i} className="rounded-xl bg-emerald-50 p-3">
-                  <span className="text-sm font-semibold text-emerald-800">{herb.nama}</span>
-                  <p className="mt-1 text-xs text-emerald-700/80">{herb.cara_pakai}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </Section>
+        {/* Card 4: Obat Herbal Alami */}
+        <BounceCard className="col-span-12 md:col-span-4">
+          <CardTitle>Obat Herbal Alami</CardTitle>
+          <div className="absolute bottom-0 left-4 right-4 top-24 translate-y-6 rounded-t-2xl bg-gradient-to-br from-[#379FD2] via-[#5BB4E0] to-[#ABE2FE] p-4 transition-transform duration-[250ms] group-hover:-translate-y-2 text-slate-900 flex flex-col items-start gap-2 overflow-y-auto max-h-[220px] shadow-md">
+            <Leaf className="w-7 h-7 shrink-0 text-[#0C2A3C]" />
+            {result.obat_herbal.length === 0 ? (
+              <span className="text-xs sm:text-sm font-semibold text-[#0C2A3C]">
+                Tidak ada saran obat herbal spesifik.
+              </span>
+            ) : (
+              <div className="space-y-2 text-xs sm:text-sm font-semibold text-slate-900 w-full">
+                {result.obat_herbal.map((herb, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-col gap-0.5 bg-white/40 rounded-xl p-2 border border-white/30"
+                  >
+                    <span className="font-bold text-[#092231] text-xs sm:text-sm">{herb.nama}</span>
+                    <span className="text-xs text-[#143B52]">{herb.cara_pakai}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </BounceCard>
       </div>
 
       {/* Peta Fasilitas Kesehatan / Apotek / Rumah Sakit Terdekat */}

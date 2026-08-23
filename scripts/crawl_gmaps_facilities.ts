@@ -193,7 +193,7 @@ async function crawlSingleQuery(
       await page.waitForTimeout(2000);
 
       const items = await page.evaluate(() => {
-        const links = Array.from(document.querySelectorAll('a[href*="/maps/place/"]'));
+        const links = Array.from(document.querySelectorAll<HTMLElement>('a[href*="/maps/place/"]'));
         return links.map((link) => {
           const parentCard =
             link.closest('div[role="article"]') || link.closest("div.Nv2PK") || link.parentElement;
@@ -216,7 +216,7 @@ async function crawlSingleQuery(
           const rawTitle =
             link.getAttribute("aria-label") ||
             link.querySelector("div.fontHeadlineSmall")?.textContent ||
-            link.innerText?.split("\n")[0] ||
+            (link as HTMLElement).innerText?.split("\n")[0] ||
             "";
 
           return {
