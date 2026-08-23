@@ -813,62 +813,8 @@ export function PharmacyMap({ dangerLevel = "rendah" }: PharmacyMapProps) {
         )}
       </div>
 
-      {/* Main Composition: Desktop 3-Column Layout & Mobile Responsive Mode */}
+      {/* Main Composition: Desktop Layout & Mobile Responsive Mode */}
       <div className="flex flex-col lg:flex-row gap-3 min-h-[480px] lg:h-[720px] items-stretch">
-        {/* 01. Navigation Rail (Desktop) */}
-        <div className="hidden lg:flex w-[70px] shrink-0 flex-col items-center justify-between rounded-2xl bg-[#FFFFFF] py-4 border border-[#E5E7EB] shadow-2xs">
-          <div className="flex flex-col items-center gap-4">
-            <button
-              type="button"
-              onClick={() => setActiveNavTab("map")}
-              title="Peta Navigasi"
-              className={`grid h-11 w-11 place-items-center rounded-xl transition cursor-pointer ${
-                activeNavTab === "map"
-                  ? "bg-gradient-blue-primary text-[#FFFFFF] shadow-sm"
-                  : "text-[#6B7280] hover:bg-[#F7F9FB] hover:text-[#379FD2]"
-              }`}
-            >
-              <Compass className="h-5 w-5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveNavTab("clinic")}
-              title="Daftar Fasilitas"
-              className={`grid h-11 w-11 place-items-center rounded-xl transition cursor-pointer ${
-                activeNavTab === "clinic"
-                  ? "bg-gradient-blue-primary text-[#FFFFFF] shadow-sm"
-                  : "text-[#6B7280] hover:bg-[#F7F9FB] hover:text-[#379FD2]"
-              }`}
-            >
-              <Building2 className="h-5 w-5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveNavTab("pharmacy")}
-              title="Apotek Terdekat"
-              className={`grid h-11 w-11 place-items-center rounded-xl transition cursor-pointer ${
-                activeNavTab === "pharmacy"
-                  ? "bg-gradient-blue-primary text-[#FFFFFF] shadow-sm"
-                  : "text-[#6B7280] hover:bg-[#F7F9FB] hover:text-[#379FD2]"
-              }`}
-            >
-              <Pill className="h-5 w-5" />
-            </button>
-          </div>
-
-          <div className="flex flex-col items-center gap-3">
-            <button
-              type="button"
-              onClick={() => getUserGeolocation(true)}
-              title="Pusatkan ke Lokasi Saya"
-              className="grid h-9 w-9 place-items-center rounded-xl text-[#6B7280] hover:bg-[#ABE2FE]/20 hover:text-[#379FD2] transition cursor-pointer"
-            >
-              <Crosshair className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
 
         {/* 02. Clinic List Column */}
         <div
