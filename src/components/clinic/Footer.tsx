@@ -2,12 +2,7 @@ import { useState } from "react";
 import { ArrowRight, Github, Linkedin, MessageCircle, Twitter } from "lucide-react";
 import { Reveal } from "./Reveal";
 
-const NAV_LINKS = [
-  { label: "Konsultasi Dokter", href: "/consultation" },
-  { label: "Eksplorasi Anatomi", href: "/anatomy" },
-  { label: "Scan Penyakit AI", href: "/scanner" },
-  { label: "Layanan", href: "/#services" },
-];
+const NAV_LINKS = ["How it works", "Features", "Pricing", "Testimonials", "FAQ"];
 const COMPANY_LINKS = ["Blog", "About", "Terms and Condition", "Privacy Policy"];
 const SOCIALS = [
   { icon: MessageCircle, label: "Discord" },
@@ -68,13 +63,13 @@ export function Footer() {
                 Navigation
               </p>
               <ul className="mt-4 space-y-3">
-                {NAV_LINKS.map((item) => (
-                  <li key={item.label}>
+                {NAV_LINKS.map((l) => (
+                  <li key={l}>
                     <a
-                      href={item.href}
+                      href="#"
                       className="text-sm text-[color:var(--color-clinic-muted)] transition hover:text-[color:var(--color-clinic-blue)]"
                     >
-                      {item.label}
+                      {l}
                     </a>
                   </li>
                 ))}

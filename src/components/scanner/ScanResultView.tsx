@@ -21,49 +21,64 @@ import { AiConsultation } from "./AiConsultation";
 
 const DANGER_STYLES: Record<
   DangerLevel,
-  { label: string; badge: string; icon: typeof ShieldCheck; ring: string }
+  {
+    label: string;
+    badge: string;
+    icon: typeof ShieldCheck;
+    ring: string;
+    card: string;
+    panel: string;
+    title: string;
+    accent: string;
+  }
 > = {
   rendah: {
     label: "Bahaya Rendah",
     badge: "bg-emerald-100 text-emerald-700",
     icon: ShieldCheck,
     ring: "from-emerald-400 to-emerald-500",
+    card: "border-emerald-200 bg-emerald-50/60",
+    panel: "from-emerald-500 to-teal-400",
+    title: "text-emerald-950",
+    accent: "text-emerald-100",
   },
   sedang: {
     label: "Perlu Diperhatikan",
     badge: "bg-amber-100 text-amber-700",
     icon: ShieldQuestion,
     ring: "from-amber-400 to-amber-500",
+    card: "border-amber-200 bg-amber-50/60",
+    panel: "from-amber-400 to-yellow-300",
+    title: "text-amber-950",
+    accent: "text-amber-100",
   },
   tinggi: {
     label: "Bahaya Tinggi",
     badge: "bg-red-100 text-red-700",
     icon: ShieldAlert,
     ring: "from-red-400 to-red-500",
+    card: "border-red-200 bg-red-50/60",
+    panel: "from-red-500 to-rose-400",
+    title: "text-red-950",
+    accent: "text-red-100",
   },
 };
 
-const BounceCard = ({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) => {
+const BounceCard = ({ className, children }: { className?: string; children: React.ReactNode }) => {
   return (
     <motion.div
       whileHover={{ y: -6 }}
       transition={{ duration: 0.2 }}
-      className={`group relative min-h-[310px] cursor-pointer overflow-hidden rounded-2xl bg-slate-50 p-7 border border-slate-200 shadow-sm hover:shadow-md transition-shadow ${className}`}
+      className={`group relative flex h-full flex-col rounded-2xl border p-7 shadow-sm transition-shadow hover:shadow-md ${className}`}
     >
       {children}
     </motion.div>
   );
 };
 
-const CardTitle = ({ children }: { children: React.ReactNode }) => {
+const CardTitle = ({ children, className }: { children: React.ReactNode; className?: string }) => {
   return (
-    <h3 className="mx-auto text-center text-2xl font-bold text-slate-800 font-display">
+    <h3 className={`mx-auto text-center text-2xl font-bold font-display ${className ?? ""}`}>
       {children}
     </h3>
   );
@@ -113,7 +128,9 @@ export function ScanResultView({
       </div>
 
       {/* Header card: photo + disease identity */}
-      <div className="animate-fade-up grid gap-6 rounded-[28px] bg-white p-6 shadow-[var(--shadow-clinic-lg)] md:grid-cols-[280px_1fr] lg:grid-cols-[320px_1fr] md:p-8 w-full">
+      <div
+        className={`animate-fade-up grid w-full gap-6 rounded-[28px] border p-6 shadow-[var(--shadow-clinic-lg)] md:grid-cols-[280px_1fr] md:p-8 lg:grid-cols-[320px_1fr] ${danger.card}`}
+      >
         <div className="relative overflow-hidden rounded-2xl">
           <img
             src={previewUrl}
@@ -134,7 +151,9 @@ export function ScanResultView({
             <DangerIcon className="h-4 w-4" />
             {danger.label}
           </span>
-          <h2 className="mt-3 font-display text-2xl font-extrabold text-[color:var(--color-clinic-ink)] md:text-3xl lg:text-4xl">
+          <h2
+            className={`mt-3 font-display text-2xl font-extrabold md:text-3xl lg:text-4xl ${danger.title}`}
+          >
             {result.nama_penyakit}
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-clinic-muted)] md:text-base">
@@ -165,10 +184,12 @@ export function ScanResultView({
       {/* Bouncy Cards Results Features Section */}
       <div className="mb-4 grid grid-cols-12 gap-4">
         {/* Card 1: Kemungkinan Penyebab */}
-        <BounceCard className="col-span-12 md:col-span-4">
-          <CardTitle>Kemungkinan Penyebab</CardTitle>
-          <div className="absolute bottom-0 left-4 right-4 top-24 translate-y-6 rounded-t-2xl bg-gradient-to-br from-[#379FD2] to-[#5BB4E0] p-4 transition-transform duration-[250ms] group-hover:-translate-y-2 text-white flex flex-col items-start gap-2 overflow-y-auto max-h-[220px] shadow-md">
-            <Stethoscope className="w-7 h-7 shrink-0 text-cyan-100" />
+        <BounceCard className={`col-span-12 md:col-span-4 ${danger.card}`}>
+          <CardTitle className={danger.title}>Kemungkinan Penyebab</CardTitle>
+          <div
+            className={`mt-8 flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-white shadow-md ${danger.panel}`}
+          >
+            <Stethoscope className={`h-7 w-7 shrink-0 ${danger.accent}`} />
             <ul className="space-y-1.5 text-xs sm:text-sm font-medium text-white leading-relaxed w-full">
               {result.penyebab.map((item, i) => (
                 <li key={i} className="flex items-start gap-2 bg-white/15 rounded-xl p-2">
@@ -181,9 +202,11 @@ export function ScanResultView({
         </BounceCard>
 
         {/* Card 2: Pencegahan Mandiri */}
-        <BounceCard className="col-span-12 md:col-span-8">
-          <CardTitle>Pencegahan Mandiri</CardTitle>
-          <div className="absolute bottom-0 left-4 right-4 top-24 translate-y-6 rounded-t-2xl bg-gradient-to-br from-[#379FD2] via-[#5BB4E0] to-[#ABE2FE] p-4 transition-transform duration-[250ms] group-hover:-translate-y-2 text-slate-900 flex flex-col items-start gap-2 overflow-y-auto max-h-[220px] shadow-md">
+        <BounceCard className={`col-span-12 md:col-span-8 ${danger.card}`}>
+          <CardTitle className={danger.title}>Pencegahan Mandiri</CardTitle>
+          <div
+            className={`mt-8 flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
+          >
             <CheckCircle2 className="w-7 h-7 shrink-0 text-[#11354A]" />
             <div className="grid gap-2 text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed sm:grid-cols-2 w-full">
               {result.pencegahan_mandiri.map((item, i) => (
@@ -202,9 +225,11 @@ export function ScanResultView({
 
       <div className="grid grid-cols-12 gap-4">
         {/* Card 3: Rekomendasi Obat */}
-        <BounceCard className="col-span-12 md:col-span-8">
-          <CardTitle>Rekomendasi Obat & Medis</CardTitle>
-          <div className="absolute bottom-0 left-4 right-4 top-24 translate-y-6 rounded-t-2xl bg-gradient-to-br from-[#5BB4E0] to-[#ABE2FE] p-4 transition-transform duration-[250ms] group-hover:-translate-y-2 text-slate-900 flex flex-col items-start gap-2 overflow-y-auto max-h-[220px] shadow-md">
+        <BounceCard className={`col-span-12 md:col-span-8 ${danger.card}`}>
+          <CardTitle className={danger.title}>Rekomendasi Obat & Medis</CardTitle>
+          <div
+            className={`mt-8 flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
+          >
             <Pill className="w-7 h-7 shrink-0 text-[#0C2A3C]" />
             {result.obat_rekomendasi.length === 0 ? (
               <span className="text-xs sm:text-sm font-semibold text-[#0C2A3C]">
@@ -218,7 +243,9 @@ export function ScanResultView({
                     className="flex flex-col gap-0.5 bg-white/50 rounded-xl p-2.5 border border-white/40 shadow-2xs"
                   >
                     <div className="flex items-center justify-between gap-1">
-                      <span className="font-bold text-[#092231] text-xs sm:text-sm">{med.nama}</span>
+                      <span className="font-bold text-[#092231] text-xs sm:text-sm">
+                        {med.nama}
+                      </span>
                       <span className="rounded-full bg-[#379FD2] px-2 py-0.5 text-[11px] font-bold text-white">
                         {med.dosis}
                       </span>
@@ -232,9 +259,11 @@ export function ScanResultView({
         </BounceCard>
 
         {/* Card 4: Obat Herbal Alami */}
-        <BounceCard className="col-span-12 md:col-span-4">
-          <CardTitle>Obat Herbal Alami</CardTitle>
-          <div className="absolute bottom-0 left-4 right-4 top-24 translate-y-6 rounded-t-2xl bg-gradient-to-br from-[#379FD2] via-[#5BB4E0] to-[#ABE2FE] p-4 transition-transform duration-[250ms] group-hover:-translate-y-2 text-slate-900 flex flex-col items-start gap-2 overflow-y-auto max-h-[220px] shadow-md">
+        <BounceCard className={`col-span-12 md:col-span-4 ${danger.card}`}>
+          <CardTitle className={danger.title}>Obat Herbal Alami</CardTitle>
+          <div
+            className={`mt-8 flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
+          >
             <Leaf className="w-7 h-7 shrink-0 text-[#0C2A3C]" />
             {result.obat_herbal.length === 0 ? (
               <span className="text-xs sm:text-sm font-semibold text-[#0C2A3C]">
@@ -258,10 +287,7 @@ export function ScanResultView({
       </div>
 
       {/* Peta Fasilitas Kesehatan / Apotek / Rumah Sakit Terdekat */}
-      <PharmacyMap
-        dangerLevel={result.tingkat_bahaya}
-        conditionName={result.nama_penyakit}
-      />
+      <PharmacyMap dangerLevel={result.tingkat_bahaya} conditionName={result.nama_penyakit} />
 
       {result.catatan_tambahan && (
         <p

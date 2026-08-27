@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, Bell, Leaf, MapPin, Mic2, Stethoscope, Activity, type LucideIcon } from "lucide-react";
+import { ArrowRight, Bell, Leaf, MapPin, Mic2, Stethoscope, type LucideIcon } from "lucide-react";
 import { Reveal } from "./Reveal";
 
 export interface Service {
@@ -8,7 +8,6 @@ export interface Service {
   description: string;
   price: string;
   icon: LucideIcon;
-  href?: string;
 }
 
 const SERVICES: Service[] = [
@@ -18,41 +17,31 @@ const SERVICES: Service[] = [
     description: "Analisis kesehatan dengan teknologi AI untuk deteksi dini penyakit dari foto.",
     price: "Tersedia",
     icon: Stethoscope,
-    href: "/scanner",
   },
   {
     number: "02",
-    title: "Eksplorasi Anatomi AI",
-    description: "Pilih bagian tubuh secara visual & interaktif untuk skrining kesehatan mandiri dengan AI.",
-    price: "Tersedia",
-    icon: Activity,
-    href: "/anatomy",
-  },
-  {
-    number: "03",
     title: "Konsultasi",
     description:
       "Jelaskan gejala Anda dengan mudah melalui speech-to-text untuk diagnosis lebih akurat.",
     price: "Tersedia",
     icon: Mic2,
-    href: "/consultation",
   },
   {
-    number: "04",
+    number: "03",
     title: "Lokasi & Apotek",
     description: "Temukan klinik terdekat dan apotek dalam satu aplikasi untuk kemudahan Anda.",
     price: "Tersedia",
     icon: MapPin,
   },
   {
-    number: "05",
+    number: "04",
     title: "Edukasi Herbal",
     description: "Pelajari manfaat obat herbal alami untuk kesehatan optimal.",
     price: "Gratis",
     icon: Leaf,
   },
   {
-    number: "06",
+    number: "05",
     title: "Medicine Reminder",
     description: "Pengingat minum obat agar Anda tidak lupa jadwal minum.",
     price: "Tersedia",
@@ -198,7 +187,7 @@ export function Services() {
 
             <div className="mt-auto flex items-center gap-3 pt-8">
               <a
-                href={current.href || "#services"}
+                href={active === 0 ? "/scanner" : "#services"}
                 className="group inline-flex items-center gap-2 rounded-full bg-[color:var(--color-clinic-ink)] py-2 pl-5 pr-2 text-sm font-medium text-white transition hover:bg-black/80"
               >
                 Coba sekarang
