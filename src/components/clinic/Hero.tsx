@@ -1,9 +1,9 @@
 import { useState } from "react";
-<<<<<<< Updated upstream
 import {
   ArrowUpRight,
   Bell,
   LogIn,
+  MapPin,
   MessageCircleHeart,
   Menu,
   Phone,
@@ -13,9 +13,6 @@ import {
   User,
   X,
 } from "lucide-react";
-=======
-import { ArrowUpRight, Bell, LogIn, MapPin, Menu, Play, ScanLine, User, X } from "lucide-react";
->>>>>>> Stashed changes
 import { Link } from "@tanstack/react-router";
 import { FloatingCard } from "./FloatingCard";
 import fotodokter1 from "@/assets/fotodokter(1).png?url";

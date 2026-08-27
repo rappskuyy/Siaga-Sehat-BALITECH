@@ -43,6 +43,7 @@ import {
   type RouteInfo,
   type TransportMode,
 } from "./maps.service";
+import { fetchWikimediaPhoto } from "@/hooks/useLocationPlaces";
 import { PharmacyList } from "./PharmacyList";
 import { SourceSummaryBar } from "./SourceBadge";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -727,6 +728,13 @@ export function DedicatedMapsView() {
       setDynamicPhotoUrl(null);
     }
 
+    // 100% Free Wikimedia Commons Geosearch API Photo Search
+    fetchWikimediaPhoto(selectedPharmacy.lat, selectedPharmacy.lon).then((wikiPhoto) => {
+      if (wikiPhoto) {
+        setDynamicPhotoUrl((prev) => prev || wikiPhoto);
+      }
+    });
+
     if (
       typeof window !== "undefined" &&
       window.google &&
@@ -774,7 +782,7 @@ export function DedicatedMapsView() {
         console.error("Places photo error:", e);
       }
     }
-  }, [selectedPharmacy?.id, selectedPharmacy?.name]);
+  }, [selectedPharmacy?.id, selectedPharmacy?.name, selectedPharmacy?.lat, selectedPharmacy?.lon]);
 
   // Stable photo fallback
   const activePhotoUrl = useMemo(() => {
