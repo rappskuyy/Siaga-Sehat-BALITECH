@@ -37,30 +37,30 @@ const DANGER_STYLES: Record<
     badge: "bg-emerald-100 text-emerald-700",
     icon: ShieldCheck,
     ring: "from-emerald-400 to-emerald-500",
-    card: "border-emerald-200 bg-emerald-50/60",
-    panel: "from-emerald-500 to-teal-400",
-    title: "text-emerald-950",
-    accent: "text-emerald-100",
+    card: "border-slate-200 bg-slate-50",
+    panel: "from-[color:var(--color-clinic-blue)] to-[color:var(--color-clinic-blue-dark)]",
+    title: "text-slate-800",
+    accent: "text-[color:var(--color-clinic-blue-soft)]",
   },
   sedang: {
     label: "Perlu Diperhatikan",
     badge: "bg-amber-100 text-amber-700",
     icon: ShieldQuestion,
     ring: "from-amber-400 to-amber-500",
-    card: "border-amber-200 bg-amber-50/60",
-    panel: "from-amber-400 to-yellow-300",
-    title: "text-amber-950",
-    accent: "text-amber-100",
+    card: "border-slate-200 bg-slate-50",
+    panel: "from-[color:var(--color-clinic-blue)] to-[color:var(--color-clinic-blue-dark)]",
+    title: "text-slate-800",
+    accent: "text-[color:var(--color-clinic-blue-soft)]",
   },
   tinggi: {
     label: "Bahaya Tinggi",
     badge: "bg-red-100 text-red-700",
     icon: ShieldAlert,
     ring: "from-red-400 to-red-500",
-    card: "border-red-200 bg-red-50/60",
-    panel: "from-red-500 to-rose-400",
-    title: "text-red-950",
-    accent: "text-red-100",
+    card: "border-slate-200 bg-slate-50",
+    panel: "from-[color:var(--color-clinic-blue)] to-[color:var(--color-clinic-blue-dark)]",
+    title: "text-slate-800",
+    accent: "text-[color:var(--color-clinic-blue-soft)]",
   },
 };
 
@@ -128,9 +128,7 @@ export function ScanResultView({
       </div>
 
       {/* Header card: photo + disease identity */}
-      <div
-        className={`animate-fade-up grid w-full gap-6 rounded-[28px] border p-6 shadow-[var(--shadow-clinic-lg)] md:grid-cols-[280px_1fr] md:p-8 lg:grid-cols-[320px_1fr] ${danger.card}`}
-      >
+      <div className="animate-fade-up grid w-full gap-6 rounded-[28px] border border-emerald-200 bg-emerald-50/60 p-6 shadow-[var(--shadow-clinic-lg)] md:grid-cols-[280px_1fr] md:p-8 lg:grid-cols-[320px_1fr]">
         <div className="relative overflow-hidden rounded-2xl">
           <img
             src={previewUrl}
@@ -151,9 +149,7 @@ export function ScanResultView({
             <DangerIcon className="h-4 w-4" />
             {danger.label}
           </span>
-          <h2
-            className={`mt-3 font-display text-2xl font-extrabold md:text-3xl lg:text-4xl ${danger.title}`}
-          >
+          <h2 className="mt-3 font-display text-2xl font-extrabold text-emerald-950 md:text-3xl lg:text-4xl">
             {result.nama_penyakit}
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-clinic-muted)] md:text-base">
@@ -184,8 +180,8 @@ export function ScanResultView({
       {/* Bouncy Cards Results Features Section */}
       <div className="mb-4 grid grid-cols-12 gap-4">
         {/* Card 1: Kemungkinan Penyebab */}
-        <BounceCard className={`col-span-12 md:col-span-4 ${danger.card}`}>
-          <CardTitle className={danger.title}>Kemungkinan Penyebab</CardTitle>
+        <BounceCard className="col-span-12 border-slate-200 bg-slate-50 md:col-span-4">
+          <CardTitle className="text-slate-800">Kemungkinan Penyebab</CardTitle>
           <div
             className={`mt-8 flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-white shadow-md ${danger.panel}`}
           >
@@ -193,7 +189,7 @@ export function ScanResultView({
             <ul className="space-y-1.5 text-xs sm:text-sm font-medium text-white leading-relaxed w-full">
               {result.penyebab.map((item, i) => (
                 <li key={i} className="flex items-start gap-2 bg-white/15 rounded-xl p-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-200" />
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--color-clinic-blue-soft)]" />
                   <span className="text-xs sm:text-sm font-semibold">{item}</span>
                 </li>
               ))}
@@ -202,20 +198,22 @@ export function ScanResultView({
         </BounceCard>
 
         {/* Card 2: Pencegahan Mandiri */}
-        <BounceCard className={`col-span-12 md:col-span-8 ${danger.card}`}>
-          <CardTitle className={danger.title}>Pencegahan Mandiri</CardTitle>
+        <BounceCard className="col-span-12 border-slate-200 bg-slate-50 md:col-span-8">
+          <CardTitle className="text-slate-800">Pencegahan Mandiri</CardTitle>
           <div
             className={`mt-8 flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
           >
-            <CheckCircle2 className="w-7 h-7 shrink-0 text-[#11354A]" />
+            <CheckCircle2 className="h-7 w-7 shrink-0 text-white" />
             <div className="grid gap-2 text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed sm:grid-cols-2 w-full">
               {result.pencegahan_mandiri.map((item, i) => (
                 <div
                   key={i}
                   className="flex items-start gap-2 bg-white/40 rounded-xl p-2 border border-white/30"
                 >
-                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#379FD2]" />
-                  <span className="text-xs sm:text-sm text-[#0C2A3C]">{item}</span>
+                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
+                  <span className="text-xs sm:text-sm text-[color:var(--color-clinic-ink)]">
+                    {item}
+                  </span>
                 </div>
               ))}
             </div>
@@ -225,14 +223,14 @@ export function ScanResultView({
 
       <div className="grid grid-cols-12 gap-4">
         {/* Card 3: Rekomendasi Obat */}
-        <BounceCard className={`col-span-12 md:col-span-8 ${danger.card}`}>
-          <CardTitle className={danger.title}>Rekomendasi Obat & Medis</CardTitle>
+        <BounceCard className="col-span-12 border-slate-200 bg-slate-50 md:col-span-8">
+          <CardTitle className="text-slate-800">Rekomendasi Obat & Medis</CardTitle>
           <div
             className={`mt-8 flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
           >
-            <Pill className="w-7 h-7 shrink-0 text-[#0C2A3C]" />
+            <Pill className="h-7 w-7 shrink-0 text-white" />
             {result.obat_rekomendasi.length === 0 ? (
-              <span className="text-xs sm:text-sm font-semibold text-[#0C2A3C]">
+              <span className="text-xs sm:text-sm font-semibold text-[color:var(--color-clinic-ink)]">
                 Tidak ada saran obat bebas untuk kondisi ini — konsultasikan ke dokter/apoteker.
               </span>
             ) : (
@@ -243,14 +241,16 @@ export function ScanResultView({
                     className="flex flex-col gap-0.5 bg-white/50 rounded-xl p-2.5 border border-white/40 shadow-2xs"
                   >
                     <div className="flex items-center justify-between gap-1">
-                      <span className="font-bold text-[#092231] text-xs sm:text-sm">
+                      <span className="text-xs font-bold text-[color:var(--color-clinic-ink)] sm:text-sm">
                         {med.nama}
                       </span>
-                      <span className="rounded-full bg-[#379FD2] px-2 py-0.5 text-[11px] font-bold text-white">
+                      <span className="rounded-full bg-[color:var(--color-clinic-blue-dark)] px-2 py-0.5 text-[11px] font-bold text-white">
                         {med.dosis}
                       </span>
                     </div>
-                    <span className="text-xs text-[#143B52]">{med.catatan}</span>
+                    <span className="text-xs text-[color:var(--color-clinic-ink)]">
+                      {med.catatan}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -259,14 +259,14 @@ export function ScanResultView({
         </BounceCard>
 
         {/* Card 4: Obat Herbal Alami */}
-        <BounceCard className={`col-span-12 md:col-span-4 ${danger.card}`}>
-          <CardTitle className={danger.title}>Obat Herbal Alami</CardTitle>
+        <BounceCard className="col-span-12 border-slate-200 bg-slate-50 md:col-span-4">
+          <CardTitle className="text-slate-800">Obat Herbal Alami</CardTitle>
           <div
             className={`mt-8 flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
           >
-            <Leaf className="w-7 h-7 shrink-0 text-[#0C2A3C]" />
+            <Leaf className="h-7 w-7 shrink-0 text-white" />
             {result.obat_herbal.length === 0 ? (
-              <span className="text-xs sm:text-sm font-semibold text-[#0C2A3C]">
+              <span className="text-xs sm:text-sm font-semibold text-[color:var(--color-clinic-ink)]">
                 Tidak ada saran obat herbal spesifik.
               </span>
             ) : (
@@ -276,8 +276,12 @@ export function ScanResultView({
                     key={i}
                     className="flex flex-col gap-0.5 bg-white/40 rounded-xl p-2 border border-white/30"
                   >
-                    <span className="font-bold text-[#092231] text-xs sm:text-sm">{herb.nama}</span>
-                    <span className="text-xs text-[#143B52]">{herb.cara_pakai}</span>
+                    <span className="text-xs font-bold text-[color:var(--color-clinic-ink)] sm:text-sm">
+                      {herb.nama}
+                    </span>
+                    <span className="text-xs text-[color:var(--color-clinic-ink)]">
+                      {herb.cara_pakai}
+                    </span>
                   </div>
                 ))}
               </div>

@@ -83,7 +83,10 @@ export function Statement() {
   const { segIndex, charIndex, done } = useTypewriter(SEGMENTS, inView);
 
   return (
-    <section className="w-full bg-white px-6 py-8 text-center md:px-16 md:py-12">
+    <section
+      id="about"
+      className="w-full bg-white px-5 py-10 text-center sm:px-6 md:px-8 md:py-14 lg:px-10"
+    >
       <p
         ref={ref}
         className="mx-auto max-w-4xl font-display text-2xl font-medium leading-snug text-[color:var(--color-clinic-ink)] md:text-3xl lg:text-[32px]"

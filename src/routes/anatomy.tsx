@@ -22,7 +22,12 @@ export const Route = createFileRoute("/anatomy")({
   component: AnatomyPage,
 });
 
-const NAV_ITEMS = ["Tentang Kami", "Layanan", "Dokter", "Hubungi"];
+const NAV_ITEMS = [
+  { label: "Tentang Kami", hash: "about" },
+  { label: "Layanan", hash: "services" },
+  { label: "Dokter", hash: "doctors" },
+  { label: "Hubungi", hash: "contact" },
+];
 
 function AnatomyPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -45,14 +50,14 @@ function AnatomyPage() {
 
             {/* Desktop Nav */}
             <nav className="hidden items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2 py-1.5 text-sm text-[color:var(--color-clinic-ink)] lg:flex">
-              {NAV_ITEMS.map((l) => (
+              {NAV_ITEMS.map((item) => (
                 <Link
-                  key={l}
+                  key={item.label}
                   to="/"
-                  hash={l.toLowerCase().replace(/\s/g, "")}
+                  hash={item.hash}
                   className="rounded-full px-4 py-1.5 transition hover:bg-white text-[color:var(--color-clinic-ink)]"
                 >
-                  {l}
+                  {item.label}
                 </Link>
               ))}
               <Link
@@ -125,15 +130,15 @@ function AnatomyPage() {
           {isMenuOpen && (
             <div className="mt-3 rounded-2xl border border-black/5 bg-white p-3 shadow-[var(--shadow-clinic)] lg:hidden">
               <nav className="flex flex-col gap-1">
-                {NAV_ITEMS.map((l) => (
+                {NAV_ITEMS.map((item) => (
                   <Link
-                    key={l}
+                    key={item.label}
                     to="/"
-                    hash={l.toLowerCase().replace(/\s/g, "")}
+                    hash={item.hash}
                     onClick={() => setIsMenuOpen(false)}
                     className="rounded-xl px-3 py-2 text-sm font-medium text-[color:var(--color-clinic-ink)] transition hover:bg-[color:var(--color-clinic-blue-soft)]"
                   >
-                    {l}
+                    {item.label}
                   </Link>
                 ))}
                 <Link

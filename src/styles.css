@@ -31,7 +31,12 @@
   background-image:
     radial-gradient(120% 90% at 18% -10%, rgba(46, 230, 196, 0.16), transparent 55%),
     radial-gradient(90% 70% at 88% 0%, rgba(160, 139, 255, 0.2), transparent 55%),
-    linear-gradient(180deg, var(--color-siaga-void) 0%, var(--color-siaga-navy) 46%, var(--color-siaga-indigo) 100%);
+    linear-gradient(
+      180deg,
+      var(--color-siaga-void) 0%,
+      var(--color-siaga-navy) 46%,
+      var(--color-siaga-indigo) 100%
+    );
 }
 
 @utility siaga-rays {
@@ -107,6 +112,17 @@
   animation: phoneSwitch 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes orbitSpin {
   to {
     transform: rotate(360deg);
@@ -170,7 +186,6 @@
 @utility accordion-grid-open {
   grid-template-rows: 1fr;
 }
-
 
 @utility hex-pattern {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='92' viewBox='0 0 80 92'><g fill='none' stroke='white' stroke-opacity='0.09' stroke-width='1'><polygon points='40,2 76,23 76,69 40,90 4,69 4,23'/></g></svg>");
@@ -422,6 +437,10 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   * {
     border-color: var(--color-border);
   }
@@ -429,5 +448,24 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+  }
+
+  main {
+    animation: pageEnter 0.45s ease-out both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

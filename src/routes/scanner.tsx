@@ -1,7 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertCircle, ArrowLeft, Camera, ScanLine, Sparkles, UploadCloud } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle2,
+  Lightbulb,
+  ScanLine,
+  ShieldCheck,
+  XCircle,
+} from "lucide-react";
 
 import { analyzeHealthImage } from "@/lib/scanner/scan.server";
 import type { ScanResult } from "@/lib/scanner/types";
@@ -9,9 +17,20 @@ import { ImageCapture, type SelectedImage } from "@/components/scanner/ImageCapt
 import { ScanningOverlay, SCAN_STEPS } from "@/components/scanner/ScanningOverlay";
 import { ScanResultView } from "@/components/scanner/ScanResultView";
 import { Button } from "@/components/ui/button";
-import fotodokter2 from "@/assets/fotodokter(2).png?url";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
+
+const PHOTO_DO = [
+  "Gunakan cahaya alami atau lampu terang yang merata",
+  "Ambil jarak dekat, fokuskan pada area yang bermasalah",
+  "Gunakan latar belakang polos tanpa gangguan",
+];
+
+const PHOTO_DONT = [
+  "Jangan gunakan filter, efek, atau edit foto",
+  "Hindari foto buram atau bergerak saat memotret",
+  "Hindari bayangan yang menutupi area keluhan",
+];
 
 export const Route = createFileRoute("/scanner")({
   head: () => ({
@@ -112,8 +131,8 @@ function ScannerPage() {
 
   return (
     <main className="min-h-screen bg-[#f7f4ee] pb-16 font-sans">
-      <div className="px-4 pt-4 sm:px-6 md:px-8 lg:px-10">
-        <header className="hex-pattern relative overflow-hidden rounded-3xl bg-[color:var(--color-clinic-blue)] px-6 py-5 shadow-md border border-white/10 flex items-center justify-between gap-4 w-full">
+      <div className="px-5 pt-4 sm:px-6 md:px-8 lg:px-10">
+        <header className="hex-pattern relative mx-auto flex w-full max-w-6xl items-center justify-between gap-4 overflow-hidden rounded-3xl border border-white/10 bg-[color:var(--color-clinic-blue)] px-6 py-5 shadow-md">
           <Link to="/" className="flex items-center gap-2.5">
             <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white shadow-sm">
               <span className="h-3 w-3 rounded-full bg-[color:var(--color-clinic-blue)]" />
@@ -122,6 +141,20 @@ function ScannerPage() {
               SiagaSehat
             </span>
           </Link>
+          <nav className="hidden items-center gap-1 rounded-full bg-white/10 p-1 text-xs font-semibold text-white sm:flex">
+            <Link to="/anatomy" className="rounded-full px-3 py-1.5 transition hover:bg-white/15">
+              Anatomi
+            </Link>
+            <Link
+              to="/consultation"
+              className="rounded-full px-3 py-1.5 transition hover:bg-white/15"
+            >
+              Konsultasi AI
+            </Link>
+            <Link to="/scanner" className="rounded-full bg-white/20 px-3 py-1.5">
+              Scan AI
+            </Link>
+          </nav>
           <Link
             to="/"
             className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/30 hover:scale-105 active:scale-95 shadow-sm"
@@ -132,9 +165,9 @@ function ScannerPage() {
         </header>
       </div>
 
-      <div className="relative z-20 w-full px-4 mt-6 sm:px-6 md:px-8 lg:px-10">
+      <div className="relative z-20 mt-6 w-full px-5 sm:px-6 md:px-8 lg:px-10">
         {stage !== "result" && (
-          <div className="grid gap-6 rounded-[28px] bg-white p-5 shadow-[var(--shadow-clinic-lg)] lg:grid-cols-12 md:p-8 w-full">
+          <div className="mx-auto grid w-full max-w-6xl gap-6 rounded-[28px] bg-white p-5 shadow-[var(--shadow-clinic-lg)] md:p-8 lg:grid-cols-12">
             {/* Left: capture area */}
             <div className="flex flex-col gap-4 lg:col-span-7">
               {stage === "scanning" && image ? (
@@ -164,55 +197,54 @@ function ScannerPage() {
               </Button>
             </div>
 
-            {/* Right: friendly illustration + steps */}
-            <div className="relative flex flex-col justify-between overflow-hidden rounded-[24px] bg-[color:var(--color-clinic-blue-soft)]/60 p-6 lg:col-span-5">
-              <div className="relative mx-auto h-44 w-44">
-                <span className="absolute inset-0 animate-scanner-ring rounded-full border-2 border-[color:var(--color-clinic-blue)]/40" />
-                <span
-                  className="absolute inset-0 animate-scanner-ring rounded-full border-2 border-[color:var(--color-clinic-blue)]/30"
-                  style={{ animationDelay: "0.6s" }}
-                />
-                <div className="relative h-44 w-44 overflow-hidden rounded-full border-4 border-white shadow-lg">
-                  <img
-                    src={fotodokter2}
-                    alt="Ilustrasi dokter AI"
-                    className="h-full w-full object-cover object-top"
-                  />
-                </div>
-                <span className="animate-float absolute -right-2 top-2 grid h-9 w-9 place-items-center rounded-full bg-white text-[color:var(--color-clinic-blue)] shadow-md">
-                  <Sparkles className="h-4 w-4" />
+            {/* Right: correct photo-taking guide */}
+            <div className="flex flex-col rounded-[24px] border border-black/[0.06] bg-[color:var(--color-clinic-blue-soft)]/30 p-5 lg:col-span-5 md:p-6">
+              <div className="flex items-center gap-2">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white text-[color:var(--color-clinic-blue)] shadow-sm">
+                  <Lightbulb className="h-4 w-4" />
                 </span>
+                <div>
+                  <p className="font-display text-sm font-bold text-[color:var(--color-clinic-ink)]">
+                    Tata Cara Foto yang Benar
+                  </p>
+                  <p className="text-[11px] text-[color:var(--color-clinic-muted)]">
+                    Ikuti panduan ini agar hasil analisis lebih akurat
+                  </p>
+                </div>
               </div>
 
-              <div className="mt-6 space-y-3">
-                {[
-                  { icon: UploadCloud, text: "Upload atau foto kondisi kulit/tubuhmu" },
-                  { icon: ScanLine, text: "AI menganalisis ciri-ciri visual secara instan" },
-                  { icon: Camera, text: "Dapatkan penjelasan, pencegahan, dan rekomendasi" },
-                ].map((step, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 rounded-xl bg-white/70 p-3 backdrop-blur"
-                  >
-                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white text-[color:var(--color-clinic-blue)] shadow-sm">
-                      <step.icon className="h-4 w-4" />
-                    </span>
-                    <span className="text-xs font-medium text-[color:var(--color-clinic-ink)]">
-                      {step.text}
+              <div className="mt-4 flex flex-col gap-2">
+                {PHOTO_DO.map((text) => (
+                  <div key={text} className="flex items-start gap-2.5 rounded-xl bg-white p-3">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                    <span className="text-xs leading-relaxed text-[color:var(--color-clinic-ink)]">
+                      {text}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <p className="mt-4 text-center text-[11px] leading-relaxed text-[color:var(--color-clinic-muted)]">
+              <div className="mt-2 flex flex-col gap-2">
+                {PHOTO_DONT.map((text) => (
+                  <div key={text} className="flex items-start gap-2.5 rounded-xl bg-white/70 p-3">
+                    <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+                    <span className="text-xs leading-relaxed text-[color:var(--color-clinic-muted)]">
+                      {text}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-auto pt-4 flex items-start gap-2 border-t border-black/[0.06] text-[11px] leading-relaxed text-[color:var(--color-clinic-muted)]">
+                <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
                 Hasil scan bersifat edukatif dan bukan pengganti diagnosis dokter.
-              </p>
+              </div>
             </div>
           </div>
         )}
 
         {stage === "result" && result && image && (
-          <div className="w-full">
+          <div className="mx-auto w-full max-w-6xl">
             <ScanResultView result={result} previewUrl={image.previewUrl} onReset={handleReset} />
           </div>
         )}

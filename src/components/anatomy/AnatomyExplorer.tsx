@@ -32,9 +32,7 @@ export function AnatomyExplorer() {
   // Toggle symptom checkbox
   const handleToggleSymptom = (symptomName: string) => {
     setSelectedSymptoms((prev) =>
-      prev.includes(symptomName)
-        ? prev.filter((s) => s !== symptomName)
-        : [...prev, symptomName],
+      prev.includes(symptomName) ? prev.filter((s) => s !== symptomName) : [...prev, symptomName],
     );
   };
 
@@ -124,10 +122,7 @@ export function AnatomyExplorer() {
             </span>
           </div>
 
-          <AnatomyViewer
-            selectedRegion={selectedRegion}
-            onSelectRegion={handleSelectRegion}
-          />
+          <AnatomyViewer selectedRegion={selectedRegion} onSelectRegion={handleSelectRegion} />
         </div>
 
         {/* Right Column: Symptom Selector OR AI Assessment Result */}
@@ -143,6 +138,9 @@ export function AnatomyExplorer() {
             <AIAssessmentResultCard
               result={assessmentResult}
               regionName={selectedRegion.nameIndonesian}
+              selectedSymptoms={selectedSymptoms}
+              selectedConditions={selectedConditions}
+              additionalNotes={additionalNotes}
               onReset={handleReset}
             />
           ) : (

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowLeft,
@@ -29,6 +29,9 @@ import {
 } from "@/components/ui/sheet";
 
 export const Route = createFileRoute("/consultation")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    anatomy: typeof search.anatomy === "string" ? search.anatomy : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Konsultasi AI — SiagaSehat" },
@@ -70,6 +73,7 @@ function ChatBubble({ message }: { message: ChatMessage }) {
 function ConsultationPage() {
   const chat = useServerFn(chatWithAI);
   const { user } = useAuth();
+  const { anatomy } = useSearch({ from: "/consultation" });
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -77,6 +81,7 @@ function ConsultationPage() {
   const [bodySheetOpen, setBodySheetOpen] = useState(false);
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const initialContextSent = useRef(false);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -88,29 +93,32 @@ function ConsultationPage() {
       .map((m) => `${m.role === "user" ? "Pengguna" : "Asisten"}: ${m.text}`)
       .join("\n");
 
-  const sendMessage = async (text: string) => {
-    if (!text.trim()) return;
-    const next = messages.concat({ role: "user", text });
-    setMessages(next);
-    setLoading(true);
-    try {
-      const prompt = `Kamu sedang melakukan sesi konsultasi kesehatan interaktif. Berikut riwayat percakapan sejauh ini:\n${buildContext(
-        next,
-      )}\n\nLanjutkan percakapan secara natural: jika informasi (usia, lama gejala, tingkat keparahan, riwayat penyakit) belum lengkap, tanyakan satu per satu. Jika sudah cukup informasi, berikan Preliminary Analysis, Risk Assessment, dan Health Recommendation secara ringkas.`;
-      const res = await chat({ data: { prompt } });
-      const reply = res?.reply?.trim() || "Maaf, saya tidak mendapatkan respons. Coba lagi.";
-      setMessages((m) => m.concat({ role: "assistant", text: reply }));
-    } catch {
-      setMessages((m) =>
-        m.concat({
-          role: "assistant",
-          text: "Terjadi kesalahan saat menghubungi layanan AI. Coba lagi sebentar lagi.",
-        }),
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  const sendMessage = useCallback(
+    async (text: string) => {
+      if (!text.trim()) return;
+      const next = messages.concat({ role: "user", text });
+      setMessages(next);
+      setLoading(true);
+      try {
+        const prompt = `Kamu sedang melakukan sesi konsultasi kesehatan interaktif. Berikut riwayat percakapan sejauh ini:\n${buildContext(
+          next,
+        )}\n\nLanjutkan percakapan secara natural: jika informasi (usia, lama gejala, tingkat keparahan, riwayat penyakit) belum lengkap, tanyakan satu per satu. Jika sudah cukup informasi, berikan Preliminary Analysis, Risk Assessment, dan Health Recommendation secara ringkas.`;
+        const res = await chat({ data: { prompt } });
+        const reply = res?.reply?.trim() || "Maaf, saya tidak mendapatkan respons. Coba lagi.";
+        setMessages((m) => m.concat({ role: "assistant", text: reply }));
+      } catch {
+        setMessages((m) =>
+          m.concat({
+            role: "assistant",
+            text: "Terjadi kesalahan saat menghubungi layanan AI. Coba lagi sebentar lagi.",
+          }),
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [chat, messages],
+  );
 
   const handleSend = async () => {
     const text = input.trim();
@@ -128,6 +136,38 @@ function ConsultationPage() {
   const handleSeverity = async (severityLabel: string) => {
     await sendMessage(`Tingkat rasa sakitnya: ${severityLabel}.`);
   };
+
+  useEffect(() => {
+    if (!anatomy || initialContextSent.current) return;
+
+    let context: {
+      regionName?: string;
+      selectedSymptoms?: string[];
+      selectedConditions?: string[];
+      additionalNotes?: string;
+      primaryCondition?: string;
+    };
+    try {
+      context = JSON.parse(anatomy);
+    } catch {
+      return;
+    }
+
+    initialContextSent.current = true;
+    const details = [
+      `Bagian tubuh: ${context.regionName || "tidak disebutkan"}`,
+      `Gejala: ${context.selectedSymptoms?.join(", ") || "tidak ada"}`,
+      `Kondisi yang dipilih: ${context.selectedConditions?.join(", ") || "tidak ada"}`,
+      context.additionalNotes ? `Catatan tambahan: ${context.additionalNotes}` : "",
+      context.primaryCondition ? `Hasil awal AI: ${context.primaryCondition}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    void sendMessage(
+      `Saya baru selesai memilih keluhan di halaman Anatomi. Berikut data saya:\n${details}\n\nTolong analisis keluhan ini, tanyakan informasi penting yang masih kurang, lalu sarankan langkah perawatan atau obat yang aman bila sesuai.`,
+    );
+  }, [anatomy, sendMessage]);
 
   useEffect(() => {
     // Simpan ringkasan sesi konsultasi ke Supabase saat percakapan berkembang (opsional, hanya jika login).
@@ -172,6 +212,17 @@ function ConsultationPage() {
             </p>
           </div>
         </div>
+        <nav className="hidden items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)] p-1 text-xs font-semibold text-[color:var(--color-clinic-blue-dark)] md:flex">
+          <Link to="/anatomy" className="rounded-full px-3 py-1.5 transition hover:bg-white">
+            Anatomi
+          </Link>
+          <Link to="/consultation" className="rounded-full bg-white px-3 py-1.5 shadow-sm">
+            Konsultasi AI
+          </Link>
+          <Link to="/scanner" className="rounded-full px-3 py-1.5 transition hover:bg-white">
+            Scan AI
+          </Link>
+        </nav>
         <div className="flex items-center gap-1 text-[color:var(--color-clinic-muted)]">
           <button
             className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-[color:var(--color-clinic-blue-soft)]"
@@ -211,7 +262,9 @@ function ConsultationPage() {
             </div>
           )}
           {messages.map((m, i) => (
-            <ChatBubble key={i} message={m} />
+            <div key={i}>
+              <ChatBubble message={m} />
+            </div>
           ))}
           {loading && (
             <div className="mb-2 flex justify-start">

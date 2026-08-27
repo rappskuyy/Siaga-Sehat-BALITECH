@@ -17,12 +17,18 @@ import { Button } from "@/components/ui/button";
 interface AIAssessmentResultCardProps {
   result: AIAssessmentResult;
   regionName: string;
+  selectedSymptoms: string[];
+  selectedConditions: string[];
+  additionalNotes: string;
   onReset: () => void;
 }
 
 export function AIAssessmentResultCard({
   result,
   regionName,
+  selectedSymptoms,
+  selectedConditions,
+  additionalNotes,
   onReset,
 }: AIAssessmentResultCardProps) {
   const {
@@ -35,6 +41,14 @@ export function AIAssessmentResultCard({
     emergencyMessage,
     disclaimer,
   } = result;
+
+  const consultationContext = JSON.stringify({
+    regionName,
+    selectedSymptoms,
+    selectedConditions,
+    additionalNotes,
+    primaryCondition: primaryCondition.name,
+  });
 
   return (
     <div className="flex flex-col gap-6 rounded-[28px] bg-white p-6 md:p-8 shadow-[var(--shadow-clinic-lg)] border border-black/5 animate-fade-up">
@@ -194,6 +208,7 @@ export function AIAssessmentResultCard({
         <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
           <Link
             to="/consultation"
+            search={{ anatomy: consultationContext }}
             className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-full bg-[color:var(--color-clinic-blue)] px-6 py-3.5 text-xs font-semibold text-white shadow-md shadow-[color:var(--color-clinic-blue)]/20 transition hover:bg-[color:var(--color-clinic-blue-dark)]"
           >
             <Stethoscope className="h-4 w-4" />
