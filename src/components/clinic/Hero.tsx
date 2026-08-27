@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { FloatingCard } from "./FloatingCard";
 import fotodokter1 from "@/assets/fotodokter(1).png?url";
 import fotodokter2 from "@/assets/fotodokter(2).png?url";
@@ -46,14 +47,7 @@ export function Hero() {
     <section className="relative w-full overflow-hidden bg-white px-4 pt-5 pb-8 sm:px-6 md:px-8 md:pt-7 md:pb-14 lg:px-10 lg:pt-8 lg:pb-16">
       {/* Header */}
       <header className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue)]">
-            <span className="h-2.5 w-2.5 rounded-full bg-white" />
-          </div>
-          <span className="font-display text-lg font-bold tracking-tight text-[color:var(--color-clinic-ink)]">
-            SiagaSehat
-          </span>
-        </div>
+        <BrandLogo />
 
         <nav className="hidden items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2 py-1.5 text-sm text-[color:var(--color-clinic-ink)] lg:flex">
           {NAV_ITEMS.map((item) => (

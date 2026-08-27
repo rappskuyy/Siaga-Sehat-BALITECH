@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowRight, Github, Linkedin, MessageCircle, Twitter } from "lucide-react";
 import { Reveal } from "./Reveal";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 
 const NAV_LINKS = ["How it works", "Features", "Pricing", "Testimonials", "FAQ"];
 const COMPANY_LINKS = ["Blog", "About", "Terms and Condition", "Privacy Policy"];
@@ -24,11 +25,8 @@ export function Footer() {
           <div className="relative flex min-h-[280px] flex-col justify-between overflow-hidden rounded-[22px] bg-gradient-to-br from-[color:var(--color-clinic-blue)] to-[color:var(--color-clinic-blue-dark)] p-6 text-white">
             <div className="hex-pattern absolute inset-0 opacity-40" />
 
-            <div className="relative flex items-center gap-2">
-              <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white">
-                <span className="h-2.5 w-2.5 rounded-full bg-[color:var(--color-clinic-blue)]" />
-              </div>
-              <span className="font-display text-lg font-bold tracking-tight">{BRAND_NAME}</span>
+            <div className="relative bg-white/90 backdrop-blur-xs p-2 rounded-2xl inline-block w-fit">
+              <BrandLogo />
             </div>
 
             <div className="relative">

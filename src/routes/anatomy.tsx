@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { AnatomyExplorer } from "@/components/anatomy/AnatomyExplorer";
 import { Footer } from "@/components/clinic/Footer";
 import { ArrowLeft, Sparkles, User, Bell, LogIn, Menu, X, ScanLine, MapPin } from "lucide-react";
@@ -39,14 +40,7 @@ function AnatomyPage() {
         {/* Integrated Header / Navbar matching existing design */}
         <header className="bg-white border-b border-black/5 px-6 py-4 md:px-10">
           <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue)]">
-                <span className="h-2.5 w-2.5 rounded-full bg-white" />
-              </div>
-              <span className="font-display text-lg font-bold tracking-tight text-[color:var(--color-clinic-ink)]">
-                SiagaSehat
-              </span>
-            </Link>
+            <BrandLogo />
 
             {/* Desktop Nav */}
             <nav className="hidden items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2 py-1.5 text-sm text-[color:var(--color-clinic-ink)] lg:flex">

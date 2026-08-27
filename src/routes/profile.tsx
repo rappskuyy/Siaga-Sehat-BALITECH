@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import {
   LineChart,
   Line,
@@ -152,13 +153,16 @@ function ProfilePage() {
   return (
     <main className="min-h-screen bg-[#f7f4ee] pb-16 font-sans">
       <div className="mx-auto max-w-4xl px-4 pt-8 md:px-6">
-        <div className="flex items-center justify-between">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 text-sm text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
-          >
-            <ArrowLeft className="h-4 w-4" /> Kembali
-          </Link>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 text-sm text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+            <BrandLogo size="sm" />
+          </div>
           <Button
             variant="ghost"
             onClick={handleSignOut}

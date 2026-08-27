@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowLeft,
@@ -200,15 +201,10 @@ function ConsultationPage() {
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <div className="grid h-10 w-10 place-items-center rounded-full bg-[color:var(--color-clinic-blue)] text-white">
-            <Stethoscope className="h-5 w-5" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-[color:var(--color-clinic-ink)]">
-              SiagaSehat AI
-            </p>
-            <p className="flex items-center gap-1 text-xs text-emerald-600">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Online — siap membantu
+          <BrandLogo size="sm" />
+          <div className="hidden sm:block border-l border-slate-200 pl-3">
+            <p className="flex items-center gap-1 text-xs text-emerald-600 font-bold">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Online — Asisten AI
             </p>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { LogIn, Mail, Lock, ShieldCheck } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -50,14 +51,7 @@ function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f7f4ee] px-4 py-12 font-sans">
       <div className="w-full max-w-md rounded-3xl border border-black/5 bg-white p-8 shadow-[var(--shadow-clinic-lg)]">
-        <Link to="/" className="mb-6 flex items-center gap-2">
-          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue)]">
-            <span className="h-2.5 w-2.5 rounded-full bg-white" />
-          </div>
-          <span className="font-display text-lg font-bold tracking-tight text-[color:var(--color-clinic-ink)]">
-            SiagaSehat
-          </span>
-        </Link>
+        <BrandLogo className="mb-6" />
 
         <h1 className="font-display text-2xl font-extrabold text-[color:var(--color-clinic-ink)]">
           Masuk

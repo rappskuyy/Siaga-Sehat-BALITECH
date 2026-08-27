@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useServerFn } from "@tanstack/react-start";
 import {
   AlertCircle,
@@ -133,14 +134,7 @@ function ScannerPage() {
     <main className="min-h-screen bg-[#f7f4ee] pb-16 font-sans">
       <div className="px-5 pt-4 sm:px-6 md:px-8 lg:px-10">
         <header className="hex-pattern relative mx-auto flex w-full max-w-6xl items-center justify-between gap-4 overflow-hidden rounded-3xl border border-white/10 bg-[color:var(--color-clinic-blue)] px-6 py-5 shadow-md">
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white shadow-sm">
-              <span className="h-3 w-3 rounded-full bg-[color:var(--color-clinic-blue)]" />
-            </div>
-            <span className="font-display text-xl font-bold tracking-tight text-white">
-              SiagaSehat
-            </span>
-          </Link>
+          <BrandLogo />
           <nav className="hidden items-center gap-1 rounded-full bg-white/10 p-1 text-xs font-semibold text-white sm:flex">
             <Link to="/anatomy" className="rounded-full px-3 py-1.5 transition hover:bg-white/15">
               Anatomi
