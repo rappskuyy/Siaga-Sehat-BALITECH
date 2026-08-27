@@ -147,6 +147,7 @@ function ScannerPage() {
             </Link>
             <Link
               to="/consultation"
+              search={{ anatomy: undefined }}
               className="rounded-full px-3 py-1.5 transition hover:bg-white/15"
             >
               Konsultasi AI

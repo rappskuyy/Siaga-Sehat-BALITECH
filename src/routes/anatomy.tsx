@@ -69,6 +69,7 @@ function AnatomyPage() {
               </Link>
               <Link
                 to="/consultation"
+                search={{ anatomy: undefined }}
                 className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
               >
                 Konsultasi
@@ -143,6 +144,7 @@ function AnatomyPage() {
                 ))}
                 <Link
                   to="/consultation"
+                  search={{ anatomy: undefined }}
                   onClick={() => setIsMenuOpen(false)}
                   className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-white/80 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
                 >

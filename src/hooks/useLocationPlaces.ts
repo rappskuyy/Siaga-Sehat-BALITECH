@@ -75,30 +75,62 @@ export function calculateHaversineDistance(
 }
 
 /**
- * 100% FREE Real Place Photo Search via Wikimedia Commons Geosearch API
+ * Opsi 1: 100% FREE Real Place Photo Search via Wikimedia Commons API
+ * 1. Geosearch: https://commons.wikimedia.org/w/api.php?action=query&list=geosearch&gscoord=LAT|LON&gsradius=1000&gsnamespace=6&format=json&origin=*
+ * 2. Thumbnail Fetch: https://commons.wikimedia.org/w/api.php?action=query&pageids=PAGE_ID&prop=pageimages&piprop=thumbnail&pithumbsize=1000&format=json&origin=*
  */
 export async function fetchWikimediaPhoto(
   lat: number,
   lng: number,
+  placeName?: string,
   radiusMeters = 1000
 ): Promise<string | null> {
+  // Step 1: Wikimedia Commons List Geosearch API (100% Gratis Selamanya)
   try {
-    const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=geosearch&ggscoord=${lat}|${lng}&ggsradius=${radiusMeters}&ggslimit=5&prop=pageimages&pithumbsize=800&format=json&origin=*`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const data = await res.json();
-
-    if (data.query && data.query.pages) {
-      const pages = Object.values(data.query.pages) as any[];
-      for (const page of pages) {
-        if (page.thumbnail && page.thumbnail.source) {
-          return page.thumbnail.source;
+    const geosearchUrl = `https://commons.wikimedia.org/w/api.php?action=query&list=geosearch&gscoord=${lat}|${lng}&gsradius=${radiusMeters}&gsnamespace=6&format=json&origin=*`;
+    const res = await fetch(geosearchUrl);
+    if (res.ok) {
+      const data = await res.json();
+      const items = data.query?.geosearch || [];
+      if (items.length > 0) {
+        const pageIds = items.slice(0, 5).map((item: any) => item.pageid).join("|");
+        const thumbUrl = `https://commons.wikimedia.org/w/api.php?action=query&pageids=${pageIds}&prop=pageimages&piprop=thumbnail&pithumbsize=1000&format=json&origin=*`;
+        const thumbRes = await fetch(thumbUrl);
+        if (thumbRes.ok) {
+          const thumbData = await thumbRes.json();
+          const pages = Object.values(thumbData.query?.pages || {}) as any[];
+          for (const p of pages) {
+            if (p.thumbnail?.source) {
+              return p.thumbnail.source;
+            }
+          }
         }
       }
     }
   } catch (err) {
-    console.warn("Wikimedia photo fetch warning:", err);
+    console.warn("Wikimedia Commons list geosearch warning:", err);
   }
+
+  // Step 2: Wikimedia Commons Text Search by Place Name
+  if (placeName && placeName.trim().length > 2) {
+    try {
+      const cleanName = placeName.replace(/gmaps|local|nom-/gi, "").trim();
+      const searchUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(cleanName)}&gsrnamespace=6&gsrlimit=5&prop=pageimages&piprop=thumbnail&pithumbsize=1000&format=json&origin=*`;
+      const searchRes = await fetch(searchUrl);
+      if (searchRes.ok) {
+        const searchData = await searchRes.json();
+        const pages = Object.values(searchData.query?.pages || {}) as any[];
+        for (const p of pages) {
+          if (p.thumbnail?.source) {
+            return p.thumbnail.source;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Wikimedia Commons search warning:", err);
+    }
+  }
+
   return null;
 }
 
@@ -183,9 +215,9 @@ export function useLocationPlaces({
 
           const distanceKm = calculateHaversineDistance(lat, lng, itemLat, itemLng);
 
-          // Try 100% Free Wikimedia Commons Photo Geosearch
-          const wikimediaPhoto = await fetchWikimediaPhoto(itemLat, itemLng, 800);
-          const photoUrl = wikimediaPhoto || getUnsplashFallbackPhoto(category, item.id);
+          // Try 100% Free Wikimedia Commons Photo (Geosearch & Search API)
+          const wikimediaPhoto = await fetchWikimediaPhoto(itemLat, itemLng, name, 1500);
+          const photoUrl = wikimediaPhoto || "";
           const photoSource: "wikimedia" | "unsplash" = wikimediaPhoto ? "wikimedia" : "unsplash";
 
           return {

@@ -14,8 +14,8 @@ import {
   Pill,
   CheckCircle2,
   AlertCircle,
-  Clock3,
   ArrowUpDown,
+  MapPin,
 } from "lucide-react";
 import type { PlaceNode, PharmacyNode, RouteInfo, TransportMode, DangerLevelType } from "./maps.service";
 import { SourceBadge } from "./SourceBadge";
@@ -294,10 +294,17 @@ export function PharmacyList({
             const isClinic = pharm.facilityType === "clinic";
 
             return (
-              <button
+              <div
                 key={pharm.id}
-                type="button"
+                role="button"
+                tabIndex={0}
                 onClick={() => onSelectPharmacy(isSelected ? null : pharm)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onSelectPharmacy(isSelected ? null : pharm);
+                  }
+                }}
                 className={`group w-full rounded-2xl p-3 text-left transition border cursor-pointer ${
                   isSelected
                     ? isHospital
@@ -353,7 +360,13 @@ export function PharmacyList({
                               : "bg-blue-50 text-[#379FD2] border-blue-200"
                           }`}
                         >
-                          {isHospital ? "🏥 Rumah Sakit" : isClinic ? "🩺 Klinik" : "💊 Apotek"}
+                          {isHospital ? (
+                            <span className="flex items-center gap-1"><Building2 className="h-2.5 w-2.5" /> Rumah Sakit</span>
+                          ) : isClinic ? (
+                            <span className="flex items-center gap-1"><Stethoscope className="h-2.5 w-2.5" /> Klinik</span>
+                          ) : (
+                            <span className="flex items-center gap-1"><Pill className="h-2.5 w-2.5" /> Apotek</span>
+                          )}
                         </span>
 
                         <SourceBadge
@@ -381,7 +394,7 @@ export function PharmacyList({
                           </span>
                         ) : pharm.openingStatus === "closing-soon" ? (
                           <span className="inline-flex items-center gap-1 font-semibold text-[#D97706] bg-amber-100 px-2 py-0.5 rounded-full text-[9px]">
-                            <Clock3 className="h-2.5 w-2.5" /> Tutup Segera
+                            <Clock className="h-2.5 w-2.5" /> Tutup Segera
                           </span>
                         ) : pharm.isOpenNow === false || pharm.openingStatus === "closed" ? (
                           <span className="inline-flex items-center gap-1 font-semibold text-[#6B7280] bg-[#F7F9FB] px-2 py-0.5 rounded-full text-[9px] border border-[#E5E7EB]">
@@ -457,7 +470,7 @@ export function PharmacyList({
                     ))}
                   </div>
                 )}
-              </button>
+              </div>
             );
           })
         )}
@@ -533,7 +546,13 @@ export function RouteOverlayCard({
                 isHospital ? "bg-[#EF4444]" : isClinic ? "bg-[#F59E0B]" : "bg-[#379FD2]"
               }`}
             >
-              {isHospital ? "🏥 RUMAH SAKIT TERPILIH" : isClinic ? "🩺 KLINIK TERPILIH" : "💊 APOTEK TERPILIH"}
+              {isHospital ? (
+                <span className="flex items-center gap-1"><Building2 className="h-2.5 w-2.5" /> RUMAH SAKIT TERPILIH</span>
+              ) : isClinic ? (
+                <span className="flex items-center gap-1"><Stethoscope className="h-2.5 w-2.5" /> KLINIK TERPILIH</span>
+              ) : (
+                <span className="flex items-center gap-1"><Pill className="h-2.5 w-2.5" /> APOTEK TERPILIH</span>
+              )}
             </span>
             <SourceBadge
               dataSource={selectedPlace._dataSource}
@@ -573,8 +592,8 @@ export function RouteOverlayCard({
       </div>
 
       {/* Address */}
-      <p className="text-[10px] text-[#6B7280] line-clamp-2">
-        📍 {selectedPlace.address}
+      <p className="text-[10px] text-[#6B7280] line-clamp-2 flex items-center gap-1">
+        <MapPin className="h-3 w-3 text-[#379FD2] shrink-0" /> {selectedPlace.address}
       </p>
 
       {/* Mode Selector */}

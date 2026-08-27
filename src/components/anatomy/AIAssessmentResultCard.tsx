@@ -83,7 +83,7 @@ export function AIAssessmentResultCard({
         <div className="flex items-start gap-3.5 rounded-2xl bg-red-50 p-4 border border-red-200 text-red-900">
           <AlertOctagon className="mt-0.5 h-6 w-6 shrink-0 text-red-600 animate-pulse" />
           <div>
-            <h4 className="text-sm font-bold text-red-700">⚠️ PERHATIAN MEDIS PENTING</h4>
+            <h4 className="text-sm font-bold text-red-700 flex items-center gap-1.5"><AlertOctagon className="h-4 w-4 text-red-600 shrink-0" /> PERHATIAN MEDIS PENTING</h4>
             <p className="mt-1 text-xs leading-relaxed text-red-800">
               {emergencyMessage ||
                 "Beberapa gejala yang Anda pilih memerlukan evaluasi medis segera. Jika kondisi terasa berat, memburuk, atau disertai sesak napas/nyeri hebat, segera hubungi layanan darurat atau IGD terdekat."}

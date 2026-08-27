@@ -430,5 +430,38 @@
     "kota": "Bogor",
     "keyword": "Apotek 24 Jam Bogor",
     "url": "https://www.google.com/maps/place/Apotek+K-24+Pajajaran"
+  },
+  {
+    "id": "gmaps-apt-kimia-farma-wangun-bogor",
+    "nama": "Kimia Farma Apotek",
+    "kategori": "pharmacy",
+    "rating": "4.3",
+    "ulasan": "61",
+    "alamat": "Jl. Raya Wangun No.240D, RT.02/RW.04, Sindangsari, Kec. Bogor Tim., Kota Bogor, Jawa Barat 15560",
+    "jam_buka": "Buka · Tutup pukul 22.00",
+    "isOpenNow": true,
+    "telepon": "(0251) 8241313",
+    "lat": -6.6452,
+    "lon": 106.8437,
+    "kota": "Bogor",
+    "keyword": "Kimia Farma Apotek Wangun Bogor",
+    "photoUrl": "https://lh5.googleusercontent.com/p/AF1QipM5XW_7lQv_t7m8K27M88w80zN2yM0_G-h7E-5r=w800-h600-k-no",
+    "url": "https://www.google.com/maps/search/?api=1&query=Kimia+Farma+Apotek+Jl+Raya+Wangun+Bogor"
+  },
+  {
+    "id": "gmaps-apt-k24-tajur-bogor",
+    "nama": "Apotek K-24 Tajur Bogor",
+    "kategori": "pharmacy",
+    "rating": "4.7",
+    "ulasan": "890",
+    "alamat": "Jl. Raya Tajur No.65, Muarasari, Kec. Bogor Tim., Kota Bogor, Jawa Barat 16137",
+    "jam_buka": "Buka 24 Jam",
+    "isOpenNow": true,
+    "telepon": "0811-1902-424",
+    "lat": -6.6341,
+    "lon": 106.8322,
+    "kota": "Bogor",
+    "keyword": "Apotek K24 Tajur Bogor",
+    "url": "https://www.google.com/maps/search/?api=1&query=Apotek+K24+Tajur+Bogor"
   }
 ]

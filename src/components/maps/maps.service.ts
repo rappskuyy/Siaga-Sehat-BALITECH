@@ -41,6 +41,7 @@ export interface PlaceNode {
   photoUrl?: string;
   description?: string;
   reviews?: string[];
+  url?: string;
   _dataSource?: "google" | "osm" | "gemini" | "cache" | "unknown";
   _dataSourceLabel?: string;
   _trustScore?: number;

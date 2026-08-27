@@ -1,5 +1,4 @@
-import React from "react";
-import { Star, Clock, Phone, MapPin, Navigation, ExternalLink, Camera } from "lucide-react";
+import { Star, Clock, Phone, MapPin, Navigation, ExternalLink, Camera, Building2, Stethoscope, Pill } from "lucide-react";
 import { type LocationPlace } from "@/hooks/useLocationPlaces";
 
 interface LocationCardProps {
@@ -17,11 +16,13 @@ export const LocationCard: React.FC<LocationCardProps> = ({ place, onSelect, isS
       : "bg-[#379FD2] text-white border-blue-600";
 
   const categoryLabel =
-    place.category === "hospital"
-      ? "🏥 RUMAH SAKIT"
-      : place.category === "clinic"
-      ? "🩺 KLINIK"
-      : "💊 APOTEK";
+    place.category === "hospital" ? (
+      <span className="flex items-center gap-1"><Building2 className="h-3 w-3" /> RUMAH SAKIT</span>
+    ) : place.category === "clinic" ? (
+      <span className="flex items-center gap-1"><Stethoscope className="h-3 w-3" /> KLINIK</span>
+    ) : (
+      <span className="flex items-center gap-1"><Pill className="h-3 w-3" /> APOTEK</span>
+    );
 
   return (
     <div
@@ -48,26 +49,43 @@ export const LocationCard: React.FC<LocationCardProps> = ({ place, onSelect, isS
           </div>
         </div>
 
-        {/* Clean Full-Width Photo Header (Wikimedia or Unsplash Fallback) */}
-        <div className="relative h-40 w-full rounded-2xl overflow-hidden mb-3 border border-[#E5E7EB] bg-slate-100 shrink-0 shadow-xs group">
-          <img
-            src={place.photoUrl}
-            alt={place.name}
-            className="h-full w-full object-cover group-hover:scale-105 transition duration-300"
-            loading="lazy"
-          />
-          <span className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-xs text-white text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1">
-            <Camera className="h-2.5 w-2.5" />
-            {place.photoSource === "wikimedia" ? "Wikimedia Commons" : "Unsplash HD"}
-          </span>
-        </div>
+        {/* Real Photo or Clean UI Badge Header (NO DUMMY PHOTOS!) */}
+        {place.photoUrl && place.photoUrl.startsWith("http") ? (
+          <div className="relative h-40 w-full rounded-2xl overflow-hidden mb-3 border border-[#E5E7EB] bg-slate-100 shrink-0 shadow-xs group">
+            <img
+              src={place.photoUrl}
+              alt={place.name}
+              className="h-full w-full object-cover group-hover:scale-105 transition duration-300"
+              loading="lazy"
+            />
+            <span className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-xs text-white text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1">
+              <Camera className="h-2.5 w-2.5" />
+              Foto Depan Tempat
+            </span>
+          </div>
+        ) : (
+          <div className="relative h-28 w-full rounded-2xl overflow-hidden mb-3 border border-[#E5E7EB] bg-gradient-to-br from-[#E0F2FE] via-[#F0F9FF] to-[#E0F2FE] p-4 flex flex-col justify-between shrink-0 shadow-xs">
+            <div className="flex items-center justify-between">
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#379FD2] text-white shadow-sm">
+                <Building2 className="h-4 w-4" />
+              </div>
+              <span className="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/90 text-[#2781AF] border border-[#379FD2]/20">
+                Tampak Depan Tempat
+              </span>
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-[#111111] line-clamp-1">{place.name}</h4>
+              <p className="text-[10px] text-[#6B7280] flex items-center gap-1"><MapPin className="h-3 w-3 text-[#379FD2] shrink-0" /> {place.address}</p>
+            </div>
+          </div>
+        )}
 
         {/* Name & Address */}
         <h3 className="text-base sm:text-lg font-bold text-[#111111] leading-snug line-clamp-1">
           {place.name}
         </h3>
-        <p className="text-xs text-[#6B7280] mt-1 leading-relaxed line-clamp-2">
-          📍 {place.address}
+        <p className="text-xs text-[#6B7280] mt-1 leading-relaxed line-clamp-2 flex items-center gap-1">
+          <MapPin className="h-3 w-3 text-[#379FD2] shrink-0" /> {place.address}
         </p>
 
         {/* Hours & Distance */}
@@ -95,7 +113,7 @@ export const LocationCard: React.FC<LocationCardProps> = ({ place, onSelect, isS
         target="_blank"
         rel="noreferrer"
         onClick={(e) => e.stopPropagation()}
-        className="mt-4 w-full h-10 bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white font-extrabold text-xs rounded-2xl flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer"
+        className="mt-4 w-full h-10 bg-gradient-to-r from-[#379FD2] to-[#2563EB] text-white font-extrabold text-xs rounded-2xl flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer"
       >
         <Navigation className="h-3.5 w-3.5" />
         <span>Buka Navigasi Google Maps</span>

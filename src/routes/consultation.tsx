@@ -216,7 +216,7 @@ function ConsultationPage() {
           <Link to="/anatomy" className="rounded-full px-3 py-1.5 transition hover:bg-white">
             Anatomi
           </Link>
-          <Link to="/consultation" className="rounded-full bg-white px-3 py-1.5 shadow-sm">
+          <Link to="/consultation" search={{ anatomy: undefined }} className="rounded-full bg-[#FFFFFF] px-3 py-1.5 shadow-xs font-bold text-[#379FD2]">
             Konsultasi AI
           </Link>
           <Link to="/scanner" className="rounded-full px-3 py-1.5 transition hover:bg-white">

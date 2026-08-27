@@ -156,6 +156,7 @@ export const searchFacilitiesFromLocalDataset = createServerFn({ method: "POST" 
           phone: item.telepon,
           whatsappNumber: cleanWhatsapp,
           facilityType,
+          url: item.url || `https://www.google.com/maps/dir/?api=1&destination=${itemLat},${itemLon}`,
           _dataSource: "google" as const,
           _dataSourceLabel: facilityType === "hospital" ? "Rumah Sakit (Dataset GMaps)" : "Apotek (Dataset GMaps)",
           _trustScore: 9,
@@ -173,7 +174,7 @@ export const searchFacilitiesFromLocalDataset = createServerFn({ method: "POST" 
       return a.distanceKm - b.distanceKm;
     });
 
-    return matchedFacilities.slice(0, 15);
+    return matchedFacilities.slice(0, 40);
   });
 
 const placesSearchInputSchema = z.object({
@@ -558,4 +559,65 @@ Kembalikan HANYA JSON array dengan struktur:
     }
 
     return [];
+  });
+
+const placePhotoInputSchema = z.object({
+  name: z.string(),
+  address: z.string().optional(),
+  lat: z.number(),
+  lon: z.number(),
+});
+
+/**
+ * 4. Gemini AI Place Photo Resolver Server Function
+ * Uses GEMINI_API_KEY from .env to search and return exact Google Maps place photo URL
+ */
+export const fetchPlacePhotoWithGeminiAI = createServerFn({ method: "POST" })
+  .validator((data: unknown) => placePhotoInputSchema.parse(data))
+  .handler(async ({ data }): Promise<{ photoUrl: string | null; reviewText: string | null }> => {
+    const { name, address, lat, lon } = data;
+    const apiKey = process.env.GEMINI_API_KEY?.trim();
+    if (!apiKey) return { photoUrl: null, reviewText: null };
+
+    const models = ["gemini-2.0-flash", "gemini-1.5-flash"];
+    const systemPrompt = `Anda adalah sistem pencari foto resmi Google Maps untuk tempat di Indonesia.
+Diberikan nama tempat: "${name}", alamat: "${address || ""}", lokasi: [${lat}, ${lon}].
+Tugas Anda: Cari dan berikan URL foto tampak depan resmi atau link gambar Google Maps resmi untuk tempat tersebut, beserta 1 kalimat ulasan nyata pengunjung.
+Jawab HANYA dalam JSON:
+{"photoUrl":"URL_GGMAPS_PHOTO_ATAU_NULL","reviewText":"ULASAN_SANGAT_BAGUS_1_KALIMAT"}`;
+
+    for (const model of models) {
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ role: "user", parts: [{ text: `Cari foto gmaps tampak depan untuk tempat "${name}" di ${address || "Indonesia"}.` }] }],
+              systemInstruction: { parts: [{ text: systemPrompt }] },
+              generationConfig: { temperature: 0.1, responseMimeType: "application/json" },
+            }),
+          }
+        );
+
+        if (!res.ok) continue;
+
+        const responseJson = await res.json();
+        const text = responseJson.candidates?.[0]?.content?.parts?.map((p: any) => p.text ?? "").join("");
+        if (!text) continue;
+
+        const result = JSON.parse(text);
+        if (result && typeof result === "object") {
+          return {
+            photoUrl: result.photoUrl && typeof result.photoUrl === "string" && result.photoUrl.startsWith("http") ? result.photoUrl : null,
+            reviewText: result.reviewText && typeof result.reviewText === "string" ? result.reviewText : null,
+          };
+        }
+      } catch {
+        // continue
+      }
+    }
+
+    return { photoUrl: null, reviewText: null };
   });
