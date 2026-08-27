@@ -38,6 +38,9 @@ export interface PlaceNode {
   phone?: string;
   whatsappNumber?: string;
   facilityType?: FacilityType;
+  photoUrl?: string;
+  description?: string;
+  reviews?: string[];
   _dataSource?: "google" | "osm" | "gemini" | "cache" | "unknown";
   _dataSourceLabel?: string;
   _trustScore?: number;

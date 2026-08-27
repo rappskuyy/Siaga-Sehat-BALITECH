@@ -483,21 +483,6 @@ export function PharmacyList({
           </button>
         )}
       </div>
-
-      {/* 04. Kartu Informasi Fasilitas Terpilih (Diletakkan di Bawah Daftar, Tidak Menghalangi Peta) */}
-      {selectedPlace && (
-        <div className="shrink-0 pt-2 border-t border-[#E5E7EB]">
-          <RouteOverlayCard
-            selectedPlace={selectedPlace}
-            routeInfo={routeInfo}
-            loadingRoute={loadingRoute}
-            transportMode={transportMode}
-            userLocation={userLocation}
-            onTransportModeChange={onTransportModeChange}
-            onClose={onCloseCard}
-          />
-        </div>
-      )}
     </div>
   );
 }

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnatomyRouteImport } from './routes/anatomy'
 import { Route as ConsultationRouteImport } from './routes/consultation'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as MapsRouteImport } from './routes/maps'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ScannerRouteImport } from './routes/scanner'
@@ -37,6 +38,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MapsRoute = MapsRouteImport.update({
+  id: '/maps',
+  path: '/maps',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/anatomy': typeof AnatomyRoute
   '/consultation': typeof ConsultationRoute
   '/login': typeof LoginRoute
+  '/maps': typeof MapsRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/scanner': typeof ScannerRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/anatomy': typeof AnatomyRoute
   '/consultation': typeof ConsultationRoute
   '/login': typeof LoginRoute
+  '/maps': typeof MapsRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/scanner': typeof ScannerRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/anatomy': typeof AnatomyRoute
   '/consultation': typeof ConsultationRoute
   '/login': typeof LoginRoute
+  '/maps': typeof MapsRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/scanner': typeof ScannerRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/anatomy'
     | '/consultation'
     | '/login'
+    | '/maps'
     | '/profile'
     | '/register'
     | '/scanner'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/anatomy'
     | '/consultation'
     | '/login'
+    | '/maps'
     | '/profile'
     | '/register'
     | '/scanner'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/anatomy'
     | '/consultation'
     | '/login'
+    | '/maps'
     | '/profile'
     | '/register'
     | '/scanner'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   AnatomyRoute: typeof AnatomyRoute
   ConsultationRoute: typeof ConsultationRoute
   LoginRoute: typeof LoginRoute
+  MapsRoute: typeof MapsRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
   ScannerRoute: typeof ScannerRoute
@@ -151,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/maps': {
+      id: '/maps'
+      path: '/maps'
+      fullPath: '/maps'
+      preLoaderRoute: typeof MapsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   AnatomyRoute: AnatomyRoute,
   ConsultationRoute: ConsultationRoute,
   LoginRoute: LoginRoute,
+  MapsRoute: MapsRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
   ScannerRoute: ScannerRoute,

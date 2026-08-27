@@ -1,4 +1,5 @@
 import { useState } from "react";
+<<<<<<< Updated upstream
 import {
   ArrowUpRight,
   Bell,
@@ -12,6 +13,9 @@ import {
   User,
   X,
 } from "lucide-react";
+=======
+import { ArrowUpRight, Bell, LogIn, MapPin, Menu, Play, ScanLine, User, X } from "lucide-react";
+>>>>>>> Stashed changes
 import { Link } from "@tanstack/react-router";
 import { FloatingCard } from "./FloatingCard";
 import fotodokter1 from "@/assets/fotodokter(1).png?url";
@@ -59,6 +63,13 @@ export function Hero() {
               {l}
             </a>
           ))}
+          <Link
+            to="/maps"
+            className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
+          >
+            <MapPin className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)]" />
+            Peta Lokasi
+          </Link>
           <Link
             to="/consultation"
             className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
