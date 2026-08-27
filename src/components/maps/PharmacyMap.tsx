@@ -45,7 +45,7 @@ type Libraries = ("places" | "drawing" | "geometry" | "visualization")[];
 const GOOGLE_MAPS_LIBRARIES: Libraries = Object.freeze(["places"]) as Libraries;
 
 // Helper SVG Marker Generators with distinct colors:
-// Hospital = RED (#EF4444), Clinic = YELLOW (#F59E0B), Pharmacy = BLUE (#379FD2)
+// Hospital = RED (#EF4444), Clinic = YELLOW (#F59E0B), Pharmacy = landing-page blue (#4A6FA5)
 
 const userLocationSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
@@ -94,7 +94,7 @@ const clinicActivePinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponen
 // 💊 Pharmacy Markers (Blue)
 const pharmacyPinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
 <svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 34 42" fill="none">
-  <path d="M17 0C7.611 0 0 7.611 0 17C0 29.75 17 42 17 42C17 42 34 29.75 34 17C34 7.611 26.389 0 17 0Z" fill="#379FD2"/>
+  <path d="M17 0C7.611 0 0 7.611 0 17C0 29.75 17 42 17 42C17 42 34 29.75 34 17C34 7.611 26.389 0 17 0Z" fill="#4A6FA5"/>
   <circle cx="17" cy="16" r="7.5" fill="#FFFFFF"/>
   <circle cx="17" cy="16" r="4" fill="#2563EB"/>
 </svg>
@@ -110,7 +110,7 @@ const pharmacyActivePinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURICompon
 `)}`;
 
 /**
- * Route Renderer with White Underlay and #379FD2 Route Polyline
+ * Route Renderer with White Underlay and landing-page blue Route Polyline
  */
 function MapRouteRenderer({
   map,
@@ -145,7 +145,7 @@ function MapRouteRenderer({
         directions: routeInfo.directionsResult,
         suppressMarkers: true,
         polylineOptions: {
-          strokeColor: "#379FD2",
+          strokeColor: "#4A6FA5",
           strokeWeight: 5,
           strokeOpacity: 0.95,
         },
@@ -165,11 +165,11 @@ function MapRouteRenderer({
       });
       underlayPolylineRef.current = underlay;
 
-      // 2. Primary Route #379FD2
+      // 2. Primary Route landing-page blue
       const foreground = new google.maps.Polyline({
         map: map,
         path: path,
-        strokeColor: "#379FD2",
+        strokeColor: "#4A6FA5",
         strokeWeight: 5,
         strokeOpacity: 1,
         zIndex: 2,
@@ -208,7 +208,7 @@ interface PharmacyMapProps {
   conditionName?: string;
 }
 
-export function PharmacyMap({ dangerLevel = "rendah" }: PharmacyMapProps) {
+export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyMapProps) {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [loadingLocation, setLoadingLocation] = useState<boolean>(false);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -664,7 +664,9 @@ export function PharmacyMap({ dangerLevel = "rendah" }: PharmacyMapProps) {
                   : "Peta Klinik & Apotek Terdekat"}
               </h3>
               <p className="text-[11px] text-[#6B7280]">
-                Navigasi presisi fasilitas kesehatan terdekat
+                {conditionName
+                  ? `Rekomendasi fasilitas untuk ${conditionName}`
+                  : "Navigasi presisi fasilitas kesehatan terdekat"}
               </p>
             </div>
           </div>
@@ -675,7 +677,7 @@ export function PharmacyMap({ dangerLevel = "rendah" }: PharmacyMapProps) {
               variant="outline"
               size="sm"
               disabled={loadingLocation}
-              className="h-8 gap-1.5 rounded-xl text-xs bg-[#FFFFFF] border-[#E5E7EB] text-[#379FD2] hover:bg-[#ABE2FE]/20 cursor-pointer shadow-2xs"
+              className="h-8 gap-1.5 rounded-xl text-xs bg-[#FFFFFF] border-[#E5E7EB] text-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue-soft)]/20 cursor-pointer shadow-2xs"
             >
               <RefreshCw className={`h-3 w-3 ${loadingLocation ? "animate-spin" : ""}`} />
               {loadingLocation ? "Mencari GPS..." : "GPS Presisi"}
@@ -687,7 +689,7 @@ export function PharmacyMap({ dangerLevel = "rendah" }: PharmacyMapProps) {
         <div className="relative" ref={searchContainerRef}>
           <form onSubmit={handleAddressSearch} className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#379FD2]" />
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:var(--color-clinic-blue)]" />
               <Input
                 type="text"
                 placeholder="Cari lokasi Anda (misal: Denpasar Bali, Jakarta, Surabaya)..."
@@ -719,10 +721,10 @@ export function PharmacyMap({ dangerLevel = "rendah" }: PharmacyMapProps) {
                   getUserGeolocation(true);
                   setShowSearchResults(false);
                 }}
-                className="w-full text-left p-2.5 bg-blue-50/80 hover:bg-blue-100 rounded-xl flex items-center justify-between gap-2.5 border-b border-[#E5E7EB] cursor-pointer mb-1 text-[#379FD2] font-semibold transition"
+                className="mb-1 flex w-full items-center justify-between gap-2.5 rounded-xl border-b border-[#E5E7EB] bg-[color:var(--color-clinic-blue-soft)]/80 p-2.5 text-left font-semibold text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue-soft)]"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="grid h-7 w-7 place-items-center rounded-lg bg-[#379FD2] text-white shrink-0 shadow-xs">
+                  <div className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[color:var(--color-clinic-blue)] text-white shadow-xs">
                     <Crosshair className="h-4 w-4 animate-pulse" />
                   </div>
                   <div className="flex flex-col min-w-0">
@@ -732,7 +734,7 @@ export function PharmacyMap({ dangerLevel = "rendah" }: PharmacyMapProps) {
                     </span>
                   </div>
                 </div>
-                <span className="text-[9px] bg-[#379FD2] text-white px-2 py-0.5 rounded-full shrink-0 font-medium">
+                <span className="shrink-0 rounded-full bg-[color:var(--color-clinic-blue)] px-2 py-0.5 text-[9px] font-medium text-white">
                   Lokasi Anda
                 </span>
               </button>
@@ -815,7 +817,6 @@ export function PharmacyMap({ dangerLevel = "rendah" }: PharmacyMapProps) {
 
       {/* Main Composition: Desktop Layout & Mobile Responsive Mode */}
       <div className="flex flex-col lg:flex-row gap-3 min-h-[480px] lg:h-[720px] items-stretch">
-
         {/* 02. Clinic List Column */}
         <div
           className={`w-full lg:w-[420px] shrink-0 h-[480px] sm:h-[520px] lg:h-full flex-col ${

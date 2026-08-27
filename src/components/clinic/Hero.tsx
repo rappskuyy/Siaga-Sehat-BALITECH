@@ -34,14 +34,19 @@ const MINI_STATS = [
   { n: "100%", l: "diagnostik digital" },
 ];
 
-const NAV_ITEMS = ["Tentang Kami", "Layanan", "Dokter", "Hubungi"];
+const NAV_ITEMS = [
+  { label: "Tentang Kami", hash: "about" },
+  { label: "Layanan", hash: "services" },
+  { label: "Keunggulan", hash: "doctors" },
+  { label: "Hubungi", hash: "contact" },
+];
 
 export function Hero() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, profile } = useAuth();
 
   return (
-    <section className="relative w-full overflow-hidden bg-white px-6 pt-5 pb-8 md:px-8 md:pt-7 md:pb-14 lg:px-10 lg:pt-8 lg:pb-16">
+    <section className="relative w-full overflow-hidden bg-white px-4 pt-5 pb-8 sm:px-6 md:px-8 md:pt-7 md:pb-14 lg:px-10 lg:pt-8 lg:pb-16">
       {/* Header */}
       <header className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
@@ -54,13 +59,13 @@ export function Hero() {
         </div>
 
         <nav className="hidden items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2 py-1.5 text-sm text-[color:var(--color-clinic-ink)] lg:flex">
-          {NAV_ITEMS.map((l) => (
+          {NAV_ITEMS.map((item) => (
             <a
-              key={l}
-              href={`#${l.toLowerCase().replace(/\s/g, "")}`}
+              key={item.label}
+              href={`#${item.hash}`}
               className="rounded-full px-4 py-1.5 transition hover:bg-white"
             >
-              {l}
+              {item.label}
             </a>
           ))}
           <Link
@@ -75,6 +80,12 @@ export function Hero() {
             className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
           >
             Konsultasi
+          </Link>
+          <Link
+            to="/anatomy"
+            className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
+          >
+            Anatomi
           </Link>
           <Link
             to="/scanner"
@@ -140,14 +151,14 @@ export function Hero() {
       {isMenuOpen && (
         <div className="mt-3 rounded-2xl border border-black/5 bg-white p-3 shadow-[var(--shadow-clinic)] lg:hidden">
           <nav className="flex flex-col gap-1">
-            {NAV_ITEMS.map((l) => (
+            {NAV_ITEMS.map((item) => (
               <a
-                key={l}
-                href={`#${l.toLowerCase().replace(/\s/g, "")}`}
+                key={item.label}
+                href={`#${item.hash}`}
                 onClick={() => setIsMenuOpen(false)}
                 className="rounded-xl px-3 py-2 text-sm font-medium text-[color:var(--color-clinic-ink)] transition hover:bg-[color:var(--color-clinic-blue-soft)]"
               >
-                {l}
+                {item.label}
               </a>
             ))}
             <Link
@@ -157,6 +168,13 @@ export function Hero() {
             >
               <ScanLine className="h-4 w-4" />
               Scan AI
+            </Link>
+            <Link
+              to="/anatomy"
+              onClick={() => setIsMenuOpen(false)}
+              className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-white/80 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
+            >
+              Anatomi
             </Link>
             <Link
               to="/consultation"
@@ -178,10 +196,10 @@ export function Hero() {
       )}
 
       {/* Body */}
-      <div className="relative mt-6 grid gap-8 lg:mt-8 lg:grid-cols-[1.05fr_1.1fr_0.85fr] lg:items-start lg:gap-5">
+      <div className="relative mt-7 grid gap-10 sm:gap-8 lg:mt-8 lg:grid-cols-[1.05fr_1.1fr_0.85fr] lg:items-start lg:gap-5">
         {/* Left column: headline + CTA + proof card */}
         <div className="relative z-10 flex flex-col justify-start">
-          <h1 className="font-display text-[56px] font-extrabold leading-[0.88] tracking-tight text-[color:var(--color-clinic-ink)] md:text-[68px] lg:text-[76px]">
+          <h1 className="font-display text-5xl font-extrabold leading-[0.9] tracking-tight text-[color:var(--color-clinic-ink)] sm:text-[56px] md:text-[68px] lg:text-[76px]">
             Siaga
             <br />
             Sehat
@@ -215,7 +233,7 @@ export function Hero() {
             </Link>
           </div>
 
-          <div className="mt-8 flex items-stretch gap-3 md:mt-12">
+          <div className="mt-8 flex items-stretch gap-2 sm:gap-3 md:mt-12">
             <button
               type="button"
               className="group relative hidden h-24 w-32 shrink-0 overflow-hidden rounded-2xl shadow-[var(--shadow-clinic)] md:block"
@@ -235,14 +253,14 @@ export function Hero() {
               </span>
             </button>
 
-            <div className="grid flex-1 grid-cols-3 gap-3 rounded-2xl bg-white p-3 shadow-[var(--shadow-clinic)] md:p-4">
+            <div className="grid min-w-0 flex-1 grid-cols-3 gap-2 rounded-2xl bg-white p-3 shadow-[var(--shadow-clinic)] sm:gap-3 md:p-4">
               {MINI_STATS.map((s, i) => (
                 <div
                   key={s.n}
                   className="animate-fade-up border-l border-black/5 pl-3 first:border-l-0 first:pl-0"
                   style={{ animationDelay: `${0.1 + i * 0.1}s` }}
                 >
-                  <div className="font-display text-2xl font-extrabold text-[color:var(--color-clinic-ink)] md:text-[28px] md:leading-none">
+                  <div className="font-display text-xl font-extrabold text-[color:var(--color-clinic-ink)] sm:text-2xl md:text-[28px] md:leading-none">
                     {s.n}
                   </div>
                   <div className="mt-1.5 text-[11px] leading-tight text-[color:var(--color-clinic-muted)]">
@@ -256,14 +274,17 @@ export function Hero() {
 
         {/* Center column: doctor photo pulled up close to the header, with floating AI feature cards */}
         <div className="relative order-first flex justify-center lg:order-none lg:-mt-6">
-          <div className="relative inline-flex h-[380px] items-end md:h-[460px] lg:h-[540px]">
+          <div className="relative inline-flex h-[340px] max-w-full items-end sm:h-[400px] md:h-[460px] lg:h-[540px]">
             <img
               src={fotodokter2}
               alt="Dokter dengan stetoskop"
               className="h-full max-h-[860px] w-auto object-contain object-bottom"
             />
 
-            <FloatingCard className="-left-4 top-4 w-[168px] md:-left-8 md:w-[180px]" delay="0s">
+            <FloatingCard
+              className="left-0 top-3 w-[min(168px,calc(100vw-48px))] sm:-left-2 md:-left-8 md:w-[180px]"
+              delay="0s"
+            >
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-medium text-[color:var(--color-clinic-muted)]">
                   Progres Pemulihanmu
@@ -284,7 +305,7 @@ export function Hero() {
             </FloatingCard>
 
             <FloatingCard
-              className="-right-4 top-[42%] w-[196px] -translate-y-1/2 md:-right-10 md:w-[210px]"
+              className="right-0 top-[42%] w-[min(196px,calc(100vw-40px))] -translate-y-1/2 sm:-right-2 md:-right-10 md:w-[210px]"
               delay="0.5s"
             >
               <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-siaga-scan)]/12 px-2.5 py-1 text-[10px] font-semibold text-[color:var(--color-siaga-scan-dim)]">
@@ -307,7 +328,7 @@ export function Hero() {
             </FloatingCard>
 
             <FloatingCard
-              className="-right-2 bottom-16 w-[200px] md:-right-6 md:w-[210px]"
+              className="right-0 bottom-12 w-[min(200px,calc(100vw-40px))] sm:-right-2 md:-right-6 md:w-[210px]"
               delay="1s"
             >
               <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-siaga-consult)]/12 px-2.5 py-1 text-[10px] font-semibold text-[color:var(--color-siaga-consult-dim)]">
@@ -322,7 +343,7 @@ export function Hero() {
               </p>
             </FloatingCard>
 
-            <div className="absolute bottom-4 -right-2 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-sm backdrop-blur-md md:-right-4">
+            <div className="absolute bottom-2 right-0 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-sm backdrop-blur-md sm:bottom-4 sm:-right-2 md:-right-4">
               <div className="flex -space-x-2">
                 {AVATARS.map((a) => (
                   <img

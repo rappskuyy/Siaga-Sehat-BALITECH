@@ -30,26 +30,26 @@ export function SourceBadge({
     }
   > = {
     google: {
-      icon: <CheckCircle2 className="h-3 w-3 text-[#379FD2]" />,
+      icon: <CheckCircle2 className="h-3 w-3 text-[color:var(--color-clinic-blue)]" />,
       label: "Google Maps",
-      bgColor: "bg-[#ABE2FE]/20",
-      textColor: "text-[#379FD2]",
-      borderColor: "border-[#5BB4E0]/40",
+      bgColor: "bg-[color:var(--color-clinic-blue-soft)]/20",
+      textColor: "text-[color:var(--color-clinic-blue)]",
+      borderColor: "border-[color:var(--color-clinic-blue-dark)]/40",
       tooltip: "Data terverifikasi dari dataset Google Maps",
     },
     osm: {
-      icon: <Info className="h-3 w-3 text-[#379FD2]" />,
+      icon: <Info className="h-3 w-3 text-[color:var(--color-clinic-blue)]" />,
       label: "OpenStreetMap",
-      bgColor: "bg-[#ABE2FE]/20",
-      textColor: "text-[#379FD2]",
-      borderColor: "border-[#5BB4E0]/40",
+      bgColor: "bg-[color:var(--color-clinic-blue-soft)]/20",
+      textColor: "text-[color:var(--color-clinic-blue)]",
+      borderColor: "border-[color:var(--color-clinic-blue-dark)]/40",
       tooltip: "Data geospasial komunitas OpenStreetMap resmi",
     },
     gemini: {
-      icon: <Sparkles className="h-3 w-3 text-[#5BB4E0]" />,
+      icon: <Sparkles className="h-3 w-3 text-[color:var(--color-clinic-blue-dark)]" />,
       label: "AI Terverifikasi",
       bgColor: "bg-[#F7F9FB]",
-      textColor: "text-[#379FD2]",
+      textColor: "text-[color:var(--color-clinic-blue)]",
       borderColor: "border-[#E5E7EB]",
       tooltip: "Pencarian cerdas basis data fasilitas kesehatan",
     },
@@ -102,20 +102,20 @@ export function SourceSummaryBar({
     <div className="flex items-center gap-2 flex-wrap rounded-full bg-[#F7F9FB] px-3 py-1 text-[10px] text-[#6B7280] border border-[#E5E7EB]">
       <span className="font-semibold text-[#111111]">Sumber Data:</span>
       {sources.google > 0 && (
-        <span className="flex items-center gap-1 text-[#379FD2] font-medium">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#379FD2] inline-block" />
+        <span className="flex items-center gap-1 text-[color:var(--color-clinic-blue)] font-medium">
+          <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-clinic-blue)] inline-block" />
           Google ({Math.round((sources.google / sources.total) * 100)}%)
         </span>
       )}
       {sources.osm > 0 && (
-        <span className="flex items-center gap-1 text-[#5BB4E0] font-medium">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#5BB4E0] inline-block" />
+        <span className="flex items-center gap-1 text-[color:var(--color-clinic-blue-dark)] font-medium">
+          <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-clinic-blue-dark)] inline-block" />
           OSM ({Math.round((sources.osm / sources.total) * 100)}%)
         </span>
       )}
       {sources.gemini > 0 && (
-        <span className="flex items-center gap-1 text-[#379FD2] font-medium">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#ABE2FE] inline-block" />
+        <span className="flex items-center gap-1 text-[color:var(--color-clinic-blue)] font-medium">
+          <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] inline-block" />
           AI ({Math.round((sources.gemini / sources.total) * 100)}%)
         </span>
       )}

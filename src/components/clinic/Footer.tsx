@@ -17,7 +17,7 @@ export function Footer() {
   const [email, setEmail] = useState("");
 
   return (
-    <footer className="w-full bg-[#f7f4ee] px-4 pb-2 pt-10 md:px-8">
+    <footer id="contact" className="w-full bg-[#f7f4ee] px-4 pb-2 pt-10 md:px-8">
       <Reveal className="relative overflow-hidden rounded-[28px] bg-white p-4 shadow-[var(--shadow-clinic)] md:p-6">
         <div className="grid gap-4 md:grid-cols-[1.1fr_1fr_1.1fr]">
           {/* Brand card */}

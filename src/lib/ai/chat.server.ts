@@ -10,7 +10,6 @@ export const chatWithAI = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { prompt } = data as { prompt: string };
 
-    const openaiKey = process.env.OPENAI_API_KEY?.trim();
     const geminiKey = process.env.GEMINI_API_KEY?.trim();
 
     const SYSTEM_PROMPT =
@@ -22,33 +21,6 @@ export const chatWithAI = createServerFn({ method: "POST" })
       '- Jangan pernah membuat diagnosis pasti 100% — gunakan bahasa "kemungkinan", "bisa jadi", "perlu dipastikan oleh dokter".\n' +
       "- Jika ada tanda bahaya (nyeri dada hebat, sesak napas berat, pendarahan hebat, penurunan kesadaran, dll), segera sarankan ke IGD tanpa menunggu info lain.\n" +
       "- Jawaban singkat, ramah, dan empatik.";
-
-    if (openaiKey) {
-      const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
-      const res = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${openaiKey}`,
-        },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: "system", content: SYSTEM_PROMPT },
-            { role: "user", content: prompt },
-          ],
-          max_tokens: 800,
-        }),
-      });
-
-      if (!res.ok) {
-        const txt = await res.text().catch(() => "");
-        throw new Error(`OpenAI error ${res.status}: ${txt.slice(0, 300)}`);
-      }
-      const payload = await res.json();
-      const content = payload.choices?.[0]?.message?.content;
-      return { reply: content ?? "" };
-    }
 
     if (geminiKey) {
       const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"];
@@ -87,10 +59,12 @@ export const chatWithAI = createServerFn({ method: "POST" })
           lastErrText = err instanceof Error ? err.message : String(err);
         }
       }
-      throw new Error(`Gemini API tidak dapat dihubungi (${lastErrText || "semua model sibuk/error"})`);
+      throw new Error(
+        `Gemini API tidak dapat dihubungi (${lastErrText || "semua model sibuk/error"})`,
+      );
     }
 
     throw new Error(
-      "Tidak ada API key AI yang dikonfigurasi. Tambahkan OPENAI_API_KEY atau GEMINI_API_KEY di .env",
+      "GEMINI_API_KEY belum dikonfigurasi di server. Tambahkan key Gemini ke file .env lalu restart server.",
     );
   });
