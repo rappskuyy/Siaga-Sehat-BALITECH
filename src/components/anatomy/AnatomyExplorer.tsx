@@ -6,7 +6,7 @@ import { assessHealthAnatomy } from "@/lib/anatomy/anatomy.server";
 import { AnatomyViewer } from "./AnatomyViewer";
 import { SymptomSelectorCard } from "./SymptomSelectorCard";
 import { AIAssessmentResultCard } from "./AIAssessmentResultCard";
-import { AlertCircle, Activity } from "lucide-react";
+import { AlertCircle, Activity, Sparkles } from "lucide-react";
 
 export function AnatomyExplorer() {
   const assessFn = useServerFn(assessHealthAnatomy);
@@ -32,7 +32,9 @@ export function AnatomyExplorer() {
   // Toggle symptom checkbox
   const handleToggleSymptom = (symptomName: string) => {
     setSelectedSymptoms((prev) =>
-      prev.includes(symptomName) ? prev.filter((s) => s !== symptomName) : [...prev, symptomName],
+      prev.includes(symptomName)
+        ? prev.filter((s) => s !== symptomName)
+        : [...prev, symptomName],
     );
   };
 
@@ -88,47 +90,27 @@ export function AnatomyExplorer() {
   };
 
   return (
-    <div className="w-full max-w-[1500px] mx-auto">
+    <div className="w-full max-w-[1440px] mx-auto">
       {/* Top Banner Intro */}
-      <div className="text-center mb-5">
-        <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-3.5 py-1 text-xs font-semibold text-[color:var(--color-clinic-blue-dark)]">
+      <div className="text-center mb-6 md:mb-8">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-4 py-1 text-xs font-semibold text-[color:var(--color-clinic-blue-dark)] shadow-xs">
           <Activity className="h-3.5 w-3.5" />
           Interactive Anatomy Explorer & AI Assessment
         </span>
-        <h1 className="font-display text-2xl font-extrabold text-[color:var(--color-clinic-ink)] sm:text-3xl md:text-4xl mt-2 tracking-tight">
+        <h1 className="font-display text-2xl font-extrabold text-[color:var(--color-clinic-ink)] sm:text-3xl md:text-4xl mt-2.5 tracking-tight">
           Eksplorasi Anatomi Tubuh
         </h1>
-        <p className="mt-1.5 max-w-lg mx-auto text-xs text-[color:var(--color-clinic-muted)] leading-relaxed">
-          Pilih bagian tubuh secara interaktif, tandai gejala yang Anda rasakan, dan dapatkan
-          analisis kesehatan awal berbasis AI.
+        <p className="mt-2 max-w-xl mx-auto text-xs md:text-sm text-[color:var(--color-clinic-muted)] leading-relaxed">
+          Pilih bagian tubuh secara interaktif di model anatomi sebelah kanan, tandai gejala yang Anda rasakan, dan dapatkan analisis kesehatan awal berbasis AI.
         </p>
       </div>
 
-      {/* Main 2-Column Responsive Layout */}
-      <div className="grid gap-5 lg:grid-cols-[0.85fr_1.15fr] items-start">
-        {/* Left Column: Interactive Anatomy Viewer */}
-        <div className="flex flex-col items-center rounded-[24px] bg-white p-4 md:p-5 shadow-[var(--shadow-clinic)] border border-black/5">
-          <div className="flex items-center justify-between w-full mb-3 border-b border-black/5 pb-2.5">
-            <div className="flex items-center gap-2">
-              <span className="grid h-6 w-6 place-items-center rounded-full bg-[color:var(--color-clinic-blue)] text-white text-xs font-bold">
-                1
-              </span>
-              <h2 className="font-display text-base font-bold text-[color:var(--color-clinic-ink)]">
-                Pilih Bagian Tubuh
-              </h2>
-            </div>
-            <span className="text-[11px] text-[color:var(--color-clinic-muted)]">
-              Klik hotspot interaktif
-            </span>
-          </div>
-
-          <AnatomyViewer selectedRegion={selectedRegion} onSelectRegion={handleSelectRegion} />
-        </div>
-
-        {/* Right Column: Symptom Selector OR AI Assessment Result */}
-        <div>
+      {/* Main 2-Column Responsive Layout: Left (Symptoms / Result) & Right (Anatomy Viewer) */}
+      <div className="grid gap-6 lg:grid-cols-12 items-start">
+        {/* Left Column: Symptom Selector OR AI Assessment Result (Col Span 7) */}
+        <div className="lg:col-span-7 w-full">
           {errorMessage && (
-            <div className="mb-3 flex items-start gap-2 rounded-xl bg-red-50 p-3 text-xs font-medium text-red-700 border border-red-200">
+            <div className="mb-4 flex items-start gap-2.5 rounded-2xl bg-red-50 p-4 text-xs font-medium text-red-700 border border-red-200 shadow-sm animate-fade-up">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
               <div>{errorMessage}</div>
             </div>
@@ -138,9 +120,6 @@ export function AnatomyExplorer() {
             <AIAssessmentResultCard
               result={assessmentResult}
               regionName={selectedRegion.nameIndonesian}
-              selectedSymptoms={selectedSymptoms}
-              selectedConditions={selectedConditions}
-              additionalNotes={additionalNotes}
               onReset={handleReset}
             />
           ) : (
@@ -157,6 +136,14 @@ export function AnatomyExplorer() {
               isLoading={isLoading}
             />
           )}
+        </div>
+
+        {/* Right Column: Interactive Anatomy Viewer (Col Span 5) */}
+        <div className="lg:col-span-5 w-full">
+          <AnatomyViewer
+            selectedRegion={selectedRegion}
+            onSelectRegion={handleSelectRegion}
+          />
         </div>
       </div>
     </div>

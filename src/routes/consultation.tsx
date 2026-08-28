@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
-import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowLeft,
@@ -30,7 +29,7 @@ import {
 } from "@/components/ui/sheet";
 
 export const Route = createFileRoute("/consultation")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { anatomy?: string } => ({
     anatomy: typeof search.anatomy === "string" ? search.anatomy : undefined,
   }),
   head: () => ({
@@ -59,11 +58,10 @@ function ChatBubble({ message }: { message: ChatMessage }) {
   return (
     <div className={`mb-3 flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div
-        className={`max-w-[82%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-sm ${
-          isUser
+        className={`max-w-[82%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-sm ${isUser
             ? "rounded-br-md bg-[color:var(--color-clinic-blue)] text-white"
             : "rounded-bl-md bg-white text-[color:var(--color-clinic-ink)]"
-        }`}
+          }`}
       >
         {message.text}
       </div>
@@ -193,7 +191,7 @@ function ConsultationPage() {
   return (
     <main className="flex min-h-screen flex-col bg-[#e9ecf1] font-sans">
       {/* Chat header, styled like a live-support widget */}
-      <header className="flex items-center justify-between gap-3 bg-white px-4 py-3 shadow-sm md:px-6">
+      <header className="relative flex items-center justify-between gap-3 bg-white px-4 py-3 shadow-sm md:px-6">
         <div className="flex items-center gap-3">
           <Link
             to="/"
@@ -201,21 +199,49 @@ function ConsultationPage() {
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <BrandLogo size="sm" />
-          <div className="hidden sm:block border-l border-slate-200 pl-3">
-            <p className="flex items-center gap-1 text-xs text-emerald-600 font-bold">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Online — Asisten AI
+          <div className="grid h-10 w-10 place-items-center rounded-full bg-[color:var(--color-clinic-blue)] text-white">
+            <Stethoscope className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-[color:var(--color-clinic-ink)]">
+              SiagaSehat AI
+            </p>
+            <p className="flex items-center gap-1 text-xs text-emerald-600">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Online — siap membantu
             </p>
           </div>
         </div>
-        <nav className="hidden items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)] p-1 text-xs font-semibold text-[color:var(--color-clinic-blue-dark)] md:flex">
-          <Link to="/anatomy" className="rounded-full px-3 py-1.5 transition hover:bg-white">
+        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)] p-1 text-xs font-semibold text-[color:var(--color-clinic-blue-dark)] whitespace-nowrap shadow-xs">
+          <Link
+            to="/maps"
+            activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue)] font-bold shadow-xs" }}
+            inactiveProps={{ className: "text-[color:var(--color-clinic-blue-dark)] hover:bg-white/60" }}
+            className="rounded-full px-3 py-1.5 transition"
+          >
+            Peta Lokasi
+          </Link>
+          <Link
+            to="/anatomy"
+            activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue)] font-bold shadow-xs" }}
+            inactiveProps={{ className: "text-[color:var(--color-clinic-blue-dark)] hover:bg-white/60" }}
+            className="rounded-full px-3 py-1.5 transition"
+          >
             Anatomi
           </Link>
-          <Link to="/consultation" search={{ anatomy: undefined }} className="rounded-full bg-[#FFFFFF] px-3 py-1.5 shadow-xs font-bold text-[#379FD2]">
+          <Link
+            to="/consultation"
+            activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue)] font-bold shadow-xs" }}
+            inactiveProps={{ className: "text-[color:var(--color-clinic-blue-dark)] hover:bg-white/60" }}
+            className="rounded-full px-3 py-1.5 transition"
+          >
             Konsultasi AI
           </Link>
-          <Link to="/scanner" className="rounded-full px-3 py-1.5 transition hover:bg-white">
+          <Link
+            to="/scanner"
+            activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue)] font-bold shadow-xs" }}
+            inactiveProps={{ className: "text-[color:var(--color-clinic-blue-dark)] hover:bg-white/60" }}
+            className="rounded-full px-3 py-1.5 transition"
+          >
             Scan AI
           </Link>
         </nav>
