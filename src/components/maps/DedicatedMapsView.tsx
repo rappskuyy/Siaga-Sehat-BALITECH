@@ -14,7 +14,6 @@ import {
   Navigation,
   Star,
   Clock,
-  Phone,
   Car,
   Bike,
   X,
@@ -44,17 +43,13 @@ import {
   type RouteInfo,
   type TransportMode,
 } from "./maps.service";
-import { fetchWikimediaPhoto } from "@/hooks/useLocationPlaces";
-import { fetchPlacePhotoWithGeminiAI } from "@/lib/maps/pharmacy.server";
 import { PharmacyList } from "./PharmacyList";
 import { SourceSummaryBar } from "./SourceBadge";
 import { useAuth } from "@/lib/auth/auth-context";
-import { BrandLogo } from "@/components/ui/BrandLogo";
 
 const containerStyle = {
   width: "100%",
   height: "100%",
-  minHeight: "380px",
 };
 
 interface ExtendedRouteInfo extends RouteInfo {
@@ -64,7 +59,12 @@ interface ExtendedRouteInfo extends RouteInfo {
 type Libraries = ("places" | "drawing" | "geometry" | "visualization")[];
 const GOOGLE_MAPS_LIBRARIES: Libraries = Object.freeze(["places"]) as Libraries;
 
-
+// High quality photo fallbacks
+const FACILITY_PHOTOS = {
+  hospital: "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=600&auto=format&fit=crop&q=80",
+  clinic: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=80",
+  pharmacy: "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=600&auto=format&fit=crop&q=80",
+};
 
 // Review comments snippets
 const FACILITY_REVIEWS = {
@@ -277,7 +277,7 @@ function OpenStreetMapCanvas({
     });
   }, [userLocation, pharmacies, selectedPharmacy, routeInfo, onSelectPharmacy]);
 
-  return <div ref={mapContainerRef} className="w-full h-full min-h-[380px]" />;
+  return <div ref={mapContainerRef} className="w-full h-full" />;
 }
 
 /**
@@ -413,15 +413,29 @@ export function DedicatedMapsView() {
   const SAVED_LOCATION_KEY = "siaga_user_chosen_location";
 
   useEffect(() => {
-    // Immediately center map on user's current live GPS position when opening page
-    getUserGeolocation(true);
+    try {
+      const saved = sessionStorage.getItem(SAVED_LOCATION_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed.coords) && parsed.coords.length === 2) {
+          setUserLocation(parsed.coords);
+          setLocationSource(parsed.source || "Titik Pilihan Anda");
+          if (parsed.address) setSearchQuery(parsed.address);
+          loadPharmacies(parsed.coords[0], parsed.coords[1], parsed.address);
+          return;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    getUserGeolocation();
   }, []);
 
   const getUserGeolocation = async (isManualClick = false) => {
     if (isManualClick) {
       try {
         sessionStorage.removeItem(SAVED_LOCATION_KEY);
-      } catch {}
+      } catch { }
     }
 
     setLoadingLocation(true);
@@ -440,7 +454,7 @@ export function DedicatedMapsView() {
         if (addressName) {
           setSearchQuery(addressName);
         }
-      } catch {}
+      } catch { }
       loadPharmacies(coords[0], coords[1], addressName);
     };
 
@@ -555,7 +569,7 @@ export function DedicatedMapsView() {
           address: result.displayname,
         })
       );
-    } catch {}
+    } catch { }
 
     loadPharmacies(result.lat, result.lon, result.displayname);
   };
@@ -707,32 +721,12 @@ export function DedicatedMapsView() {
       return;
     }
 
-    if (selectedPharmacy.photoUrl && selectedPharmacy.photoUrl.startsWith("http")) {
+    if (selectedPharmacy.photoUrl) {
       setDynamicPhotoUrl(selectedPharmacy.photoUrl);
     } else {
       setDynamicPhotoUrl(null);
     }
 
-    // API 1: Gemini AI Photo & Review Resolver (GEMINI_API_KEY from .env)
-    fetchPlacePhotoWithGeminiAI({
-      data: {
-        name: selectedPharmacy.name,
-        address: selectedPharmacy.address,
-        lat: selectedPharmacy.lat,
-        lon: selectedPharmacy.lon,
-      },
-    })
-      .then((aiRes) => {
-        if (aiRes?.photoUrl) {
-          setDynamicPhotoUrl((prev) => prev || aiRes.photoUrl);
-        }
-        if (aiRes?.reviewText) {
-          setDynamicReviewText((prev) => prev || aiRes.reviewText);
-        }
-      })
-      .catch(() => {});
-
-    // API 2: Google Places API Photo & Real Reviews Search
     if (
       typeof window !== "undefined" &&
       window.google &&
@@ -743,13 +737,10 @@ export function DedicatedMapsView() {
         const dummyDiv = document.createElement("div");
         const service = new window.google.maps.places.PlacesService(dummyDiv);
 
-        const searchQuery = `${selectedPharmacy.name} ${selectedPharmacy.address || ""}`.trim();
-
         service.findPlaceFromQuery(
           {
-            query: searchQuery,
-            fields: ["place_id", "photos", "rating", "user_ratings_total", "formatted_address", "name"],
-            locationBias: { lat: selectedPharmacy.lat, lng: selectedPharmacy.lon },
+            query: `${selectedPharmacy.name} ${selectedPharmacy.address || ""}`,
+            fields: ["place_id", "photos", "rating", "user_ratings_total"],
           },
           (results, status) => {
             if (
@@ -758,8 +749,7 @@ export function DedicatedMapsView() {
               results[0]
             ) {
               if (results[0].photos && results[0].photos.length > 0) {
-                const photoUrl = results[0].photos[0].getUrl({ maxWidth: 1000, maxHeight: 800 });
-                setDynamicPhotoUrl(photoUrl);
+                setDynamicPhotoUrl(results[0].photos[0].getUrl({ maxWidth: 800, maxHeight: 600 }));
               }
               const pId = results[0].place_id;
               if (pId) {
@@ -768,8 +758,7 @@ export function DedicatedMapsView() {
                   (details, dStatus) => {
                     if (dStatus === window.google.maps.places.PlacesServiceStatus.OK && details) {
                       if (details.photos && details.photos.length > 0) {
-                        const highResPhoto = details.photos[0].getUrl({ maxWidth: 1000, maxHeight: 800 });
-                        setDynamicPhotoUrl(highResPhoto);
+                        setDynamicPhotoUrl(details.photos[0].getUrl({ maxWidth: 800, maxHeight: 600 }));
                       }
                       if (details.reviews && details.reviews.length > 0) {
                         setDynamicReviewText(details.reviews[0].text);
@@ -785,28 +774,15 @@ export function DedicatedMapsView() {
         console.error("Places photo error:", e);
       }
     }
-  }, [selectedPharmacy?.id, selectedPharmacy?.name, selectedPharmacy?.lat, selectedPharmacy?.lon]);
+  }, [selectedPharmacy?.id, selectedPharmacy?.name]);
 
-  // Real Place Photo Provider matching exact place category & name
-  const facilityPhotoFallback = useMemo(() => {
-    if (!selectedPharmacy) return "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=800&auto=format&fit=crop&q=80";
-    const name = selectedPharmacy.name.toLowerCase();
-
-    if (name.includes("kimia farma")) {
-      return "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=800&auto=format&fit=crop&q=80";
-    }
-    if (name.includes("k-24") || name.includes("k24")) {
-      return "https://images.unsplash.com/photo-1576602976047-174e57a47881?w=800&auto=format&fit=crop&q=80";
-    }
-    if (selectedPharmacy.facilityType === "clinic" || name.includes("klinik") || name.includes("puskesmas") || name.includes("medika")) {
-      return "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&auto=format&fit=crop&q=80";
-    }
-    if (selectedPharmacy.facilityType === "hospital" || name.includes("rsud") || name.includes("rsup") || name.includes("rumah sakit")) {
-      return "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=800&auto=format&fit=crop&q=80";
-    }
-
-    return "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=800&auto=format&fit=crop&q=80";
-  }, [selectedPharmacy?.id, selectedPharmacy?.name, selectedPharmacy?.facilityType]);
+  // Stable photo fallback
+  const activePhotoUrl = useMemo(() => {
+    if (!selectedPharmacy) return FACILITY_PHOTOS.hospital;
+    if (selectedPharmacy.facilityType === "hospital") return FACILITY_PHOTOS.hospital;
+    if (selectedPharmacy.facilityType === "clinic") return FACILITY_PHOTOS.clinic;
+    return FACILITY_PHOTOS.pharmacy;
+  }, [selectedPharmacy?.id, selectedPharmacy?.facilityType]);
 
   // Stable review snippet fallback
   const activeReviewText = useMemo(() => {
@@ -816,7 +792,7 @@ export function DedicatedMapsView() {
     return FACILITY_REVIEWS.pharmacy;
   }, [selectedPharmacy?.id, selectedPharmacy?.facilityType]);
 
-  const finalPhotoUrl = dynamicPhotoUrl || (selectedPharmacy?.photoUrl && selectedPharmacy.photoUrl.startsWith("http") ? selectedPharmacy.photoUrl : facilityPhotoFallback);
+  const finalPhotoUrl = dynamicPhotoUrl || selectedPharmacy?.photoUrl || activePhotoUrl;
   const finalReviewText = dynamicReviewText || activeReviewText;
 
   return (
@@ -825,44 +801,54 @@ export function DedicatedMapsView() {
       {/* 01. INTEGRATED WEBSITE HEADER NAVBAR                                      */}
       {/* ========================================================================= */}
       <header className="bg-white border-b border-[#E5E7EB] px-4 py-3 sm:px-6 sm:py-4 md:px-10 sticky top-0 z-50 shadow-2xs">
-        <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-3">
-          <BrandLogo />
+        <div className="max-w-[1700px] mx-auto relative flex items-center justify-between gap-3">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue)]">
+              <span className="h-2.5 w-2.5 rounded-full bg-white" />
+            </div>
+            <span className="font-display text-lg font-bold tracking-tight text-[color:var(--color-clinic-ink)]">
+              SiagaSehat
+            </span>
+          </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2 py-1.5 text-sm text-[color:var(--color-clinic-ink)] lg:flex">
-            {NAV_ITEMS.map((l) => (
-              <Link
-                key={l}
-                to="/"
-                hash={l.toLowerCase().replace(/\s/g, "")}
-                className="rounded-full px-4 py-1.5 transition hover:bg-white text-[color:var(--color-clinic-ink)]"
-              >
-                {l}
-              </Link>
-            ))}
+          <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 p-1 text-xs font-medium text-[color:var(--color-clinic-ink)] whitespace-nowrap shadow-xs">
+            <Link
+              to="/"
+              className="rounded-full px-3 py-1.5 transition hover:bg-white/80 hover:text-[color:var(--color-clinic-blue)] text-[color:var(--color-clinic-ink)]"
+            >
+              Beranda
+            </Link>
             <Link
               to="/maps"
-              className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 font-bold text-[color:var(--color-clinic-blue)] shadow-xs transition"
+              activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue)] font-bold shadow-xs" }}
+              inactiveProps={{ className: "text-[color:var(--color-clinic-ink)] hover:bg-white/70" }}
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition"
             >
               <MapPin className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)]" />
               Peta Lokasi
             </Link>
             <Link
               to="/consultation"
-              search={{ anatomy: undefined }}
-              className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
+              activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue)] font-bold shadow-xs" }}
+              inactiveProps={{ className: "text-[color:var(--color-clinic-ink)] hover:bg-white/70" }}
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition"
             >
               Konsultasi
             </Link>
             <Link
               to="/anatomy"
-              className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
+              activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue)] font-bold shadow-xs" }}
+              inactiveProps={{ className: "text-[color:var(--color-clinic-ink)] hover:bg-white/70" }}
+              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 transition"
             >
               Anatomi
             </Link>
             <Link
               to="/scanner"
-              className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue)] px-4 py-1.5 text-white transition hover:bg-[color:var(--color-clinic-blue-dark)]"
+              activeProps={{ className: "bg-[color:var(--color-clinic-blue-dark)] text-white font-bold shadow-xs" }}
+              inactiveProps={{ className: "bg-[color:var(--color-clinic-blue)] text-white hover:bg-[color:var(--color-clinic-blue-dark)]" }}
+              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-semibold transition"
             >
               <ScanLine className="h-3.5 w-3.5" />
               Scan AI
@@ -1011,13 +997,80 @@ export function DedicatedMapsView() {
 
             <SourceSummaryBar sources={sourceStats} />
           </div>
+
+          {/* Mobile View Toggle Bar (Responsive Segment Switcher) */}
+          <div className="flex lg:hidden items-center p-1 bg-[#FFFFFF] rounded-2xl border border-[#E5E7EB] shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setMobileTab("map")}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${mobileTab === "map"
+                  ? "bg-[#379FD2] text-white shadow-xs"
+                  : "text-[#6B7280] hover:text-[#379FD2]"
+                }`}
+            >
+              <Compass className="h-4 w-4" />
+              Peta Navigasi
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileTab("list")}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${mobileTab === "list"
+                  ? "bg-[#379FD2] text-white shadow-xs"
+                  : "text-[#6B7280] hover:text-[#379FD2]"
+                }`}
+            >
+              <Building2 className="h-4 w-4" />
+              Daftar ({pharmacies.length})
+            </button>
+            {selectedPharmacy && (
+              <button
+                type="button"
+                onClick={() => setMobileTab("detail")}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${mobileTab === "detail"
+                    ? "bg-[#F59E0B] text-white shadow-xs"
+                    : "text-[#6B7280] hover:text-[#F59E0B]"
+                  }`}
+              >
+                <Info className="h-4 w-4" />
+                Detail
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Main Unified Responsive Layout (Desktop 3-Column / Mobile Stacked View) */}
-        <div className="flex flex-col lg:flex-row gap-4 lg:h-[560px] xl:h-[580px] items-stretch">
-          {/* Map Canvas (Top on Mobile for immediate interactive viewing, Center on Desktop) */}
-          <div className="order-1 lg:order-2 relative flex-1 min-w-0 min-h-[380px] h-[380px] sm:h-[440px] lg:h-full rounded-3xl overflow-hidden border border-[#E5E7EB] bg-[#FFFFFF] shadow-md flex flex-col shrink-0 lg:shrink flex-1">
-            <div className="relative flex-1 w-full min-h-[380px] h-full">
+        {/* Main 3-Column Desktop Layout & Mobile View */}
+        <div className="flex flex-col lg:flex-row gap-4 min-h-[450px] lg:h-[560px] xl:h-[580px] items-stretch">
+          {/* Column 1 (Left): PharmacyList */}
+          <div
+            className={`w-full lg:w-[340px] xl:w-[380px] shrink-0 h-full flex-col ${mobileTab === "list" ? "flex" : "hidden lg:flex"
+              }`}
+          >
+            <PharmacyList
+              pharmacies={pharmacies}
+              loadingPharmacies={loadingPharmacies}
+              selectedPharmacy={selectedPharmacy}
+              selectedPlace={selectedPlace}
+              routeInfo={routeInfo}
+              loadingRoute={loadingRoute}
+              transportMode={transportMode}
+              userLocation={userLocation}
+              dangerLevel="rendah"
+              onSelectPharmacy={handleSelectPharmacy}
+              onTransportModeChange={handleTransportModeChange}
+              onCloseCard={() => {
+                setSelectedPharmacy(null);
+                setSelectedPlace(null);
+                setRouteInfo(null);
+              }}
+            />
+          </div>
+
+          {/* Column 2 (Center): Clean Unobstructed Map Canvas */}
+          <div
+            className={`relative flex-1 min-w-0 h-full rounded-3xl overflow-hidden border border-[#E5E7EB] bg-[#FFFFFF] shadow-md flex flex-col ${mobileTab === "map" ? "block" : "hidden lg:block"
+              }`}
+          >
+            <div className="relative flex-1 w-full h-full">
               {useGoogleMapsEngine ? (
                 <GoogleMap
                   mapContainerStyle={containerStyle}
@@ -1055,12 +1108,12 @@ export function DedicatedMapsView() {
                         ? hospitalActivePinSvg
                         : hospitalPinSvg
                       : isClinic
-                      ? isSelected
-                        ? clinicActivePinSvg
-                        : clinicPinSvg
-                      : isSelected
-                      ? pharmacyActivePinSvg
-                      : pharmacyPinSvg;
+                        ? isSelected
+                          ? clinicActivePinSvg
+                          : clinicPinSvg
+                        : isSelected
+                          ? pharmacyActivePinSvg
+                          : pharmacyPinSvg;
 
                     return (
                       <Marker
@@ -1124,107 +1177,31 @@ export function DedicatedMapsView() {
                   <Crosshair className="h-4 w-4" />
                 </button>
               </div>
-
-              {/* Floating Mobile Bottom Quick Preview Card */}
-              {selectedPharmacy && (
-                <div className="lg:hidden absolute bottom-3 left-3 right-3 z-30 bg-white/95 backdrop-blur-md border border-[#E5E7EB] rounded-2xl p-3 sm:p-4 shadow-xl flex items-center justify-between gap-3 animate-fade-in">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase text-white ${
-                          selectedPharmacy.facilityType === "hospital"
-                            ? "bg-red-500"
-                            : selectedPharmacy.facilityType === "clinic"
-                            ? "bg-[#F59E0B]"
-                            : "bg-[#379FD2]"
-                        }`}
-                      >
-                        {selectedPharmacy.facilityType === "hospital" ? (
-                          <Building2 className="h-2.5 w-2.5" />
-                        ) : selectedPharmacy.facilityType === "clinic" ? (
-                          <Stethoscope className="h-2.5 w-2.5" />
-                        ) : (
-                          <Pill className="h-2.5 w-2.5" />
-                        )}
-                        {selectedPharmacy.facilityType === "hospital"
-                          ? "RSUD/RS"
-                          : selectedPharmacy.facilityType === "clinic"
-                          ? "Klinik"
-                          : "Apotek"}
-                      </span>
-                      <span className="text-[10px] font-bold text-[#379FD2]">
-                        {selectedPharmacy.distanceKm < 1
-                          ? `${(selectedPharmacy.distanceKm * 1000).toFixed(0)} m`
-                          : `${selectedPharmacy.distanceKm.toFixed(2)} km`}
-                      </span>
-                    </div>
-                    <h4 className="text-xs font-bold text-[#111111] truncate">{selectedPharmacy.name}</h4>
-                    <p className="text-[10px] text-[#6B7280] truncate flex items-center gap-1 mt-0.5">
-                      <MapPin className="h-2.5 w-2.5 text-[#379FD2] shrink-0" />
-                      {selectedPharmacy.address}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                        selectedPharmacy.name + " " + (selectedPharmacy.address || "")
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-2 rounded-xl bg-[#379FD2] text-white text-[11px] font-bold shadow-xs hover:bg-[#2563EB] transition cursor-pointer flex items-center gap-1"
-                    >
-                      <Navigation className="h-3.5 w-3.5" />
-                      Navigasi
-                    </a>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
-          {/* PharmacyList (Left on Desktop, Below Map on Mobile) */}
-          <div className="order-2 lg:order-1 w-full lg:w-[340px] xl:w-[380px] shrink-0 h-[460px] lg:h-full flex flex-col">
-            <PharmacyList
-              pharmacies={pharmacies}
-              loadingPharmacies={loadingPharmacies}
-              selectedPharmacy={selectedPharmacy}
-              selectedPlace={selectedPlace}
-              routeInfo={routeInfo}
-              loadingRoute={loadingRoute}
-              transportMode={transportMode}
-              userLocation={userLocation}
-              dangerLevel="rendah"
-              onSelectPharmacy={handleSelectPharmacy}
-              onTransportModeChange={handleTransportModeChange}
-              onCloseCard={() => {
-                setSelectedPharmacy(null);
-                setSelectedPlace(null);
-                setRouteInfo(null);
-              }}
-            />
-          </div>
-
-          {/* Column 3 (Right Side Dedicated Detail Panel - Visible when facility selected) */}
+          {/* Column 3 (Right Side Dedicated Detail Panel - Outside the Map!) */}
           {selectedPharmacy && (
-            <div className="order-3 w-full lg:w-[380px] xl:w-[420px] shrink-0 h-auto lg:h-full bg-[#FFFFFF] border border-[#E5E7EB] rounded-3xl p-4 sm:p-5 shadow-lg flex flex-col overflow-y-auto animate-fade-in scrollbar-thin scrollbar-thumb-[#379FD2]/20">
+            <div
+              className={`w-full lg:w-[380px] xl:w-[420px] shrink-0 h-full bg-[#FFFFFF] border border-[#E5E7EB] rounded-3xl p-4 sm:p-5 shadow-lg flex-col overflow-y-auto animate-fade-in scrollbar-thin scrollbar-thumb-[#379FD2]/20 ${mobileTab === "detail" ? "flex" : "hidden lg:flex"
+                }`}
+            >
               {/* Category Badge & Rating Header */}
               <div className="flex items-center justify-between gap-2 mb-3 shrink-0">
                 <span
-                  className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide border shadow-xs ${
-                    selectedPharmacy.facilityType === "hospital"
+                  className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide border shadow-xs ${selectedPharmacy.facilityType === "hospital"
                       ? "bg-red-500 text-white border-red-600"
                       : selectedPharmacy.facilityType === "clinic"
-                      ? "bg-[#F59E0B] text-white border-amber-600"
-                      : "bg-[#379FD2] text-white border-blue-600"
-                  }`}
+                        ? "bg-[#F59E0B] text-white border-amber-600"
+                        : "bg-[#379FD2] text-white border-blue-600"
+                    }`}
                 >
                   {selectedPharmacy.facilityType === "hospital" ? (
-                    <><Building2 className="h-3 w-3 inline" /> RUMAH SAKIT</>
+                    <>🏥 RUMAH SAKIT</>
                   ) : selectedPharmacy.facilityType === "clinic" ? (
-                    <><Stethoscope className="h-3 w-3 inline" /> KLINIK</>
+                    <>🩺 KLINIK</>
                   ) : (
-                    <><Pill className="h-3 w-3 inline" /> APOTEK</>
+                    <>💊 APOTEK</>
                   )}
                 </span>
 
@@ -1250,16 +1227,13 @@ export function DedicatedMapsView() {
                 </div>
               </div>
 
-              {/* Clean Full-Width Real Place Photo Header */}
+              {/* Clean Full Photo Header */}
               <div className="relative h-36 sm:h-40 w-full rounded-2xl overflow-hidden mb-3 border border-[#E5E7EB] bg-slate-100 shrink-0 shadow-xs">
                 <img
                   src={finalPhotoUrl}
                   alt={selectedPharmacy.name}
                   className="h-full w-full object-cover"
                 />
-                <span className="absolute bottom-2 right-2 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-xs text-[10px] font-bold text-white flex items-center gap-1">
-                  <MapPin className="h-3 w-3 text-sky-400 shrink-0" /> Foto Tampak Depan Lokasi
-                </span>
               </div>
 
               {/* Title & Address */}
@@ -1267,8 +1241,8 @@ export function DedicatedMapsView() {
                 <h3 className="text-lg font-bold text-[#111111] leading-snug">
                   {selectedPharmacy.name}
                 </h3>
-                <p className="text-xs text-[#6B7280] mt-1.5 leading-relaxed flex items-center gap-1">
-                  <MapPin className="h-3.5 w-3.5 text-[#379FD2] shrink-0" /> {selectedPharmacy.address || `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
+                <p className="text-xs text-[#6B7280] mt-1.5 leading-relaxed">
+                  📍 {selectedPharmacy.address || `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
                 </p>
               </div>
 
@@ -1287,8 +1261,8 @@ export function DedicatedMapsView() {
                 </div>
 
                 {selectedPharmacy.phone && (
-                  <div className="text-[11px] text-[#6B7280] font-medium flex items-center gap-1">
-                    <Phone className="h-3 w-3 text-[#379FD2] shrink-0" /> Telepon: <strong className="text-[#111111]">{selectedPharmacy.phone}</strong>
+                  <div className="text-[11px] text-[#6B7280] font-medium">
+                    📞 Telepon: <strong className="text-[#111111]">{selectedPharmacy.phone}</strong>
                   </div>
                 )}
               </div>
@@ -1305,22 +1279,20 @@ export function DedicatedMapsView() {
                   <button
                     type="button"
                     onClick={() => handleTransportModeChange("driving")}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${
-                      transportMode === "driving"
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${transportMode === "driving"
                         ? "bg-[#379FD2] text-white shadow-xs"
                         : "bg-white text-[#6B7280] border border-[#E5E7EB]"
-                    }`}
+                      }`}
                   >
                     <Car className="h-3.5 w-3.5" /> Mobil
                   </button>
                   <button
                     type="button"
                     onClick={() => handleTransportModeChange("motorcycle")}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${
-                      transportMode === "motorcycle"
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${transportMode === "motorcycle"
                         ? "bg-[#379FD2] text-white shadow-xs"
                         : "bg-white text-[#6B7280] border border-[#E5E7EB]"
-                    }`}
+                      }`}
                   >
                     <Bike className="h-3.5 w-3.5" /> Motor
                   </button>
@@ -1336,14 +1308,10 @@ export function DedicatedMapsView() {
 
               {/* Direct Google Maps Navigation Primary CTA Button */}
               <a
-                href={
-                  selectedPharmacy.url && selectedPharmacy.url.startsWith("http")
-                    ? selectedPharmacy.url
-                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedPharmacy.name + " " + (selectedPharmacy.address || ""))}`
-                }
+                href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPharmacy.lat},${selectedPharmacy.lon}`}
                 target="_blank"
                 rel="noreferrer"
-                className="w-full h-11 bg-gradient-to-r from-[#379FD2] to-[#2563EB] text-white font-extrabold text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer mt-auto"
+                className="w-full h-11 bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white font-extrabold text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer mt-auto"
               >
                 <Navigation className="h-4 w-4" />
                 <span>Buka Navigasi Google Maps</span>

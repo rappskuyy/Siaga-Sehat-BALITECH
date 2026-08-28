@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalibrator Anatomi Medis Interaktif 3D/2D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .font-display { font-family: 'Manrope', sans-serif; }
+    .anatomy-canvas { user-select: none; touch-action: none; }
+    @keyframes radarPing {
+      0% { transform: scale(0.8); opacity: 0.9; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    .animate-radar { animation: radarPing 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+  <!-- Top Navigation Bar -->
+  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-6 py-4 flex items-center justify-between flex-wrap gap-4 shadow-xl">
+    <div class="flex items-center gap-3">
+      <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center font-extrabold text-slate-950 shadow-lg shadow-cyan-500/20 text-xl">
+        🩺
+      </div>
+      <div>
+        <h1 class="font-display text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
+          <span>Kalibrator Titik Anatomi Medis</span>
+          <span class="bg-cyan-500/20 text-cyan-400 text-xs px-2.5 py-0.5 rounded-full border border-cyan-500/30">Pro Version</span>
+        </h1>
+        <p class="text-xs text-slate-400">Atur posisi titik interaktif untuk seluruh organ & bagian tubuh (Tampak Depan & Belakang)</p>
+      </div>
+    </div>
+
+    <!-- Controls & Action Button -->
+    <div class="flex items-center gap-4">
+      <label class="flex items-center gap-2 text-xs text-slate-300 font-medium cursor-pointer select-none bg-slate-900 px-3.5 py-2 rounded-full border border-slate-800 hover:border-slate-700 transition">
+        <input type="checkbox" id="chk-show-labels" onchange="showAllLabels = this.checked; render();" class="rounded border-slate-700 text-cyan-500 focus:ring-cyan-500 w-4 h-4" />
+        <span>Tampilkan Semua Label</span>
+      </label>
+
+      <button onclick="copyOutput()" class="px-5 py-2.5 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 text-slate-950 font-extrabold rounded-full text-xs transition flex items-center gap-1.5 shadow-lg shadow-emerald-500/20">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+        SALIN KODE KOORDINAT
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Grid Layout -->
+  <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 max-w-[1650px] w-full mx-auto">
+    <!-- Left Column: Detailed Region List & Code Output -->
+    <div class="lg:col-span-5 flex flex-col gap-4 bg-slate-900/80 p-5 rounded-3xl border border-slate-800/80 backdrop-blur shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h2 class="font-display text-sm font-extrabold text-slate-100 uppercase tracking-wider flex items-center gap-2">
+            <span>Daftar Bagian Tubuh</span>
+            <span id="region-count" class="bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded-full text-xs font-mono">14 Bagian</span>
+          </h2>
+          <p class="text-[11px] text-slate-400 mt-0.5">Klik salah satu bagian tubuh untuk mengatur titiknya secara presisi:</p>
+        </div>
+      </div>
+
+      <!-- Scrollable Region Items -->
+      <div id="region-list" class="flex-1 overflow-y-auto max-h-[440px] space-y-2 pr-1.5 scrollbar-thin">
+        <!-- Javascript dynamic inject -->
+      </div>
+
+      <!-- Real-time TypeScript Output Box -->
+      <div class="pt-3 border-t border-slate-800">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-xs font-bold text-slate-300">Hasil Kode Koordinat Lengkap:</label>
+          <button onclick="copyOutput()" class="px-3 py-1 bg-cyan-500 hover:bg-cyan-400 text-slate-950 rounded-lg text-xs font-bold transition">
+            Salin Kode
+          </button>
+        </div>
+        <textarea id="code-output" readonly rows="5" class="w-full bg-slate-950 font-mono text-[11px] text-cyan-300 p-3 rounded-2xl border border-slate-800 focus:outline-none select-all leading-relaxed"></textarea>
+      </div>
+    </div>
+
+    <!-- Right Column: Interactive Medical Visual Canvas -->
+    <div class="lg:col-span-7 flex flex-col items-center bg-slate-900/90 p-6 rounded-3xl border border-slate-800 shadow-2xl relative min-h-[660px]">
+      
+      <!-- Big Prominent View Switcher Bar -->
+      <div class="w-full flex items-center justify-center gap-3 bg-slate-950 p-2 rounded-2xl border border-slate-800 shadow-inner mb-4">
+        <button id="btn-front" onclick="setView('front')" class="flex-1 py-3 px-6 rounded-xl font-display font-extrabold text-sm transition-all duration-200 flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25 border border-cyan-400">
+          <span>👤 TAMPAK DEPAN</span>
+        </button>
+        <button id="btn-back" onclick="setView('back')" class="flex-1 py-3 px-6 rounded-xl font-display font-extrabold text-sm transition-all duration-200 flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800">
+          <span>🔄 TAMPAK BELAKANG</span>
+        </button>
+      </div>
+
+      <!-- Active Region Floating Scanner Banner -->
+      <div class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white border border-cyan-300 px-6 py-2 rounded-full text-xs font-extrabold shadow-xl backdrop-blur mb-3 flex items-center gap-2.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-white animate-ping"></span>
+        <span id="active-banner-text">Sedang Mengatur: Kepala</span>
+      </div>
+
+      <!-- Image Canvas Wrapper with Radar Glow -->
+      <div id="canvas-container" class="relative anatomy-canvas max-w-[400px] w-full aspect-[1/2] rounded-3xl bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border border-slate-800 shadow-2xl flex justify-center items-center overflow-hidden cursor-crosshair">
+        <!-- Radial Glow & Blueprint Grid -->
+        <div class="absolute inset-0 opacity-[0.06] pointer-events-none bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-96 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none"></div>
+
+        <img id="anatomy-img" src="/anatomy/human-anatomy-front.png" alt="Anatomi Manusia" class="h-full w-auto max-h-[580px] object-contain select-none pointer-events-none drop-shadow-[0_10px_25px_rgba(56,189,248,0.15)]" />
+
+        <!-- Overlay Pin Layer -->
+        <div id="pins-layer" class="absolute inset-0 pointer-events-none"></div>
+      </div>
+
+      <p class="mt-3 text-xs text-slate-400 text-center font-medium">
+        💡 <strong>Panduan:</strong> Geser / klik titik berpendar neon di atas tubuh manusia untuk menyesuaikan koordinatnya.
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const INITIAL_REGIONS = [
+      { id: "kepala", name: "Kepala & Otak", icon: "🧠", color: "from-purple-500 to-cyan-400", front: { x: 50, y: 8.5 }, back: { x: 50, y: 8.5 } },
+      { id: "mata", name: "Mata & Penglihatan", icon: "👁️", color: "from-cyan-400 to-blue-500", front: { x: 46, y: 11.5 }, back: { x: 46, y: 11.5 } },
+      { id: "hidung", name: "Hidung & Sinus", icon: "👃", color: "from-teal-400 to-cyan-500", front: { x: 50, y: 13.5 }, back: { x: 50, y: 13.5 } },
+      { id: "leher", name: "Leher & Tenggorokan", icon: "🦒", color: "from-amber-400 to-orange-500", front: { x: 50, y: 17.5 }, back: { x: 50, y: 17.5 } },
+      { id: "dada", name: "Dada & Jantung", icon: "🫀", color: "from-rose-500 to-red-600", front: { x: 50, y: 26 }, back: { x: 50, y: 26 } },
+      { id: "perut", name: "Perut & Pencernaan", icon: "🥗", color: "from-emerald-400 to-teal-500", front: { x: 50, y: 38 }, back: { x: 50, y: 38 } },
+      { id: "lengan_kiri", name: "Lengan & Tangan Kiri", icon: "🦾", color: "from-blue-400 to-indigo-500", front: { x: 30, y: 34 }, back: { x: 70, y: 34 } },
+      { id: "lengan_kanan", name: "Lengan & Tangan Kanan", icon: "🦾", color: "from-blue-400 to-indigo-500", front: { x: 70, y: 34 }, back: { x: 30, y: 34 } },
+      { id: "punggung_atas", name: "Punggung Atas & Bahu Belakang", icon: "🦴", color: "from-indigo-400 to-purple-500", front: { x: 50, y: 26 }, back: { x: 50, y: 26 } },
+      { id: "punggung_bawah", name: "Punggung Bawah & Pinggang", icon: "🩸", color: "from-violet-400 to-fuchsia-500", front: { x: 50, y: 39 }, back: { x: 50, y: 39 } },
+      { id: "pinggul", name: "Pinggul & Panggul", icon: "⚡", color: "from-amber-500 to-yellow-400", front: { x: 50, y: 48 }, back: { x: 50, y: 48 } },
+      { id: "lutut_kiri", name: "Lutut & Paha Kiri", icon: "🦵", color: "from-cyan-400 to-emerald-400", front: { x: 43, y: 72 }, back: { x: 57, y: 74 } },
+      { id: "lutut_kanan", name: "Lutut & Paha Kanan", icon: "🦵", color: "from-cyan-400 to-emerald-400", front: { x: 57, y: 72 }, back: { x: 43, y: 74 } },
+      { id: "kaki", name: "Telapak Kaki & Pergelangan", icon: "👟", color: "from-teal-300 to-cyan-500", front: { x: 50, y: 92 }, back: { x: 50, y: 92 } }
+    ];
+
+    let currentView = "front";
+    let activeRegionId = "kepala";
+    let regionsData = JSON.parse(JSON.stringify(INITIAL_REGIONS));
+    let draggingRegionId = null;
+    let showAllLabels = false;
+
+    const container = document.getElementById("canvas-container");
+    const imgEl = document.getElementById("anatomy-img");
+    const pinsLayer = document.getElementById("pins-layer");
+    const regionListEl = document.getElementById("region-list");
+    const codeOutput = document.getElementById("code-output");
+
+    function setView(view) {
+      currentView = view;
+      document.getElementById("btn-front").className = view === "front" 
+        ? "flex-1 py-3 px-6 rounded-xl font-display font-extrabold text-sm transition-all duration-200 flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25 border border-cyan-400"
+        : "flex-1 py-3 px-6 rounded-xl font-display font-extrabold text-sm transition-all duration-200 flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800";
+      
+      document.getElementById("btn-back").className = view === "back"
+        ? "flex-1 py-3 px-6 rounded-xl font-display font-extrabold text-sm transition-all duration-200 flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25 border border-cyan-400"
+        : "flex-1 py-3 px-6 rounded-xl font-display font-extrabold text-sm transition-all duration-200 flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800";
+      
+      imgEl.src = view === "front" ? "/anatomy/human-anatomy-front.png" : "/anatomy/human-anatomy-back.png";
+
+      render();
+    }
+
+    function render() {
+      renderRegionList();
+      renderPins();
+      updateCodeOutput();
+      updateBanner();
+    }
+
+    function updateBanner() {
+      const activeReg = regionsData.find(r => r.id === activeRegionId);
+      if (activeReg) {
+        const pos = currentView === "front" ? activeReg.front : activeReg.back;
+        document.getElementById("active-banner-text").textContent = `Sedang Mengatur (${currentView === "front" ? "Tampak Depan" : "Tampak Belakang"}): ${activeReg.icon} ${activeReg.name} (x: ${pos.x.toFixed(1)}%, y: ${pos.y.toFixed(1)}%)`;
+      }
+    }
+
+    function renderRegionList() {
+      document.getElementById("region-count").textContent = `${regionsData.length} Bagian`;
+      regionListEl.innerHTML = regionsData.map((r, index) => {
+        const pos = currentView === "front" ? r.front : r.back;
+        const isActive = r.id === activeRegionId;
+        return `
+          <div onclick="activeRegionId='${r.id}'; render();" class="p-3.5 rounded-2xl border flex items-center justify-between cursor-pointer transition ${isActive ? 'bg-gradient-to-r from-cyan-500/20 to-blue-600/20 border-cyan-400 text-white font-bold shadow-lg ring-1 ring-cyan-400/40' : 'bg-slate-950/60 border-slate-800/80 text-slate-300 hover:bg-slate-900 hover:border-slate-700'}">
+            <div class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold ${isActive ? 'bg-cyan-400 text-slate-950 border-cyan-300' : 'text-slate-400'}">
+                ${index + 1}
+              </span>
+              <span class="text-xs font-semibold flex items-center gap-1.5">
+                <span>${r.icon}</span>
+                <span>${r.name}</span>
+              </span>
+            </div>
+            <div class="text-[11px] font-mono ${isActive ? 'text-cyan-300 font-extrabold' : 'text-slate-400'}">
+              x: ${pos.x.toFixed(1)}%, y: ${pos.y.toFixed(1)}%
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderPins() {
+      pinsLayer.innerHTML = regionsData.map((r, index) => {
+        const pos = currentView === "front" ? r.front : r.back;
+        const isActive = r.id === activeRegionId;
+        const shouldShowLabel = showAllLabels || isActive;
+
+        return `
+          <div 
+            style="left: ${pos.x}%; top: ${pos.y}%;" 
+            onmousedown="startDrag(event, '${r.id}')"
+            touchstart="startDrag(event, '${r.id}')"
+            class="absolute pointer-events-auto -translate-x-1/2 -translate-y-1/2 group cursor-grab active:cursor-grabbing ${isActive ? 'z-30' : 'z-20'}"
+          >
+            <!-- Radar Neon Glowing Pin Node -->
+            <div class="relative flex items-center justify-center">
+              ${isActive ? `
+                <span class="absolute w-9 h-9 rounded-full bg-cyan-400/40 animate-radar"></span>
+                <span class="absolute w-7 h-7 rounded-full bg-cyan-400/30 ring-2 ring-cyan-300 animate-ping"></span>
+              ` : `
+                <span class="absolute w-6 h-6 rounded-full bg-cyan-500/20 group-hover:bg-cyan-500/40 transition-all"></span>
+              `}
+              
+              <div class="relative w-5 h-5 rounded-full bg-slate-950 border-2 ${isActive ? 'border-cyan-300 bg-gradient-to-br from-cyan-400 to-blue-500 scale-125 shadow-[0_0_15px_rgba(56,189,248,0.8)]' : 'border-white bg-cyan-500 group-hover:scale-110'} flex items-center justify-center transition-all shadow-md">
+                <span class="text-[9px] font-extrabold text-slate-950 font-mono">${index + 1}</span>
+              </div>
+            </div>
+
+            ${shouldShowLabel ? `
+              <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 rounded-full text-[10px] font-extrabold whitespace-nowrap backdrop-blur transition-all pointer-events-none shadow-2xl flex items-center gap-1.5 ${isActive ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white ring-2 ring-white scale-105 shadow-[0_5px_20px_rgba(56,189,248,0.4)]' : 'bg-slate-900/90 text-slate-200 border border-slate-700'}">
+                <span>${r.icon}</span>
+                <span>${r.name}</span>
+                <span class="text-[9px] opacity-80 font-mono">(${pos.x.toFixed(1)}%, ${pos.y.toFixed(1)}%)</span>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function updatePosFromEvent(e) {
+      const rect = container.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      let xPct = ((clientX - rect.left) / rect.width) * 100;
+      let yPct = ((clientY - rect.top) / rect.height) * 100;
+
+      xPct = Math.max(0, Math.min(100, Math.round(xPct * 10) / 10));
+      yPct = Math.max(0, Math.min(100, Math.round(yPct * 10) / 10));
+
+      const reg = regionsData.find(r => r.id === activeRegionId);
+      if (reg) {
+        if (currentView === "front") reg.front = { x: xPct, y: yPct };
+        if (currentView === "back") reg.back = { x: xPct, y: yPct };
+      }
+      render();
+    }
+
+    function startDrag(e, id) {
+      e.stopPropagation();
+      activeRegionId = id;
+      draggingRegionId = id;
+      render();
+    }
+
+    window.addEventListener("mousemove", (e) => {
+      if (draggingRegionId) {
+        updatePosFromEvent(e);
+      }
+    });
+
+    window.addEventListener("mouseup", () => {
+      draggingRegionId = null;
+    });
+
+    container.addEventListener("click", (e) => {
+      updatePosFromEvent(e);
+    });
+
+    function updateCodeOutput() {
+      const result = regionsData.map(r => {
+        return `  ${r.id}: {\n    frontPosition: { x: ${r.front.x.toFixed(1)}, y: ${r.front.y.toFixed(1)} },\n    backPosition: { x: ${r.back.x.toFixed(1)}, y: ${r.back.y.toFixed(1)} }\n  }`;
+      }).join(",\n\n");
+
+      codeOutput.value = `// KOORDINAT PRESET ANATOMI LENGKAP:\nconst ANATOMY_POSITIONS = {\n${result}\n};`;
+    }
+
+    function copyOutput() {
+      codeOutput.select();
+      navigator.clipboard.writeText(codeOutput.value);
+      alert("✅ Berhasil menyalin kode koordinat presisi! Silakan paste & kirimkan teks ini ke chat.");
+    }
+
+    // Initialize
+    setView("front");
+  </script>
+</body>
+</html>
