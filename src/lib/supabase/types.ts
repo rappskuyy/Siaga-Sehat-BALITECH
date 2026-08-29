@@ -47,3 +47,42 @@ export type ConsultationHistoryInsert = Omit<
   ConsultationHistoryRow,
   "id" | "user_id" | "created_at"
 >;
+
+export type PurchaseLocation = "apotek" | "rs";
+export type ReminderSourceType = "scan" | "consultation";
+
+export interface MedicineReminder {
+  id: string;
+  user_id: string;
+  source_type: ReminderSourceType;
+  source_id: string | null;
+  purchase_location: PurchaseLocation;
+  nama_obat: string;
+  dosis_per_minum: string;
+  jumlah_tablet: number;
+  interval_jam: number;
+  waktu_mulai: string;
+  waktu_berakhir: string | null;
+  is_active: boolean;
+  tablet_tersisa: number | null;
+  catatan: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type MedicineReminderInsert = Omit<
+  MedicineReminder,
+  "id" | "user_id" | "created_at" | "updated_at"
+>;
+
+export interface ReminderLog {
+  id: string;
+  reminder_id: string;
+  user_id: string;
+  taken_at: string;
+  skipped: boolean;
+  catatan: string | null;
+  created_at: string;
+}
+
+export type ReminderLogInsert = Omit<ReminderLog, "id" | "user_id" | "created_at">;

@@ -16,6 +16,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as MapsRouteImport } from './routes/maps'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as RemindersRouteImport } from './routes/reminders'
 import { Route as ScannerRouteImport } from './routes/scanner'
 
 const IndexRoute = IndexRouteImport.update({
@@ -53,6 +54,11 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RemindersRoute = RemindersRouteImport.update({
+  id: '/reminders',
+  path: '/reminders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ScannerRoute = ScannerRouteImport.update({
   id: '/scanner',
   path: '/scanner',
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/maps': typeof MapsRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/reminders': typeof RemindersRoute
   '/scanner': typeof ScannerRoute
 }
 export interface FileRoutesByTo {
@@ -77,6 +84,7 @@ export interface FileRoutesByTo {
   '/maps': typeof MapsRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/reminders': typeof RemindersRoute
   '/scanner': typeof ScannerRoute
 }
 export interface FileRoutesById {
@@ -88,6 +96,7 @@ export interface FileRoutesById {
   '/maps': typeof MapsRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/reminders': typeof RemindersRoute
   '/scanner': typeof ScannerRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/maps'
     | '/profile'
     | '/register'
+    | '/reminders'
     | '/scanner'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/maps'
     | '/profile'
     | '/register'
+    | '/reminders'
     | '/scanner'
   id:
     | '__root__'
@@ -120,6 +131,7 @@ export interface FileRouteTypes {
     | '/maps'
     | '/profile'
     | '/register'
+    | '/reminders'
     | '/scanner'
   fileRoutesById: FileRoutesById
 }
@@ -131,6 +143,7 @@ export interface RootRouteChildren {
   MapsRoute: typeof MapsRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
+  RemindersRoute: typeof RemindersRoute
   ScannerRoute: typeof ScannerRoute
 }
 
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reminders': {
+      id: '/reminders'
+      path: '/reminders'
+      fullPath: '/reminders'
+      preLoaderRoute: typeof RemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/scanner': {
       id: '/scanner'
       path: '/scanner'
@@ -203,6 +223,7 @@ const rootRouteChildren: RootRouteChildren = {
   MapsRoute: MapsRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
+  RemindersRoute: RemindersRoute,
   ScannerRoute: ScannerRoute,
 }
 export const routeTree = rootRouteImport

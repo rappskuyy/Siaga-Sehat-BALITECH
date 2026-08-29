@@ -106,7 +106,10 @@ function PhoneMockup({ tab }: { tab: Tab }) {
             {/* Glass sheen */}
             <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-br from-white/25 via-transparent to-transparent" />
 
-            <div key={tab} className="animate-phone-switch min-h-[500px] px-5 pb-7 pt-12">
+            <div
+              key={tab}
+              className="animate-phone-switch flex min-h-[500px] flex-col justify-center px-5 py-7"
+            >
               {tab === "scan" && <ScanScreen />}
               {tab === "konsultasi" && <ConsultScreen />}
               {tab === "anatomi" && <AnatomyScreen />}
@@ -129,13 +132,20 @@ function PhoneMockup({ tab }: { tab: Tab }) {
 
 function ScanScreen() {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2.5">
       <span
         className="animate-fade-up inline-flex w-fit items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-2.5 py-1 text-[10px] font-semibold text-[color:var(--color-clinic-blue-dark)]"
         style={{ animationDuration: "0.4s" }}
       >
         <ScanLine className="h-3 w-3" /> Analisis Selesai
       </span>
+      <div className="relative h-24 overflow-hidden rounded-2xl bg-[#d4a58f] shadow-inner">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_48%_48%,#d88983_0%,#bf6e71_25%,#d4a58f_48%,#b8796a_70%,#e0b8a3_100%)]" />
+        <div className="absolute left-[28%] top-[17%] h-16 w-24 rounded-[48%] border-2 border-[#a64f5b]/70 bg-[#c9787e]/55 shadow-[inset_0_0_12px_rgba(114,45,53,0.25)]" />
+        <span className="absolute bottom-1.5 left-2 rounded-full bg-white/85 px-2 py-0.5 text-[9px] font-semibold text-[color:var(--color-clinic-blue-dark)]">
+          Foto keluhan kulit
+        </span>
+      </div>
       <div
         className="animate-fade-up flex items-center gap-3 rounded-2xl bg-[color:var(--color-clinic-blue-soft)]/60 p-3"
         style={{ animationDuration: "0.4s", animationDelay: "0.1s" }}
@@ -172,7 +182,7 @@ function ScanScreen() {
         </div>
         <div>
           <p className="text-xs font-bold text-[color:var(--color-clinic-ink)]">
-            Iritasi Kulit Ringan
+            Dermatitis Kontak Ringan
           </p>
           <span className="mt-1 inline-block rounded-full bg-[color:var(--color-clinic-blue-soft)] px-2 py-0.5 text-[10px] font-semibold text-[color:var(--color-clinic-blue-dark)]">
             Risiko Rendah
@@ -180,12 +190,24 @@ function ScanScreen() {
         </div>
       </div>
       <div
-        className="animate-fade-up flex flex-col gap-2 text-[11px] text-[color:var(--color-clinic-muted)]"
+        className="animate-fade-up flex flex-col gap-1.5 text-[11px] text-[color:var(--color-clinic-muted)]"
         style={{ animationDuration: "0.4s", animationDelay: "0.2s" }}
       >
-        <p className="font-semibold text-[color:var(--color-clinic-ink)]">Kemungkinan penyebab:</p>
+        <p className="font-semibold text-[color:var(--color-clinic-ink)]">Kemungkinan penyakit:</p>
+        <p>Dermatitis kontak akibat iritasi kulit</p>
+        <p className="font-semibold text-[color:var(--color-clinic-ink)]">Saran awal:</p>
         <p>• Reaksi alergi ringan pada kulit</p>
         <p>• Gesekan atau iritasi bahan tekstil</p>
+      </div>
+      <div className="grid grid-cols-2 gap-1.5 text-[10px]">
+        <div className="rounded-xl bg-[color:var(--color-clinic-blue-soft)] p-2 text-[color:var(--color-clinic-ink)]">
+          <p className="font-bold text-[color:var(--color-clinic-blue-dark)]">Obat umum</p>
+          <p className="mt-0.5">Krim hidrokortison 1%</p>
+        </div>
+        <div className="rounded-xl bg-[color:var(--color-clinic-blue-soft)] p-2 text-[color:var(--color-clinic-ink)]">
+          <p className="font-bold text-[color:var(--color-clinic-blue-dark)]">Herbal</p>
+          <p className="mt-0.5">Gel lidah buaya</p>
+        </div>
       </div>
       <div
         className="animate-fade-up mt-auto flex items-center gap-2 rounded-2xl bg-[color:var(--color-clinic-blue-soft)] p-2.5"
@@ -193,7 +215,7 @@ function ScanScreen() {
       >
         <Leaf className="h-4 w-4 shrink-0 text-[color:var(--color-clinic-blue)]" />
         <p className="text-[10px] leading-snug text-[color:var(--color-clinic-ink)]">
-          Kompres dingin & hindari sabun beraroma kuat
+          Kompres dingin, gunakan pelembap, dan hindari sabun beraroma kuat
         </p>
       </div>
     </div>
@@ -216,25 +238,31 @@ function ConsultScreen() {
       >
         <MessageCircleHeart className="h-3 w-3" /> SiagaSehat AI
       </span>
-      <div className="animate-fade-up max-w-[85%] rounded-2xl rounded-bl-md bg-[color:var(--color-clinic-blue-soft)]/60 px-3 py-2 text-[11px] text-[color:var(--color-clinic-ink)]">
-        Bagian tubuh mana yang terasa sakit?
+      <div className="animate-fade-up w-full rounded-2xl rounded-bl-md bg-[color:var(--color-clinic-blue-soft)]/60 px-3 py-2 text-[11px] leading-relaxed text-[color:var(--color-clinic-ink)]">
+        Bagian tubuh mana yang terasa sakit dan sejak kapan keluhan ini mulai dirasakan?
       </div>
-      <div className="animate-fade-up ml-auto flex max-w-[85%] items-center gap-1.5 rounded-2xl rounded-br-md bg-[color:var(--color-clinic-blue)] px-3 py-2 text-[11px] text-white">
+      <div className="animate-fade-up ml-auto flex max-w-[92%] items-center gap-1.5 rounded-2xl rounded-br-md bg-[color:var(--color-clinic-blue)] px-3 py-2 text-[11px] leading-relaxed text-white">
         <Bone className="h-3 w-3 shrink-0" />
-        Kepala, sejak 2 hari
+        Kepala, sejak 2 hari dan terasa berdenyut
       </div>
       {!showReply ? (
-        <div className="flex max-w-[85%] items-center gap-1.5 rounded-2xl rounded-bl-md bg-[color:var(--color-clinic-blue-soft)]/60 px-3 py-2 text-[11px] text-[color:var(--color-clinic-muted)]">
+        <div className="flex w-full items-center gap-1.5 rounded-2xl rounded-bl-md bg-[color:var(--color-clinic-blue-soft)]/60 px-3 py-2 text-[11px] text-[color:var(--color-clinic-muted)]">
           <span className="animate-bounce">•</span>
           <span className="animate-bounce [animation-delay:150ms]">•</span>
           <span className="animate-bounce [animation-delay:300ms]">•</span>
           <span className="sr-only">AI sedang mengetik</span>
         </div>
       ) : (
-        <div className="animate-fade-up max-w-[85%] rounded-2xl rounded-bl-md bg-[color:var(--color-clinic-blue-soft)]/60 px-3 py-2 text-[11px] text-[color:var(--color-clinic-ink)]">
-          Baik, apakah disertai demam atau mual?
+        <div className="animate-fade-up w-full rounded-2xl rounded-bl-md bg-[color:var(--color-clinic-blue-soft)]/60 px-3 py-2 text-[11px] leading-relaxed text-[color:var(--color-clinic-ink)]">
+          Baik, apakah disertai demam, mual, atau keluhan lain yang terasa mengganggu aktivitas?
         </div>
       )}
+      <div className="animate-fade-up w-full rounded-2xl rounded-bl-md bg-[color:var(--color-clinic-blue-soft)]/60 px-3 py-2 text-[11px] leading-relaxed text-[color:var(--color-clinic-ink)]">
+        Dari ceritamu, kemungkinan keluhan ringan. Istirahat cukup dan pantau perubahan gejala.
+      </div>
+      <div className="animate-fade-up w-full rounded-2xl rounded-bl-md bg-[color:var(--color-clinic-blue-soft)]/60 px-3 py-2 text-[11px] leading-relaxed text-[color:var(--color-clinic-ink)]">
+        Bila memburuk, konsultasikan segera ke dokter.
+      </div>
       <div
         className="animate-fade-up mt-auto flex items-center gap-2 rounded-full border border-black/10 px-3 py-2 text-[10px] text-[color:var(--color-clinic-muted)]"
         style={{ animationDuration: "0.4s", animationDelay: "0.45s" }}

@@ -120,6 +120,9 @@ export function AnatomyExplorer() {
             <AIAssessmentResultCard
               result={assessmentResult}
               regionName={selectedRegion.nameIndonesian}
+              selectedSymptoms={selectedSymptoms}
+              selectedConditions={selectedConditions}
+              additionalNotes={additionalNotes}
               onReset={handleReset}
             />
           ) : (

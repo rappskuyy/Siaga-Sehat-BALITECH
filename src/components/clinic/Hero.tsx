@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   ArrowUpRight,
-  Bell,
   LogIn,
   MapPin,
   MessageCircleHeart,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/ui/BrandLogo";
+import { ReminderBell } from "@/components/reminder/ReminderBell";
 import { FloatingCard } from "./FloatingCard";
 import fotodokter1 from "@/assets/fotodokter(1).png?url";
 import fotodokter2 from "@/assets/fotodokter(2).png?url";
@@ -33,10 +33,7 @@ const MINI_STATS = [
 ];
 
 const NAV_ITEMS = [
-  { label: "Tentang Kami", hash: "about" },
   { label: "Layanan", hash: "services" },
-  { label: "Keunggulan", hash: "doctors" },
-  { label: "Hubungi", hash: "contact" },
 ];
 
 export function Hero() {
@@ -44,7 +41,9 @@ export function Hero() {
   const { user, profile } = useAuth();
 
   return (
-    <section className="relative w-full overflow-hidden bg-white px-4 pt-5 pb-8 sm:px-6 md:px-8 md:pt-7 md:pb-14 lg:px-10 lg:pt-8 lg:pb-16">
+    <section className="relative w-full overflow-hi
+    
+    dden bg-white px-4 pt-5 pb-8 sm:px-6 md:px-8 md:pt-7 md:pb-14 lg:px-10 lg:pt-8 lg:pb-16">
       {/* Header */}
       <header className="flex items-center justify-between gap-4">
         <BrandLogo />
@@ -87,6 +86,12 @@ export function Hero() {
             Scan AI
           </Link>
           <Link
+            to="/reminders"
+            className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
+          >
+            Pengingat Obat
+          </Link>
+          <Link
             to={user ? "/profile" : "/login"}
             className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
           >
@@ -115,12 +120,7 @@ export function Hero() {
           >
             <Phone className="h-4 w-4" />
           </button>
-          <button
-            className="hidden h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)]/20 md:inline-flex"
-            aria-label="Notifikasi"
-          >
-            <Bell className="h-4 w-4" />
-          </button>
+          <ReminderBell variant="dark" className="hidden md:grid" />
           <Link
             to={user ? "/profile" : "/login"}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-clinic-ink)] text-white transition hover:bg-black/80 lg:hidden"
@@ -175,6 +175,13 @@ export function Hero() {
               className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-white/80 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
             >
               Konsultasi
+            </Link>
+            <Link
+              to="/reminders"
+              onClick={() => setIsMenuOpen(false)}
+              className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-white/80 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
+            >
+              Pengingat Obat
             </Link>
             <Link
               to={user ? "/profile" : "/login"}

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AnatomyExplorer } from "@/components/anatomy/AnatomyExplorer";
 import { Footer } from "@/components/clinic/Footer";
-import { ArrowLeft, Sparkles, User, Bell, LogIn, Menu, X, ScanLine, MapPin } from "lucide-react";
+import { ArrowLeft, Sparkles, User, Bell, LogIn, Menu, X, ScanLine, MapPin, MessageCircleHeart } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth/auth-context";
 
