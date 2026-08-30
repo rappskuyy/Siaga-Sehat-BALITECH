@@ -1,5 +1,7 @@
+import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { DedicatedMapsView } from "@/components/maps/DedicatedMapsView";
+import { MobileMapView } from "@/components/maps/MobileMapView";
 
 export const Route = createFileRoute("/maps")({
   head: () => ({
@@ -19,5 +21,28 @@ export const Route = createFileRoute("/maps")({
 });
 
 function MapsPage() {
-  return <DedicatedMapsView />;
+  const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    setIsMobile(window.innerWidth < 1024);
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-slate-50">
+        <div className="w-10 h-10 border-4 border-[#4a6fa5] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  return isMobile ? <MobileMapView /> : <DedicatedMapsView />;
 }
