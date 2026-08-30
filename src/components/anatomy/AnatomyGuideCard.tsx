@@ -47,7 +47,7 @@ export function AnatomyGuideCard({ onSelectRegion }: AnatomyGuideCardProps) {
       color: "bg-emerald-600 text-white",
       badge: "Hasil & Rujukan",
       badgeStyle: "bg-emerald-50 text-emerald-800 border border-emerald-200/60",
-      desc: "Dapatkan ringkasan kemungkinan kondisi, deteksi darurat Red Flag, dan rekomendasi konsultasi medis.",
+      desc: "Dapatkan ringkasan kemungkinan kondisi, deteksi tanda bahaya darurat, dan rekomendasi rujukan konsultasi medis.",
     },
   ];
 

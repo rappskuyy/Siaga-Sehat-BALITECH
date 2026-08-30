@@ -84,23 +84,23 @@ export function AnatomyHotspot({
           isSelected ? "scale-125 z-40" : "hover:scale-120 z-20"
         }`}
       >
-        {/* Subtle Ambient Beacon Pulse (Only on selected or hover, minimal & elegant) */}
+        {/* Subtle Ambient Beacon Pulse */}
         {isSelected ? (
-          <span className="absolute h-8 w-8 rounded-full bg-sky-500/25 animate-ping pointer-events-none" />
+          <span className="absolute h-9 w-9 rounded-full bg-[color:var(--color-clinic-blue)]/30 animate-ping pointer-events-none" />
         ) : isHovered ? (
-          <span className="absolute h-7 w-7 rounded-full bg-sky-400/20 animate-pulse pointer-events-none" />
+          <span className="absolute h-8 w-8 rounded-full bg-[color:var(--color-clinic-blue)]/20 animate-pulse pointer-events-none" />
         ) : (
-          <span className="absolute h-5 w-5 rounded-full bg-sky-400/10 pointer-events-none" />
+          <span className="absolute h-6 w-6 rounded-full bg-[color:var(--color-clinic-blue)]/10 pointer-events-none" />
         )}
 
         {/* Outer Ring & Main Node */}
         <span
-          className={`relative flex h-4 w-4 items-center justify-center rounded-full border-2 transition-all duration-200 ${
+          className={`relative flex h-4.5 w-4.5 items-center justify-center rounded-full border-2 transition-all duration-200 ${
             isSelected
-              ? "bg-sky-600 border-white shadow-[0_0_12px_rgba(2,132,199,0.7)] ring-2 ring-sky-500"
+              ? "bg-[color:var(--color-clinic-blue)] border-white shadow-[0_0_14px_rgba(74,111,165,0.7)] ring-2 ring-[color:var(--color-clinic-blue)]"
               : isHovered
-                ? "bg-sky-500 border-white shadow-[0_0_10px_rgba(14,165,233,0.5)]"
-                : "bg-slate-700/85 border-white shadow-sm hover:bg-sky-500"
+                ? "bg-[color:var(--color-clinic-blue)] border-white shadow-[0_0_10px_rgba(74,111,165,0.5)]"
+                : "bg-[color:var(--color-clinic-blue)]/85 border-white shadow-sm hover:bg-[color:var(--color-clinic-blue)]"
           }`}
         >
           {/* Inner Precision White Core */}
@@ -133,49 +133,41 @@ export function AnatomyHotspot({
           }`}
         >
           <div
-            className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs transition-all duration-200 ${
+            className={`flex items-center gap-2.5 rounded-2xl px-3.5 py-2.5 text-xs transition-all duration-200 ${
               isSelected
-                ? "bg-slate-900/95 backdrop-blur-xl text-white shadow-[0_12px_28px_rgba(15,23,42,0.35)] border border-slate-700/80 ring-1 ring-sky-400/40"
-                : "bg-white/95 backdrop-blur-xl text-slate-800 shadow-[0_8px_24px_rgba(15,23,42,0.12)] border border-slate-200/90 hover:border-sky-300"
+                ? "bg-white/98 backdrop-blur-xl text-[color:var(--color-clinic-ink)] shadow-[0_12px_32px_rgba(74,111,165,0.2)] border-2 border-[color:var(--color-clinic-blue)] ring-4 ring-[color:var(--color-clinic-blue-soft)]"
+                : "bg-white/95 backdrop-blur-xl text-[color:var(--color-clinic-ink)] shadow-[0_8px_24px_rgba(15,23,42,0.1)] border border-black/10 hover:border-[color:var(--color-clinic-blue)]/50"
             }`}
           >
             {/* Medical Icon Badge */}
             <div
-              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border transition-colors ${
+              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-xl border transition-colors ${
                 isSelected
-                  ? "bg-sky-500/20 text-sky-400 border-sky-400/30"
-                  : "bg-sky-50 text-sky-600 border-sky-100/80"
+                  ? "bg-[color:var(--color-clinic-blue)] text-white border-[color:var(--color-clinic-blue)] shadow-xs"
+                  : "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] border-[color:var(--color-clinic-blue)]/20"
               }`}
             >
               {getRegionIcon(region.id)}
             </div>
 
             {/* Organ Title & Details */}
-            <div className="flex flex-col min-w-[70px] pr-1">
-              <span
-                className={`font-bold tracking-tight text-xs leading-tight ${
-                  isSelected ? "text-white" : "text-slate-900"
-                }`}
-              >
+            <div className="flex flex-col min-w-[75px] pr-1">
+              <span className="font-display font-bold tracking-tight text-xs leading-tight text-[color:var(--color-clinic-ink)]">
                 {region.nameIndonesian}
               </span>
-              <span
-                className={`text-[10px] font-medium leading-tight mt-0.5 ${
-                  isSelected ? "text-slate-300" : "text-slate-500"
-                }`}
-              >
+              <span className="text-[10px] font-medium leading-tight mt-0.5 text-[color:var(--color-clinic-muted)]">
                 {symptomCount} Gejala
               </span>
             </div>
 
             {/* Status / Action Indicator */}
             {isSelected ? (
-              <div className="flex items-center gap-1 rounded-full bg-sky-500 px-2 py-0.5 text-[9px] font-bold text-white shadow-xs">
-                <Check className="h-2.5 w-2.5 stroke-[3]" />
+              <div className="flex items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue)] px-2.5 py-1 text-[10px] font-bold text-white shadow-xs">
+                <Check className="h-3 w-3 stroke-[3]" />
                 <span>Dipilih</span>
               </div>
             ) : (
-              <div className="flex items-center gap-0.5 rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600 group-hover:text-sky-600 transition">
+              <div className="flex items-center gap-0.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-2 py-1 text-[10px] font-semibold text-[color:var(--color-clinic-blue)] group-hover:bg-[color:var(--color-clinic-blue)] group-hover:text-white transition">
                 <ChevronRight className="h-3 w-3" />
               </div>
             )}

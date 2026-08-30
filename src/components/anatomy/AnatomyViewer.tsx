@@ -122,18 +122,18 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
 
         {/* Selected Region Bottom Glass Pill Indicator */}
         {selectedRegion && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2.5 rounded-full backdrop-blur-xl bg-white/95 px-4 py-1.5 text-xs font-semibold text-slate-800 shadow-[0_10px_25px_-5px_rgba(15,23,42,0.15)] border border-slate-200/90 transition-all duration-200 animate-in fade-in slide-in-from-bottom-2">
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2.5 rounded-full backdrop-blur-xl bg-white/95 px-4 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-ink)] shadow-[0_10px_25px_-5px_rgba(74,111,165,0.2)] border border-[color:var(--color-clinic-blue)]/30 transition-all duration-200 animate-in fade-in slide-in-from-bottom-2">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-600" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[color:var(--color-clinic-blue)] opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[color:var(--color-clinic-blue)]" />
             </span>
             <div className="flex items-center gap-1.5">
-              <span className="text-slate-500 font-normal text-[11px]">Bagian Terpilih:</span>
-              <strong className="text-slate-900 font-bold text-xs">
+              <span className="text-[color:var(--color-clinic-muted)] font-normal text-[11px]">Bagian Terpilih:</span>
+              <strong className="text-[color:var(--color-clinic-ink)] font-bold text-xs">
                 {selectedRegion.nameIndonesian}
               </strong>
             </div>
-            <span className="text-[10px] text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full font-medium border border-sky-100">
+            <span className="text-[10px] text-[color:var(--color-clinic-blue-dark)] bg-[color:var(--color-clinic-blue-soft)] px-2 py-0.5 rounded-full font-semibold border border-[color:var(--color-clinic-blue)]/20">
               {selectedRegion.symptoms.length} Gejala
             </span>
           </div>

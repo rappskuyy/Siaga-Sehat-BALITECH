@@ -10,7 +10,7 @@ export const Route = createFileRoute("/anatomy")({
       {
         name: "description",
         content:
-          "Eksplorasi bagian tubuh secara interaktif, pilih gejala Anda, dan dapatkan AI Health Assessment awal dari SiagaSehat.",
+          "Eksplorasi bagian tubuh secara interaktif, pilih gejala Anda, dan dapatkan analisis penilaian kesehatan awal berbasis AI dari SiagaSehat.",
       },
       { property: "og:title", content: "Eksplorasi Anatomi AI — SiagaSehat" },
       { property: "og:type", content: "website" },

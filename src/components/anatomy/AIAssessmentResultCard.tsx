@@ -58,7 +58,7 @@ export function AIAssessmentResultCard({
           </div>
           <div>
             <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[color:var(--color-clinic-blue-dark)] uppercase tracking-wider">
-              AI Health Assessment Result
+              Hasil Analisis Kesehatan AI
             </span>
             <h2 className="font-display text-lg font-extrabold text-[color:var(--color-clinic-ink)]">
               Hasil Analisis: {regionName}
@@ -207,7 +207,7 @@ export function AIAssessmentResultCard({
         <div className="rounded-xl bg-amber-50/60 p-3 border border-amber-200/60 flex items-start gap-2 text-[10px] text-amber-900 leading-relaxed">
           <ShieldAlert className="h-3.5 w-3.5 shrink-0 text-amber-700 mt-0.5" />
           <span>
-            <strong>Disclaimer Medis:</strong> {disclaimer}
+            <strong>Pernyataan Medis:</strong> {disclaimer}
           </span>
         </div>
       </div>
