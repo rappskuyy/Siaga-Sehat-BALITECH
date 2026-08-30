@@ -12,7 +12,7 @@ interface StatItem {
   accentSoft: string;
 }
 
-// Unified to the site's two signature accents (Scan cyan / Konsultasi violet) plus the
+// Unified to the site's two signature accents (Scan cyan / Konsultasi blue) plus the
 // primary clinic blue in two shades — no off-brand hues.
 const STATS: StatItem[] = [
   {

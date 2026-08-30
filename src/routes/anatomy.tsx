@@ -1,10 +1,17 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { AnatomyExplorer } from "@/components/anatomy/AnatomyExplorer";
 import { Footer } from "@/components/clinic/Footer";
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+import { SiteHeader } from "@/components/layout/SiteHeader";
+=======
+>>>>>>> dac6929
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import { ArrowLeft, Sparkles, User, Bell, LogIn, Menu, X, ScanLine, MapPin, MessageCircleHeart } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth/auth-context";
+>>>>>>> 1a3057d (menambah logo)
 
 export const Route = createFileRoute("/anatomy")({
   head: () => ({
@@ -23,20 +30,13 @@ export const Route = createFileRoute("/anatomy")({
   component: AnatomyPage,
 });
 
-const NAV_ITEMS = [
-  { label: "Tentang Kami", hash: "about" },
-  { label: "Layanan", hash: "services" },
-  { label: "Dokter", hash: "doctors" },
-  { label: "Hubungi", hash: "contact" },
-];
-
 function AnatomyPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user } = useAuth();
-
   return (
     <main className="min-h-screen bg-[#f7f4ee] font-sans flex flex-col justify-between">
       <div>
+<<<<<<< HEAD
+        <SiteHeader />
+=======
         {/* Integrated Header / Navbar matching existing design */}
         <header className="bg-white border-b border-black/5 px-4 py-3 md:px-8 sticky top-0 z-40 shadow-2xs">
           <div className="max-w-[1600px] mx-auto relative flex items-center justify-between gap-3">
@@ -177,6 +177,7 @@ function AnatomyPage() {
             </div>
           )}
         </header>
+>>>>>>> 1a3057d (menambah logo)
 
         {/* Content Container */}
         <div className="px-3 py-4 md:px-6 md:py-6">

@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 
 const PHOTO_DO = [
   "Gunakan cahaya alami atau lampu terang yang merata",
@@ -132,7 +133,15 @@ function ScannerPage() {
 
   return (
     <main className="min-h-screen bg-[#f7f4ee] pb-16 font-sans">
+      <SiteHeader />
       <div className="px-5 pt-4 sm:px-6 md:px-8 lg:px-10">
+<<<<<<< HEAD
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between">
+          <h1 className="flex items-center gap-2 text-sm font-semibold text-[color:var(--color-clinic-ink)]">
+            <ScanLine className="h-4 w-4 text-[color:var(--color-clinic-blue)]" />
+            Scan AI
+          </h1>
+=======
         <header className="hex-pattern relative mx-auto flex w-full max-w-6xl items-center justify-between gap-4 overflow-hidden rounded-3xl border border-white/10 bg-[color:var(--color-clinic-blue)] px-6 py-5 shadow-md">
           <BrandLogo inverted />
           <nav className="hidden sm:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 rounded-full bg-white/10 p-1 text-xs font-semibold text-white whitespace-nowrap shadow-xs">
@@ -169,14 +178,15 @@ function ScannerPage() {
               Scan AI
             </Link>
           </nav>
+>>>>>>> 1a3057d (menambah logo)
           <Link
             to="/"
-            className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/30 hover:scale-105 active:scale-95 shadow-sm"
+            className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-ink)] shadow-sm transition hover:bg-slate-50"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-3.5 w-3.5" />
             Kembali ke Beranda
           </Link>
-        </header>
+        </div>
       </div>
 
       <div className="relative z-20 mt-6 w-full px-5 sm:px-6 md:px-8 lg:px-10">

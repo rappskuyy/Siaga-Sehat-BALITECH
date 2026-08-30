@@ -70,7 +70,7 @@ function RegisterPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f7f4ee] px-4 py-12 font-sans">
       <div className="w-full max-w-md rounded-3xl border border-black/5 bg-white p-8 shadow-[var(--shadow-clinic-lg)]">
-        <BrandLogo className="mb-6" />
+        <BrandLogo size="lg" className="mb-6" />
 
         <h1 className="font-display text-2xl font-extrabold text-[color:var(--color-clinic-ink)]">
           Buat Akun

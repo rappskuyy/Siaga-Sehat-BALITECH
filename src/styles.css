@@ -16,14 +16,14 @@
   --shadow-clinic: 0 20px 60px rgba(0, 0, 0, 0.08);
   --shadow-clinic-lg: 0 30px 80px rgba(0, 0, 0, 0.12);
 
-  /* Siaga Aurora — dark hero identity for Scan AI (cyan) & Konsultasi AI (violet) */
+  /* Siaga Aurora — dark hero identity for Scan AI (cyan) & Konsultasi AI (blue) */
   --color-siaga-void: #04060e;
   --color-siaga-navy: #0a1630;
   --color-siaga-indigo: #16214a;
   --color-siaga-scan: #2ee6c4;
   --color-siaga-scan-dim: #17a690;
-  --color-siaga-consult: #a08bff;
-  --color-siaga-consult-dim: #6f5cd9;
+  --color-siaga-consult: var(--color-clinic-blue);
+  --color-siaga-consult-dim: var(--color-clinic-blue-dark);
   --color-siaga-mist: #eef1ff;
 }
 
