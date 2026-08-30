@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { BrandLogo } from "@/components/ui/BrandLogo";
 import {
   LineChart,
   Line,
@@ -11,7 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import {
-  ArrowLeft,
+  Bell,
   Calendar,
   LogOut,
   Ruler,
@@ -29,6 +28,7 @@ import type { ScanHistoryRow } from "@/lib/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -39,11 +39,29 @@ export const Route = createFileRoute("/profile")({
 
 const DANGER_META: Record<
   string,
-  { label: string; color: string; icon: typeof ShieldCheck; score: number }
+  { label: string; color: string; badgeBg: string; icon: typeof ShieldCheck; score: number }
 > = {
-  rendah: { label: "Rendah", color: "text-emerald-600", icon: ShieldCheck, score: 1 },
-  sedang: { label: "Sedang", color: "text-amber-600", icon: ShieldQuestion, score: 2 },
-  tinggi: { label: "Tinggi", color: "text-red-600", icon: ShieldAlert, score: 3 },
+  rendah: {
+    label: "Rendah",
+    color: "text-emerald-600",
+    badgeBg: "bg-emerald-50",
+    icon: ShieldCheck,
+    score: 1,
+  },
+  sedang: {
+    label: "Sedang",
+    color: "text-amber-600",
+    badgeBg: "bg-amber-50",
+    icon: ShieldQuestion,
+    score: 2,
+  },
+  tinggi: {
+    label: "Tinggi",
+    color: "text-red-600",
+    badgeBg: "bg-red-50",
+    icon: ShieldAlert,
+    score: 3,
+  },
 };
 
 function ProfilePage() {
@@ -142,6 +160,11 @@ function ProfilePage() {
       nama: h.nama_penyakit,
     }));
 
+  const lastScan = history && history.length > 0 ? history[0] : null;
+  const lastScanMeta = lastScan
+    ? (DANGER_META[lastScan.tingkat_bahaya] ?? DANGER_META.rendah)
+    : null;
+
   if (loading || !user) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#f7f4ee]">
@@ -152,47 +175,92 @@ function ProfilePage() {
 
   return (
     <main className="min-h-screen bg-[#f7f4ee] pb-16 font-sans">
-      <div className="mx-auto max-w-4xl px-4 pt-8 md:px-6">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-1.5 text-sm text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-            <BrandLogo size="sm" />
-          </div>
-          <Button
-            variant="ghost"
-            onClick={handleSignOut}
-            className="gap-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700"
-          >
-            <LogOut className="h-4 w-4" /> Keluar
-          </Button>
-        </div>
+      <SiteHeader />
 
-        <div className="mt-4 flex items-center gap-4">
-          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
-            <UserIcon className="h-7 w-7" />
-          </div>
-          <div>
-            <h1 className="font-display text-2xl font-extrabold text-[color:var(--color-clinic-ink)]">
+      <div className="mx-auto max-w-4xl px-4 pt-6 md:px-6">
+        {/* Profile hero card */}
+        <div className="overflow-hidden rounded-3xl border border-black/5 bg-white shadow-[var(--shadow-clinic)]">
+          <div className="relative bg-[color:var(--color-clinic-blue)] px-6 pb-14 pt-8 sm:px-8">
+            <div
+              className="pointer-events-none absolute inset-0 opacity-20"
+              style={{ background: "radial-gradient(60% 100% at 15% 0%, #2ee6c4, transparent)" }}
+            />
+            <p className="relative z-10 text-xs font-medium uppercase tracking-wide text-white/70">
+              Akun Saya
+            </p>
+            <h1 className="relative z-10 mt-1 font-display text-2xl font-extrabold text-white sm:text-3xl">
               {profile?.full_name || "Profil Saya"}
             </h1>
-            <p className="text-sm text-[color:var(--color-clinic-muted)]">{user.email}</p>
+            <p className="relative z-10 text-sm text-white/75">{user.email}</p>
+          </div>
+
+          <div className="-mt-10 flex flex-col items-center gap-3 px-6 pb-6 sm:flex-row sm:items-end sm:justify-between sm:px-8">
+            <div className="flex items-end gap-4">
+              {/* Avatar IS the logout button — tap the photo to sign out */}
+              <button
+                type="button"
+                onClick={handleSignOut}
+                title="Ketuk untuk keluar dari akun"
+                aria-label="Keluar dari akun"
+                className="group relative grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full border-4 border-white bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] shadow-md transition active:scale-95"
+              >
+                <UserIcon className="h-9 w-9 transition group-hover:opacity-0" />
+                <span className="absolute inset-0 grid place-items-center bg-red-500/90 text-white opacity-0 transition group-hover:opacity-100">
+                  <LogOut className="h-7 w-7" />
+                </span>
+                <span className="absolute -bottom-0.5 -right-0.5 grid h-6 w-6 place-items-center rounded-full border-2 border-white bg-red-500 text-white shadow-sm">
+                  <LogOut className="h-3 w-3" />
+                </span>
+              </button>
+              <p className="mb-1 hidden text-xs text-[color:var(--color-clinic-muted)] sm:block">
+                Ketuk foto untuk keluar dari akun
+              </p>
+            </div>
+
+            {/* Quick stats */}
+            <div className="flex w-full gap-2 sm:w-auto">
+              <div className="flex-1 rounded-2xl bg-[color:var(--color-clinic-blue-soft)]/70 px-4 py-2.5 text-center sm:flex-none">
+                <p className="font-display text-lg font-extrabold text-[color:var(--color-clinic-ink)]">
+                  {history?.length ?? 0}
+                </p>
+                <p className="text-[10px] text-[color:var(--color-clinic-muted)]">Total Scan</p>
+              </div>
+              <div className="flex-1 rounded-2xl bg-[color:var(--color-clinic-blue-soft)]/70 px-4 py-2.5 text-center sm:flex-none">
+                <p
+                  className={`font-display text-lg font-extrabold ${lastScanMeta?.color ?? "text-[color:var(--color-clinic-ink)]"}`}
+                >
+                  {lastScanMeta?.label ?? "—"}
+                </p>
+                <p className="text-[10px] text-[color:var(--color-clinic-muted)]">
+                  Risiko Terakhir
+                </p>
+              </div>
+              <div className="flex-1 rounded-2xl bg-[color:var(--color-clinic-blue-soft)]/70 px-4 py-2.5 text-center sm:flex-none">
+                <p className="font-display text-lg font-extrabold text-[color:var(--color-clinic-ink)]">
+                  {bmi ?? "—"}
+                </p>
+                <p className="text-[10px] text-[color:var(--color-clinic-muted)]">BMI</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.2fr]">
           {/* Edit profile form */}
           <div className="rounded-3xl border border-black/5 bg-white p-6 shadow-[var(--shadow-clinic)]">
-            <h2 className="font-display text-lg font-bold text-[color:var(--color-clinic-ink)]">
-              Data Kesehatan
-            </h2>
-            <p className="mt-1 text-sm text-[color:var(--color-clinic-muted)]">
-              Perbarui tinggi, berat, dan umur agar analisis AI lebih akurat.
-            </p>
+            <div className="flex items-center gap-2.5">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
+                <UserIcon className="h-4 w-4" />
+              </span>
+              <div>
+                <h2 className="font-display text-lg font-bold text-[color:var(--color-clinic-ink)]">
+                  Data Kesehatan
+                </h2>
+                <p className="text-xs text-[color:var(--color-clinic-muted)]">
+                  Agar analisis AI lebih akurat
+                </p>
+              </div>
+            </div>
 
             <form onSubmit={handleSave} className="mt-5 flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
@@ -275,9 +343,20 @@ function ProfilePage() {
           {/* Scan history */}
           <div className="rounded-3xl border border-black/5 bg-white p-6 shadow-[var(--shadow-clinic)]">
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-lg font-bold text-[color:var(--color-clinic-ink)]">
-                Riwayat Scan AI
-              </h2>
+              <div className="flex items-center gap-2.5">
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
+                  <ScanLine className="h-4 w-4" />
+                </span>
+                <div>
+                  <h2 className="font-display text-lg font-bold text-[color:var(--color-clinic-ink)]">
+                    Riwayat Scan AI
+                  </h2>
+                  <p className="text-xs text-[color:var(--color-clinic-muted)]">
+                    Ketuk <Bell className="inline h-3 w-3 -translate-y-px" /> untuk atur pengingat
+                    obat
+                  </p>
+                </div>
+              </div>
               <Link
                 to="/scanner"
                 className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3 py-1.5 text-xs font-medium text-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue)]/10"
@@ -339,9 +418,13 @@ function ProfilePage() {
                     return (
                       <li
                         key={h.id}
-                        className="flex items-start gap-3 rounded-xl border border-black/5 p-3"
+                        className="flex items-start gap-3 rounded-xl border border-black/5 p-3 transition hover:border-black/10 hover:bg-slate-50/60"
                       >
-                        <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${meta.color}`} />
+                        <span
+                          className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full ${meta.badgeBg} ${meta.color}`}
+                        >
+                          <Icon className="h-4 w-4" />
+                        </span>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="truncate text-sm font-semibold text-[color:var(--color-clinic-ink)]">
@@ -359,6 +442,16 @@ function ProfilePage() {
                             {h.ringkasan}
                           </p>
                         </div>
+
+                        {/* Notification icon — jumps straight to the reminder page for this condition */}
+                        <Link
+                          to="/reminders"
+                          title="Atur pengingat obat untuk kondisi ini"
+                          aria-label={`Atur pengingat obat untuk ${h.nama_penyakit}`}
+                          className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)] hover:text-white"
+                        >
+                          <Bell className="h-3.5 w-3.5" />
+                        </Link>
                       </li>
                     );
                   })}

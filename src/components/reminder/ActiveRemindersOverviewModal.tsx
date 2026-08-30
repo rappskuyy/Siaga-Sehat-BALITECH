@@ -1,6 +1,12 @@
 import { createPortal } from "react-dom";
 import { X, CheckCircle2, Bell, Clock, Calendar, Plus, ExternalLink } from "lucide-react";
 import type { MedicineReminder, ReminderLog } from "@/lib/supabase/types";
+import {
+  formatDoseTime,
+  getLastTakenLabel,
+  getNextDoseDate,
+  isTakenForCurrentSlot,
+} from "@/lib/reminders/scheduling";
 
 interface Props {
   open: boolean;
@@ -9,43 +15,6 @@ interface Props {
   logs: ReminderLog[];
   onMarkTaken: (id: string) => void;
   onOpenSetup: () => void;
-}
-
-function getLastTakenTime(reminderId: string, logs: ReminderLog[]): string {
-  const reminderLogs = logs.filter((log) => log.reminder_id === reminderId && !log.skipped);
-  if (reminderLogs.length === 0) return "Belum pernah";
-  
-  const lastLog = reminderLogs[0]; // Already ordered by taken_at desc
-  const date = new Date(lastLog.taken_at);
-  
-  // Format to local readable string: e.g. "Hari ini, 08:30" or "Kemarin, 21:00"
-  const now = new Date();
-  const isToday = date.toDateString() === now.toDateString();
-  
-  const timeString = date.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-  if (isToday) {
-    return `Hari ini pukul ${timeString}`;
-  }
-  
-  const yesterday = new Date(now);
-  yesterday.setDate(now.getDate() - 1);
-  const isYesterday = date.toDateString() === yesterday.toDateString();
-  if (isYesterday) {
-    return `Kemarin pukul ${timeString}`;
-  }
-  
-  return date.toLocaleDateString("id-ID", { day: "numeric", month: "short" }) + ` pukul ${timeString}`;
-}
-
-function getNextDoseTime(reminder: MedicineReminder): string {
-  const start = new Date(reminder.waktu_mulai);
-  const now = new Date();
-  const intervalMs = reminder.interval_jam * 60 * 60 * 1000;
-  let next = new Date(start.getTime());
-  while (next <= now) {
-    next = new Date(next.getTime() + intervalMs);
-  }
-  return next.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
 }
 
 export function ActiveRemindersOverviewModal({
@@ -108,9 +77,10 @@ export function ActiveRemindersOverviewModal({
           ) : (
             <div className="flex flex-col gap-3">
               {activeReminders.map((reminder) => {
-                const lastTaken = getLastTakenTime(reminder.id, logs);
-                const nextDose = getNextDoseTime(reminder);
+                const lastTaken = getLastTakenLabel(reminder.id, logs);
+                const nextDose = formatDoseTime(getNextDoseDate(reminder, logs));
                 const isDepleted = (reminder.tablet_tersisa ?? 0) === 0;
+                const taken = isTakenForCurrentSlot(reminder, logs);
 
                 return (
                   <div
@@ -152,25 +122,8 @@ export function ActiveRemindersOverviewModal({
                       )}
                     </div>
 
-                    {!isDepleted && (() => {
-                      const taken = (() => {
-                        const reminderLogs = logs.filter((log) => log.reminder_id === reminder.id && !log.skipped);
-                        if (reminderLogs.length === 0) return false;
-                        const lastLog = reminderLogs[0];
-                        const lastTakenTime = new Date(lastLog.taken_at).getTime();
-
-                        const start = new Date(reminder.waktu_mulai);
-                        const now = new Date();
-                        const intervalMs = reminder.interval_jam * 60 * 60 * 1000;
-                        let next = new Date(start.getTime());
-                        while (next <= now) {
-                          next = new Date(next.getTime() + intervalMs);
-                        }
-                        const currentIntervalStart = next.getTime() - intervalMs;
-                        return lastTakenTime >= currentIntervalStart;
-                      })();
-
-                      return taken ? (
+                    {!isDepleted &&
+                      (taken ? (
                         <div className="mt-1 flex items-center justify-center gap-1.5 rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-600 border border-emerald-100">
                           <CheckCircle2 className="h-3.5 w-3.5" />
                           Sudah Diminum untuk Dosis Ini
@@ -183,8 +136,7 @@ export function ActiveRemindersOverviewModal({
                           <CheckCircle2 className="h-3.5 w-3.5" />
                           Sudah Minum Sekarang
                         </button>
-                      );
-                    })()}
+                      ))}
                   </div>
                 );
               })}
@@ -215,6 +167,6 @@ export function ActiveRemindersOverviewModal({
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }

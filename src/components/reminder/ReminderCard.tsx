@@ -1,23 +1,13 @@
 import { Clock, Pill, CheckCircle2, XCircle, AlertTriangle, Building2, Store } from "lucide-react";
-import type { MedicineReminder } from "@/lib/supabase/types";
+import type { MedicineReminder, ReminderLog } from "@/lib/supabase/types";
+import { formatDoseTime, getNextDoseDate, isTakenForCurrentSlot } from "@/lib/reminders/scheduling";
 
 interface Props {
   reminder: MedicineReminder;
+  logs: ReminderLog[];
   onMarkTaken: (id: string) => void;
   onSkip: (id: string) => void;
   onDeactivate: (id: string) => void;
-  alreadyTaken?: boolean;
-}
-
-function getNextDoseTime(reminder: MedicineReminder): string {
-  const start = new Date(reminder.waktu_mulai);
-  const now = new Date();
-  const intervalMs = reminder.interval_jam * 60 * 60 * 1000;
-  let next = new Date(start.getTime());
-  while (next <= now) {
-    next = new Date(next.getTime() + intervalMs);
-  }
-  return next.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
 }
 
 function progressPercent(reminder: MedicineReminder): number {
@@ -25,40 +15,38 @@ function progressPercent(reminder: MedicineReminder): number {
   return Math.round((reminder.tablet_tersisa / reminder.jumlah_tablet) * 100);
 }
 
-export function ReminderCard({ reminder, onMarkTaken, onSkip, onDeactivate, alreadyTaken = false }: Props) {
+export function ReminderCard({ reminder, logs, onMarkTaken, onSkip, onDeactivate }: Props) {
   const pct = progressPercent(reminder);
-  const nextDose = getNextDoseTime(reminder);
+  const nextDose = formatDoseTime(getNextDoseDate(reminder, logs));
+  const alreadyTaken = isTakenForCurrentSlot(reminder, logs);
   const isDepleted = (reminder.tablet_tersisa ?? 0) === 0;
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border bg-white shadow-sm transition-all ${
+      className={`group relative overflow-hidden rounded-2xl border bg-white shadow-sm transition-all hover:shadow-md ${
         reminder.is_active ? "border-blue-100" : "border-gray-100 opacity-60"
       }`}
     >
       {/* Top accent bar */}
       <div
-        className="h-1 w-full"
-        style={{
-          background: reminder.is_active
-            ? "linear-gradient(90deg, #4a6fa5, #2ee6c4)"
-            : "#e5e7eb",
-        }}
+        className="h-1.5 w-full"
+        style={{ background: reminder.is_active ? "var(--color-clinic-blue)" : "#e5e7eb" }}
       />
 
       <div className="p-4">
         {/* Header row */}
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
-              <Pill className="h-4 w-4" />
+          <div className="flex items-center gap-3">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] shadow-inner">
+              <Pill className="h-5 w-5" />
             </span>
             <div>
-              <p className="font-semibold text-[color:var(--color-clinic-ink)] leading-tight">
+              <p className="font-display font-bold text-[color:var(--color-clinic-ink)] leading-tight">
                 {reminder.nama_obat}
               </p>
               <p className="text-xs text-[color:var(--color-clinic-muted)] mt-0.5">
-                {reminder.dosis_per_minum} · tiap {reminder.interval_jam} jam
+                {reminder.dosis_per_minum} · {Math.round(24 / reminder.interval_jam)}x sehari · tiap{" "}
+                {reminder.interval_jam} jam
               </p>
             </div>
           </div>
@@ -75,7 +63,7 @@ export function ReminderCard({ reminder, onMarkTaken, onSkip, onDeactivate, alre
         </div>
 
         {/* Tablet progress */}
-        <div className="mt-3">
+        <div className="mt-3.5">
           <div className="flex items-center justify-between text-xs text-[color:var(--color-clinic-muted)] mb-1.5">
             <span>Tablet tersisa</span>
             <span className="font-semibold text-[color:var(--color-clinic-ink)]">
@@ -88,26 +76,26 @@ export function ReminderCard({ reminder, onMarkTaken, onSkip, onDeactivate, alre
               style={{
                 width: `${pct}%`,
                 background:
-                  pct > 50
-                    ? "linear-gradient(90deg, #4a6fa5, #2ee6c4)"
-                    : pct > 20
-                      ? "#f59e0b"
-                      : "#ef4444",
+                  pct > 50 ? "var(--color-clinic-blue)" : pct > 20 ? "#f59e0b" : "#ef4444",
               }}
             />
           </div>
         </div>
 
-        {/* Next dose & status */}
-        {reminder.is_active && !isDepleted && (
-          <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-blue-50 px-3 py-2 text-xs text-blue-700">
-            <Clock className="h-3.5 w-3.5 shrink-0" />
-            <span>Dosis berikutnya jam <strong>{nextDose}</strong></span>
+        {/* Next dose confirmation — shown only after user marks the current dose taken */}
+        {reminder.is_active && !isDepleted && alreadyTaken && (
+          <div className="mt-3.5 flex items-center gap-2 rounded-xl bg-[color:var(--color-clinic-blue-soft)] px-3 py-2.5 text-xs text-[color:var(--color-clinic-blue-dark)]">
+            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white text-[color:var(--color-clinic-blue)] shadow-sm">
+              <Clock className="h-3.5 w-3.5" />
+            </span>
+            <span>
+              Dosis berikutnya jam <strong className="font-display">{nextDose}</strong>
+            </span>
           </div>
         )}
 
         {isDepleted && reminder.is_active && (
-          <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-700">
+          <div className="mt-3.5 flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-700">
             <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
             <span>Tablet habis — segera beli lagi</span>
           </div>
@@ -116,29 +104,27 @@ export function ReminderCard({ reminder, onMarkTaken, onSkip, onDeactivate, alre
         {/* Action buttons */}
         {reminder.is_active && !isDepleted && (
           <div className="mt-3 flex gap-2">
-            {alreadyTaken ? (
-              <div className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-50 border border-emerald-100 py-2.5 text-xs font-semibold text-emerald-600">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                Sudah Diminum untuk Dosis Ini
-              </div>
-            ) : (
-              <>
-                <button
-                  onClick={() => onMarkTaken(reminder.id)}
-                  id={`reminder-taken-${reminder.id}`}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[color:var(--color-clinic-blue)] py-2 text-xs font-semibold text-white transition hover:bg-[color:var(--color-clinic-blue-dark)] active:scale-95"
-                >
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  Sudah Minum
-                </button>
-                <button
-                  onClick={() => onSkip(reminder.id)}
-                  id={`reminder-skip-${reminder.id}`}
-                  className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium text-slate-500 transition hover:bg-slate-50"
-                >
-                  Lewati
-                </button>
-              </>
+            <button
+              onClick={() => onMarkTaken(reminder.id)}
+              id={`reminder-taken-${reminder.id}`}
+              disabled={alreadyTaken}
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition active:scale-95 ${
+                alreadyTaken
+                  ? "cursor-not-allowed bg-emerald-50 border border-emerald-100 text-emerald-600"
+                  : "bg-[color:var(--color-clinic-blue)] text-white hover:bg-[color:var(--color-clinic-blue-dark)]"
+              }`}
+            >
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              {alreadyTaken ? "Sudah Diminum" : "Sudah Minum"}
+            </button>
+            {!alreadyTaken && (
+              <button
+                onClick={() => onSkip(reminder.id)}
+                id={`reminder-skip-${reminder.id}`}
+                className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2.5 text-xs font-medium text-slate-500 transition hover:bg-slate-50"
+              >
+                Lewati
+              </button>
             )}
           </div>
         )}

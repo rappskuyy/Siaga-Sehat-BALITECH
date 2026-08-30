@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   Building2,
   CheckCircle2,
+  ChevronDown,
   Leaf,
   MapPin,
   Pill,
@@ -64,23 +65,50 @@ const DANGER_STYLES: Record<
   },
 };
 
-const BounceCard = ({ className, children }: { className?: string; children: React.ReactNode }) => {
+const ResultCard = ({
+  title,
+  icon: Icon,
+  className,
+  defaultOpen = false,
+  children,
+}: {
+  title: string;
+  icon: typeof Stethoscope;
+  className?: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
   return (
     <motion.div
       whileHover={{ y: -6 }}
       transition={{ duration: 0.2 }}
-      className={`group relative flex h-full flex-col rounded-2xl border p-7 shadow-sm transition-shadow hover:shadow-md ${className}`}
+      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border shadow-sm transition-shadow hover:shadow-md ${className}`}
     >
-      {children}
-    </motion.div>
-  );
-};
+      <button
+        type="button"
+        onClick={() => setIsOpen((o) => !o)}
+        aria-expanded={isOpen}
+        className="flex w-full shrink-0 items-center gap-2.5 px-4 py-3.5 text-left sm:px-7 sm:py-5 md:pointer-events-none md:justify-center md:px-7 md:pt-7 md:pb-0"
+      >
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-800/5 text-slate-700 md:hidden">
+          <Icon className="h-4 w-4" />
+        </span>
+        <h3 className="flex-1 font-display text-base font-bold text-slate-800 sm:text-lg md:mx-auto md:flex-none md:text-center md:text-2xl">
+          {title}
+        </h3>
+        <ChevronDown
+          className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200 md:hidden ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
 
-const CardTitle = ({ children, className }: { children: React.ReactNode; className?: string }) => {
-  return (
-    <h3 className={`mx-auto text-center text-2xl font-bold font-display ${className ?? ""}`}>
-      {children}
-    </h3>
+      <div className={`${isOpen ? "block" : "hidden"} md:block`}>
+        <div className="px-4 pb-4 sm:px-7 sm:pb-7 md:pt-8">{children}</div>
+      </div>
+    </motion.div>
   );
 };
 
@@ -180,12 +208,16 @@ export function ScanResultView({
       {/* Bouncy Cards Results Features Section */}
       <div className="mb-4 grid grid-cols-12 gap-4">
         {/* Card 1: Kemungkinan Penyebab */}
-        <BounceCard className="col-span-12 border-slate-200 bg-slate-50 md:col-span-4">
-          <CardTitle className="text-slate-800">Kemungkinan Penyebab</CardTitle>
+        <ResultCard
+          title="Kemungkinan Penyebab"
+          icon={Stethoscope}
+          defaultOpen={false}
+          className="col-span-12 border-slate-200 bg-slate-50 md:col-span-4"
+        >
           <div
-            className={`mt-8 flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-white shadow-md ${danger.panel}`}
+            className={`flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-white shadow-md ${danger.panel}`}
           >
-            <Stethoscope className={`h-7 w-7 shrink-0 ${danger.accent}`} />
+            <Stethoscope className={`hidden h-7 w-7 shrink-0 md:block ${danger.accent}`} />
             <ul className="space-y-1.5 text-xs sm:text-sm font-medium text-white leading-relaxed w-full">
               {result.penyebab.map((item, i) => (
                 <li key={i} className="flex items-start gap-2 bg-white/15 rounded-xl p-2">
@@ -195,15 +227,19 @@ export function ScanResultView({
               ))}
             </ul>
           </div>
-        </BounceCard>
+        </ResultCard>
 
         {/* Card 2: Pencegahan Mandiri */}
-        <BounceCard className="col-span-12 border-slate-200 bg-slate-50 md:col-span-8">
-          <CardTitle className="text-slate-800">Pencegahan Mandiri</CardTitle>
+        <ResultCard
+          title="Pencegahan Mandiri"
+          icon={CheckCircle2}
+          defaultOpen={false}
+          className="col-span-12 border-slate-200 bg-slate-50 md:col-span-8"
+        >
           <div
-            className={`mt-8 flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
+            className={`flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
           >
-            <CheckCircle2 className="h-7 w-7 shrink-0 text-white" />
+            <CheckCircle2 className="hidden h-7 w-7 shrink-0 text-white md:block" />
             <div className="grid gap-2 text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed sm:grid-cols-2 w-full">
               {result.pencegahan_mandiri.map((item, i) => (
                 <div
@@ -218,17 +254,21 @@ export function ScanResultView({
               ))}
             </div>
           </div>
-        </BounceCard>
+        </ResultCard>
       </div>
 
       <div className="grid grid-cols-12 gap-4">
         {/* Card 3: Rekomendasi Obat */}
-        <BounceCard className="col-span-12 border-slate-200 bg-slate-50 md:col-span-8">
-          <CardTitle className="text-slate-800">Rekomendasi Obat & Medis</CardTitle>
+        <ResultCard
+          title="Rekomendasi Obat & Medis"
+          icon={Pill}
+          defaultOpen={false}
+          className="col-span-12 border-slate-200 bg-slate-50 md:col-span-8"
+        >
           <div
-            className={`mt-8 flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
+            className={`flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
           >
-            <Pill className="h-7 w-7 shrink-0 text-white" />
+            <Pill className="hidden h-7 w-7 shrink-0 text-white md:block" />
             {result.obat_rekomendasi.length === 0 ? (
               <span className="text-xs sm:text-sm font-semibold text-[color:var(--color-clinic-ink)]">
                 Tidak ada saran obat bebas untuk kondisi ini — konsultasikan ke dokter/apoteker.
@@ -238,9 +278,9 @@ export function ScanResultView({
                 {result.obat_rekomendasi.map((med, i) => (
                   <div
                     key={i}
-                    className="flex flex-col gap-0.5 bg-white/50 rounded-xl p-2.5 border border-white/40 shadow-2xs"
+                    className="flex flex-col gap-1 bg-white/50 rounded-xl p-2.5 border border-white/40 shadow-2xs"
                   >
-                    <div className="flex items-center justify-between gap-1">
+                    <div className="flex flex-wrap items-center justify-between gap-1.5">
                       <span className="text-xs font-bold text-[color:var(--color-clinic-ink)] sm:text-sm">
                         {med.nama}
                       </span>
@@ -256,15 +296,19 @@ export function ScanResultView({
               </div>
             )}
           </div>
-        </BounceCard>
+        </ResultCard>
 
         {/* Card 4: Obat Herbal Alami */}
-        <BounceCard className="col-span-12 border-slate-200 bg-slate-50 md:col-span-4">
-          <CardTitle className="text-slate-800">Obat Herbal Alami</CardTitle>
+        <ResultCard
+          title="Obat Herbal Alami"
+          icon={Leaf}
+          defaultOpen={false}
+          className="col-span-12 border-slate-200 bg-slate-50 md:col-span-4"
+        >
           <div
-            className={`mt-8 flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
+            className={`flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
           >
-            <Leaf className="h-7 w-7 shrink-0 text-white" />
+            <Leaf className="hidden h-7 w-7 shrink-0 text-white md:block" />
             {result.obat_herbal.length === 0 ? (
               <span className="text-xs sm:text-sm font-semibold text-[color:var(--color-clinic-ink)]">
                 Tidak ada saran obat herbal spesifik.
@@ -287,7 +331,7 @@ export function ScanResultView({
               </div>
             )}
           </div>
-        </BounceCard>
+        </ResultCard>
       </div>
 
       {/* Peta Fasilitas Kesehatan / Apotek / Rumah Sakit Terdekat */}
@@ -303,7 +347,7 @@ export function ScanResultView({
       )}
 
       <div className="flex justify-center pt-2">
-        <div className="flex gap-3">
+        <div className="flex w-full max-w-xs flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row">
           <AiConsultation
             initialContext={`Nama kondisi: ${result.nama_penyakit}\nRingkasan: ${result.ringkasan}\nTingkat keyakinan: ${result.tingkat_keyakinan}`}
           />

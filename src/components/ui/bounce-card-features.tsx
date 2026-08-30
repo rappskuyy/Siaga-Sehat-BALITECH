@@ -50,7 +50,7 @@ export const BouncyCardsFeatures = () => {
         </BounceCard>
         <BounceCard className="col-span-12 md:col-span-4">
           <CardTitle>Konsultasi AI</CardTitle>
-          <div className="absolute bottom-0 left-4 right-4 top-28 translate-y-8 rounded-t-2xl bg-gradient-to-br from-purple-400 to-pink-500 p-4 transition-transform duration-[250ms] group-hover:translate-y-4 group-hover:rotate-[2deg] text-white flex flex-col items-center justify-center gap-2">
+          <div className="absolute bottom-0 left-4 right-4 top-28 translate-y-8 rounded-t-2xl bg-gradient-to-br from-[color:var(--color-clinic-blue)] to-[color:var(--color-siaga-scan)] p-4 transition-transform duration-[250ms] group-hover:translate-y-4 group-hover:rotate-[2deg] text-white flex flex-col items-center justify-center gap-2">
             <Bot className="w-10 h-10" />
             <span className="block text-center font-semibold">
               Tanya jawab seputar gejala 24/7

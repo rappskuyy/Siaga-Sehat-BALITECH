@@ -46,6 +46,7 @@ import {
 import { PharmacyList } from "./PharmacyList";
 import { SourceSummaryBar } from "./SourceBadge";
 import { useAuth } from "@/lib/auth/auth-context";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 
 const containerStyle = {
   width: "100%",
@@ -61,16 +62,22 @@ const GOOGLE_MAPS_LIBRARIES: Libraries = Object.freeze(["places"]) as Libraries;
 
 // High quality photo fallbacks
 const FACILITY_PHOTOS = {
-  hospital: "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=600&auto=format&fit=crop&q=80",
-  clinic: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=80",
-  pharmacy: "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=600&auto=format&fit=crop&q=80",
+  hospital:
+    "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=600&auto=format&fit=crop&q=80",
+  clinic:
+    "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=80",
+  pharmacy:
+    "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=600&auto=format&fit=crop&q=80",
 };
 
 // Review comments snippets
 const FACILITY_REVIEWS = {
-  hospital: "Fasilitas medis sangat lengkap, penanganan dokter spesialis cepat dan tanggap di UGD 24 Jam.",
-  clinic: "Dokter ramah dan teliti menjelaskan indikasi kesehatan. Antrean teratur dan tempat sangat bersih.",
-  pharmacy: "Obat resep lengkap, pelayanan petugas racik obat cepat, lokasi strategis dan harga terjangkau.",
+  hospital:
+    "Fasilitas medis sangat lengkap, penanganan dokter spesialis cepat dan tanggap di UGD 24 Jam.",
+  clinic:
+    "Dokter ramah dan teliti menjelaskan indikasi kesehatan. Antrean teratur dan tempat sangat bersih.",
+  pharmacy:
+    "Obat resep lengkap, pelayanan petugas racik obat cepat, lokasi strategis dan harga terjangkau.",
 };
 
 // SVG Marker Icons (Identical to Scanner)
@@ -237,7 +244,7 @@ function OpenStreetMapCanvas({
             align-items: center;
             justify-content: center;
             font-size: ${isSelected ? 17 : 13}px;
-            transform: ${isSelected ? 'scale(1.15)' : 'scale(1)'};
+            transform: ${isSelected ? "scale(1.15)" : "scale(1)"};
             transition: transform 0.2s ease;
           ">
             ${emoji}
@@ -388,7 +395,7 @@ export function DedicatedMapsView() {
         mapInstance.setZoom(14);
       }
     },
-    [userLocation]
+    [userLocation],
   );
 
   const onUnmount = useCallback(function callback() {
@@ -435,7 +442,7 @@ export function DedicatedMapsView() {
     if (isManualClick) {
       try {
         sessionStorage.removeItem(SAVED_LOCATION_KEY);
-      } catch { }
+      } catch {}
     }
 
     setLoadingLocation(true);
@@ -454,7 +461,7 @@ export function DedicatedMapsView() {
         if (addressName) {
           setSearchQuery(addressName);
         }
-      } catch { }
+      } catch {}
       loadPharmacies(coords[0], coords[1], addressName);
     };
 
@@ -483,7 +490,7 @@ export function DedicatedMapsView() {
           setLocationError("Izin lokasi tidak diberikan. Cari alamat untuk menentukan posisi.");
         }
       },
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 },
     );
   };
 
@@ -491,7 +498,13 @@ export function DedicatedMapsView() {
     setLoadingPharmacies(true);
     try {
       const currentAddress = addressName || searchQuery;
-      const nodes = await fetchNearbyPharmacies(lat, lon, map || undefined, currentAddress, "rendah");
+      const nodes = await fetchNearbyPharmacies(
+        lat,
+        lon,
+        map || undefined,
+        currentAddress,
+        "rendah",
+      );
       setPharmacies(nodes);
 
       if (nodes.length > 0) {
@@ -567,9 +580,9 @@ export function DedicatedMapsView() {
           coords,
           source: `Alamat: ${result.displayname.slice(0, 30)}...`,
           address: result.displayname,
-        })
+        }),
       );
-    } catch { }
+    } catch {}
 
     loadPharmacies(result.lat, result.lon, result.displayname);
   };
@@ -611,7 +624,7 @@ export function DedicatedMapsView() {
 
       selectPharmacyAndRoute(pharmacy, transportMode, userLocation || undefined);
     },
-    [map, transportMode, userLocation]
+    [map, transportMode, userLocation],
   );
 
   const handleTransportModeChange = (newMode: TransportMode) => {
@@ -624,7 +637,7 @@ export function DedicatedMapsView() {
   const selectPharmacyAndRoute = async (
     pharmacy: PharmacyNode,
     mode: TransportMode,
-    origin?: [number, number]
+    origin?: [number, number],
   ) => {
     const startLoc = origin || userLocation || DEFAULT_CENTER;
     setLoadingRoute(true);
@@ -647,11 +660,7 @@ export function DedicatedMapsView() {
     };
 
     try {
-      if (
-        window.google &&
-        window.google.maps &&
-        window.google.maps.DirectionsService
-      ) {
+      if (window.google && window.google.maps && window.google.maps.DirectionsService) {
         const directionsService = new window.google.maps.DirectionsService();
         const googleTravelMode = window.google.maps.TravelMode.DRIVING;
 
@@ -679,7 +688,7 @@ export function DedicatedMapsView() {
             } else {
               await useOSRM();
             }
-          }
+          },
         );
       } else {
         await useOSRM();
@@ -758,17 +767,19 @@ export function DedicatedMapsView() {
                   (details, dStatus) => {
                     if (dStatus === window.google.maps.places.PlacesServiceStatus.OK && details) {
                       if (details.photos && details.photos.length > 0) {
-                        setDynamicPhotoUrl(details.photos[0].getUrl({ maxWidth: 800, maxHeight: 600 }));
+                        setDynamicPhotoUrl(
+                          details.photos[0].getUrl({ maxWidth: 800, maxHeight: 600 }),
+                        );
                       }
                       if (details.reviews && details.reviews.length > 0) {
                         setDynamicReviewText(details.reviews[0].text);
                       }
                     }
-                  }
+                  },
                 );
               }
             }
-          }
+          },
         );
       } catch (e) {
         console.error("Places photo error:", e);
@@ -798,84 +809,9 @@ export function DedicatedMapsView() {
   return (
     <div className="min-h-screen bg-[#F7F9FB] font-sans antialiased text-[#111111] flex flex-col justify-between pb-16 md:pb-0">
       {/* ========================================================================= */}
-      {/* 01. INTEGRATED WEBSITE HEADER NAVBAR                                      */}
+      {/* 01. INTEGRATED WEBSITE HEADER NAVBAR (shared across the whole app)        */}
       {/* ========================================================================= */}
-      <header className="bg-white border-b border-[#E5E7EB] px-4 py-3 sm:px-6 sm:py-4 md:px-10 sticky top-0 z-50 shadow-2xs">
-        <div className="max-w-[1700px] mx-auto relative flex items-center justify-between gap-3">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue)]">
-              <span className="h-2.5 w-2.5 rounded-full bg-white" />
-            </div>
-            <span className="font-display text-lg font-bold tracking-tight text-[color:var(--color-clinic-ink)]">
-              SiagaSehat
-            </span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 p-1 text-xs font-medium text-[color:var(--color-clinic-ink)] whitespace-nowrap shadow-xs">
-            <Link
-              to="/"
-              className="rounded-full px-3 py-1.5 transition hover:bg-white/80 hover:text-[color:var(--color-clinic-blue)] text-[color:var(--color-clinic-ink)]"
-            >
-              Beranda
-            </Link>
-            <Link
-              to="/maps"
-              activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue)] font-bold shadow-xs" }}
-              inactiveProps={{ className: "text-[color:var(--color-clinic-ink)] hover:bg-white/70" }}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition"
-            >
-              <MapPin className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)]" />
-              Peta Lokasi
-            </Link>
-            <Link
-              to="/consultation"
-              activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue)] font-bold shadow-xs" }}
-              inactiveProps={{ className: "text-[color:var(--color-clinic-ink)] hover:bg-white/70" }}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition"
-            >
-              Konsultasi
-            </Link>
-            <Link
-              to="/anatomy"
-              activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue)] font-bold shadow-xs" }}
-              inactiveProps={{ className: "text-[color:var(--color-clinic-ink)] hover:bg-white/70" }}
-              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 transition"
-            >
-              Anatomi
-            </Link>
-            <Link
-              to="/scanner"
-              activeProps={{ className: "bg-[color:var(--color-clinic-blue-dark)] text-white font-bold shadow-xs" }}
-              inactiveProps={{ className: "bg-[color:var(--color-clinic-blue)] text-white hover:bg-[color:var(--color-clinic-blue-dark)]" }}
-              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-semibold transition"
-            >
-              <ScanLine className="h-3.5 w-3.5" />
-              Scan AI
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            {!user ? (
-              <Link
-                to="/login"
-                className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue)] px-3.5 py-1.5 text-xs font-semibold text-white shadow-md transition hover:bg-[color:var(--color-clinic-blue-dark)]"
-              >
-                <LogIn className="h-3.5 w-3.5" />
-                Masuk
-              </Link>
-            ) : (
-              <Link
-                to="/profile"
-                className="h-9 w-9 items-center justify-center rounded-full bg-[color:var(--color-clinic-ink)] text-white transition hover:bg-black/80 flex"
-                aria-label="Profil"
-              >
-                <User className="h-4 w-4" />
-              </Link>
-            )}
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* ========================================================================= */}
       {/* 02. MAIN RESPONSIVE PAGE CONTAINER                                       */}
@@ -974,12 +910,15 @@ export function DedicatedMapsView() {
                       className="w-full text-left p-2.5 hover:bg-[#F7F9FB] rounded-xl flex items-start gap-2 border-b border-[#E5E7EB]/40 last:border-0 cursor-pointer transition text-xs"
                     >
                       <MapPin className="h-4 w-4 shrink-0 text-[#379FD2] mt-0.5" />
-                      <span className="text-[#111111] line-clamp-2 leading-relaxed">{res.displayname}</span>
+                      <span className="text-[#111111] line-clamp-2 leading-relaxed">
+                        {res.displayname}
+                      </span>
                     </button>
                   ))
                 ) : searchQuery.trim().length > 0 && !isSearching ? (
                   <div className="p-2.5 text-center text-[#6B7280] text-xs">
-                    Tekan <strong className="text-[#379FD2]">Cari</strong> untuk mencari &quot;{searchQuery}&quot;
+                    Tekan <strong className="text-[#379FD2]">Cari</strong> untuk mencari &quot;
+                    {searchQuery}&quot;
                   </div>
                 ) : null}
               </div>
@@ -1003,10 +942,11 @@ export function DedicatedMapsView() {
             <button
               type="button"
               onClick={() => setMobileTab("map")}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${mobileTab === "map"
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
+                mobileTab === "map"
                   ? "bg-[#379FD2] text-white shadow-xs"
                   : "text-[#6B7280] hover:text-[#379FD2]"
-                }`}
+              }`}
             >
               <Compass className="h-4 w-4" />
               Peta Navigasi
@@ -1014,10 +954,11 @@ export function DedicatedMapsView() {
             <button
               type="button"
               onClick={() => setMobileTab("list")}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${mobileTab === "list"
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
+                mobileTab === "list"
                   ? "bg-[#379FD2] text-white shadow-xs"
                   : "text-[#6B7280] hover:text-[#379FD2]"
-                }`}
+              }`}
             >
               <Building2 className="h-4 w-4" />
               Daftar ({pharmacies.length})
@@ -1026,10 +967,11 @@ export function DedicatedMapsView() {
               <button
                 type="button"
                 onClick={() => setMobileTab("detail")}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${mobileTab === "detail"
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
+                  mobileTab === "detail"
                     ? "bg-[#F59E0B] text-white shadow-xs"
                     : "text-[#6B7280] hover:text-[#F59E0B]"
-                  }`}
+                }`}
               >
                 <Info className="h-4 w-4" />
                 Detail
@@ -1042,8 +984,9 @@ export function DedicatedMapsView() {
         <div className="flex flex-col lg:flex-row gap-4 min-h-[450px] lg:h-[560px] xl:h-[580px] items-stretch">
           {/* Column 1 (Left): PharmacyList */}
           <div
-            className={`w-full lg:w-[340px] xl:w-[380px] shrink-0 h-full flex-col ${mobileTab === "list" ? "flex" : "hidden lg:flex"
-              }`}
+            className={`w-full lg:w-[340px] xl:w-[380px] shrink-0 h-full flex-col ${
+              mobileTab === "list" ? "flex" : "hidden lg:flex"
+            }`}
           >
             <PharmacyList
               pharmacies={pharmacies}
@@ -1067,8 +1010,9 @@ export function DedicatedMapsView() {
 
           {/* Column 2 (Center): Clean Unobstructed Map Canvas */}
           <div
-            className={`relative flex-1 min-w-0 h-full rounded-3xl overflow-hidden border border-[#E5E7EB] bg-[#FFFFFF] shadow-md flex flex-col ${mobileTab === "map" ? "block" : "hidden lg:block"
-              }`}
+            className={`relative flex-1 min-w-0 h-full rounded-3xl overflow-hidden border border-[#E5E7EB] bg-[#FFFFFF] shadow-md flex flex-col ${
+              mobileTab === "map" ? "block" : "hidden lg:block"
+            }`}
           >
             <div className="relative flex-1 w-full h-full">
               {useGoogleMapsEngine ? (
@@ -1183,18 +1127,20 @@ export function DedicatedMapsView() {
           {/* Column 3 (Right Side Dedicated Detail Panel - Outside the Map!) */}
           {selectedPharmacy && (
             <div
-              className={`w-full lg:w-[380px] xl:w-[420px] shrink-0 h-full bg-[#FFFFFF] border border-[#E5E7EB] rounded-3xl p-4 sm:p-5 shadow-lg flex-col overflow-y-auto animate-fade-in scrollbar-thin scrollbar-thumb-[#379FD2]/20 ${mobileTab === "detail" ? "flex" : "hidden lg:flex"
-                }`}
+              className={`w-full lg:w-[380px] xl:w-[420px] shrink-0 h-full bg-[#FFFFFF] border border-[#E5E7EB] rounded-3xl p-4 sm:p-5 shadow-lg flex-col overflow-y-auto animate-fade-in scrollbar-thin scrollbar-thumb-[#379FD2]/20 ${
+                mobileTab === "detail" ? "flex" : "hidden lg:flex"
+              }`}
             >
               {/* Category Badge & Rating Header */}
               <div className="flex items-center justify-between gap-2 mb-3 shrink-0">
                 <span
-                  className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide border shadow-xs ${selectedPharmacy.facilityType === "hospital"
+                  className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide border shadow-xs ${
+                    selectedPharmacy.facilityType === "hospital"
                       ? "bg-red-500 text-white border-red-600"
                       : selectedPharmacy.facilityType === "clinic"
                         ? "bg-[#F59E0B] text-white border-amber-600"
                         : "bg-[#379FD2] text-white border-blue-600"
-                    }`}
+                  }`}
                 >
                   {selectedPharmacy.facilityType === "hospital" ? (
                     <>🏥 RUMAH SAKIT</>
@@ -1208,8 +1154,12 @@ export function DedicatedMapsView() {
                 <div className="flex items-center gap-2">
                   <div className="bg-amber-50 text-amber-900 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-2xs">
                     <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                    <span>{selectedPharmacy.rating ? Number(selectedPharmacy.rating).toFixed(1) : "4.8"}</span>
-                    <span className="text-[10px] text-amber-700 font-normal">({selectedPharmacy.userRatingsTotal || "128"})</span>
+                    <span>
+                      {selectedPharmacy.rating ? Number(selectedPharmacy.rating).toFixed(1) : "4.8"}
+                    </span>
+                    <span className="text-[10px] text-amber-700 font-normal">
+                      ({selectedPharmacy.userRatingsTotal || "128"})
+                    </span>
                   </div>
 
                   <button
@@ -1242,7 +1192,9 @@ export function DedicatedMapsView() {
                   {selectedPharmacy.name}
                 </h3>
                 <p className="text-xs text-[#6B7280] mt-1.5 leading-relaxed">
-                  📍 {selectedPharmacy.address || `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
+                  📍{" "}
+                  {selectedPharmacy.address ||
+                    `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
                 </p>
               </div>
 
@@ -1279,20 +1231,22 @@ export function DedicatedMapsView() {
                   <button
                     type="button"
                     onClick={() => handleTransportModeChange("driving")}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${transportMode === "driving"
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${
+                      transportMode === "driving"
                         ? "bg-[#379FD2] text-white shadow-xs"
                         : "bg-white text-[#6B7280] border border-[#E5E7EB]"
-                      }`}
+                    }`}
                   >
                     <Car className="h-3.5 w-3.5" /> Mobil
                   </button>
                   <button
                     type="button"
                     onClick={() => handleTransportModeChange("motorcycle")}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${transportMode === "motorcycle"
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${
+                      transportMode === "motorcycle"
                         ? "bg-[#379FD2] text-white shadow-xs"
                         : "bg-white text-[#6B7280] border border-[#E5E7EB]"
-                      }`}
+                    }`}
                   >
                     <Bike className="h-3.5 w-3.5" /> Motor
                   </button>
@@ -1300,7 +1254,9 @@ export function DedicatedMapsView() {
 
                 <div className="text-right">
                   <div className="font-extrabold text-[#379FD2] text-sm sm:text-base">
-                    {routeInfo ? `${routeInfo.durationMin} Menit` : `${Math.ceil(selectedPharmacy.distanceKm * 4)} Menit`}
+                    {routeInfo
+                      ? `${routeInfo.durationMin} Menit`
+                      : `${Math.ceil(selectedPharmacy.distanceKm * 4)} Menit`}
                   </div>
                   <div className="text-[10px] text-[#6B7280]">Estimasi Waktu</div>
                 </div>

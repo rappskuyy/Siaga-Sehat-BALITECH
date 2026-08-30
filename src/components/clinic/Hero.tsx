@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/ui/BrandLogo";
-import { ReminderBell } from "@/components/reminder/ReminderBell";
 import { FloatingCard } from "./FloatingCard";
 import fotodokter1 from "@/assets/fotodokter(1).png?url";
 import fotodokter2 from "@/assets/fotodokter(2).png?url";
@@ -32,18 +31,18 @@ const MINI_STATS = [
   { n: "100%", l: "diagnostik digital" },
 ];
 
-const NAV_ITEMS = [
-  { label: "Layanan", hash: "services" },
-];
+const NAV_ITEMS = [{ label: "Layanan", hash: "services" }];
 
 export function Hero() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, profile } = useAuth();
 
   return (
-    <section className="relative w-full overflow-hi
+    <section
+      className="relative w-full overflow-hi
     
-    dden bg-white px-4 pt-5 pb-8 sm:px-6 md:px-8 md:pt-7 md:pb-14 lg:px-10 lg:pt-8 lg:pb-16">
+    dden bg-white px-4 pt-5 pb-8 sm:px-6 md:px-8 md:pt-7 md:pb-14 lg:px-10 lg:pt-8 lg:pb-16"
+    >
       {/* Header */}
       <header className="flex items-center justify-between gap-4">
         <BrandLogo />
@@ -86,12 +85,6 @@ export function Hero() {
             Scan AI
           </Link>
           <Link
-            to="/reminders"
-            className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
-          >
-            Pengingat Obat
-          </Link>
-          <Link
             to={user ? "/profile" : "/login"}
             className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
           >
@@ -120,7 +113,6 @@ export function Hero() {
           >
             <Phone className="h-4 w-4" />
           </button>
-          <ReminderBell variant="dark" className="hidden md:grid" />
           <Link
             to={user ? "/profile" : "/login"}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-clinic-ink)] text-white transition hover:bg-black/80 lg:hidden"
@@ -175,13 +167,6 @@ export function Hero() {
               className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-white/80 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
             >
               Konsultasi
-            </Link>
-            <Link
-              to="/reminders"
-              onClick={() => setIsMenuOpen(false)}
-              className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-white/80 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
-            >
-              Pengingat Obat
             </Link>
             <Link
               to={user ? "/profile" : "/login"}
