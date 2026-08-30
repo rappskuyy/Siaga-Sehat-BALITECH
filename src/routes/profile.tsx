@@ -11,8 +11,10 @@ import {
 } from "recharts";
 import {
   Bell,
+  Bone,
   Calendar,
   LogOut,
+  MessageCircleHeart,
   Ruler,
   Save,
   ScanLine,
@@ -24,7 +26,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
-import type { ScanHistoryRow } from "@/lib/supabase/types";
+import type { ConsultationHistoryRow, ScanHistoryRow } from "@/lib/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -64,6 +66,12 @@ const DANGER_META: Record<
   },
 };
 
+function firstMessageSnippet(messages: ConsultationHistoryRow["messages"]): string {
+  const firstUser = messages.find((m) => m.role === "user");
+  const text = (firstUser ?? messages[0])?.text ?? "";
+  return text.length > 140 ? `${text.slice(0, 140)}…` : text;
+}
+
 function ProfilePage() {
   const navigate = useNavigate();
   const { user, profile, loading, refreshProfile, signOut } = useAuth();
@@ -77,6 +85,9 @@ function ProfilePage() {
 
   const [history, setHistory] = useState<ScanHistoryRow[] | null>(null);
   const [historyLoading, setHistoryLoading] = useState(true);
+
+  const [anatomyHistory, setAnatomyHistory] = useState<ConsultationHistoryRow[] | null>(null);
+  const [anatomyLoading, setAnatomyLoading] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -107,6 +118,26 @@ function ProfilePage() {
         if (!active) return;
         if (!error && data) setHistory(data as ScanHistoryRow[]);
         setHistoryLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    let active = true;
+    setAnatomyLoading(true);
+    supabase
+      .from("consultation_history")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(50)
+      .then(({ data, error }) => {
+        if (!active) return;
+        if (!error && data) setAnatomyHistory(data as ConsultationHistoryRow[]);
+        setAnatomyLoading(false);
       });
     return () => {
       active = false;
@@ -178,9 +209,9 @@ function ProfilePage() {
       <SiteHeader />
 
       <div className="mx-auto max-w-4xl px-4 pt-6 md:px-6">
-        {/* Profile hero card */}
+        {/* Profile hero card — banner and content are two separate, non-overlapping blocks */}
         <div className="overflow-hidden rounded-3xl border border-black/5 bg-white shadow-[var(--shadow-clinic)]">
-          <div className="relative bg-[color:var(--color-clinic-blue)] px-6 pb-14 pt-8 sm:px-8">
+          <div className="relative bg-[color:var(--color-clinic-blue)] px-6 py-7 sm:px-8">
             <div
               className="pointer-events-none absolute inset-0 opacity-20"
               style={{ background: "radial-gradient(60% 100% at 15% 0%, #2ee6c4, transparent)" }}
@@ -194,25 +225,25 @@ function ProfilePage() {
             <p className="relative z-10 text-sm text-white/75">{user.email}</p>
           </div>
 
-          <div className="-mt-10 flex flex-col items-center gap-3 px-6 pb-6 sm:flex-row sm:items-end sm:justify-between sm:px-8">
-            <div className="flex items-end gap-4">
+          <div className="flex flex-col gap-4 border-t border-black/5 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+            <div className="flex items-center gap-4">
               {/* Avatar IS the logout button — tap the photo to sign out */}
               <button
                 type="button"
                 onClick={handleSignOut}
                 title="Ketuk untuk keluar dari akun"
                 aria-label="Keluar dari akun"
-                className="group relative grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full border-4 border-white bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] shadow-md transition active:scale-95"
+                className="group relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] shadow-sm transition active:scale-95"
               >
-                <UserIcon className="h-9 w-9 transition group-hover:opacity-0" />
+                <UserIcon className="h-7 w-7 transition group-hover:opacity-0" />
                 <span className="absolute inset-0 grid place-items-center bg-red-500/90 text-white opacity-0 transition group-hover:opacity-100">
-                  <LogOut className="h-7 w-7" />
+                  <LogOut className="h-6 w-6" />
                 </span>
-                <span className="absolute -bottom-0.5 -right-0.5 grid h-6 w-6 place-items-center rounded-full border-2 border-white bg-red-500 text-white shadow-sm">
-                  <LogOut className="h-3 w-3" />
+                <span className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full border-2 border-white bg-red-500 text-white shadow-sm">
+                  <LogOut className="h-2.5 w-2.5" />
                 </span>
               </button>
-              <p className="mb-1 hidden text-xs text-[color:var(--color-clinic-muted)] sm:block">
+              <p className="text-xs text-[color:var(--color-clinic-muted)]">
                 Ketuk foto untuk keluar dari akun
               </p>
             </div>
@@ -361,7 +392,7 @@ function ProfilePage() {
                 to="/scanner"
                 className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3 py-1.5 text-xs font-medium text-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue)]/10"
               >
-                <ScanLine className="h-3.5 w-3.5" /> Scan Baru
+                Scan Baru
               </Link>
             </div>
 
@@ -446,6 +477,7 @@ function ProfilePage() {
                         {/* Notification icon — jumps straight to the reminder page for this condition */}
                         <Link
                           to="/reminders"
+                          search={{ scan: h.id, penyakit: h.nama_penyakit }}
                           title="Atur pengingat obat untuk kondisi ini"
                           aria-label={`Atur pengingat obat untuk ${h.nama_penyakit}`}
                           className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)] hover:text-white"
@@ -459,6 +491,74 @@ function ProfilePage() {
               </>
             )}
           </div>
+        </div>
+
+        {/* Anatomy / body-part consultation history */}
+        <div className="mt-6 rounded-3xl border border-black/5 bg-white p-6 shadow-[var(--shadow-clinic)]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
+                <Bone className="h-4 w-4" />
+              </span>
+              <div>
+                <h2 className="font-display text-lg font-bold text-[color:var(--color-clinic-ink)]">
+                  Riwayat Anatomi
+                </h2>
+                <p className="text-xs text-[color:var(--color-clinic-muted)]">
+                  Sesi pilih-bagian-tubuh dan konsultasi AI kamu
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/anatomy"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3 py-1.5 text-xs font-medium text-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue)]/10"
+            >
+              Konsultasi Baru
+            </Link>
+          </div>
+
+          {anatomyLoading && (
+            <p className="mt-4 text-sm text-[color:var(--color-clinic-muted)]">Memuat riwayat...</p>
+          )}
+
+          {!anatomyLoading && anatomyHistory && anatomyHistory.length === 0 && (
+            <p className="mt-4 text-sm text-[color:var(--color-clinic-muted)]">
+              Belum ada riwayat konsultasi anatomi. Pilih bagian tubuh yang bermasalah untuk
+              memulai.
+            </p>
+          )}
+
+          {!anatomyLoading && anatomyHistory && anatomyHistory.length > 0 && (
+            <ul className="mt-4 flex max-h-80 flex-col gap-2 overflow-auto">
+              {anatomyHistory.map((h) => (
+                <li
+                  key={h.id}
+                  className="flex items-start gap-3 rounded-xl border border-black/5 p-3 transition hover:border-black/10 hover:bg-slate-50/60"
+                >
+                  <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
+                    <MessageCircleHeart className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="truncate text-sm font-semibold capitalize text-[color:var(--color-clinic-ink)]">
+                        {h.body_part || "Konsultasi Umum"}
+                      </p>
+                      <span className="shrink-0 text-xs text-[color:var(--color-clinic-muted)]">
+                        {new Date(h.created_at).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 line-clamp-2 text-xs text-[color:var(--color-clinic-muted)]">
+                      {firstMessageSnippet(h.messages)}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </main>
