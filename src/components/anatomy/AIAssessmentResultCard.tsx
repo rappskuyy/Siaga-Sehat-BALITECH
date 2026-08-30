@@ -3,7 +3,10 @@ import { Link } from "@tanstack/react-router";
 import {
   AlertOctagon,
   ArrowRight,
+  Building2,
   CheckCircle2,
+  MapPin,
+  Navigation,
   RefreshCw,
   ScanLine,
   ShieldAlert,
@@ -50,7 +53,7 @@ export function AIAssessmentResultCard({
 
   return (
     <div className="flex flex-col h-full rounded-[28px] bg-white p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 overflow-hidden animate-fade-up">
-      {/* Header Banner (Fixed Height / Shrink-0) */}
+      {/* Header Banner */}
       <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-4 shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="grid h-8 w-8 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white shadow-md">
@@ -76,17 +79,19 @@ export function AIAssessmentResultCard({
         </Button>
       </div>
 
-      {/* Middle Scrollable Section (Flex-1) */}
+      {/* Middle Scrollable Section */}
       <div className="flex-1 overflow-y-auto mt-4 pr-1.5 space-y-4 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-        {/* Emergency Red Flag Warning Banner if Emergency Detected */}
+        {/* Emergency Red Flag Warning Banner */}
         {isEmergency && (
-          <div className="flex items-start gap-3 rounded-2xl bg-red-50 p-3.5 border border-red-200 text-red-900">
+          <div className="flex items-start gap-3 rounded-2xl bg-red-50 p-3.5 border border-red-200 text-red-900 shadow-xs">
             <AlertOctagon className="mt-0.5 h-5 w-5 shrink-0 text-red-600 animate-pulse" />
             <div>
-              <h4 className="text-xs font-bold text-red-700">⚠️ PERHATIAN MEDIS PENTING</h4>
+              <h4 className="text-xs font-bold text-red-700 uppercase tracking-wide">
+                ⚠️ Perhatian Medis Penting
+              </h4>
               <p className="mt-1 text-[11px] leading-relaxed text-red-800">
                 {emergencyMessage ||
-                  "Beberapa gejala yang Anda pilih memerlukan evaluasi medis segera. Jika kondisi terasa berat, memburuk, atau disertai sesak napas/nyeri hebat, segera hubungi layanan darurat atau IGD terdekat."}
+                  "Beberapa gejala yang Anda pilih memerlukan evaluasi medis segera. Jika kondisi terasa berat, memburuk, atau disertai sesak napas/nyeri hebat, segera kunjungi Instalasi Gawat Darurat (IGD) rumah sakit terdekat."}
               </p>
             </div>
           </div>
@@ -203,6 +208,82 @@ export function AIAssessmentResultCard({
           </div>
         </div>
 
+        {/* Rekomendasi Rujukan IGD & Banner Gambar Peta (Diarahkan ke Peta Lokasi) */}
+        {isEmergency && (
+          <div className="rounded-2xl border border-red-200/80 bg-gradient-to-b from-red-50/40 to-white p-4 space-y-3.5 shadow-xs">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <div className="grid h-7 w-7 place-items-center rounded-xl bg-red-600 text-white shadow-xs">
+                  <Building2 className="h-3.5 w-3.5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-[color:var(--color-clinic-ink)]">
+                    Rujukan Rumah Sakit & IGD Terdekat
+                  </h4>
+                  <p className="text-[10px] text-[color:var(--color-clinic-muted)]">
+                    Pemeriksaan rute navigasi dan fasilitas gawat darurat 24 jam
+                  </p>
+                </div>
+              </div>
+              <span className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-bold text-red-700 border border-red-200">
+                Siaga 24 Jam
+              </span>
+            </div>
+
+            {/* Visual Gambar Peta Interaktif Banner */}
+            <Link
+              to="/maps"
+              className="relative block overflow-hidden rounded-2xl border border-red-200/80 bg-slate-900 h-36 group cursor-pointer shadow-sm"
+            >
+              <div
+                className="absolute inset-0 bg-cover bg-center opacity-85 group-hover:scale-105 transition-transform duration-700"
+                style={{
+                  backgroundImage: `url("https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&auto=format&fit=crop&q=80")`,
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent" />
+
+              {/* Pin Radar Visual */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                <div className="relative flex items-center justify-center">
+                  <span className="animate-ping absolute inline-flex h-10 w-10 rounded-full bg-red-500 opacity-75"></span>
+                  <div className="relative grid h-9 w-9 place-items-center rounded-full bg-red-600 text-white shadow-xl border-2 border-white group-hover:scale-110 transition-transform">
+                    <MapPin className="h-4 w-4" />
+                  </div>
+                </div>
+                <span className="mt-1.5 rounded-full bg-slate-900/90 backdrop-blur-xs px-2.5 py-0.5 text-[10px] font-bold text-white shadow-md border border-white/10">
+                  Cari RS & IGD Terdekat
+                </span>
+              </div>
+
+              {/* Bottom Card Overlay Info */}
+              <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-xs">
+                <span className="flex items-center gap-1.5 text-[11px] font-medium text-white/90">
+                  <Navigation className="h-3.5 w-3.5 text-red-400" />
+                  Cek Faskes & Rute GPS Realtime
+                </span>
+                <span className="inline-flex items-center gap-1 font-bold text-amber-300 group-hover:text-amber-200 text-xs bg-black/40 px-2 py-0.5 rounded-lg backdrop-blur-xs">
+                  Buka Peta &rarr;
+                </span>
+              </div>
+            </Link>
+
+            {/* Penjelasan Ringkas & Tombol Utama */}
+            <p className="text-[11px] text-[color:var(--color-clinic-muted)] text-center leading-relaxed">
+              Berdasarkan gejala yang dipilih, Anda disarankan segera mengunjungi Instalasi Gawat Darurat (IGD). Buka fitur <strong>Peta Lokasi</strong> untuk melihat daftar lengkap rumah sakit terdekat, estimasi jarak tempuh, nomor darurat, dan panduan rute navigasi.
+            </p>
+
+            <Link
+              to="/maps"
+              className="flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold py-3 px-4 text-xs shadow-md transition group cursor-pointer"
+            >
+              <MapPin className="h-4 w-4 group-hover:scale-110 transition-transform" />
+              <span>Lihat Rekomendasi RS Terdekat di Peta Lokasi</span>
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
+        )}
+
         {/* Mandatory Medical Safety Disclaimer */}
         <div className="rounded-xl bg-amber-50/60 p-3 border border-amber-200/60 flex items-start gap-2 text-[10px] text-amber-900 leading-relaxed">
           <ShieldAlert className="h-3.5 w-3.5 shrink-0 text-amber-700 mt-0.5" />
@@ -215,10 +296,24 @@ export function AIAssessmentResultCard({
       {/* Integrated CTAs (Fixed / Sticky at Bottom) */}
       <div className="pt-3 mt-3 border-t border-black/5 flex flex-wrap items-center justify-between gap-2 shrink-0">
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          {isEmergency && (
+            <Link
+              to="/maps"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-red-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-red-700 transition"
+            >
+              <MapPin className="h-3.5 w-3.5" />
+              Peta IGD Rujukan &rarr;
+            </Link>
+          )}
+
           <Link
             to="/consultation"
             search={{ anatomy: consultationContext }}
-            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue)] px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-[color:var(--color-clinic-blue-dark)] transition"
+            className={`inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold text-white shadow-md transition ${
+              isEmergency
+                ? "bg-[color:var(--color-clinic-blue-dark)] hover:bg-[color:var(--color-clinic-ink)]"
+                : "bg-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue-dark)]"
+            }`}
           >
             <Stethoscope className="h-3.5 w-3.5" />
             Konsultasi Dokter &rarr;
