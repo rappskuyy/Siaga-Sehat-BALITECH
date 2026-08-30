@@ -212,12 +212,12 @@ async function analyzeWithGemini(data: {
     return cached.result;
   }
 
-  const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"];
+  const models = ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-2.5-pro"];
 
   let lastError: Error | null = null;
 
   for (const model of models) {
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    for (let attempt = 1; attempt <= 2; attempt++) {
       try {
         const res = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
@@ -227,6 +227,7 @@ async function analyzeWithGemini(data: {
               "Content-Type": "application/json",
               "x-goog-api-key": apiKey,
             },
+            signal: AbortSignal.timeout(15000),
             body: JSON.stringify({
               contents: [
                 {
@@ -248,6 +249,8 @@ async function analyzeWithGemini(data: {
               generationConfig: {
                 responseMimeType: "application/json",
                 responseSchema: GEMINI_RESULT_SCHEMA,
+                maxOutputTokens: 2500,
+                thinkingConfig: { thinkingBudget: 0 },
               },
             }),
           },
@@ -337,5 +340,15 @@ async function analyzeWithGemini(data: {
 export const analyzeHealthImage = createServerFn({ method: "POST" })
   .validator((data: unknown) => scanInputSchema.parse(data))
   .handler(async ({ data }): Promise<ScanResult> => {
+    const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase().trim();
+    if (provider === "openai" && process.env.OPENAI_API_KEY?.trim()) {
+      try {
+        return await analyzeWithOpenAI(data);
+      } catch (err) {
+        console.warn("OpenAI scan analysis failed, attempting Gemini fallback:", err);
+        return await analyzeWithGemini(data);
+      }
+    }
     return analyzeWithGemini(data);
   });
+

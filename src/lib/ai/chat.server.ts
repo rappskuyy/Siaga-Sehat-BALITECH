@@ -1,5 +1,97 @@
 import { createServerFn } from "@tanstack/react-start";
 
+const SYSTEM_PROMPT =
+  'Kamu adalah asisten kesehatan virtual bernama "SiagaSehat AI". Kamu melakukan konsultasi kesehatan interaktif dalam Bahasa Indonesia yang jelas, singkat, dan mudah dipahami.\n\n' +
+  "ATURAN PERCAKAPAN:\n" +
+  "- Jika pengguna baru menyebutkan gejala atau bagian tubuh yang sakit, gali informasi penting SATU per SATU (jangan tanya semua sekaligus): usia, sudah berapa lama gejala dirasakan, seberapa parah, gejala penyerta, riwayat penyakit/alergi/obat yang sedang dikonsumsi.\n" +
+  '- Setelah informasi cukup (idealnya setelah 2-4 pertanyaan), berikan ringkasan terstruktur dengan judul: "Preliminary Analysis", "Risk Assessment", dan "Health Recommendation".\n' +
+  "- Pada Health Recommendation, sertakan saran obat umum/OTC dan alternatif herbal yang aman bila relevan, serta kapan harus segera ke dokter/IGD.\n" +
+  '- Jangan pernah membuat diagnosis pasti 100% — gunakan bahasa "kemungkinan", "bisa jadi", "perlu dipastikan oleh dokter".\n' +
+  "- Jika ada tanda bahaya (nyeri dada hebat, sesak napas berat, pendarahan hebat, penurunan kesadaran, dll), segera sarankan ke IGD tanpa menunggu info lain.\n" +
+  "- Jawaban singkat, ramah, dan empatik.";
+
+async function chatWithGemini(prompt: string): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  if (!apiKey) throw new Error("GEMINI_API_KEY belum dikonfigurasi di server.");
+
+  const models = ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-2.5-pro"];
+  let lastErrText = "";
+
+  for (const model of models) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey,
+          },
+          signal: AbortSignal.timeout(12000),
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: {
+              maxOutputTokens: 1500,
+              thinkingConfig: { thinkingBudget: 0 },
+            },
+          }),
+        },
+      );
+
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        lastErrText = `Model ${model} status ${res.status}: ${txt.slice(0, 150)}`;
+        continue;
+      }
+
+      const payload = await res.json();
+      const text =
+        payload.candidates?.[0]?.content?.parts
+          ?.map((p: { text?: string }) => p.text ?? "")
+          .join("") || "";
+      if (text) return text;
+    } catch (err) {
+      lastErrText = err instanceof Error ? err.message : String(err);
+    }
+  }
+
+  throw new Error(`Gemini API tidak dapat dihubungi (${lastErrText || "semua model sibuk/error"})`);
+}
+
+async function chatWithOpenAI(prompt: string): Promise<string> {
+  const apiKey = process.env.OPENAI_API_KEY?.trim();
+  if (!apiKey) throw new Error("OPENAI_API_KEY belum dikonfigurasi di server.");
+
+  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: prompt },
+      ],
+      max_tokens: 800,
+    }),
+  });
+
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    throw new Error(`OpenAI error ${res.status}: ${txt.slice(0, 200)}`);
+  }
+
+  const payload = await res.json();
+  const text = payload.choices?.[0]?.message?.content;
+  if (!text) throw new Error("OpenAI tidak mengembalikan respon valid.");
+
+  return text;
+}
+
 export const chatWithAI = createServerFn({ method: "POST" })
   .validator((data: unknown) => {
     if (!data || typeof data !== "object") throw new Error("Invalid input");
@@ -7,64 +99,56 @@ export const chatWithAI = createServerFn({ method: "POST" })
     if (!d.prompt || typeof d.prompt !== "string") throw new Error("prompt is required");
     return d;
   })
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<{ reply: string }> => {
     const { prompt } = data as { prompt: string };
+    const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase().trim();
+    let lastError: Error | null = null;
 
-    const geminiKey = process.env.GEMINI_API_KEY?.trim();
-
-    const SYSTEM_PROMPT =
-      'Kamu adalah asisten kesehatan virtual bernama "SiagaSehat AI". Kamu melakukan konsultasi kesehatan interaktif dalam Bahasa Indonesia yang jelas, singkat, dan mudah dipahami.\n\n' +
-      "ATURAN PERCAKAPAN:\n" +
-      "- Jika pengguna baru menyebutkan gejala atau bagian tubuh yang sakit, gali informasi penting SATU per SATU (jangan tanya semua sekaligus): usia, sudah berapa lama gejala dirasakan, seberapa parah, gejala penyerta, riwayat penyakit/alergi/obat yang sedang dikonsumsi.\n" +
-      '- Setelah informasi cukup (idealnya setelah 2-4 pertanyaan), berikan ringkasan terstruktur dengan judul: "Preliminary Analysis", "Risk Assessment", dan "Health Recommendation".\n' +
-      "- Pada Health Recommendation, sertakan saran obat umum/OTC dan alternatif herbal yang aman bila relevan, serta kapan harus segera ke dokter/IGD.\n" +
-      '- Jangan pernah membuat diagnosis pasti 100% — gunakan bahasa "kemungkinan", "bisa jadi", "perlu dipastikan oleh dokter".\n' +
-      "- Jika ada tanda bahaya (nyeri dada hebat, sesak napas berat, pendarahan hebat, penurunan kesadaran, dll), segera sarankan ke IGD tanpa menunggu info lain.\n" +
-      "- Jawaban singkat, ramah, dan empatik.";
-
-    if (geminiKey) {
-      const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"];
-      let lastErrText = "";
-      for (const model of models) {
+    if (provider === "openai") {
+      if (process.env.OPENAI_API_KEY?.trim()) {
         try {
-          const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "x-goog-api-key": geminiKey,
-              },
-              body: JSON.stringify({
-                systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-                contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: { maxOutputTokens: 800 },
-              }),
-            },
-          );
-
-          if (!res.ok) {
-            const txt = await res.text().catch(() => "");
-            lastErrText = `Model ${model} status ${res.status}: ${txt.slice(0, 150)}`;
-            continue;
-          }
-
-          const payload = await res.json();
-          const text =
-            payload.candidates?.[0]?.content?.parts
-              ?.map((p: { text?: string }) => p.text ?? "")
-              .join("") || "";
-          if (text) return { reply: text };
+          const reply = await chatWithOpenAI(prompt);
+          return { reply };
         } catch (err) {
-          lastErrText = err instanceof Error ? err.message : String(err);
+          console.warn("OpenAI chat failed, trying Gemini as fallback:", err);
+          lastError = err instanceof Error ? err : new Error(String(err));
         }
       }
-      throw new Error(
-        `Gemini API tidak dapat dihubungi (${lastErrText || "semua model sibuk/error"})`,
-      );
+      if (process.env.GEMINI_API_KEY?.trim()) {
+        try {
+          const reply = await chatWithGemini(prompt);
+          return { reply };
+        } catch (err) {
+          console.error("Gemini chat fallback failed:", err);
+          lastError = err instanceof Error ? err : new Error(String(err));
+        }
+      }
+    } else {
+      // Default: Gemini first
+      if (process.env.GEMINI_API_KEY?.trim()) {
+        try {
+          const reply = await chatWithGemini(prompt);
+          return { reply };
+        } catch (err) {
+          console.warn("Gemini chat failed, trying OpenAI as fallback:", err);
+          lastError = err instanceof Error ? err : new Error(String(err));
+        }
+      }
+      if (process.env.OPENAI_API_KEY?.trim()) {
+        try {
+          const reply = await chatWithOpenAI(prompt);
+          return { reply };
+        } catch (err) {
+          console.error("OpenAI chat fallback failed:", err);
+          lastError = err instanceof Error ? err : new Error(String(err));
+        }
+      }
     }
 
-    throw new Error(
-      "GEMINI_API_KEY belum dikonfigurasi di server. Tambahkan key Gemini ke file .env lalu restart server.",
+    throw (
+      lastError ||
+      new Error(
+        "API AI belum dikonfigurasi di server. Tambahkan GEMINI_API_KEY atau OPENAI_API_KEY ke file .env lalu restart server.",
+      )
     );
   });
