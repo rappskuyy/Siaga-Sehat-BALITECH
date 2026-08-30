@@ -206,7 +206,29 @@ function ProfilePage() {
 
   return (
     <main className="min-h-screen bg-[#f7f4ee] pb-16 font-sans">
+<<<<<<< HEAD
       <SiteHeader />
+=======
+      <div className="mx-auto max-w-4xl px-4 pt-8 md:px-6">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 text-sm text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+            <BrandLogo />
+          </div>
+          <Button
+            variant="ghost"
+            onClick={handleSignOut}
+            className="gap-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700"
+          >
+            <LogOut className="h-4 w-4" /> Keluar
+          </Button>
+        </div>
+>>>>>>> 1a3057d (menambah logo)
 
       <div className="mx-auto max-w-4xl px-4 pt-6 md:px-6">
         {/* Profile hero card — banner and content are two separate, non-overlapping blocks */}

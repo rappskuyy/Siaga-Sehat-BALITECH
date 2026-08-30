@@ -32,12 +32,74 @@ export function Hero() {
               Sehat
             </h1>
 
+<<<<<<< HEAD
             <p className="mt-4 max-w-[320px] text-sm leading-relaxed text-[color:var(--color-clinic-muted)]">
               <span className="font-semibold text-[color:var(--color-clinic-ink)]">
                 Kami tidak hanya mengobati gejala
               </span>{" "}
               — kami peduli dengan setiap orang, didukung skrining AI yang cepat dan akurat.
             </p>
+=======
+        <nav className="hidden items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2 py-1.5 text-sm text-[color:var(--color-clinic-ink)] lg:flex">
+          {NAV_ITEMS.map((item) => (
+            <a
+              key={item.label}
+              href={`#${item.hash}`}
+              className="rounded-full px-4 py-1.5 transition hover:bg-white"
+            >
+              {item.label}
+            </a>
+          ))}
+          <Link
+            to="/maps"
+            className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
+          >
+            Peta Lokasi
+          </Link>
+          <Link
+            to="/consultation"
+            search={{ anatomy: undefined }}
+            className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
+          >
+            Konsultasi
+          </Link>
+          <Link
+            to="/anatomy"
+            className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
+          >
+            Anatomi
+          </Link>
+          <Link
+            to="/scanner"
+            className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue)] px-4 py-1.5 text-white transition hover:bg-[color:var(--color-clinic-blue-dark)]"
+          >
+            <ScanLine className="h-3.5 w-3.5" />
+            Scan AI
+          </Link>
+          <Link
+            to="/reminders"
+            className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
+          >
+            Pengingat Obat
+          </Link>
+          <Link
+            to={user ? "/profile" : "/login"}
+            className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
+          >
+            {user ? (
+              <>
+                <User className="h-3.5 w-3.5" />
+                {profile?.full_name?.split(" ")[0] || "Profil"}
+              </>
+            ) : (
+              <>
+                <LogIn className="h-3.5 w-3.5" />
+                Masuk
+              </>
+            )}
+          </Link>
+        </nav>
+>>>>>>> 1a3057d (menambah logo)
 
             <div className="mt-5 flex flex-wrap items-center gap-2">
               <a

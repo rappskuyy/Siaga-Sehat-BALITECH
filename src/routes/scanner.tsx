@@ -17,6 +17,7 @@ import { ImageCapture, type SelectedImage } from "@/components/scanner/ImageCapt
 import { ScanningOverlay, SCAN_STEPS } from "@/components/scanner/ScanningOverlay";
 import { ScanResultView } from "@/components/scanner/ScanResultView";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -134,11 +135,50 @@ function ScannerPage() {
     <main className="min-h-screen bg-[#f7f4ee] pb-16 font-sans">
       <SiteHeader />
       <div className="px-5 pt-4 sm:px-6 md:px-8 lg:px-10">
+<<<<<<< HEAD
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between">
           <h1 className="flex items-center gap-2 text-sm font-semibold text-[color:var(--color-clinic-ink)]">
             <ScanLine className="h-4 w-4 text-[color:var(--color-clinic-blue)]" />
             Scan AI
           </h1>
+=======
+        <header className="hex-pattern relative mx-auto flex w-full max-w-6xl items-center justify-between gap-4 overflow-hidden rounded-3xl border border-white/10 bg-[color:var(--color-clinic-blue)] px-6 py-5 shadow-md">
+          <BrandLogo inverted />
+          <nav className="hidden sm:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 rounded-full bg-white/10 p-1 text-xs font-semibold text-white whitespace-nowrap shadow-xs">
+            <Link
+              to="/maps"
+              activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue-dark)] shadow-sm" }}
+              inactiveProps={{ className: "text-white hover:bg-white/15" }}
+              className="rounded-full px-3.5 py-1.5 transition"
+            >
+              Peta Lokasi
+            </Link>
+            <Link
+              to="/anatomy"
+              activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue-dark)] shadow-sm" }}
+              inactiveProps={{ className: "text-white hover:bg-white/15" }}
+              className="rounded-full px-3.5 py-1.5 transition"
+            >
+              Anatomi
+            </Link>
+            <Link
+              to="/consultation"
+              activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue-dark)] shadow-sm" }}
+              inactiveProps={{ className: "text-white hover:bg-white/15" }}
+              className="rounded-full px-3.5 py-1.5 transition"
+            >
+              Konsultasi AI
+            </Link>
+            <Link
+              to="/scanner"
+              activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue-dark)] shadow-sm" }}
+              inactiveProps={{ className: "text-white hover:bg-white/15" }}
+              className="rounded-full px-3.5 py-1.5 transition"
+            >
+              Scan AI
+            </Link>
+          </nav>
+>>>>>>> 1a3057d (menambah logo)
           <Link
             to="/"
             className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-ink)] shadow-sm transition hover:bg-slate-50"
