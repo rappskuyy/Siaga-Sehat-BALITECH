@@ -16,20 +16,12 @@ import { useMedicineReminders } from "@/hooks/useMedicineReminders";
 import { ReminderCard } from "@/components/reminder/ReminderCard";
 import { MedicineReminderModal } from "@/components/reminder/MedicineReminderModal";
 import { ReminderNotificationManager } from "@/components/reminder/ReminderNotificationManager";
-<<<<<<< HEAD
-import { BrandLogo } from "@/components/ui/BrandLogo";
-=======
-<<<<<<< HEAD
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
 interface RemindersSearch {
   scan?: string;
   penyakit?: string;
 }
-=======
-import { BrandLogo } from "@/components/ui/BrandLogo";
->>>>>>> 1a3057d (menambah logo)
->>>>>>> dac6929
 
 export const Route = createFileRoute("/reminders")({
   validateSearch: (search: Record<string, unknown>): RemindersSearch => ({
@@ -118,9 +110,6 @@ function RemindersPage() {
             className="pointer-events-none absolute inset-0 opacity-25"
             style={{ background: "radial-gradient(60% 90% at 90% 0%, #2ee6c4, transparent)" }}
           />
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
           <div className="relative z-10 flex items-center gap-3">
             <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/15 text-white backdrop-blur">
               <Bell className="h-5.5 w-5.5" />
@@ -131,15 +120,6 @@ function RemindersPage() {
                 Pengingat minum obat, otomatis dan tepat waktu
               </p>
             </div>
-=======
->>>>>>> dac6929
-          <Link to="/" className="flex items-center gap-2.5 z-10">
-            <BrandLogo inverted />
-          </Link>
-          <div className="z-10 flex items-center gap-2">
-            <Bell className="h-5 w-5 text-white/80" />
-            <span className="font-semibold text-white text-sm">Pengingat Obat</span>
->>>>>>> 1a3057d (menambah logo)
           </div>
 
           {/* Quick stats */}

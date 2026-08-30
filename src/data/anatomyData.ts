@@ -8,8 +8,8 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "head",
     description: "Bagian atas tubuh yang memuat otak, organ sensorik, dan saraf pusat.",
     view: "both",
-    frontPosition: { x: 50, y: 8.5 },
-    backPosition: { x: 50, y: 8.5 },
+    frontPosition: { x: 50.4, y: 10.0 },
+    backPosition: { x: 50.0, y: 8.5 },
     symptoms: [
       { id: "sakit_kepala", name: "Sakit kepala berdenyut" },
       { id: "pusing", name: "Pusing / Sensasi melayang" },
@@ -63,7 +63,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "head",
     description: "Organ penglihatan sensitif terhadap iritasi, infeksi, dan kelelahan.",
     view: "front",
-    frontPosition: { x: 46, y: 11.5 },
+    frontPosition: { x: 46.2, y: 14.3 },
     symptoms: [
       { id: "mata_merah", name: "Mata merah & berair" },
       { id: "mata_gatal", name: "Gatal atau perih pada kelopak mata" },
@@ -106,7 +106,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "head",
     description: "Saluran napas atas dan rongga pembau.",
     view: "front",
-    frontPosition: { x: 50, y: 13.5 },
+    frontPosition: { x: 50.4, y: 16.9 },
     symptoms: [
       { id: "hidung_tersumbat", name: "Hidung tersumbat / mampet" },
       { id: "bersin_bersin", name: "Bersin berulang kali" },
@@ -149,8 +149,8 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "head",
     description: "Penopang kepala yang berisi tenggorokan, pita suara, dan kelenjar getah bening.",
     view: "both",
-    frontPosition: { x: 50, y: 17.5 },
-    backPosition: { x: 50, y: 17.5 },
+    frontPosition: { x: 50.5, y: 22.0 },
+    backPosition: { x: 49.5, y: 17.5 },
     symptoms: [
       { id: "nyeri_menelan", name: "Nyeri atau perih saat menelan" },
       { id: "tenggorokan_kering", name: "Tenggorokan gatal / kering" },
@@ -193,7 +193,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "torso",
     description: "Rongga utama organ pernapasan (paru-paru) dan sirkulasi darah (jantung).",
     view: "front",
-    frontPosition: { x: 50, y: 26 },
+    frontPosition: { x: 53.8, y: 28.9 },
     symptoms: [
       { id: "nyeri_dada_hebat", name: "Nyeri dada seperti tertindih beban berat", isEmergencyWarning: true },
       { id: "sesak_napas", name: "Sesak napas / Kesulitan bernapas", isEmergencyWarning: true },
@@ -236,7 +236,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "torso",
     description: "Rongga abdomen yang menampung lambung, hati, usus, dan usus buntu.",
     view: "front",
-    frontPosition: { x: 50, y: 38 },
+    frontPosition: { x: 50.5, y: 33.3 },
     symptoms: [
       { id: "nyeri_ulu_hati", name: "Nyeri / perih di ulu hati" },
       { id: "kram_perut", name: "Kram atau melilit pada perut" },
@@ -288,8 +288,8 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "limbs",
     description: "Ekstremitas atas kiri meliputi bahu, siku, dan jari tangan.",
     view: "both",
-    frontPosition: { x: 30, y: 34 },
-    backPosition: { x: 70, y: 34 },
+    frontPosition: { x: 71.4, y: 37.0 },
+    backPosition: { x: 26.3, y: 38.1 },
     symptoms: [
       { id: "pegal_lengan", name: "Nyeri atau pegal pada otot lengan" },
       { id: "kesemutan_tangan", name: "Kesemutan atau kebas di jari tangan" },
@@ -331,8 +331,8 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "limbs",
     description: "Ekstremitas atas kanan meliputi bahu, siku, dan jari tangan.",
     view: "both",
-    frontPosition: { x: 70, y: 34 },
-    backPosition: { x: 30, y: 34 },
+    frontPosition: { x: 29.8, y: 36.4 },
+    backPosition: { x: 72.5, y: 38.2 },
     symptoms: [
       { id: "pegal_lengan_r", name: "Nyeri atau pegal pada otot lengan kanan" },
       { id: "kesemutan_tangan_r", name: "Kesemutan atau kebas di jari tangan kanan" },
@@ -365,7 +365,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "back",
     description: "Area tulang belakang bagian atas, belikat, dan leher belakang.",
     view: "back",
-    backPosition: { x: 50, y: 26 },
+    backPosition: { x: 49.5, y: 26.0 },
     symptoms: [
       { id: "nyeri_punggung_atas", name: "Pegel / kaku di punggung atas & belikat" },
       { id: "nyeri_leher_belakang", name: "Tengkuk leher terasa berat" },
@@ -389,7 +389,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "back",
     description: "Area tulang belakang bawah, pinggang, dan posisi ginjal.",
     view: "back",
-    backPosition: { x: 50, y: 39 },
+    backPosition: { x: 49.5, y: 39.0 },
     symptoms: [
       { id: "nyeri_pinggang_bawah", name: "Nyeri pinggang bawah (Low Back Pain)" },
       { id: "nyeri_menjalar_kaki", name: "Nyeri menjalar dari pinggang hingga ke kaki" },
@@ -430,8 +430,8 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "torso",
     description: "Area sendi panggul dan bokong.",
     view: "both",
-    frontPosition: { x: 50, y: 48 },
-    backPosition: { x: 50, y: 48 },
+    frontPosition: { x: 55.3, y: 42.1 },
+    backPosition: { x: 50.0, y: 48.0 },
     symptoms: [
       { id: "nyeri_panggul", name: "Nyeri pada sendi panggul saat berjalan" },
       { id: "kaku_bokong", name: "Pegal & kaku pada bokong" },
@@ -454,8 +454,8 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "limbs",
     description: "Sendi lutut dan paha sebelah kiri.",
     view: "both",
-    frontPosition: { x: 43, y: 72 },
-    backPosition: { x: 57, y: 74 },
+    frontPosition: { x: 61.0, y: 60.1 },
+    backPosition: { x: 39.1, y: 60.6 },
     symptoms: [
       { id: "nyeri_lutut", name: "Nyeri / gemertak pada lutut saat menekuk" },
       { id: "bengkak_lutut", name: "Pembengkakan pada sendi lutut" },
@@ -488,8 +488,8 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "limbs",
     description: "Sendi lutut dan paha sebelah kanan.",
     view: "both",
-    frontPosition: { x: 57, y: 72 },
-    backPosition: { x: 43, y: 74 },
+    frontPosition: { x: 41.6, y: 60.5 },
+    backPosition: { x: 59.2, y: 61.1 },
     symptoms: [
       { id: "nyeri_lutut_r", name: "Nyeri / gemertak pada lutut kanan saat menekuk" },
       { id: "bengkak_lutut_r", name: "Pembengkakan pada sendi lutut kanan" },
@@ -513,8 +513,8 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "limbs",
     description: "Area tumit, pergelangan kaki, dan jempol kaki.",
     view: "both",
-    frontPosition: { x: 50, y: 92 },
-    backPosition: { x: 50, y: 92 },
+    frontPosition: { x: 62.5, y: 78.9 },
+    backPosition: { x: 60.6, y: 82.0 },
     symptoms: [
       { id: "bengkak_pergelangan", name: "Pembengkakan pada pergelangan kaki" },
       { id: "asam_urat_jempol", name: "Nyeri tajam & merah pada sendi jempol kaki" },

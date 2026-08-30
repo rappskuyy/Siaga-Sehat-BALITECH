@@ -812,79 +812,7 @@ export function DedicatedMapsView() {
       {/* ========================================================================= */}
       {/* 01. INTEGRATED WEBSITE HEADER NAVBAR (shared across the whole app)        */}
       {/* ========================================================================= */}
-<<<<<<< HEAD
       <SiteHeader />
-=======
-      <header className="bg-white border-b border-[#E5E7EB] px-4 py-3 sm:px-6 sm:py-4 md:px-10 sticky top-0 z-50 shadow-2xs">
-        <div className="max-w-[1700px] mx-auto relative flex items-center justify-between gap-3">
-          <BrandLogo />
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 p-1 text-xs font-medium text-[color:var(--color-clinic-ink)] whitespace-nowrap shadow-xs">
-            <Link
-              to="/"
-              className="rounded-full px-3 py-1.5 transition hover:bg-white/80 hover:text-[color:var(--color-clinic-blue)] text-[color:var(--color-clinic-ink)]"
-            >
-              Beranda
-            </Link>
-            <Link
-              to="/maps"
-              activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue)] font-bold shadow-xs" }}
-              inactiveProps={{ className: "text-[color:var(--color-clinic-ink)] hover:bg-white/70" }}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition"
-            >
-              <MapPin className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)]" />
-              Peta Lokasi
-            </Link>
-            <Link
-              to="/consultation"
-              activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue)] font-bold shadow-xs" }}
-              inactiveProps={{ className: "text-[color:var(--color-clinic-ink)] hover:bg-white/70" }}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition"
-            >
-              Konsultasi
-            </Link>
-            <Link
-              to="/anatomy"
-              activeProps={{ className: "bg-white text-[color:var(--color-clinic-blue)] font-bold shadow-xs" }}
-              inactiveProps={{ className: "text-[color:var(--color-clinic-ink)] hover:bg-white/70" }}
-              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 transition"
-            >
-              Anatomi
-            </Link>
-            <Link
-              to="/scanner"
-              activeProps={{ className: "bg-[color:var(--color-clinic-blue-dark)] text-white font-bold shadow-xs" }}
-              inactiveProps={{ className: "bg-[color:var(--color-clinic-blue)] text-white hover:bg-[color:var(--color-clinic-blue-dark)]" }}
-              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-semibold transition"
-            >
-              <ScanLine className="h-3.5 w-3.5" />
-              Scan AI
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            {!user ? (
-              <Link
-                to="/login"
-                className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue)] px-3.5 py-1.5 text-xs font-semibold text-white shadow-md transition hover:bg-[color:var(--color-clinic-blue-dark)]"
-              >
-                <LogIn className="h-3.5 w-3.5" />
-                Masuk
-              </Link>
-            ) : (
-              <Link
-                to="/profile"
-                className="h-9 w-9 items-center justify-center rounded-full bg-[color:var(--color-clinic-ink)] text-white transition hover:bg-black/80 flex"
-                aria-label="Profil"
-              >
-                <User className="h-4 w-4" />
-              </Link>
-            )}
-          </div>
-        </div>
-      </header>
->>>>>>> 1a3057d (menambah logo)
 
       {/* ========================================================================= */}
       {/* 02. MAIN RESPONSIVE PAGE CONTAINER                                       */}

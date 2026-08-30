@@ -3,7 +3,6 @@ import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowLeft,
-  Bone,
   Loader2,
   Phone,
   Send,
@@ -16,18 +15,9 @@ import {
 import { chatWithAI } from "@/lib/ai/chat.server";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
-import { BodyPainSelector } from "@/components/scanner/BodyPainSelector";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
 export const Route = createFileRoute("/consultation")({
@@ -40,7 +30,7 @@ export const Route = createFileRoute("/consultation")({
       {
         name: "description",
         content:
-          "Konsultasi interaktif dengan asisten kesehatan AI SiagaSehat. Pilih bagian tubuh yang sakit langsung dari peta tubuh, lalu jelaskan gejalamu.",
+          "Konsultasi interaktif dengan asisten kesehatan AI SiagaSehat. Jelaskan keluhan atau gejala Anda dan dapatkan analisis kesehatan terpercaya.",
       },
     ],
   }),
@@ -48,12 +38,6 @@ export const Route = createFileRoute("/consultation")({
 });
 
 type ChatMessage = { role: "user" | "assistant"; text: string };
-
-const SEVERITY_OPTIONS: Array<{ label: string; value: string }> = [
-  { label: "Ringan", value: "ringan" },
-  { label: "Sedang", value: "sedang" },
-  { label: "Berat", value: "berat" },
-];
 
 function ChatBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
@@ -80,8 +64,6 @@ function ConsultationPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [bodySheetOpen, setBodySheetOpen] = useState(false);
-  const [selectedPart, setSelectedPart] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const initialContextSent = useRef(false);
 
@@ -129,16 +111,6 @@ function ConsultationPage() {
     await sendMessage(text);
   };
 
-  const handleSelectBodyPart = async (label: string) => {
-    setSelectedPart(label);
-    setBodySheetOpen(false);
-    await sendMessage(`Saya merasa sakit di bagian: ${label}.`);
-  };
-
-  const handleSeverity = async (severityLabel: string) => {
-    await sendMessage(`Tingkat rasa sakitnya: ${severityLabel}.`);
-  };
-
   useEffect(() => {
     if (!anatomy || initialContextSent.current) return;
 
@@ -178,7 +150,7 @@ function ConsultationPage() {
       supabase
         .from("consultation_history")
         .insert({
-          body_part: selectedPart,
+          body_part: null,
           pain_level: null,
           detail: null,
           messages,
@@ -252,7 +224,7 @@ function ConsultationPage() {
           {messages.length === 0 && (
             <div className="flex h-full flex-col items-center justify-center gap-2 text-center text-sm text-[color:var(--color-clinic-muted)]">
               <Sparkles className="h-6 w-6 text-[color:var(--color-clinic-blue)]" />
-              <p>Mulai dengan menuliskan gejalamu, atau pilih bagian tubuh yang sakit di bawah.</p>
+              <p>Mulai percakapan dengan menuliskan keluhan atau pertanyaan kesehatanmu di bawah.</p>
             </div>
           )}
           {messages.map((m, i) => (
@@ -269,52 +241,8 @@ function ConsultationPage() {
           )}
         </div>
 
-        {/* Quick severity chips shown after a body part is selected */}
-        {selectedPart && (
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-xs text-[color:var(--color-clinic-muted)]">
-              Seberapa sakit di {selectedPart}?
-            </span>
-            {SEVERITY_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => handleSeverity(opt.label)}
-                disabled={loading}
-                className="rounded-full border border-[color:var(--color-clinic-blue)]/30 bg-white px-3 py-1 text-xs font-medium text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue-soft)] disabled:opacity-50"
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        )}
-
         {/* Input row */}
         <div className="mt-3 flex items-end gap-2">
-          <Sheet open={bodySheetOpen} onOpenChange={setBodySheetOpen}>
-            <SheetTrigger asChild>
-              <Button
-                type="button"
-                variant="outline"
-                className="h-11 shrink-0 gap-2 rounded-full border-[color:var(--color-clinic-blue)]/30 text-[color:var(--color-clinic-blue)]"
-              >
-                <Bone className="h-4 w-4" />
-                <span className="hidden sm:inline">Bagian Tubuh</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-3xl">
-              <SheetHeader>
-                <SheetTitle>Pilih Bagian Tubuh yang Sakit</SheetTitle>
-                <SheetDescription>
-                  Ketuk area yang terasa sakit pada gambar tubuh. Pilihanmu akan langsung dikirim ke
-                  chat AI.
-                </SheetDescription>
-              </SheetHeader>
-              <div className="mt-4 flex justify-center pb-4">
-                <BodyPainSelector onSelectPart={handleSelectBodyPart} selectedPartId={null} />
-              </div>
-            </SheetContent>
-          </Sheet>
-
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}

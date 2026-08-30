@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import type { AIAssessmentResult, AnatomyRegion } from "@/lib/anatomy/types";
-import { ANATOMY_REGIONS } from "@/data/anatomyData";
 import { assessHealthAnatomy } from "@/lib/anatomy/anatomy.server";
 import { AnatomyViewer } from "./AnatomyViewer";
+import { AnatomyGuideCard } from "./AnatomyGuideCard";
 import { SymptomSelectorCard } from "./SymptomSelectorCard";
 import { AIAssessmentResultCard } from "./AIAssessmentResultCard";
-import { AlertCircle, Activity, Sparkles } from "lucide-react";
+import { AlertCircle, Activity } from "lucide-react";
 
 export function AnatomyExplorer() {
   const assessFn = useServerFn(assessHealthAnatomy);
 
-  const [selectedRegion, setSelectedRegion] = useState<AnatomyRegion>(ANATOMY_REGIONS[0]); // Default: Kepala
+  // Initial state is null: user sees the Step-by-Step Guide Card until a body part is clicked
+  const [selectedRegion, setSelectedRegion] = useState<AnatomyRegion | null>(null);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const [additionalNotes, setAdditionalNotes] = useState<string>("");
@@ -20,7 +21,7 @@ export function AnatomyExplorer() {
   const [assessmentResult, setAssessmentResult] = useState<AIAssessmentResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Switch region handler
+  // Switch / Select region handler
   const handleSelectRegion = (region: AnatomyRegion) => {
     setSelectedRegion(region);
     setSelectedSymptoms([]);
@@ -47,8 +48,9 @@ export function AnatomyExplorer() {
     );
   };
 
-  // Reset current selection
+  // Reset back to guide / initial state
   const handleReset = () => {
+    setSelectedRegion(null);
     setSelectedSymptoms([]);
     setSelectedConditions([]);
     setAdditionalNotes("");
@@ -58,6 +60,11 @@ export function AnatomyExplorer() {
 
   // Trigger AI assessment call
   const handleAnalyze = async () => {
+    if (!selectedRegion) {
+      setErrorMessage("Silakan pilih bagian tubuh pada model anatomi terlebih dahulu.");
+      return;
+    }
+
     if (selectedSymptoms.length === 0 && selectedConditions.length === 0) {
       setErrorMessage("Silakan pilih minimal 1 gejala atau kondisi sebelum memulai analisis.");
       return;
@@ -77,13 +84,26 @@ export function AnatomyExplorer() {
         },
       });
       setAssessmentResult(result);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Gagal melakukan AI Health Assessment:", err);
-      setErrorMessage(
-        err instanceof Error
-          ? err.message
-          : "Terjadi kesalahan saat memproses analisis. Silakan coba lagi beberapa saat lagi.",
-      );
+
+      let message = "Terjadi kesalahan saat memproses analisis. Silakan coba lagi beberapa saat lagi.";
+      const rawText = err instanceof Error ? err.message : String(err || "");
+
+      try {
+        const parsed = JSON.parse(rawText);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          message = parsed.map((item: { message?: string }) => item.message || "").filter(Boolean).join(", ");
+        } else if (parsed && typeof parsed === "object" && parsed.message) {
+          message = parsed.message;
+        }
+      } catch {
+        if (rawText && !rawText.startsWith("{") && !rawText.startsWith("[")) {
+          message = rawText;
+        }
+      }
+
+      setErrorMessage(message || "Terjadi kesalahan saat memproses analisis.");
     } finally {
       setIsLoading(false);
     }
@@ -105,18 +125,18 @@ export function AnatomyExplorer() {
         </p>
       </div>
 
-      {/* Main 2-Column Responsive Layout: Left (Symptoms / Result) & Right (Anatomy Viewer) */}
-      <div className="grid gap-6 lg:grid-cols-12 items-start">
-        {/* Left Column: Symptom Selector OR AI Assessment Result (Col Span 7) */}
-        <div className="lg:col-span-7 w-full">
+      {/* Main 2-Column Responsive Layout: Left (Guide / Symptoms / Result) & Right (Anatomy Viewer) */}
+      <div className="grid gap-6 lg:grid-cols-12 items-stretch">
+        {/* Left Column: Step-by-Step Guide OR Symptom Selector OR AI Assessment Result (Col Span 6) */}
+        <div className="lg:col-span-6 w-full flex flex-col h-full">
           {errorMessage && (
-            <div className="mb-4 flex items-start gap-2.5 rounded-2xl bg-red-50 p-4 text-xs font-medium text-red-700 border border-red-200 shadow-sm animate-fade-up">
+            <div className="mb-4 flex items-start gap-2.5 rounded-2xl bg-red-50 p-4 text-xs font-medium text-red-700 border border-red-200 shadow-sm animate-fade-up shrink-0">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
               <div>{errorMessage}</div>
             </div>
           )}
 
-          {assessmentResult ? (
+          {assessmentResult && selectedRegion ? (
             <AIAssessmentResultCard
               result={assessmentResult}
               regionName={selectedRegion.nameIndonesian}
@@ -125,7 +145,7 @@ export function AnatomyExplorer() {
               additionalNotes={additionalNotes}
               onReset={handleReset}
             />
-          ) : (
+          ) : selectedRegion ? (
             <SymptomSelectorCard
               region={selectedRegion}
               selectedSymptoms={selectedSymptoms}
@@ -138,11 +158,13 @@ export function AnatomyExplorer() {
               onAnalyze={handleAnalyze}
               isLoading={isLoading}
             />
+          ) : (
+            <AnatomyGuideCard onSelectRegion={handleSelectRegion} />
           )}
         </div>
 
-        {/* Right Column: Interactive Anatomy Viewer (Col Span 5) */}
-        <div className="lg:col-span-5 w-full">
+        {/* Right Column: Interactive Anatomy Viewer (Col Span 6) */}
+        <div className="lg:col-span-6 w-full flex flex-col h-full">
           <AnatomyViewer
             selectedRegion={selectedRegion}
             onSelectRegion={handleSelectRegion}

@@ -489,51 +489,105 @@ const aiSearchInputSchema = z.object({
 });
 
 /**
- * 3. Gemini AI Search Server Function (Fallback)
+ * 3. AI Facility Search Server Function (Gemini + OpenAI Fallback)
  */
 export const searchPharmaciesWithAI = createServerFn({ method: "POST" })
   .validator((data: unknown) => aiSearchInputSchema.parse(data))
   .handler(async ({ data }): Promise<PharmacyNode[]> => {
     const { lat, lon, address } = data;
-    const apiKey = process.env.GEMINI_API_KEY?.trim();
-    if (!apiKey) return [];
+    const geminiKey = process.env.GEMINI_API_KEY?.trim();
+    const openaiKey = process.env.OPENAI_API_KEY?.trim();
+    const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase().trim();
 
-    const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"];
     const systemPrompt = `Anda adalah sistem direktori apotek dan fasilitas kesehatan lokal di Indonesia. 
 Berikan daftar 8 fasilitas kesehatan (Apotek / Klinik / RS) terdekat nyata di sekitar koordinat [${lat}, ${lon}] (${address || "Indonesia"}).
 Kembalikan HANYA JSON array dengan struktur:
 [{"id":"APOTEK-01","lat":-6.23,"lon":106.98,"name":"Nama Fasilitas","address":"Alamat Lengkap","isOpenNow":true,"openingHoursText":"Buka 24 Jam","phone":"021-xxxx"}]`;
 
-    for (const model of models) {
-      try {
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ role: "user", parts: [{ text: `Temukan fasilitas terdekat di sekitar [${lat}, ${lon}].` }] }],
-              systemInstruction: { parts: [{ text: systemPrompt }] },
-              generationConfig: { temperature: 0.1, responseMimeType: "application/json" },
-            }),
+    const runGemini = async (): Promise<PharmacyNode[]> => {
+      if (!geminiKey) return [];
+      const models = ["gemini-2.5-flash", "gemini-3.6-flash", "gemini-flash-latest", "gemini-2.5-pro"];
+      for (const model of models) {
+        try {
+          const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ role: "user", parts: [{ text: `Temukan fasilitas terdekat di sekitar [${lat}, ${lon}].` }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: { temperature: 0.1, responseMimeType: "application/json" },
+              }),
+            }
+          );
+          if (!res.ok) continue;
+          const responseJson = await res.json();
+          const text = responseJson.candidates?.[0]?.content?.parts?.map((p: any) => p.text ?? "").join("");
+          if (!text) continue;
+          const items = JSON.parse(text);
+          if (Array.isArray(items) && items.length > 0) {
+            return items.map((item: any, idx: number) => {
+              const itemLat = typeof item.lat === "number" ? item.lat : lat + (idx + 1) * 0.003;
+              const itemLon = typeof item.lon === "number" ? item.lon : lon + (idx + 1) * 0.003;
+              const calcDistance = haversineDistance([lat, lon], [itemLat, itemLon]);
+              return {
+                id: item.id || `env-api-${idx}`,
+                lat: itemLat,
+                lon: itemLon,
+                name: item.name || `Apotek Terdekat ${idx + 1}`,
+                address: item.address || address || "Alamat Terdekat",
+                distanceKm: Number(calcDistance.toFixed(2)),
+                isOpenNow: typeof item.isOpenNow === "boolean" ? item.isOpenNow : true,
+                openingStatus: "open",
+                openingHoursText: item.openingHoursText || "Buka 24 Jam",
+                phone: item.phone,
+                facilityType: detectFacilityType(item.name || ""),
+                _dataSource: "gemini",
+                _dataSourceLabel: "AI Gemini (Terverifikasi)",
+                _trustScore: 6,
+              };
+            });
           }
-        );
+        } catch {
+          // continue
+        }
+      }
+      return [];
+    };
 
-        if (!res.ok) continue;
-
-        const responseJson = await res.json();
-        const text = responseJson.candidates?.[0]?.content?.parts?.map((p: any) => p.text ?? "").join("");
-        if (!text) continue;
-
-        const items = JSON.parse(text);
-        if (Array.isArray(items) && items.length > 0) {
-          const results: PharmacyNode[] = items.map((item: any, idx: number) => {
+    const runOpenAI = async (): Promise<PharmacyNode[]> => {
+      if (!openaiKey) return [];
+      try {
+        const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${openaiKey}`,
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: `Temukan fasilitas terdekat di sekitar [${lat}, ${lon}].` },
+            ],
+            response_format: { type: "json_object" },
+          }),
+        });
+        if (!res.ok) return [];
+        const payload = await res.json();
+        const content = payload.choices?.[0]?.message?.content;
+        if (!content) return [];
+        const parsed = JSON.parse(content);
+        const list = Array.isArray(parsed) ? parsed : parsed.facilities || parsed.results || Object.values(parsed)[0];
+        if (Array.isArray(list) && list.length > 0) {
+          return list.map((item: any, idx: number) => {
             const itemLat = typeof item.lat === "number" ? item.lat : lat + (idx + 1) * 0.003;
             const itemLon = typeof item.lon === "number" ? item.lon : lon + (idx + 1) * 0.003;
             const calcDistance = haversineDistance([lat, lon], [itemLat, itemLon]);
-
             return {
-              id: item.id || `env-api-${idx}`,
+              id: item.id || `env-api-openai-${idx}`,
               lat: itemLat,
               lon: itemLon,
               name: item.name || `Apotek Terdekat ${idx + 1}`,
@@ -545,20 +599,36 @@ Kembalikan HANYA JSON array dengan struktur:
               phone: item.phone,
               facilityType: detectFacilityType(item.name || ""),
               _dataSource: "gemini",
-              _dataSourceLabel: "AI Gemini (Terverifikasi)",
+              _dataSourceLabel: "AI Search (Terverifikasi)",
               _trustScore: 6,
             };
           });
-
-          results.sort((a, b) => a.distanceKm - b.distanceKm);
-          return results;
         }
       } catch {
         // continue
       }
-    }
+      return [];
+    };
 
-    return [];
+    if (provider === "openai") {
+      const openAiRes = await runOpenAI();
+      if (openAiRes.length > 0) {
+        openAiRes.sort((a, b) => a.distanceKm - b.distanceKm);
+        return openAiRes;
+      }
+      const geminiRes = await runGemini();
+      geminiRes.sort((a, b) => a.distanceKm - b.distanceKm);
+      return geminiRes;
+    } else {
+      const geminiRes = await runGemini();
+      if (geminiRes.length > 0) {
+        geminiRes.sort((a, b) => a.distanceKm - b.distanceKm);
+        return geminiRes;
+      }
+      const openAiRes = await runOpenAI();
+      openAiRes.sort((a, b) => a.distanceKm - b.distanceKm);
+      return openAiRes;
+    }
   });
 
 const placePhotoInputSchema = z.object({
@@ -569,50 +639,84 @@ const placePhotoInputSchema = z.object({
 });
 
 /**
- * 4. Gemini AI Place Photo Resolver Server Function
- * Uses GEMINI_API_KEY from .env to search and return exact Google Maps place photo URL
+ * 4. AI Place Photo & Review Resolver Server Function
  */
 export const fetchPlacePhotoWithGeminiAI = createServerFn({ method: "POST" })
   .validator((data: unknown) => placePhotoInputSchema.parse(data))
   .handler(async ({ data }): Promise<{ photoUrl: string | null; reviewText: string | null }> => {
     const { name, address, lat, lon } = data;
-    const apiKey = process.env.GEMINI_API_KEY?.trim();
-    if (!apiKey) return { photoUrl: null, reviewText: null };
+    const geminiKey = process.env.GEMINI_API_KEY?.trim();
+    const openaiKey = process.env.OPENAI_API_KEY?.trim();
 
-    const models = ["gemini-2.0-flash", "gemini-1.5-flash"];
     const systemPrompt = `Anda adalah sistem pencari foto resmi Google Maps untuk tempat di Indonesia.
 Diberikan nama tempat: "${name}", alamat: "${address || ""}", lokasi: [${lat}, ${lon}].
 Tugas Anda: Cari dan berikan URL foto tampak depan resmi atau link gambar Google Maps resmi untuk tempat tersebut, beserta 1 kalimat ulasan nyata pengunjung.
 Jawab HANYA dalam JSON:
 {"photoUrl":"URL_GGMAPS_PHOTO_ATAU_NULL","reviewText":"ULASAN_SANGAT_BAGUS_1_KALIMAT"}`;
 
-    for (const model of models) {
-      try {
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ role: "user", parts: [{ text: `Cari foto gmaps tampak depan untuk tempat "${name}" di ${address || "Indonesia"}.` }] }],
-              systemInstruction: { parts: [{ text: systemPrompt }] },
-              generationConfig: { temperature: 0.1, responseMimeType: "application/json" },
-            }),
+    if (geminiKey) {
+      const models = ["gemini-2.5-flash", "gemini-3.6-flash", "gemini-flash-latest"];
+      for (const model of models) {
+        try {
+          const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ role: "user", parts: [{ text: `Cari foto gmaps tampak depan untuk tempat "${name}" di ${address || "Indonesia"}.` }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: { temperature: 0.1, responseMimeType: "application/json" },
+              }),
+            }
+          );
+          if (!res.ok) continue;
+          const responseJson = await res.json();
+          const text = responseJson.candidates?.[0]?.content?.parts?.map((p: any) => p.text ?? "").join("");
+          if (!text) continue;
+          const result = JSON.parse(text);
+          if (result && typeof result === "object") {
+            return {
+              photoUrl: result.photoUrl && typeof result.photoUrl === "string" && result.photoUrl.startsWith("http") ? result.photoUrl : null,
+              reviewText: result.reviewText && typeof result.reviewText === "string" ? result.reviewText : null,
+            };
           }
-        );
+        } catch {
+          // continue
+        }
+      }
+    }
 
-        if (!res.ok) continue;
-
-        const responseJson = await res.json();
-        const text = responseJson.candidates?.[0]?.content?.parts?.map((p: any) => p.text ?? "").join("");
-        if (!text) continue;
-
-        const result = JSON.parse(text);
-        if (result && typeof result === "object") {
-          return {
-            photoUrl: result.photoUrl && typeof result.photoUrl === "string" && result.photoUrl.startsWith("http") ? result.photoUrl : null,
-            reviewText: result.reviewText && typeof result.reviewText === "string" ? result.reviewText : null,
-          };
+    if (openaiKey) {
+      try {
+        const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${openaiKey}`,
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: `Cari foto gmaps tampak depan untuk tempat "${name}" di ${address || "Indonesia"}.` },
+            ],
+            response_format: { type: "json_object" },
+          }),
+        });
+        if (res.ok) {
+          const payload = await res.json();
+          const content = payload.choices?.[0]?.message?.content;
+          if (content) {
+            const result = JSON.parse(content);
+            if (result && typeof result === "object") {
+              return {
+                photoUrl: result.photoUrl && typeof result.photoUrl === "string" && result.photoUrl.startsWith("http") ? result.photoUrl : null,
+                reviewText: result.reviewText && typeof result.reviewText === "string" ? result.reviewText : null,
+              };
+            }
+          }
         }
       } catch {
         // continue
