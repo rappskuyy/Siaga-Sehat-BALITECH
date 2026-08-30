@@ -2,13 +2,21 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { AIAssessmentResult, AssessmentInput } from "./types";
 
-const assessmentInputSchema = z.object({
-  regionId: z.string().min(1),
-  regionName: z.string().min(1),
-  symptoms: z.array(z.string()).min(1),
-  selectedConditions: z.array(z.string()).default([]),
-  additionalNotes: z.string().optional().default(""),
-});
+const assessmentInputSchema = z
+  .object({
+    regionId: z.string().min(1, "ID bagian tubuh wajib diisi"),
+    regionName: z.string().min(1, "Nama bagian tubuh wajib diisi"),
+    symptoms: z.array(z.string()).default([]),
+    selectedConditions: z.array(z.string()).default([]),
+    additionalNotes: z.string().optional().default(""),
+  })
+  .refine(
+    (data) => data.symptoms.length > 0 || data.selectedConditions.length > 0,
+    {
+      message: "Silakan pilih minimal 1 gejala atau kondisi terkait sebelum memulai analisis.",
+      path: ["symptoms"],
+    },
+  );
 
 const SYSTEM_PROMPT = `Kamu adalah AI Health Assessment Assistant untuk platform "SiagaSehat".
 Tugasmu adalah menganalisis kombinasi bagian tubuh, gejala yang dialami pengguna, kondisi terkait yang dipilih, dan informasi tambahan.
@@ -52,15 +60,25 @@ async function assessWithGemini(input: AssessmentInput): Promise<AIAssessmentRes
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) throw new Error("GEMINI_API_KEY belum dikonfigurasi di server.");
 
+  const symptomsList =
+    input.symptoms && input.symptoms.length > 0
+      ? input.symptoms.join(", ")
+      : "Tidak ada gejala spesifik (hanya kondisi/keluhan umum)";
+
+  const conditionsList =
+    input.selectedConditions && input.selectedConditions.length > 0
+      ? input.selectedConditions.join(", ")
+      : "Tidak ada";
+
   const userPrompt = `
 Bagian Tubuh: ${input.regionName} (ID: ${input.regionId})
-Gejala Terpilih: ${input.symptoms.join(", ")}
-Kondisi Terkait Terpilih: ${input.selectedConditions.length > 0 ? input.selectedConditions.join(", ") : "Tidak ada"}
+Gejala Terpilih: ${symptomsList}
+Kondisi Terkait Terpilih: ${conditionsList}
 Catatan Tambahan Pengguna: ${input.additionalNotes || "Tidak ada"}
 
 Tolong lakukan AI Health Assessment dan kembalikan JSON sesuai skema yang ditentukan.`;
 
-  const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"];
+  const models = ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-2.5-pro"];
   let lastErr = "";
 
   for (const model of models) {
@@ -73,12 +91,14 @@ Tolong lakukan AI Health Assessment dan kembalikan JSON sesuai skema yang ditent
             "Content-Type": "application/json",
             "x-goog-api-key": apiKey,
           },
+          signal: AbortSignal.timeout(12000),
           body: JSON.stringify({
             systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
             contents: [{ role: "user", parts: [{ text: userPrompt }] }],
             generationConfig: {
               responseMimeType: "application/json",
-              maxOutputTokens: 1000,
+              maxOutputTokens: 2500,
+              thinkingConfig: { thinkingBudget: 0 },
             },
           }),
         },
@@ -108,10 +128,20 @@ async function assessWithOpenAI(input: AssessmentInput): Promise<AIAssessmentRes
   if (!apiKey) throw new Error("OPENAI_API_KEY belum dikonfigurasi di server.");
 
   const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const symptomsList =
+    input.symptoms && input.symptoms.length > 0
+      ? input.symptoms.join(", ")
+      : "Tidak ada gejala spesifik (hanya kondisi/keluhan umum)";
+
+  const conditionsList =
+    input.selectedConditions && input.selectedConditions.length > 0
+      ? input.selectedConditions.join(", ")
+      : "Tidak ada";
+
   const userPrompt = `
 Bagian Tubuh: ${input.regionName} (ID: ${input.regionId})
-Gejala Terpilih: ${input.symptoms.join(", ")}
-Kondisi Terkait Terpilih: ${input.selectedConditions.length > 0 ? input.selectedConditions.join(", ") : "Tidak ada"}
+Gejala Terpilih: ${symptomsList}
+Kondisi Terkait Terpilih: ${conditionsList}
 Catatan Tambahan Pengguna: ${input.additionalNotes || "Tidak ada"}
 
 Tolong lakukan AI Health Assessment dan kembalikan JSON.`;
@@ -176,47 +206,63 @@ function parseResultJson(jsonString: string): AIAssessmentResult {
 }
 
 export const assessHealthAnatomy = createServerFn({ method: "POST" })
-  .validator((data: unknown) => assessmentInputSchema.parse(data))
+  .validator((data: unknown) => {
+    const parsed = assessmentInputSchema.safeParse(data);
+    if (!parsed.success) {
+      const errorMsg =
+        parsed.error.errors.map((e) => e.message).join(", ") ||
+        "Data input tidak valid.";
+      throw new Error(errorMsg);
+    }
+    return parsed.data;
+  })
   .handler(async ({ data }): Promise<AIAssessmentResult> => {
     const input = data as AssessmentInput;
-    if (process.env.GEMINI_API_KEY?.trim()) {
-      try {
-        return await assessWithGemini(input);
-      } catch (err) {
-        console.warn("Gemini assessment failed, trying OpenAI:", err);
+    const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase().trim();
+    let lastError: Error | null = null;
+
+    if (provider === "openai") {
+      if (process.env.OPENAI_API_KEY?.trim()) {
+        try {
+          return await assessWithOpenAI(input);
+        } catch (err) {
+          console.warn("OpenAI assessment failed, trying Gemini as fallback:", err);
+          lastError = err instanceof Error ? err : new Error(String(err));
+        }
+      }
+      if (process.env.GEMINI_API_KEY?.trim()) {
+        try {
+          return await assessWithGemini(input);
+        } catch (err) {
+          console.error("Gemini assessment fallback failed:", err);
+          lastError = err instanceof Error ? err : new Error(String(err));
+        }
+      }
+    } else {
+      // Default: Gemini first
+      if (process.env.GEMINI_API_KEY?.trim()) {
+        try {
+          return await assessWithGemini(input);
+        } catch (err) {
+          console.warn("Gemini assessment failed, trying OpenAI as fallback:", err);
+          lastError = err instanceof Error ? err : new Error(String(err));
+        }
+      }
+      if (process.env.OPENAI_API_KEY?.trim()) {
+        try {
+          return await assessWithOpenAI(input);
+        } catch (err) {
+          console.error("OpenAI assessment fallback failed:", err);
+          lastError = err instanceof Error ? err : new Error(String(err));
+        }
       }
     }
 
-    if (process.env.OPENAI_API_KEY?.trim()) {
-      return await assessWithOpenAI(input);
-    }
-
-    // Fallback static mock result if no API keys are set in environment
-    return {
-      summary: `Analisis awal untuk bagian tubuh ${input.regionName}. Kombinasi gejala yang Anda pilih (${input.symptoms.slice(0, 2).join(", ")}) menunjukkan pola inflamasi atau iritasi lokal.`,
-      primaryCondition: {
-        name: input.selectedConditions[0] || `${input.regionName} Sensitivity / Inflamasi`,
-        likelihood: 80,
-        reason: "Gejala yang Anda laporkan mencocokkan profil indikasi umum pada bagian ini.",
-        severity: "sedang",
-      },
-      differentialConditions: [
-        {
-          name: "Ketegangan Otot / Kelelahan Lokal",
-          likelihood: 45,
-          reason: "Sering terjadi akibat beban aktivitas atau posisi statis.",
-          severity: "ringan",
-        },
-      ],
-      matchedSymptoms: input.symptoms,
-      recommendations: [
-        "Istirahat di ruangan yang nyaman dan hindari pemicu stres berlebih.",
-        "Konsumsi air putih secukupnya (8 gelas sehari).",
-        "Gunakan kompres hangat atau dingin sesuai tingkat kenyamanan.",
-        "Segera konsultasikan dengan dokter SiagaSehat jika gejala menetap > 48 jam.",
-      ],
-      isEmergency: input.symptoms.some((s) => s.toLowerCase().includes("hebat") || s.toLowerCase().includes("sesak") || s.toLowerCase().includes("kaku")),
-      emergencyMessage: "Beberapa gejala yang Anda pilih memerlukan evaluasi medis segera. Silakan hubungi dokter atau IGD terdekat.",
-      disclaimer: "Hasil AI merupakan informasi awal berdasarkan gejala yang dipilih dan bukan pengganti diagnosis dari tenaga medis profesional.",
-    };
+    throw (
+      lastError ||
+      new Error(
+        "API AI belum terkonfigurasi. Tambahkan GEMINI_API_KEY atau OPENAI_API_KEY pada file .env lalu mulai ulang server.",
+      )
+    );
   });
+
