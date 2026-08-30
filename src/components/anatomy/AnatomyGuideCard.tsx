@@ -53,17 +53,16 @@ export function AnatomyGuideCard({ onSelectRegion }: AnatomyGuideCardProps) {
 
   const popularRegions = ANATOMY_REGIONS.filter((r) =>
     [
-      "kepala",
+      "kepala_depan",
+      "kepala_belakang",
       "mata",
-      "hidung",
-      "leher",
+      "leher_depan",
       "dada",
       "perut",
-      "lengan_kiri",
+      "lengan_kiri_depan",
       "punggung_bawah",
-      "pinggul",
-      "lutut_kiri",
-      "kaki",
+      "lutut_kiri_depan",
+      "kaki_depan",
     ].includes(r.id),
   );
 

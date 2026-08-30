@@ -25,33 +25,16 @@ interface AnatomyHotspotProps {
 }
 
 function getRegionIcon(regionId: string) {
-  switch (regionId) {
-    case "kepala":
-      return <Brain className="h-3.5 w-3.5" />;
-    case "mata":
-      return <Eye className="h-3.5 w-3.5" />;
-    case "hidung":
-      return <Wind className="h-3.5 w-3.5" />;
-    case "leher":
-      return <Stethoscope className="h-3.5 w-3.5" />;
-    case "dada":
-      return <Heart className="h-3.5 w-3.5" />;
-    case "perut":
-      return <Flame className="h-3.5 w-3.5" />;
-    case "punggung_atas":
-    case "punggung_bawah":
-      return <Bone className="h-3.5 w-3.5" />;
-    case "pinggul":
-      return <Layers className="h-3.5 w-3.5" />;
-    case "kaki":
-      return <Footprints className="h-3.5 w-3.5" />;
-    case "lutut_kiri":
-    case "lutut_kanan":
-    case "lengan_kiri":
-    case "lengan_kanan":
-    default:
-      return <Activity className="h-3.5 w-3.5" />;
-  }
+  if (regionId.includes("kepala")) return <Brain className="h-3.5 w-3.5" />;
+  if (regionId.includes("mata")) return <Eye className="h-3.5 w-3.5" />;
+  if (regionId.includes("hidung")) return <Wind className="h-3.5 w-3.5" />;
+  if (regionId.includes("leher")) return <Stethoscope className="h-3.5 w-3.5" />;
+  if (regionId.includes("dada")) return <Heart className="h-3.5 w-3.5" />;
+  if (regionId.includes("perut")) return <Flame className="h-3.5 w-3.5" />;
+  if (regionId.includes("punggung")) return <Bone className="h-3.5 w-3.5" />;
+  if (regionId.includes("pinggul")) return <Layers className="h-3.5 w-3.5" />;
+  if (regionId.includes("kaki")) return <Footprints className="h-3.5 w-3.5" />;
+  return <Activity className="h-3.5 w-3.5" />;
 }
 
 export function AnatomyHotspot({
