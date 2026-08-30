@@ -2,9 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
+  Activity,
   AlertCircle,
   Bot,
+  Brain,
   CheckCircle2,
+  Flame,
   Loader2,
   MessageSquare,
   RotateCcw,
@@ -12,7 +15,9 @@ import {
   ShieldAlert,
   Sparkles,
   Stethoscope,
+  Thermometer,
   User as UserIcon,
+  Wind,
 } from "lucide-react";
 
 import { chatWithAI } from "@/lib/ai/chat.server";
@@ -41,10 +46,26 @@ export const Route = createFileRoute("/consultation")({
 type ChatMessage = { role: "user" | "assistant"; text: string; time?: string };
 
 const QUICK_PROMPTS = [
-  "🌡️ Demam 2 hari disertai pusing dan lemas",
-  "🤢 Mual dan nyeri pada ulu hati setelah makan",
-  "🤕 Sakit kepala berdenyut di satu sisi",
-  "🤧 Batuk berdahak dan tenggorokan terasa sakit",
+  {
+    icon: Thermometer,
+    title: "Demam & Lemas",
+    desc: "Demam 2 hari disertai pusing dan badan lemas",
+  },
+  {
+    icon: Activity,
+    title: "Mual & Lambung",
+    desc: "Mual dan nyeri pada ulu hati setelah makan",
+  },
+  {
+    icon: Brain,
+    title: "Sakit Kepala",
+    desc: "Sakit kepala berdenyut di salah satu sisi",
+  },
+  {
+    icon: Wind,
+    title: "Batuk & Tenggorokan",
+    desc: "Batuk berdahak dan tenggorokan terasa sakit",
+  },
 ];
 
 function formatTime() {
@@ -298,17 +319,30 @@ function ConsultationPage() {
                     <p className="text-[11px] font-semibold text-[color:var(--color-clinic-muted)] uppercase tracking-wider text-left">
                       Pilih Contoh Keluhan Cepat:
                     </p>
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      {QUICK_PROMPTS.map((prompt, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => sendMessage(prompt)}
-                          className="rounded-2xl border border-black/5 bg-white p-2.5 text-left text-xs text-[color:var(--color-clinic-ink)] hover:border-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue-soft)]/30 hover:shadow-xs transition cursor-pointer font-medium"
-                        >
-                          {prompt}
-                        </button>
-                      ))}
+                    <div className="grid gap-2.5 sm:grid-cols-2">
+                      {QUICK_PROMPTS.map((item, idx) => {
+                        const Icon = item.icon;
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => sendMessage(item.desc)}
+                            className="group flex items-start gap-2.5 rounded-2xl border border-black/5 bg-white p-3 text-left hover:border-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue-soft)]/30 hover:shadow-xs transition cursor-pointer"
+                          >
+                            <div className="grid h-7 w-7 shrink-0 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] group-hover:bg-[color:var(--color-clinic-blue)] group-hover:text-white transition">
+                              <Icon className="h-3.5 w-3.5" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-[color:var(--color-clinic-ink)] group-hover:text-[color:var(--color-clinic-blue-dark)] transition">
+                                {item.title}
+                              </p>
+                              <p className="text-[11px] text-[color:var(--color-clinic-muted)] leading-snug line-clamp-2 mt-0.5">
+                                {item.desc}
+                              </p>
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
