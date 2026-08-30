@@ -17,6 +17,7 @@ import { chatWithAI } from "@/lib/ai/chat.server";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { BodyPainSelector } from "@/components/scanner/BodyPainSelector";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -199,6 +200,7 @@ function ConsultationPage() {
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
+          <BrandLogo />
           <div className="grid h-10 w-10 place-items-center rounded-full bg-[color:var(--color-clinic-blue)] text-white">
             <Stethoscope className="h-5 w-5" />
           </div>

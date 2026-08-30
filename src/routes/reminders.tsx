@@ -6,6 +6,7 @@ import { useMedicineReminders } from "@/hooks/useMedicineReminders";
 import { ReminderCard } from "@/components/reminder/ReminderCard";
 import { MedicineReminderModal } from "@/components/reminder/MedicineReminderModal";
 import { ReminderNotificationManager } from "@/components/reminder/ReminderNotificationManager";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 
 export const Route = createFileRoute("/reminders")({
   head: () => ({
@@ -60,10 +61,7 @@ function RemindersPage() {
             style={{ background: "radial-gradient(60% 80% at 20% 20%, #2ee6c4, transparent)" }}
           />
           <Link to="/" className="flex items-center gap-2.5 z-10">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white shadow-sm">
-              <span className="h-3 w-3 rounded-full bg-[color:var(--color-clinic-blue)]" />
-            </div>
-            <span className="font-display text-xl font-bold tracking-tight text-white">SiagaSehat</span>
+            <BrandLogo inverted />
           </Link>
           <div className="z-10 flex items-center gap-2">
             <Bell className="h-5 w-5 text-white/80" />

@@ -62,7 +62,6 @@ export function Hero() {
             to="/maps"
             className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-[color:var(--color-clinic-ink)] transition hover:bg-white"
           >
-            <MapPin className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)]" />
             Peta Lokasi
           </Link>
           <Link

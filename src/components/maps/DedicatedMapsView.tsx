@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 import {
   DEFAULT_CENTER,
@@ -802,14 +803,7 @@ export function DedicatedMapsView() {
       {/* ========================================================================= */}
       <header className="bg-white border-b border-[#E5E7EB] px-4 py-3 sm:px-6 sm:py-4 md:px-10 sticky top-0 z-50 shadow-2xs">
         <div className="max-w-[1700px] mx-auto relative flex items-center justify-between gap-3">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue)]">
-              <span className="h-2.5 w-2.5 rounded-full bg-white" />
-            </div>
-            <span className="font-display text-lg font-bold tracking-tight text-[color:var(--color-clinic-ink)]">
-              SiagaSehat
-            </span>
-          </Link>
+          <BrandLogo />
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 p-1 text-xs font-medium text-[color:var(--color-clinic-ink)] whitespace-nowrap shadow-xs">

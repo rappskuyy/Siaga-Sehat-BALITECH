@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AnatomyExplorer } from "@/components/anatomy/AnatomyExplorer";
 import { Footer } from "@/components/clinic/Footer";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { ArrowLeft, Sparkles, User, Bell, LogIn, Menu, X, ScanLine, MapPin, MessageCircleHeart } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -39,14 +40,7 @@ function AnatomyPage() {
         {/* Integrated Header / Navbar matching existing design */}
         <header className="bg-white border-b border-black/5 px-4 py-3 md:px-8 sticky top-0 z-40 shadow-2xs">
           <div className="max-w-[1600px] mx-auto relative flex items-center justify-between gap-3">
-            <Link to="/" className="flex items-center gap-2 shrink-0">
-              <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue)]">
-                <span className="h-2.5 w-2.5 rounded-full bg-white" />
-              </div>
-              <span className="font-display text-lg font-bold tracking-tight text-[color:var(--color-clinic-ink)]">
-                SiagaSehat
-              </span>
-            </Link>
+            <BrandLogo />
 
             {/* Desktop Nav */}
             <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 p-1 text-xs font-medium text-[color:var(--color-clinic-ink)] whitespace-nowrap shadow-xs">
@@ -62,7 +56,6 @@ function AnatomyPage() {
                 inactiveProps={{ className: "text-[color:var(--color-clinic-ink)] hover:bg-white/70" }}
                 className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition"
               >
-                <MapPin className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)]" />
                 Peta Lokasi
               </Link>
               <Link
@@ -146,7 +139,6 @@ function AnatomyPage() {
                   onClick={() => setIsMenuOpen(false)}
                   className="inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium text-[color:var(--color-clinic-ink)] transition hover:bg-[color:var(--color-clinic-blue-soft)]"
                 >
-                  <MapPin className="h-4 w-4 text-[color:var(--color-clinic-blue)]" />
                   Peta Lokasi & Faskes
                 </Link>
                 <Link
