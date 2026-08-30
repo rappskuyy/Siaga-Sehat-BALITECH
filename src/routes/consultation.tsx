@@ -4,12 +4,10 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowLeft,
   Loader2,
-  Phone,
   Send,
   ShieldAlert,
   Sparkles,
   Stethoscope,
-  Video,
 } from "lucide-react";
 
 import { chatWithAI } from "@/lib/ai/chat.server";
@@ -188,20 +186,6 @@ function ConsultationPage() {
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Online — siap membantu
             </p>
           </div>
-        </div>
-        <div className="flex items-center gap-1 text-[color:var(--color-clinic-muted)]">
-          <button
-            className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-[color:var(--color-clinic-blue-soft)]"
-            aria-label="Telepon"
-          >
-            <Phone className="h-4 w-4" />
-          </button>
-          <button
-            className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-[color:var(--color-clinic-blue-soft)]"
-            aria-label="Video"
-          >
-            <Video className="h-4 w-4" />
-          </button>
         </div>
       </header>
 
