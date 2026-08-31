@@ -1,6 +1,5 @@
-import { ArrowUpRight, MessageCircleHeart, Play, ScanLine, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, MessageCircleHeart, ScanLine, ShieldCheck } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import fotodokter1 from "@/assets/fotodokter(1).png?url";
 import fotodokter2 from "@/assets/fotodokter(2).png?url";
 import { FloatingCard } from "./FloatingCard";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -21,9 +20,9 @@ export function Hero() {
   return (
     <>
       <SiteHeader />
-      <section className="relative w-full overflow-hidden bg-white px-4 pt-5 pb-8 sm:px-6 md:px-8 md:pt-7 md:pb-14 lg:px-10 lg:pt-8 lg:pb-16">
+      <section className="relative w-full overflow-hidden bg-white px-5 pt-5 pb-8 sm:px-6 md:px-8 md:pt-7 md:pb-14 lg:px-10 lg:pt-8 lg:pb-16">
         {/* Body */}
-        <div className="relative mt-7 grid gap-10 sm:gap-8 lg:mt-8 lg:grid-cols-[1.05fr_1.1fr_0.85fr] lg:items-start lg:gap-5">
+        <div className="relative mx-auto mt-7 grid max-w-6xl gap-10 sm:gap-8 lg:mt-8 lg:grid-cols-[1.05fr_1.1fr_0.85fr] lg:items-start lg:gap-5">
           {/* Left column: headline + CTA + proof card */}
           <div className="relative z-10 flex flex-col justify-start">
             <h1 className="font-display text-5xl font-extrabold leading-[0.9] tracking-tight text-[color:var(--color-clinic-ink)] sm:text-[56px] md:text-[68px] lg:text-[76px]">
@@ -60,31 +59,12 @@ export function Hero() {
               </Link>
             </div>
 
-            <div className="mt-8 flex items-stretch gap-2 sm:gap-3 md:mt-12">
-              <button
-                type="button"
-                className="group relative hidden h-24 w-32 shrink-0 overflow-hidden rounded-2xl shadow-[var(--shadow-clinic)] md:block"
-                aria-label="Putar video klinik"
-              >
-                <img
-                  src={fotodokter1}
-                  alt="Interior klinik"
-                  className="h-full w-full object-cover transition duration-300 group-hover:scale-110"
-                />
-                <span className="absolute inset-0 bg-black/25 transition group-hover:bg-black/35" />
-                <span className="absolute inset-0 grid place-items-center">
-                  <span className="animate-scanner-ring absolute h-9 w-9 rounded-full border-2 border-white/80" />
-                  <span className="relative grid h-9 w-9 place-items-center rounded-full bg-white text-[color:var(--color-clinic-blue)] shadow-md transition group-hover:scale-110">
-                    <Play className="h-3.5 w-3.5 fill-current" />
-                  </span>
-                </span>
-              </button>
-
-              <div className="grid min-w-0 flex-1 grid-cols-3 gap-2 rounded-2xl bg-white p-3 shadow-[var(--shadow-clinic)] sm:gap-3 md:p-4">
+            <div className="mt-8 md:mt-12">
+              <div className="grid grid-cols-3 gap-2 rounded-2xl bg-white p-3 shadow-[var(--shadow-clinic)] sm:gap-3 md:p-4">
                 {MINI_STATS.map((s, i) => (
                   <div
                     key={s.n}
-                    className="animate-fade-up border-l border-black/5 pl-3 first:border-l-0 first:pl-0"
+                    className="animate-fade-up flex h-full flex-col justify-center border-l border-black/5 pl-3 first:border-l-0 first:pl-0"
                     style={{ animationDelay: `${0.1 + i * 0.1}s` }}
                   >
                     <div className="font-display text-xl font-extrabold text-[color:var(--color-clinic-ink)] sm:text-2xl md:text-[28px] md:leading-none">
@@ -101,7 +81,7 @@ export function Hero() {
 
           {/* Center column: doctor photo pulled up close to the header, with floating AI feature cards */}
           <div className="relative order-first flex justify-center lg:order-none lg:-mt-6">
-            <div className="relative inline-flex h-[340px] max-w-full items-end sm:h-[400px] md:h-[460px] lg:h-[540px]">
+            <div className="relative inline-flex h-[400px] max-w-full items-end sm:h-[440px] md:h-[500px] lg:h-[580px]">
               <img
                 src={fotodokter2}
                 alt="Dokter dengan stetoskop"
@@ -109,7 +89,7 @@ export function Hero() {
               />
 
               <FloatingCard
-                className="left-0 top-3 w-[min(168px,calc(100vw-48px))] sm:-left-2 md:-left-8 md:w-[180px]"
+                className="left-0 top-0 w-[min(150px,calc(100vw-56px))] sm:-left-2 sm:w-[168px] md:-left-8 md:w-[180px]"
                 delay="0s"
               >
                 <div className="flex items-center justify-between">
@@ -132,7 +112,7 @@ export function Hero() {
               </FloatingCard>
 
               <FloatingCard
-                className="right-0 top-[42%] w-[min(196px,calc(100vw-40px))] -translate-y-1/2 sm:-right-2 md:-right-10 md:w-[210px]"
+                className="right-0 top-1/2 w-[min(172px,calc(100vw-48px))] -translate-y-1/2 sm:-right-2 sm:w-[196px] md:-right-10 md:w-[210px]"
                 delay="0.5s"
               >
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-siaga-scan)]/12 px-2.5 py-1 text-[10px] font-semibold text-[color:var(--color-siaga-scan-dim)]">
@@ -155,7 +135,7 @@ export function Hero() {
               </FloatingCard>
 
               <FloatingCard
-                className="right-0 bottom-12 w-[min(200px,calc(100vw-40px))] sm:-right-2 md:-right-6 md:w-[210px]"
+                className="right-0 bottom-16 w-[min(176px,calc(100vw-48px))] sm:-right-2 sm:bottom-12 sm:w-[200px] md:-right-6 md:w-[210px]"
                 delay="1s"
               >
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-siaga-consult)]/12 px-2.5 py-1 text-[10px] font-semibold text-[color:var(--color-siaga-consult-dim)]">
@@ -170,7 +150,7 @@ export function Hero() {
                 </p>
               </FloatingCard>
 
-              <div className="absolute bottom-2 right-0 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-sm backdrop-blur-md sm:bottom-4 sm:-right-2 md:-right-4">
+              <div className="absolute bottom-2 right-0 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-sm backdrop-blur-md sm:-right-2 md:-right-4">
                 <div className="flex -space-x-2">
                   {AVATARS.map((a) => (
                     <img

@@ -12,10 +12,10 @@ export function BrandLogo({
 }) {
   const logoHeightClass =
     size === "sm"
-      ? "h-20 sm:h-24 md:h-28"
+      ? "h-9 sm:h-10 md:h-11"
       : size === "lg"
-      ? "h-24 sm:h-32 md:h-36"
-      : "h-20 sm:h-24 md:h-28";
+        ? "h-16 sm:h-20 md:h-24"
+        : "h-12 sm:h-14 md:h-16";
 
   return (
     <Link to="/" className={`inline-flex items-center gap-2 shrink-0 ${className}`}>

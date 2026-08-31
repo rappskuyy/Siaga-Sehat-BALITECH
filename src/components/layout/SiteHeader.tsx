@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { Bell, Menu, User, X } from "lucide-react";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useAuth } from "@/lib/auth/auth-context";
 
@@ -23,13 +23,13 @@ const scanInactivePill = {
  * the links; the only icons that remain are the functional menu toggle.
  */
 export function SiteHeader() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-black/5 bg-white/95 px-4 py-3 shadow-2xs backdrop-blur md:px-8">
+    <header className="sticky top-0 z-40 border-b border-black/5 bg-white/95 px-5 py-2.5 shadow-2xs backdrop-blur sm:px-6 md:px-8 lg:px-10">
       <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-3">
-        <BrandLogo />
+        <BrandLogo size="sm" />
 
         <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2 py-1.5 text-sm text-[color:var(--color-clinic-ink)] shadow-xs lg:flex">
           <Link
@@ -73,12 +73,38 @@ export function SiteHeader() {
           </Link>
         </nav>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
+          {user && (
+            <Link
+              to="/reminders"
+              className="hidden h-9 w-9 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)]/10 sm:inline-flex"
+              aria-label="Notifikasi"
+              title="Notifikasi"
+            >
+              <Bell className="h-4 w-4" />
+            </Link>
+          )}
           <Link
             to={user ? "/profile" : "/login"}
-            className="hidden rounded-full bg-white/80 px-4 py-1.5 text-sm font-medium text-[color:var(--color-clinic-ink)] shadow-xs transition hover:bg-white sm:inline-flex"
+            className="hidden items-center gap-2 rounded-full bg-white/80 py-1 pl-1 pr-3.5 text-sm font-medium text-[color:var(--color-clinic-ink)] shadow-xs transition hover:bg-white sm:inline-flex"
           >
-            {user ? "Profil" : "Masuk"}
+            {user ? (
+              <>
+                <span className="grid h-7 w-7 place-items-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
+                  <User className="h-3.5 w-3.5" />
+                </span>
+                {profile?.full_name?.split(" ")[0] || "Profil"}
+              </>
+            ) : (
+              "Masuk"
+            )}
+          </Link>
+          <Link
+            to={user ? "/profile" : "/login"}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] sm:hidden"
+            aria-label="Akun"
+          >
+            <User className="h-4 w-4" />
           </Link>
           <button
             type="button"
@@ -131,12 +157,23 @@ export function SiteHeader() {
             >
               Scan AI
             </Link>
+            {user && (
+              <Link
+                to="/reminders"
+                onClick={() => setIsMenuOpen(false)}
+                className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl border border-black/10 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
+              >
+                <Bell className="h-4 w-4" />
+                Notifikasi
+              </Link>
+            )}
             <Link
               to={user ? "/profile" : "/login"}
               onClick={() => setIsMenuOpen(false)}
-              className="mt-1 inline-flex items-center justify-center rounded-xl border border-black/10 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
+              className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl border border-black/10 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
             >
-              {user ? "Profil Saya" : "Masuk / Daftar"}
+              <User className="h-4 w-4" />
+              {user ? profile?.full_name?.split(" ")[0] || "Profil Saya" : "Masuk / Daftar"}
             </Link>
           </nav>
         </div>

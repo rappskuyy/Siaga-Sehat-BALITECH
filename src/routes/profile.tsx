@@ -209,69 +209,61 @@ function ProfilePage() {
       <SiteHeader />
 
       <div className="mx-auto max-w-4xl px-4 pt-6 md:px-6">
-        {/* Profile hero card — banner and content are two separate, non-overlapping blocks */}
-        <div className="overflow-hidden rounded-3xl border border-black/5 bg-white shadow-[var(--shadow-clinic)]">
-          <div className="relative bg-[color:var(--color-clinic-blue)] px-6 py-7 sm:px-8">
+        {/* Profile hero card — avatar, name and email live together in one block */}
+        <div className="overflow-hidden rounded-3xl border border-black/5 bg-[color:var(--color-clinic-blue)] shadow-[var(--shadow-clinic)]">
+          <div className="relative px-6 py-7 sm:px-8">
             <div
               className="pointer-events-none absolute inset-0 opacity-20"
               style={{ background: "radial-gradient(60% 100% at 15% 0%, #2ee6c4, transparent)" }}
             />
-            <p className="relative z-10 text-xs font-medium uppercase tracking-wide text-white/70">
-              Akun Saya
-            </p>
-            <h1 className="relative z-10 mt-1 font-display text-2xl font-extrabold text-white sm:text-3xl">
-              {profile?.full_name || "Profil Saya"}
-            </h1>
-            <p className="relative z-10 text-sm text-white/75">{user.email}</p>
-          </div>
-
-          <div className="flex flex-col gap-4 border-t border-black/5 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-            <div className="flex items-center gap-4">
+            <div className="relative z-10 flex items-center gap-4">
               {/* Avatar IS the logout button — tap the photo to sign out */}
               <button
                 type="button"
                 onClick={handleSignOut}
                 title="Ketuk untuk keluar dari akun"
                 aria-label="Keluar dari akun"
-                className="group relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] shadow-sm transition active:scale-95"
+                className="group relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-full bg-white/15 text-white shadow-sm ring-2 ring-white/25 backdrop-blur transition active:scale-95"
               >
                 <UserIcon className="h-7 w-7 transition group-hover:opacity-0" />
                 <span className="absolute inset-0 grid place-items-center bg-red-500/90 text-white opacity-0 transition group-hover:opacity-100">
                   <LogOut className="h-6 w-6" />
                 </span>
-                <span className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full border-2 border-white bg-red-500 text-white shadow-sm">
+                <span className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full border-2 border-[color:var(--color-clinic-blue)] bg-red-500 text-white shadow-sm">
                   <LogOut className="h-2.5 w-2.5" />
                 </span>
               </button>
-              <p className="text-xs text-[color:var(--color-clinic-muted)]">
-                Ketuk foto untuk keluar dari akun
-              </p>
-            </div>
 
-            {/* Quick stats */}
-            <div className="flex w-full gap-2 sm:w-auto">
-              <div className="flex-1 rounded-2xl bg-[color:var(--color-clinic-blue-soft)]/70 px-4 py-2.5 text-center sm:flex-none">
-                <p className="font-display text-lg font-extrabold text-[color:var(--color-clinic-ink)]">
-                  {history?.length ?? 0}
+              <div className="min-w-0">
+                <p className="text-xs font-medium uppercase tracking-wide text-white/70">
+                  Akun Saya
                 </p>
-                <p className="text-[10px] text-[color:var(--color-clinic-muted)]">Total Scan</p>
+                <h1 className="mt-0.5 truncate font-display text-xl font-extrabold text-white sm:text-2xl">
+                  {profile?.full_name || "Profil Saya"}
+                </h1>
+                <p className="truncate text-sm text-white/75">{user.email}</p>
+                <p className="mt-1 text-[11px] text-white/55">Ketuk foto untuk keluar dari akun</p>
               </div>
-              <div className="flex-1 rounded-2xl bg-[color:var(--color-clinic-blue-soft)]/70 px-4 py-2.5 text-center sm:flex-none">
-                <p
-                  className={`font-display text-lg font-extrabold ${lastScanMeta?.color ?? "text-[color:var(--color-clinic-ink)]"}`}
-                >
-                  {lastScanMeta?.label ?? "—"}
-                </p>
-                <p className="text-[10px] text-[color:var(--color-clinic-muted)]">
-                  Risiko Terakhir
-                </p>
-              </div>
-              <div className="flex-1 rounded-2xl bg-[color:var(--color-clinic-blue-soft)]/70 px-4 py-2.5 text-center sm:flex-none">
-                <p className="font-display text-lg font-extrabold text-[color:var(--color-clinic-ink)]">
-                  {bmi ?? "—"}
-                </p>
-                <p className="text-[10px] text-[color:var(--color-clinic-muted)]">BMI</p>
-              </div>
+            </div>
+          </div>
+
+          {/* Quick stats */}
+          <div className="flex gap-2 border-t border-white/10 bg-white/5 px-6 py-4 sm:px-8">
+            <div className="flex-1 rounded-2xl bg-white/10 px-4 py-2.5 text-center backdrop-blur">
+              <p className="font-display text-lg font-extrabold text-white">
+                {history?.length ?? 0}
+              </p>
+              <p className="text-[10px] text-white/70">Total Scan</p>
+            </div>
+            <div className="flex-1 rounded-2xl bg-white/10 px-4 py-2.5 text-center backdrop-blur">
+              <p className="font-display text-lg font-extrabold text-white">
+                {lastScanMeta?.label ?? "—"}
+              </p>
+              <p className="text-[10px] text-white/70">Risiko Terakhir</p>
+            </div>
+            <div className="flex-1 rounded-2xl bg-white/10 px-4 py-2.5 text-center backdrop-blur">
+              <p className="font-display text-lg font-extrabold text-white">{bmi ?? "—"}</p>
+              <p className="text-[10px] text-white/70">BMI</p>
             </div>
           </div>
         </div>
