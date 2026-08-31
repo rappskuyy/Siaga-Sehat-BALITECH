@@ -1,26 +1,143 @@
-import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useState, useEffect, useRef } from "react";
+import { Link, useLocation } from "@tanstack/react-router";
 import { Bell, Menu, User, X } from "lucide-react";
+import { motion } from "framer-motion";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useAuth } from "@/lib/auth/auth-context";
 
-const activePill = {
-  className: "bg-white text-[color:var(--color-clinic-blue)] font-bold shadow-xs",
-};
-const inactivePill = { className: "text-[color:var(--color-clinic-ink)] hover:bg-white/70" };
-const scanActivePill = {
-  className: "bg-[color:var(--color-clinic-blue-dark)] text-white font-bold shadow-xs",
-};
-const scanInactivePill = {
-  className:
-    "bg-[color:var(--color-clinic-blue)] text-white hover:bg-[color:var(--color-clinic-blue-dark)]",
+const TABS = [
+  { label: "Beranda", path: "/" },
+  { label: "Peta Lokasi", path: "/maps" },
+  { label: "Konsultasi", path: "/consultation", search: { anatomy: undefined } },
+  { label: "Anatomi", path: "/anatomy" },
+  { label: "Scan AI", path: "/scanner" },
+];
+
+function SlideTabs() {
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  const [position, setPosition] = useState({
+    left: 0,
+    width: 0,
+    opacity: 0,
+  });
+
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const tabsRef = useRef<(HTMLAnchorElement | null)[]>([]);
+
+  // Find active index based on route pathname
+  const activeIndex = TABS.findIndex((tab) => {
+    if (tab.path === "/") {
+      return currentPath === "/";
+    }
+    return currentPath.startsWith(tab.path);
+  });
+
+  const updatePosition = (index: number) => {
+    const activeTab = tabsRef.current[index];
+    if (activeTab) {
+      setPosition({
+        left: activeTab.offsetLeft,
+        width: activeTab.offsetWidth,
+        opacity: 1,
+      });
+    } else {
+      setPosition((prev) => ({ ...prev, opacity: 0 }));
+    }
+  };
+
+  // Keep sliding pill aligned with active route on resize or pathname change
+  useEffect(() => {
+    const targetIdx = hoveredIndex !== null ? hoveredIndex : activeIndex;
+    if (targetIdx !== -1) {
+      const timer = setTimeout(() => {
+        updatePosition(targetIdx);
+      }, 50);
+      return () => clearTimeout(timer);
+    } else {
+      setPosition((prev) => ({ ...prev, opacity: 0 }));
+    }
+  }, [activeIndex, currentPath, hoveredIndex]);
+
+  // Adjust on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const targetIdx = hoveredIndex !== null ? hoveredIndex : activeIndex;
+      if (targetIdx !== -1) {
+        updatePosition(targetIdx);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [activeIndex, hoveredIndex]);
+
+  const handleMouseLeave = () => {
+    setHoveredIndex(null);
+    if (activeIndex !== -1) {
+      updatePosition(activeIndex);
+    } else {
+      setPosition((prev) => ({ ...prev, opacity: 0 }));
+    }
+  };
+
+  const currentPillIndex = hoveredIndex !== null ? hoveredIndex : activeIndex;
+
+  return (
+    <nav
+      onMouseLeave={handleMouseLeave}
+      className="absolute left-1/2 hidden -translate-x-1/2 items-center whitespace-nowrap rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-1.5 py-1 text-sm text-[color:var(--color-clinic-ink)] shadow-xs lg:flex"
+    >
+      {TABS.map((tab, i) => {
+        const isUnderPill = currentPillIndex === i;
+
+        return (
+          <Link
+            key={tab.path}
+            to={tab.path}
+            search={tab.search as any}
+            ref={(el) => {
+              tabsRef.current[i] = el;
+            }}
+            onMouseEnter={() => {
+              setHoveredIndex(i);
+              updatePosition(i);
+            }}
+            className={`relative z-10 rounded-full px-4 py-1.5 transition-colors duration-200 cursor-pointer select-none
+              ${isUnderPill
+                ? "text-white font-semibold"
+                : "text-[color:var(--color-clinic-ink)] font-medium hover:text-[color:var(--color-clinic-blue)]"
+              }
+            `}
+          >
+            {tab.label}
+          </Link>
+        );
+      })}
+
+      <Cursor position={position} />
+    </nav>
+  );
+}
+
+const Cursor = ({ position }: { position: { left: number; width: number; opacity: number } }) => {
+  return (
+    <motion.div
+      animate={{
+        left: position.left,
+        width: position.width,
+        opacity: position.opacity,
+      }}
+      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+      className="absolute z-0 h-[28px] rounded-full bg-[color:var(--color-clinic-blue)] shadow-md"
+    />
+  );
 };
 
 /**
  * The one and only navbar for the whole app — the landing page ("/") uses
  * this exact component too, so there is a single source of truth for
- * sizing, spacing and nav items. Text-only, no decorative icons next to
- * the links; the only icons that remain are the functional menu toggle.
+ * sizing, spacing and nav items.
  */
 export function SiteHeader() {
   const { user, profile } = useAuth();
@@ -31,47 +148,7 @@ export function SiteHeader() {
       <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-3">
         <BrandLogo size="sm" />
 
-        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2 py-1.5 text-sm text-[color:var(--color-clinic-ink)] shadow-xs lg:flex">
-          <Link
-            to="/"
-            className="rounded-full px-4 py-1.5 transition hover:bg-white hover:text-[color:var(--color-clinic-blue)]"
-          >
-            Beranda
-          </Link>
-          <Link
-            to="/maps"
-            activeProps={activePill}
-            inactiveProps={inactivePill}
-            className="ml-1 rounded-full px-4 py-1.5 transition"
-          >
-            Peta Lokasi
-          </Link>
-          <Link
-            to="/consultation"
-            search={{ anatomy: undefined }}
-            activeProps={activePill}
-            inactiveProps={inactivePill}
-            className="ml-1 rounded-full px-4 py-1.5 transition"
-          >
-            Konsultasi
-          </Link>
-          <Link
-            to="/anatomy"
-            activeProps={activePill}
-            inactiveProps={inactivePill}
-            className="ml-1 rounded-full px-4 py-1.5 transition"
-          >
-            Anatomi
-          </Link>
-          <Link
-            to="/scanner"
-            activeProps={scanActivePill}
-            inactiveProps={scanInactivePill}
-            className="ml-1 rounded-full px-4 py-1.5 font-semibold transition"
-          >
-            Scan AI
-          </Link>
-        </nav>
+        <SlideTabs />
 
         <div className="flex items-center gap-2 shrink-0">
           {user && (

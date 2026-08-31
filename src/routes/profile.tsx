@@ -34,7 +34,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
-    meta: [{ title: "Profil Saya — SiagaSehat" }],
+    meta: [{ title: "Profil Saya — Siaga Sehat" }],
   }),
   component: ProfilePage,
 });

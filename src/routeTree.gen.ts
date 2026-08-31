@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnatomyRouteImport } from './routes/anatomy'
 import { Route as ConsultationRouteImport } from './routes/consultation'
+import { Route as DevRouteImport } from './routes/dev'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MapsRouteImport } from './routes/maps'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -32,6 +33,11 @@ const AnatomyRoute = AnatomyRouteImport.update({
 const ConsultationRoute = ConsultationRouteImport.update({
   id: '/consultation',
   path: '/consultation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevRoute = DevRouteImport.update({
+  id: '/dev',
+  path: '/dev',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/anatomy': typeof AnatomyRoute
   '/consultation': typeof ConsultationRoute
+  '/dev': typeof DevRoute
   '/login': typeof LoginRoute
   '/maps': typeof MapsRoute
   '/profile': typeof ProfileRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/anatomy': typeof AnatomyRoute
   '/consultation': typeof ConsultationRoute
+  '/dev': typeof DevRoute
   '/login': typeof LoginRoute
   '/maps': typeof MapsRoute
   '/profile': typeof ProfileRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/anatomy': typeof AnatomyRoute
   '/consultation': typeof ConsultationRoute
+  '/dev': typeof DevRoute
   '/login': typeof LoginRoute
   '/maps': typeof MapsRoute
   '/profile': typeof ProfileRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/anatomy'
     | '/consultation'
+    | '/dev'
     | '/login'
     | '/maps'
     | '/profile'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/'
     | '/anatomy'
     | '/consultation'
+    | '/dev'
     | '/login'
     | '/maps'
     | '/profile'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/anatomy'
     | '/consultation'
+    | '/dev'
     | '/login'
     | '/maps'
     | '/profile'
@@ -139,6 +151,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnatomyRoute: typeof AnatomyRoute
   ConsultationRoute: typeof ConsultationRoute
+  DevRoute: typeof DevRoute
   LoginRoute: typeof LoginRoute
   MapsRoute: typeof MapsRoute
   ProfileRoute: typeof ProfileRoute
@@ -168,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/consultation'
       fullPath: '/consultation'
       preLoaderRoute: typeof ConsultationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev': {
+      id: '/dev'
+      path: '/dev'
+      fullPath: '/dev'
+      preLoaderRoute: typeof DevRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -219,6 +239,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnatomyRoute: AnatomyRoute,
   ConsultationRoute: ConsultationRoute,
+  DevRoute: DevRoute,
   LoginRoute: LoginRoute,
   MapsRoute: MapsRoute,
   ProfileRoute: ProfileRoute,

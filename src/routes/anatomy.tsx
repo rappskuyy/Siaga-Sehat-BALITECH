@@ -6,13 +6,13 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 export const Route = createFileRoute("/anatomy")({
   head: () => ({
     meta: [
-      { title: "Eksplorasi Anatomi AI — SiagaSehat" },
+      { title: "Eksplorasi Anatomi AI — Siaga Sehat" },
       {
         name: "description",
         content:
-          "Eksplorasi bagian tubuh secara interaktif, pilih gejala Anda, dan dapatkan analisis penilaian kesehatan awal berbasis AI dari SiagaSehat.",
+          "Eksplorasi bagian tubuh secara interaktif, pilih gejala Anda, dan dapatkan analisis penilaian kesehatan awal berbasis AI dari Siaga Sehat.",
       },
-      { property: "og:title", content: "Eksplorasi Anatomi AI — SiagaSehat" },
+      { property: "og:title", content: "Eksplorasi Anatomi AI — Siaga Sehat" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

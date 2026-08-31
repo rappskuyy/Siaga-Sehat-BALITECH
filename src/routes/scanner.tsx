@@ -37,13 +37,13 @@ const PHOTO_DONT = [
 export const Route = createFileRoute("/scanner")({
   head: () => ({
     meta: [
-      { title: "Scan Penyakit AI — SiagaSehat" },
+      { title: "Scan Penyakit AI — Siaga Sehat" },
       {
         name: "description",
         content:
-          "Unggah atau foto kondisi kulit/tubuhmu dan dapatkan skrining kesehatan awal berbasis AI dari SiagaSehat — lengkap dengan penyebab, pencegahan, dan rekomendasi obat.",
+          "Unggah atau foto kondisi kulit/tubuhmu dan dapatkan skrining kesehatan awal berbasis AI dari Siaga Sehat — lengkap dengan penyebab, pencegahan, dan rekomendasi obat.",
       },
-      { property: "og:title", content: "Scan Penyakit AI — SiagaSehat" },
+      { property: "og:title", content: "Scan Penyakit AI — Siaga Sehat" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

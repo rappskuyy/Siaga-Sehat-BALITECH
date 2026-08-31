@@ -11,17 +11,17 @@ import { Reveal } from "@/components/clinic/Reveal";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SiagaSehat — Klinik Inovasi Digital" },
+      { title: "Siaga Sehat — Klinik Inovasi Digital" },
       {
         name: "description",
         content:
-          "SiagaSehat — diagnostik canggih dengan pendekatan manusiawi. Layanan kesehatan terpadu dengan dokter berlisensi dan skrining AI.",
+          "Siaga Sehat — diagnostik kecerdasan buatan dengan pendekatan manusiawi. Layanan kesehatan terpadu dengan dokter berlisensi dan skrining AI.",
       },
-      { property: "og:title", content: "SiagaSehat — Klinik Inovasi Digital" },
+      { property: "og:title", content: "Siaga Sehat — Klinik Inovasi Digital" },
       {
         property: "og:description",
         content:
-          "Diagnostik canggih dengan sentuhan manusiawi. Konsultasikan dengan spesialis berlisensi di SiagaSehat.",
+          "Diagnostik kecerdasan buatan dengan sentuhan manusiawi. Konsultasikan dengan spesialis berlisensi di SiagaSehat.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

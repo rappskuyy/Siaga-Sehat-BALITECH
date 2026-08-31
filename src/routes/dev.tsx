@@ -1,0 +1,318 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion } from "framer-motion";
+import {
+  ArrowLeft,
+  Code2,
+  Database,
+  Cpu,
+  Palette,
+  Terminal,
+  Globe,
+  Server,
+  Sparkles,
+  Github,
+  Linkedin,
+  Heart,
+  Zap,
+  GraduationCap,
+  School,
+  Award,
+  SparkleIcon,
+} from "lucide-react";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { Footer } from "@/components/clinic/Footer";
+
+export const Route = createFileRoute("/dev")({
+  head: () => ({
+    meta: [
+      { title: "Tim Pengembang — Siaga Sehat BALITECH" },
+      {
+        name: "description",
+        content:
+          "Mengenal tim pengembang di balik platform kesehatan digital Siaga Sehat BALITECH.",
+      },
+    ],
+  }),
+  component: DevPage,
+});
+
+const TEAM_MEMBERS = [
+  {
+    name: "Rakha",
+    role: "Lead Developer & System Architect",
+    specialty: "Fullstack Architecture & AI Integration",
+    skills: ["React 19", "Vite", "AI Integration", "TypeScript"],
+    bio: "Membangun landasan arsitektur sistem SiagaSehat dan memadukan model kecerdasan buatan dengan UI yang adaptif.",
+    icon: Terminal,
+    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=faces",
+    gradient: "from-blue-600 to-indigo-700",
+    accent: "#4a6fa5",
+  },
+  {
+    name: "Bintang",
+    role: "UI/UX & Frontend Engineer",
+    specialty: "Responsive Styling & Motion Design",
+    skills: ["Tailwind CSS", "Framer Motion", "Responsive Layouts", "Aesthetics"],
+    bio: "Berfokus menghadirkan estetika premium, transisi dinamis (SlideTabs), serta kegunaan tata letak di segala perangkat display.",
+    icon: Palette,
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=faces",
+    gradient: "from-emerald-500 to-teal-600",
+    accent: "#17a690",
+  },
+  {
+    name: "Adit",
+    role: "Backend & Database Engineer",
+    specialty: "Data Pipeline & Infrastructure",
+    skills: ["Supabase", "PostgreSQL", "API Security", "Patient Data Flow"],
+    bio: "Mengelola keandalan data klinis, infrastruktur autentikasi aman, serta performa pertukaran data triase medis.",
+    icon: Database,
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=faces",
+    gradient: "from-violet-600 to-purple-700",
+    accent: "#35517d",
+  },
+];
+
+const TECH_STACK = [
+  { name: "React 19", sub: "& Vite", icon: Code2 },
+  { name: "TanStack", sub: "Router & Start", icon: Server },
+  { name: "Tailwind", sub: "CSS v4", icon: Palette },
+  { name: "Framer", sub: "Motion", icon: Sparkles },
+  { name: "Supabase", sub: "& Postgres", icon: Database },
+  { name: "Gemini AI", sub: "SDK", icon: Cpu },
+  { name: "Leaflet", sub: "Maps API", icon: Globe },
+];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.12, duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
+
+function DevPage() {
+  return (
+    <main className="min-h-screen bg-[#f7f4ee] font-sans flex flex-col justify-between">
+      <div>
+        <SiteHeader />
+
+        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:py-14 lg:px-8">
+          {/* Back link */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4 }}
+            className="mb-8 md:mb-12"
+          >
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-[color:var(--color-clinic-ink)] shadow-2xs border border-black/5 hover:shadow-sm transition"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Kembali ke Beranda
+            </Link>
+          </motion.div>
+
+          {/* Hero heading */}
+          <div className="mb-16 md:mb-20 relative">
+            {/* Decorative blurs */}
+            <span className="pointer-events-none absolute -left-20 -top-10 h-56 w-56 rounded-full bg-[color:var(--color-clinic-blue)]/[0.06] blur-3xl" />
+            <span className="pointer-events-none absolute -right-20 top-0 h-48 w-48 rounded-full bg-emerald-400/[0.06] blur-3xl" />
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="relative text-center"
+            >
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue)]/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-clinic-blue)]">
+                <Heart className="h-3 w-3" />
+                BALITECH DEV TEAM
+              </span>
+              <h1 className="font-display text-4xl font-extrabold tracking-tight text-[color:var(--color-clinic-ink)] sm:text-5xl md:text-6xl mt-5 leading-[1.1]">
+                Di Balik Layar
+                <br />
+                <span className="text-[color:var(--color-clinic-blue)]">SiagaSehat</span>
+              </h1>
+              <p className="mt-5 mx-auto max-w-lg text-sm md:text-base text-[color:var(--color-clinic-muted)] leading-relaxed">
+                Inovasi rekayasa perangkat lunak, keindahan visual, dan kecerdasan
+                buatan — mempermudah triase kesehatan awal bagi masyarakat Indonesia.
+              </p>
+            </motion.div>
+          </div>
+
+          {/* School & Project Identity Showcase Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="mb-14 rounded-3xl border border-black/5 bg-white p-6 sm:p-8 shadow-[var(--shadow-clinic)] relative overflow-hidden"
+          >
+            <span className="pointer-events-none absolute -right-10 -bottom-10 h-44 w-44 rounded-full bg-[color:var(--color-clinic-blue)]/10 blur-2xl" />
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+              <div className="flex items-start sm:items-center gap-4">
+                <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] font-extrabold text-xl shadow-xs">
+                  <GraduationCap className="h-7 w-7" />
+                </div>
+                <div>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue)]/10 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[color:var(--color-clinic-blue)]">
+                    <Award className="h-3 w-3" /> Karya Rekayasa Perangkat Lunak
+                  </span>
+                  <h3 className="font-display text-lg sm:text-xl font-bold text-[color:var(--color-clinic-ink)] mt-1">
+                    Karya Inovasi Siswa BALITECH
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[color:var(--color-clinic-muted)] mt-1 max-w-xl leading-relaxed">
+                    Aplikasi SiagaSehat merupakan proyek inovasi kesehatan digital yang dirancang dan dikembangkan oleh tim siswa bertalenta sebagai bagian dari wujud apresiasi rekayasa teknologi informasi dan kecerdasan buatan.
+                  </p>
+                </div>
+              </div>
+              <div className="flex shrink-0 items-center gap-3 rounded-2xl bg-[#f7f4ee] px-4 py-3 border border-black/5 w-full md:w-auto">
+                <School className="h-5 w-5 text-[color:var(--color-clinic-blue)] shrink-0" />
+                <div className="text-left">
+                  <div className="text-[10px] text-[color:var(--color-clinic-muted)] font-medium">Institusi & Kompetisi</div>
+                  <div className="text-xs font-bold text-[color:var(--color-clinic-ink)]">SMK BALITECH Showcase</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Developer Cards — Bento-style grid */}
+          <div className="grid gap-5 md:grid-cols-3">
+            {TEAM_MEMBERS.map((member, i) => {
+              const Icon = member.icon;
+              return (
+                <motion.div
+                  key={member.name}
+                  custom={i}
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate="visible"
+                  whileHover={{ y: -6, transition: { duration: 0.25 } }}
+                  className="group relative flex flex-col rounded-[24px] border border-black/[0.04] bg-white shadow-[var(--shadow-clinic)] transition-shadow hover:shadow-[var(--shadow-clinic-lg)]"
+                >
+                  {/* Gradient header strip */}
+                  <div className={`relative h-28 rounded-t-[24px] bg-gradient-to-br ${member.gradient} overflow-hidden`}>
+                    {/* Animated geometric decoration */}
+                    <div className="absolute inset-0 opacity-20">
+                      <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full border-[3px] border-white/30" />
+                      <div className="absolute -right-2 -top-2 h-16 w-16 rounded-full border-[3px] border-white/20" />
+                      <div className="absolute left-6 bottom-3 h-8 w-8 rounded-lg rotate-45 border-2 border-white/20" />
+                    </div>
+
+                    {/* Specialty tag */}
+                    <span className="absolute right-4 top-4 rounded-full bg-white/20 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+                      {member.specialty.split(" & ")[0]}
+                    </span>
+                  </div>
+
+                  {/* Photo avatar — positioned outside the gradient so it won't clip */}
+                  <div className="absolute left-6 top-[112px] -translate-y-1/2 z-10 h-16 w-16 rounded-2xl overflow-hidden bg-white shadow-lg border-[3px] border-white transition-transform duration-300 group-hover:scale-110">
+                    <img
+                      src={member.avatar}
+                      alt={member.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+
+                  {/* Card body */}
+                  <div className="flex flex-1 flex-col p-6 pt-12">
+                    <h2 className="font-display text-xl font-extrabold text-[color:var(--color-clinic-ink)]">
+                      {member.name}
+                    </h2>
+                    <p className="text-xs font-semibold mt-0.5" style={{ color: member.accent }}>
+                      {member.role}
+                    </p>
+
+                    <p className="mt-4 flex-1 text-[13px] leading-relaxed text-[color:var(--color-clinic-muted)]">
+                      {member.bio}
+                    </p>
+
+                    {/* Skills */}
+                    <div className="mt-6 flex flex-wrap gap-1.5">
+                      {member.skills.map((skill) => (
+                        <span
+                          key={skill}
+                          className="rounded-full bg-slate-50 border border-slate-200/80 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Social links */}
+                    <div className="mt-5 flex items-center gap-2 border-t border-black/5 pt-4">
+                      <a
+                        href="#"
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition-all duration-200"
+                        title="GitHub"
+                      >
+                        <Github className="h-3.5 w-3.5" />
+                      </a>
+                      <a
+                        href="#"
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition-all duration-200"
+                        title="LinkedIn"
+                      >
+                        <Linkedin className="h-3.5 w-3.5" />
+                      </a>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Tech Stack Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            className="mt-20 md:mt-28"
+          >
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-3">
+                <Zap className="h-3 w-3" />
+                Technology Stack
+              </div>
+              <h2 className="font-display text-2xl font-bold text-[color:var(--color-clinic-ink)] sm:text-3xl">
+                Arsitektur & Teknologi
+              </h2>
+              <p className="mt-2 text-sm text-[color:var(--color-clinic-muted)]">
+                Perkakas modern yang mendukung keandalan platform SiagaSehat.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+              {TECH_STACK.map((tech, i) => {
+                const Icon = tech.icon;
+                return (
+                  <motion.div
+                    key={tech.name}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 + i * 0.06, duration: 0.35 }}
+                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                    className="group flex flex-col items-center text-center p-4 rounded-2xl bg-white border border-black/5 shadow-2xs hover:shadow-sm hover:border-[color:var(--color-clinic-blue)]/20 transition-all duration-200"
+                  >
+                    <div className="grid h-10 w-10 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] mb-2.5 group-hover:bg-[color:var(--color-clinic-blue)] group-hover:text-white transition-colors duration-200">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-xs font-bold text-[color:var(--color-clinic-ink)] leading-tight">
+                      {tech.name}
+                    </h3>
+                    <p className="text-[10px] text-[color:var(--color-clinic-muted)] mt-0.5">
+                      {tech.sub}
+                    </p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      <Footer />
+    </main>
+  );
+}

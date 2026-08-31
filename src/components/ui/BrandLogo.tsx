@@ -21,7 +21,7 @@ export function BrandLogo({
     <Link to="/" className={`inline-flex items-center gap-2 shrink-0 ${className}`}>
       <img
         src={logoSvg}
-        alt="SiagaSehat Logo"
+        alt="Siaga Sehat Logo"
         className={`${logoHeightClass} max-w-[380px] sm:max-w-[480px] w-auto object-contain drop-shadow-sm ${inverted ? "brightness-0 invert" : ""}`}
       />
     </Link>

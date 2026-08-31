@@ -32,7 +32,7 @@ export const Route = createFileRoute("/consultation")({
   }),
   head: () => ({
     meta: [
-      { title: "Konsultasi Dokter AI — SiagaSehat" },
+      { title: "Konsultasi Dokter AI — Siaga Sehat" },
       {
         name: "description",
         content:
@@ -243,7 +243,7 @@ function ConsultationPage() {
         {/* Main Content Area */}
         <div className="w-full max-w-4xl mx-auto px-4 py-4 sm:py-6">
           {/* Chat Container Card */}
-          <div className="flex flex-col h-[76vh] min-h-[560px] max-h-[780px] rounded-[28px] bg-white shadow-[var(--shadow-clinic-lg)] border border-black/5 overflow-hidden">
+          <div className="flex flex-col h-[calc(100vh-140px)] min-h-[420px] md:h-[76vh] md:min-h-[560px] md:max-h-[780px] rounded-[28px] bg-white shadow-[var(--shadow-clinic-lg)] border border-black/5 overflow-hidden">
             {/* Consultation Card Header */}
             <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-black/5 bg-[#fafbfd] shrink-0">
               <div className="flex items-center gap-3">

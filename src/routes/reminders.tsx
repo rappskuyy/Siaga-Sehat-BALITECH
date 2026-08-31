@@ -30,7 +30,7 @@ export const Route = createFileRoute("/reminders")({
   }),
   head: () => ({
     meta: [
-      { title: "Notifikasi & Pengingat Obat — SiagaSehat" },
+      { title: "Notifikasi & Pengingat Obat — Siaga Sehat" },
       {
         name: "description",
         content:
