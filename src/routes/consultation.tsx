@@ -297,10 +297,11 @@ function ConsultationPage() {
               </div>
             )}
 
-            {/* Chat Messages Body */}
+            {/* Chat Messages Body - Lenis Prevent & Overscroll Contain enabled for smooth up/down scrolling */}
             <div
               ref={scrollRef}
-              className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#fcfdfd] scrollbar-thin scrollbar-thumb-slate-200"
+              data-lenis-prevent
+              className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-4 sm:p-6 bg-[#fcfdfd] scrollbar-thin scrollbar-thumb-slate-300 hover:scrollbar-thumb-slate-400"
             >
               {messages.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center text-center max-w-md mx-auto py-8">
