@@ -21,8 +21,10 @@ import {
   Home,
   ChevronUp,
   Phone,
+  List,
+  Layers,
 } from "lucide-react";
-import { GoogleMap, useJsApiLoader, Marker, Polyline } from "@react-google-maps/api";
+import { OpenStreetMapCanvas } from "./OpenStreetMapCanvas";
 import {
   DEFAULT_CENTER,
   fetchNearbyPharmacies,
@@ -35,6 +37,7 @@ import {
   type TransportMode,
 } from "./maps.service";
 import { getRandomFacilityPhoto, getFacilityDescriptionByIndex } from "@/data/facilitiesDummyData";
+import { getWikimediaFallbackPhoto } from "@/lib/maps/wikimedia.service";
 import { useAuth } from "@/lib/auth/auth-context";
 
 const containerStyle = {
@@ -43,7 +46,7 @@ const containerStyle = {
 };
 
 interface ExtendedRouteInfo extends RouteInfo {
-  directionsResult?: google.maps.DirectionsResult | null;
+  directionsResult?: any;
 }
 
 type Libraries = ("places" | "drawing" | "geometry" | "visualization")[];
@@ -114,117 +117,125 @@ const pharmacyActivePinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURICompon
 
 export function MobileMapView() {
   const { user } = useAuth();
-  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey,
-    libraries: GOOGLE_MAPS_LIBRARIES,
-  });
-
-  const mapRef = useRef<google.maps.Map | null>(null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [loadingLocation, setLoadingLocation] = useState<boolean>(false);
+  const [locationSource, setLocationSource] = useState<string>("GPS Presisi");
   const [pharmacies, setPharmacies] = useState<PharmacyNode[]>([]);
   const [selectedPharmacy, setSelectedPharmacy] = useState<PharmacyNode | null>(null);
   const [searchInput, setSearchInput] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const [facilityTypeFilter, setFacilityTypeFilter] = useState<"all" | "hospital" | "clinic" | "pharmacy">("all");
-  const [loading, setLoading] = useState(true);
+  const [loadingFacilities, setLoadingFacilities] = useState<boolean>(false);
+  const [showLocationList, setShowLocationList] = useState<boolean>(false);
   const [transportMode, setTransportMode] = useState<TransportMode>("driving");
   const [routeInfo, setRouteInfo] = useState<ExtendedRouteInfo | null>(null);
   const [showDetailsPanel, setShowDetailsPanel] = useState(false);
 
-  // Fetch user location
-  useEffect(() => {
-    const initializeLocation = async () => {
+  // High-precision GPS Geolocation
+  const getUserGeolocation = useCallback(async (isManualClick = false) => {
+    setLoadingLocation(true);
+
+    const updateLocationAndFacilities = async (coords: [number, number], source: string) => {
+      setUserLocation(coords);
+      setLocationSource(source);
+      setLoadingLocation(false);
+
+      let address = "";
       try {
-        const location = await fetchIPLocation();
-        if (location && Array.isArray(location) && typeof location[0] === "number" && !isNaN(location[0])) {
-          setUserLocation([location[0], location[1]]);
-          mapRef.current?.panTo({ lat: location[0], lng: location[1] });
-        } else {
-          setUserLocation(DEFAULT_CENTER);
-          mapRef.current?.panTo({ lat: DEFAULT_CENTER[0], lng: DEFAULT_CENTER[1] });
+        address = (await reverseGeocode(coords[0], coords[1])) || "";
+        if (address) {
+          setSearchInput(address);
         }
-      } catch (error) {
-        console.warn("Location fetch failed, using default:", error);
-        setUserLocation(DEFAULT_CENTER);
-        mapRef.current?.panTo({ lat: DEFAULT_CENTER[0], lng: DEFAULT_CENTER[1] });
-      }
+      } catch {}
+
+      await loadNearbyFacilities(coords[0], coords[1]);
     };
-    initializeLocation();
+
+    if (!navigator.geolocation) {
+      const ipCoords = await fetchIPLocation();
+      if (ipCoords) {
+        await updateLocationAndFacilities(ipCoords, "Lokasi IP");
+      } else {
+        await updateLocationAndFacilities(DEFAULT_CENTER, "Lokasi Default");
+      }
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+        await updateLocationAndFacilities(coords, "GPS Presisi");
+      },
+      async () => {
+        const ipCoords = await fetchIPLocation();
+        if (ipCoords) {
+          await updateLocationAndFacilities(ipCoords, "Lokasi IP");
+        } else {
+          await updateLocationAndFacilities(DEFAULT_CENTER, "Lokasi Default");
+        }
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 },
+    );
   }, []);
 
-  // Fetch nearby facilities
   useEffect(() => {
-    const fetchFacilities = async () => {
-      if (!userLocation) return;
-      try {
-        setLoading(true);
-        const results = await fetchNearbyPharmacies(
-          userLocation[0],
-          userLocation[1],
-          5000
-        );
-        setPharmacies(results);
-      } catch (error) {
-        console.error("Error fetching facilities:", error);
-      } finally {
-        setLoading(false);
+    getUserGeolocation();
+  }, [getUserGeolocation]);
+
+  // Load nearby facilities and calculate OSRM route for nearest facility
+  const loadNearbyFacilities = async (lat: number, lon: number) => {
+    setLoadingFacilities(true);
+    try {
+      // Fetch all nearby hospitals, clinics, and pharmacies around [lat, lon]
+      const results = await fetchNearbyPharmacies(lat, lon, undefined, undefined, "rendah");
+      setPharmacies(results);
+
+      if (results.length > 0) {
+        const nearest = results[0];
+        setSelectedPharmacy(nearest);
+        const route = await fetchOSRMRoute([lat, lon], nearest, transportMode);
+        setRouteInfo(route);
+      } else {
+        setSelectedPharmacy(null);
+        setRouteInfo(null);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching facilities:", error);
+    } finally {
+      setLoadingFacilities(false);
+    }
+  };
 
-    const timer = setTimeout(fetchFacilities, 1000);
-    return () => clearTimeout(timer);
-  }, [userLocation]);
-
-  // Filter pharmacies
+  // Filter pharmacies by facility type filter (All, Hospital, Clinic, Pharmacy)
   const filteredPharmacies = useMemo(() => {
     return pharmacies.filter((p) => {
-      const matchesFilter = facilityTypeFilter === "all" || p.facilityType === facilityTypeFilter;
-      const matchesSearch =
-        searchInput === "" ||
-        p.name.toLowerCase().includes(searchInput.toLowerCase()) ||
-        p.address?.toLowerCase().includes(searchInput.toLowerCase());
-      return matchesFilter && matchesSearch;
+      if (facilityTypeFilter === "all") return true;
+      return p.facilityType === facilityTypeFilter;
     });
-  }, [pharmacies, facilityTypeFilter, searchInput]);
-
-  const getMarkerIcon = (facility: PharmacyNode, isActive: boolean): string => {
-    if (facility.facilityType === "hospital") {
-      return isActive ? hospitalActivePinSvg : hospitalPinSvg;
-    }
-    if (facility.facilityType === "clinic") {
-      return isActive ? clinicActivePinSvg : clinicPinSvg;
-    }
-    return isActive ? pharmacyActivePinSvg : pharmacyPinSvg;
-  };
+  }, [pharmacies, facilityTypeFilter]);
 
   const handleSelectFacility = async (facility: PharmacyNode) => {
     setSelectedPharmacy(facility);
     setShowDetailsPanel(true);
+    setShowLocationList(false); // Otomatis hide daftar lokasi saat fasilitas dipilih
 
-    if (userLocation) {
-      try {
-        const route = await fetchOSRMRoute(
-          [userLocation[0], userLocation[1]],
-          facility,
-          transportMode
-        );
-        setRouteInfo(route);
-      } catch (error) {
-        console.error("Error fetching route:", error);
-      }
+    const startLoc = userLocation || DEFAULT_CENTER;
+    try {
+      const route = await fetchOSRMRoute(startLoc, facility, transportMode);
+      setRouteInfo(route);
+    } catch (error) {
+      console.error("Error fetching route:", error);
     }
   };
 
   const handleTransportModeChange = async (mode: TransportMode) => {
     setTransportMode(mode);
-    if (selectedPharmacy && userLocation) {
+    if (selectedPharmacy) {
+      const startLoc = userLocation || DEFAULT_CENTER;
       try {
-        const route = await fetchOSRMRoute(
-          [userLocation[0], userLocation[1]],
-          selectedPharmacy,
-          mode
-        );
+        const route = await fetchOSRMRoute(startLoc, selectedPharmacy, mode);
         setRouteInfo(route);
       } catch (error) {
         console.error("Error fetching route:", error);
@@ -232,146 +243,134 @@ export function MobileMapView() {
     }
   };
 
-  // Auto fit map bounds when route is loaded
-  useEffect(() => {
-    if (mapRef.current && routeInfo && routeInfo.coordinates && routeInfo.coordinates.length > 1) {
-      const bounds = new google.maps.LatLngBounds();
-      routeInfo.coordinates.forEach((c) => bounds.extend({ lat: c[0], lng: c[1] }));
-      mapRef.current.fitBounds(bounds, { top: 90, right: 40, bottom: 280, left: 40 });
-    }
-  }, [routeInfo]);
+  // Handle Manual Pin Placement on Map click
+  const handleManualLocationChange = async (coords: [number, number]) => {
+    setUserLocation(coords);
+    setLocationSource("Pin Manual");
+    let address = "";
+    try {
+      address = (await reverseGeocode(coords[0], coords[1])) || "";
+      if (address) setSearchInput(address);
+    } catch {}
+    await loadNearbyFacilities(coords[0], coords[1]);
+  };
 
-  if (!isLoaded) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center bg-slate-100">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-[#4a6fa5] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="text-[#6B7280] font-medium">Memuat Peta...</p>
-        </div>
-      </div>
-    );
-  }
+  // Address Geocoding Search
+  const handleAddressSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchInput.trim()) return;
+
+    setIsSearching(true);
+    setShowSearchResults(true);
+    try {
+      const results = await searchLocationByAddress(searchInput);
+      setSearchResults(results);
+      if (results.length === 1) {
+        handleSelectSearchResult(results[0]);
+      }
+    } catch {
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSelectSearchResult = (result: any) => {
+    const coords: [number, number] = [result.lat, result.lon];
+    setUserLocation(coords);
+    setLocationSource(`Alamat: ${result.displayname.slice(0, 25)}...`);
+    setShowSearchResults(false);
+    setShowLocationList(false);
+    loadNearbyFacilities(result.lat, result.lon);
+  };
 
   const finalPhotoUrl = selectedPharmacy
-    ? getRandomFacilityPhoto()
+    ? getWikimediaFallbackPhoto(selectedPharmacy.facilityType, selectedPharmacy.name?.charCodeAt(0) || 0)
     : undefined;
-
   const finalDescription = selectedPharmacy
     ? getFacilityDescriptionByIndex(selectedPharmacy.placeId?.charCodeAt(0) || 0)
     : "";
 
   return (
     <div className="fixed inset-0 w-full h-screen bg-white overflow-hidden flex flex-col lg:hidden">
-      {/* Full Screen Google Map */}
+      {/* Full Screen OpenStreetMap */}
       <div className="flex-1 relative">
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={userLocation ? { lat: userLocation[0], lng: userLocation[1] } : { lat: DEFAULT_CENTER[0], lng: DEFAULT_CENTER[1] }}
-          zoom={16}
-          options={{
-            disableDefaultUI: true,
-            zoomControl: false,
-            streetViewControl: false,
-            fullscreenControl: false,
-            mapTypeControl: false,
-            styles: [
-              {
-                featureType: "poi",
-                stylers: [{ visibility: "off" }],
-              },
-            ],
-          }}
-          onLoad={(map) => {
-            mapRef.current = map;
-          }}
-        >
-          {/* User Location Marker */}
-          {userLocation && (
-            <Marker
-              position={{ lat: userLocation[0], lng: userLocation[1] }}
-              icon={{
-                url: userLocationSvg,
-                scaledSize: new google.maps.Size(36, 36),
-                anchor: new google.maps.Point(18, 18),
-              }}
-              title="Lokasi Anda"
-            />
-          )}
-
-          {/* Facility Markers */}
-          {filteredPharmacies.map((facility) => (
-            <Marker
-              key={facility.placeId}
-              position={{ lat: facility.lat, lng: facility.lon }}
-              icon={{
-                url: getMarkerIcon(facility, selectedPharmacy?.placeId === facility.placeId),
-                scaledSize: new google.maps.Size(
-                  selectedPharmacy?.placeId === facility.placeId ? 46 : 34,
-                  selectedPharmacy?.placeId === facility.placeId ? 54 : 42
-                ),
-                anchor: new google.maps.Point(
-                  selectedPharmacy?.placeId === facility.placeId ? 23 : 17,
-                  selectedPharmacy?.placeId === facility.placeId ? 27 : 21
-                ),
-              }}
-              onClick={() => handleSelectFacility(facility)}
-              title={facility.name}
-            />
-          ))}
-
-          {/* Route Polyline (White Underlay + Blue Line) */}
-          {routeInfo && routeInfo.coordinates && routeInfo.coordinates.length > 1 && (
-            <>
-              <Polyline
-                path={routeInfo.coordinates.map((c) => ({ lat: c[0], lng: c[1] }))}
-                options={{
-                  strokeColor: "#FFFFFF",
-                  strokeWeight: 8,
-                  strokeOpacity: 0.95,
-                  zIndex: 1,
-                }}
-              />
-              <Polyline
-                path={routeInfo.coordinates.map((c) => ({ lat: c[0], lng: c[1] }))}
-                options={{
-                  strokeColor: "#379FD2",
-                  strokeWeight: 5,
-                  strokeOpacity: 1,
-                  zIndex: 2,
-                }}
-              />
-            </>
-          )}
-        </GoogleMap>
+        <OpenStreetMapCanvas
+          userLocation={userLocation}
+          pharmacies={filteredPharmacies}
+          selectedPharmacy={selectedPharmacy}
+          routeInfo={routeInfo}
+          onSelectPharmacy={handleSelectFacility}
+          onManualLocationChange={handleManualLocationChange}
+          className="w-full h-full"
+        />
 
         {/* Top Search Bar - Floating */}
-        <div className="absolute top-4 left-4 right-4 z-40">
-          <div className="flex gap-2 items-center">
+        <div className="absolute top-3 left-3 right-3 z-40">
+          <form onSubmit={handleAddressSearch} className="flex gap-2 items-center">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B7280] pointer-events-none" />
               <input
                 type="text"
-                placeholder="Cari rumah sakit, klinik, apotek..."
+                placeholder="Cari lokasi / rumah sakit..."
                 value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full pl-10 pr-3 py-2.5 rounded-2xl border border-[#E5E7EB] bg-white text-sm shadow-md focus:outline-none focus:border-[#4a6fa5]"
+                onChange={(e) => {
+                  setSearchInput(e.target.value);
+                  if (e.target.value.length > 2) {
+                    searchLocationByAddress(e.target.value)
+                      .then((res) => {
+                        setSearchResults(res);
+                        setShowSearchResults(true);
+                      })
+                      .catch(() => {});
+                  } else {
+                    setShowSearchResults(false);
+                  }
+                }}
+                className="w-full pl-10 pr-8 py-2.5 rounded-2xl border border-[#E5E7EB] bg-white/95 backdrop-blur-md text-xs font-medium text-[#111111] shadow-lg focus:outline-none focus:border-[#4a6fa5]"
               />
+              {searchInput && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchInput("");
+                    setShowSearchResults(false);
+                  }}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
             <button
-              onClick={() => {
-                setSearchInput("");
-                setFacilityTypeFilter("all");
-              }}
-              className="p-2.5 rounded-xl bg-white border border-[#E5E7EB] shadow-md hover:bg-slate-50 transition"
-              title="Reset"
+              type="button"
+              onClick={() => getUserGeolocation(true)}
+              className="p-2.5 rounded-2xl bg-white/95 backdrop-blur-md border border-[#E5E7EB] shadow-lg hover:bg-slate-50 transition active:scale-95 flex items-center justify-center text-[#4a6fa5]"
+              title="Perbarui GPS"
             >
-              <RefreshCw className="h-4 w-4 text-[#6B7280]" />
+              <RefreshCw className={`h-4 w-4 ${loadingLocation ? "animate-spin" : ""}`} />
             </button>
-          </div>
+          </form>
+
+          {/* Search Results Dropdown */}
+          {showSearchResults && searchResults.length > 0 && (
+            <div className="mt-2 bg-white rounded-2xl border border-[#E5E7EB] shadow-xl overflow-hidden max-h-48 overflow-y-auto z-50">
+              {searchResults.map((item, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSelectSearchResult(item)}
+                  className="w-full text-left px-3.5 py-2.5 text-xs text-[#111111] hover:bg-slate-50 border-b border-gray-100 last:border-0 flex items-start gap-2"
+                >
+                  <MapPin className="h-3.5 w-3.5 text-[#4a6fa5] mt-0.5 shrink-0" />
+                  <span className="line-clamp-2">{item.displayname}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Category Filter Bubbles - Floating */}
-        <div className="absolute top-16 left-4 right-4 z-40 flex gap-2 overflow-x-auto pb-2">
+        {/* Category Filter Bubbles */}
+        <div className="absolute top-16 left-3 right-3 z-40 flex gap-1.5 overflow-x-auto pb-1 no-scrollbar items-center">
           {[
             { id: "all", label: "Semua", icon: Building2 },
             { id: "hospital", label: "Rumah Sakit", icon: Building2 },
@@ -381,81 +380,140 @@ export function MobileMapView() {
             <button
               key={id}
               onClick={() => setFacilityTypeFilter(id as any)}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition shadow-sm ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition shadow-md backdrop-blur-md ${
                 facilityTypeFilter === id
                   ? "bg-[#4a6fa5] text-white"
-                  : "bg-white text-[#111111] border border-[#E5E7EB]"
+                  : "bg-white/95 text-[#111111] border border-[#E5E7EB]"
               }`}
             >
-              <Icon className="h-3.5 w-3.5" />
+              <Icon className="h-3 w-3" />
               {label}
             </button>
           ))}
+          <button
+            onClick={() => setShowLocationList(!showLocationList)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition shadow-md backdrop-blur-md shrink-0 ${
+              showLocationList
+                ? "bg-amber-500 text-white"
+                : "bg-white/95 text-[#4a6fa5] border border-[#4a6fa5]/40"
+            }`}
+          >
+            <List className="h-3.5 w-3.5" />
+            {showLocationList ? "Sembunyikan Daftar" : `Daftar Lokasi (${filteredPharmacies.length})`}
+          </button>
         </div>
 
-        {/* Floating Facility Bubbles - Bottom (Scrollable) */}
-        {!showDetailsPanel && filteredPharmacies.length > 0 && (
-          <div className="absolute bottom-24 left-4 right-4 z-40 max-h-[120px] overflow-x-auto pb-2">
-            <div className="flex gap-3 min-w-min">
-              {filteredPharmacies.slice(0, 8).map((facility) => (
-                <button
-                  key={facility.placeId}
-                  onClick={() => handleSelectFacility(facility)}
-                  className="flex flex-col gap-2 p-3 rounded-xl bg-white border border-[#E5E7EB] shadow-md hover:shadow-lg hover:border-[#4a6fa5] transition flex-shrink-0 w-[150px]"
-                >
-                  <div className="w-full h-20 rounded-lg overflow-hidden bg-slate-200">
-                    <img
-                      src={getRandomFacilityPhoto()}
-                      alt={facility.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="text-left">
-                    <h4 className="text-xs font-bold text-[#111111] line-clamp-2">{facility.name}</h4>
-                    <p className="text-[10px] text-[#6B7280] flex items-center gap-1 mt-1">
-                      <MapPin className="h-3 w-3" />
-                      {facility.distanceKm.toFixed(2)} km
-                    </p>
-                  </div>
-                </button>
-              ))}
+        {/* Active Route Floating Card Banner */}
+        {selectedPharmacy && routeInfo && (
+          <div className="absolute top-28 left-3 right-3 z-40">
+            <div className="bg-[#4a6fa5] text-white px-3.5 py-2.5 rounded-2xl shadow-xl flex items-center justify-between gap-2 border border-white/20 backdrop-blur-md">
+              <div className="flex items-center gap-2.5 overflow-hidden">
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                  <Navigation className="h-4 w-4 text-white" />
+                </div>
+                <div className="truncate">
+                  <p className="text-[11px] font-bold truncate">{selectedPharmacy.name}</p>
+                  <p className="text-[10px] text-white/80 font-medium">
+                    Estimasi {routeInfo.durationMin} Menit • {routeInfo.distanceKm} km
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowDetailsPanel(true)}
+                className="px-3 py-1.5 rounded-xl bg-white text-[#4a6fa5] text-[11px] font-extrabold hover:bg-slate-100 transition shrink-0 shadow-sm"
+              >
+                Detail
+              </button>
             </div>
           </div>
         )}
 
-        {/* Zoom Controls - Floating */}
-        <div className="absolute bottom-24 right-4 z-40 flex flex-col gap-2">
-          <button
-            onClick={() => mapRef.current?.setZoom((mapRef.current?.getZoom() || 16) + 1)}
-            className="p-2.5 rounded-lg bg-white border border-[#E5E7EB] shadow-md hover:bg-slate-50 transition"
-            title="Perbesar"
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          </button>
-          <button
-            onClick={() => mapRef.current?.setZoom((mapRef.current?.getZoom() || 16) - 1)}
-            className="p-2.5 rounded-lg bg-white border border-[#E5E7EB] shadow-md hover:bg-slate-50 transition"
-            title="Perkecil"
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-            </svg>
-          </button>
-          <button
-            onClick={() => {
-              if (userLocation) {
-                mapRef.current?.panTo({ lat: userLocation[0], lng: userLocation[1] });
-                mapRef.current?.setZoom(16);
-              }
-            }}
-            className="p-2.5 rounded-lg bg-[#4a6fa5] text-white border border-[#4a6fa5] shadow-md hover:bg-[#35517d] transition"
-            title="Lokasi Saya"
-          >
-            <Crosshair className="h-5 w-5" />
-          </button>
-        </div>
+        {/* Floating Facility Cards Horizontal Carousel - Bottom (Shown only when showLocationList is true) */}
+        {showLocationList && !showDetailsPanel && filteredPharmacies.length > 0 && (
+          <div className="absolute bottom-[80px] left-3 right-3 z-40 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-[#E5E7EB] shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200 max-h-[220px] flex flex-col">
+            <div className="flex items-center justify-between mb-2 shrink-0">
+              <h3 className="text-xs font-extrabold text-[#111111] flex items-center gap-1.5">
+                <List className="h-4 w-4 text-[#4a6fa5]" />
+                Daftar Lokasi Terdekat ({filteredPharmacies.length})
+              </h3>
+              <button
+                onClick={() => setShowLocationList(false)}
+                className="text-xs text-gray-500 hover:text-gray-800 p-1 font-bold"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="overflow-y-auto space-y-2 pr-1 max-h-[160px]">
+              {filteredPharmacies.map((facility) => {
+                const isSelected = selectedPharmacy?.id === facility.id;
+                const isHosp = facility.facilityType === "hospital";
+                const isClinic = facility.facilityType === "clinic";
+                return (
+                  <button
+                    key={facility.id}
+                    onClick={() => handleSelectFacility(facility)}
+                    className={`w-full text-left p-2.5 rounded-xl border transition flex items-center justify-between gap-2.5 ${
+                      isSelected
+                        ? "bg-[#4a6fa5]/10 border-[#4a6fa5] ring-1 ring-[#4a6fa5]"
+                        : "bg-white border-[#E5E7EB] hover:bg-slate-50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 overflow-hidden">
+                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-200 shrink-0">
+                        <img
+                          src={getWikimediaFallbackPhoto(facility.facilityType, facility.name.charCodeAt(0) || 0)}
+                          alt={facility.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="truncate">
+                        <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md block w-max mb-0.5 ${
+                          isHosp ? "bg-red-100 text-red-700" : isClinic ? "bg-amber-100 text-amber-700" : "bg-blue-100 text-blue-700"
+                        }`}>
+                          {isHosp ? "RUMAH SAKIT" : isClinic ? "KLINIK" : "APOTEK"}
+                        </span>
+                        <h4 className="text-xs font-bold text-[#111111] truncate">{facility.name}</h4>
+                        <p className="text-[10px] text-gray-500 truncate">{facility.address || "Alamat Terdaftar"}</p>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="text-xs font-extrabold text-[#4a6fa5] block">
+                        {facility.distanceKm < 1 ? `${(facility.distanceKm * 1000).toFixed(0)} m` : `${facility.distanceKm.toFixed(1)} km`}
+                      </span>
+                      <span className="text-[10px] text-amber-500 font-bold">★ {facility.rating || "4.8"}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Floating Toggle Button (Bottom Left) when list is hidden */}
+        {!showLocationList && !showDetailsPanel && (
+          <div className="absolute bottom-[80px] left-3 z-40">
+            <button
+              onClick={() => setShowLocationList(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-white/95 backdrop-blur-md border border-[#E5E7EB] shadow-xl text-xs font-bold text-[#4a6fa5] hover:bg-slate-50 active:scale-95 transition"
+            >
+              <List className="h-4 w-4" />
+              Daftar Lokasi ({filteredPharmacies.length})
+            </button>
+          </div>
+        )}
+
+        {/* Recenter GPS Floating Button (Bottom Right) */}
+        {!showDetailsPanel && (
+          <div className="absolute bottom-[80px] right-3 z-40">
+            <button
+              onClick={() => getUserGeolocation(true)}
+              className="p-3 rounded-full bg-[#4a6fa5] text-white border-2 border-white shadow-xl hover:bg-[#35517d] transition active:scale-90 flex items-center justify-center"
+              title="Lokasi Presisi Saya"
+            >
+              <Crosshair className={`h-5 w-5 ${loadingLocation ? "animate-spin" : ""}`} />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Details Panel - Bottom Sheet */}

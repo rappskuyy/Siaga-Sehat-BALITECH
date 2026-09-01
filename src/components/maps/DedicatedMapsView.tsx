@@ -29,8 +29,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BrandLogo } from "@/components/ui/BrandLogo";
-import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
+import { OpenStreetMapCanvas } from "./OpenStreetMapCanvas";
 import {
   DEFAULT_CENTER,
   fetchNearbyPharmacies,
@@ -55,20 +54,22 @@ const containerStyle = {
 };
 
 interface ExtendedRouteInfo extends RouteInfo {
-  directionsResult?: google.maps.DirectionsResult | null;
+  directionsResult?: any;
 }
 
 type Libraries = ("places" | "drawing" | "geometry" | "visualization")[];
 const GOOGLE_MAPS_LIBRARIES: Libraries = Object.freeze(["places"]) as Libraries;
 
-// High quality photo fallbacks
+import {
+  fetchWikimediaFacilityPhoto,
+  getWikimediaFallbackPhoto,
+  WIKIMEDIA_FALLBACKS,
+} from "@/lib/maps/wikimedia.service";
+
 const FACILITY_PHOTOS = {
-  hospital:
-    "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=600&auto=format&fit=crop&q=80",
-  clinic:
-    "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=80",
-  pharmacy:
-    "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=600&auto=format&fit=crop&q=80",
+  hospital: WIKIMEDIA_FALLBACKS.hospital[0],
+  clinic: WIKIMEDIA_FALLBACKS.clinic[0],
+  pharmacy: WIKIMEDIA_FALLBACKS.pharmacy[0],
 };
 
 // Review comments snippets
@@ -144,211 +145,7 @@ const pharmacyActivePinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURICompon
 </svg>
 `)}`;
 
-/**
- * OpenStreetMap Canvas (Light Tiles Daytime Mode)
- */
-function OpenStreetMapCanvas({
-  userLocation,
-  pharmacies,
-  selectedPharmacy,
-  routeInfo,
-  onSelectPharmacy,
-}: {
-  userLocation: [number, number] | null;
-  pharmacies: PharmacyNode[];
-  selectedPharmacy: PharmacyNode | null;
-  routeInfo: RouteInfo | null;
-  onSelectPharmacy: (p: PharmacyNode) => void;
-}) {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const leafletInstance = useRef<any>(null);
-  const markersLayer = useRef<any>(null);
-  const routePolyline = useRef<any>(null);
 
-  useEffect(() => {
-    if (typeof window === "undefined" || !mapContainerRef.current) return;
-
-    let isSubscribed = true;
-
-    import("leaflet").then((L) => {
-      if (!isSubscribed || !mapContainerRef.current) return;
-
-      if (!leafletInstance.current) {
-        const centerPos: [number, number] = selectedPharmacy
-          ? [selectedPharmacy.lat, selectedPharmacy.lon]
-          : userLocation || DEFAULT_CENTER;
-
-        const map = L.map(mapContainerRef.current, {
-          zoomControl: false,
-          attributionControl: false,
-        }).setView(centerPos, 14);
-
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          maxZoom: 19,
-          attribution: "&copy; OpenStreetMap contributors",
-        }).addTo(map);
-
-        leafletInstance.current = map;
-        markersLayer.current = L.layerGroup().addTo(map);
-      }
-    });
-
-    return () => {
-      isSubscribed = false;
-      if (leafletInstance.current) {
-        leafletInstance.current.remove();
-        leafletInstance.current = null;
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!leafletInstance.current || typeof window === "undefined") return;
-
-    import("leaflet").then((L) => {
-      const map = leafletInstance.current;
-      const group = markersLayer.current;
-      if (!map || !group) return;
-
-      group.clearLayers();
-
-      // Render User Location
-      if (userLocation) {
-        const userIcon = L.divIcon({
-          className: "custom-user-pin",
-          html: `<div style="width:24px;height:24px;border-radius:50%;background:#2563EB;border:3px solid #FFFFFF;box-shadow:0 0 10px rgba(37,99,235,0.6);"></div>`,
-          iconSize: [24, 24],
-          iconAnchor: [12, 12],
-        });
-        L.marker(userLocation, { icon: userIcon }).addTo(group);
-      }
-
-      // Render Facility Pins
-      pharmacies.forEach((pharm) => {
-        const isSelected = selectedPharmacy?.id === pharm.id;
-        const isHospital = pharm.facilityType === "hospital";
-        const isClinic = pharm.facilityType === "clinic";
-
-        const bgCol = isHospital ? "#EF4444" : isClinic ? "#F59E0B" : "#379FD2";
-        const pinSize = isSelected ? 36 : 28;
-        const emoji = isHospital ? "🏥" : isClinic ? "🩺" : "💊";
-
-        const iconHtml = `
-          <div style="
-            width: ${pinSize}px;
-            height: ${pinSize}px;
-            border-radius: 50%;
-            background: ${bgCol};
-            border: 2.5px solid #FFFFFF;
-            box-shadow: 0 3px 10px ${bgCol}70;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: ${isSelected ? 17 : 13}px;
-            transform: ${isSelected ? "scale(1.15)" : "scale(1)"};
-            transition: transform 0.2s ease;
-          ">
-            ${emoji}
-          </div>
-        `;
-
-        const facilityIcon = L.divIcon({
-          className: "custom-facility-pin",
-          html: iconHtml,
-          iconSize: [pinSize, pinSize],
-          iconAnchor: [pinSize / 2, pinSize / 2],
-        });
-
-        const m = L.marker([pharm.lat, pharm.lon], { icon: facilityIcon }).addTo(group);
-        m.on("click", () => onSelectPharmacy(pharm));
-      });
-
-      // Clear previous polyline
-      if (routePolyline.current) {
-        map.removeLayer(routePolyline.current);
-        routePolyline.current = null;
-      }
-
-      // Draw polyline if routeInfo available
-      if (routeInfo && routeInfo.coordinates && routeInfo.coordinates.length > 1) {
-        const polyline = L.polyline(routeInfo.coordinates, {
-          color: "#379FD2",
-          weight: 5,
-          opacity: 0.95,
-        }).addTo(map);
-
-        routePolyline.current = polyline;
-        map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
-      } else if (selectedPharmacy) {
-        map.panTo([selectedPharmacy.lat, selectedPharmacy.lon]);
-      }
-    });
-  }, [userLocation, pharmacies, selectedPharmacy, routeInfo, onSelectPharmacy]);
-
-  return <div ref={mapContainerRef} className="w-full h-full" />;
-}
-
-/**
- * Route Polyline Renderer for Google Maps
- */
-function MapRouteRenderer({
-  map,
-  routeInfo,
-}: {
-  map: google.maps.Map | null;
-  routeInfo: ExtendedRouteInfo | null;
-}) {
-  const underlayPolylineRef = useRef<google.maps.Polyline | null>(null);
-  const foregroundPolylineRef = useRef<google.maps.Polyline | null>(null);
-
-  useEffect(() => {
-    if (underlayPolylineRef.current) {
-      underlayPolylineRef.current.setMap(null);
-      underlayPolylineRef.current = null;
-    }
-    if (foregroundPolylineRef.current) {
-      foregroundPolylineRef.current.setMap(null);
-      foregroundPolylineRef.current = null;
-    }
-
-    if (!map || !routeInfo || !routeInfo.coordinates || routeInfo.coordinates.length < 2) return;
-
-    const path = routeInfo.coordinates.map((c) => ({ lat: c[0], lng: c[1] }));
-
-    const underlay = new google.maps.Polyline({
-      map: map,
-      path: path,
-      strokeColor: "#FFFFFF",
-      strokeWeight: 8,
-      strokeOpacity: 0.95,
-      zIndex: 1,
-    });
-    underlayPolylineRef.current = underlay;
-
-    const foreground = new google.maps.Polyline({
-      map: map,
-      path: path,
-      strokeColor: "#379FD2",
-      strokeWeight: 5,
-      strokeOpacity: 1,
-      zIndex: 2,
-    });
-    foregroundPolylineRef.current = foreground;
-
-    if (window.google && window.google.maps && path.length > 1) {
-      const bounds = new window.google.maps.LatLngBounds();
-      path.forEach((pt) => bounds.extend(pt));
-      map.fitBounds(bounds, { top: 60, right: 60, bottom: 60, left: 60 });
-    }
-
-    return () => {
-      if (underlayPolylineRef.current) underlayPolylineRef.current.setMap(null);
-      if (foregroundPolylineRef.current) foregroundPolylineRef.current.setMap(null);
-    };
-  }, [map, routeInfo]);
-
-  return null;
-}
 
 const NAV_ITEMS = ["Tentang Kami", "Layanan", "Dokter", "Hubungi"];
 
@@ -377,31 +174,6 @@ export function DedicatedMapsView() {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
-
-  const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-
-  // Standardized loader ID
-  const { isLoaded, loadError } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: googleApiKey,
-    libraries: GOOGLE_MAPS_LIBRARIES,
-  });
-
-  const onLoad = useCallback(
-    function callback(mapInstance: google.maps.Map) {
-      setMap(mapInstance);
-      if (userLocation) {
-        mapInstance.panTo({ lat: userLocation[0], lng: userLocation[1] });
-        mapInstance.setZoom(14);
-      }
-    },
-    [userLocation],
-  );
-
-  const onUnmount = useCallback(function callback() {
-    setMap(null);
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -452,10 +224,6 @@ export function DedicatedMapsView() {
       setUserLocation(coords);
       setLocationSource(source);
       setLoadingLocation(false);
-      if (map) {
-        map.panTo({ lat: coords[0], lng: coords[1] });
-        map.setZoom(14);
-      }
       let addressName = "";
       try {
         addressName = (await reverseGeocode(coords[0], coords[1])) || "";
@@ -502,7 +270,7 @@ export function DedicatedMapsView() {
       const nodes = await fetchNearbyPharmacies(
         lat,
         lon,
-        map || undefined,
+        undefined,
         currentAddress,
         "rendah",
       );
@@ -569,11 +337,6 @@ export function DedicatedMapsView() {
     setSelectedPlace(null);
     setRouteInfo(null);
 
-    if (map) {
-      map.panTo({ lat: result.lat, lng: result.lon });
-      map.setZoom(14);
-    }
-
     try {
       sessionStorage.setItem(
         SAVED_LOCATION_KEY,
@@ -618,14 +381,9 @@ export function DedicatedMapsView() {
       setSelectedPharmacy(pharmacy);
       setRouteInfo(null);
 
-      if (map) {
-        map.panTo({ lat: pharmacy.lat, lng: pharmacy.lon });
-        map.setZoom(15);
-      }
-
       selectPharmacyAndRoute(pharmacy, transportMode, userLocation || undefined);
     },
-    [map, transportMode, userLocation],
+    [transportMode, userLocation],
   );
 
   const handleTransportModeChange = (newMode: TransportMode) => {
@@ -643,59 +401,19 @@ export function DedicatedMapsView() {
     const startLoc = origin || userLocation || DEFAULT_CENTER;
     setLoadingRoute(true);
 
-    const useOSRM = async () => {
-      try {
-        const osrmData = await fetchOSRMRoute(startLoc, pharmacy, mode);
-        setRouteInfo({
-          coordinates: osrmData.coordinates,
-          distanceKm: osrmData.distanceKm,
-          durationMin: osrmData.durationMin,
-          directionsResult: null,
-          mode: mode,
-        });
-      } catch (e) {
-        console.error("OSRM Route Error:", e);
-      } finally {
-        setLoadingRoute(false);
-      }
-    };
-
     try {
-      if (window.google && window.google.maps && window.google.maps.DirectionsService) {
-        const directionsService = new window.google.maps.DirectionsService();
-        const googleTravelMode = window.google.maps.TravelMode.DRIVING;
-
-        directionsService.route(
-          {
-            origin: new window.google.maps.LatLng(startLoc[0], startLoc[1]),
-            destination: new window.google.maps.LatLng(pharmacy.lat, pharmacy.lon),
-            travelMode: googleTravelMode,
-          },
-          async (result, status) => {
-            if (status === window.google.maps.DirectionsStatus.OK && result) {
-              const leg = result.routes[0].legs[0];
-              setRouteInfo({
-                coordinates: [],
-                distanceKm: leg.distance
-                  ? Number((leg.distance.value / 1000).toFixed(2))
-                  : pharmacy.distanceKm,
-                durationMin: leg.duration
-                  ? Math.ceil(leg.duration.value / 60)
-                  : Math.ceil(pharmacy.distanceKm * 4),
-                directionsResult: result,
-                mode: mode,
-              });
-              setLoadingRoute(false);
-            } else {
-              await useOSRM();
-            }
-          },
-        );
-      } else {
-        await useOSRM();
-      }
-    } catch {
-      await useOSRM();
+      const osrmData = await fetchOSRMRoute(startLoc, pharmacy, mode);
+      setRouteInfo({
+        coordinates: osrmData.coordinates,
+        distanceKm: osrmData.distanceKm,
+        durationMin: osrmData.durationMin,
+        directionsResult: null,
+        mode: mode,
+      });
+    } catch (e) {
+      console.error("OSRM Route Error:", e);
+    } finally {
+      setLoadingRoute(false);
     }
   };
 
@@ -719,8 +437,6 @@ export function DedicatedMapsView() {
     ? { lat: userLocation[0], lng: userLocation[1] }
     : { lat: DEFAULT_CENTER[0], lng: DEFAULT_CENTER[1] };
 
-  const useGoogleMapsEngine = Boolean(isLoaded && !loadError);
-
   const [dynamicPhotoUrl, setDynamicPhotoUrl] = useState<string | null>(null);
   const [dynamicReviewText, setDynamicReviewText] = useState<string | null>(null);
 
@@ -737,24 +453,20 @@ export function DedicatedMapsView() {
       setDynamicPhotoUrl(null);
     }
 
-    if (
-      typeof window !== "undefined" &&
-      window.google &&
-      window.google.maps &&
-      window.google.maps.places
-    ) {
+    const winG = typeof window !== "undefined" ? (window as any).google : undefined;
+    if (winG && winG.maps && winG.maps.places) {
       try {
         const dummyDiv = document.createElement("div");
-        const service = new window.google.maps.places.PlacesService(dummyDiv);
+        const service = new winG.maps.places.PlacesService(dummyDiv);
 
         service.findPlaceFromQuery(
           {
             query: `${selectedPharmacy.name} ${selectedPharmacy.address || ""}`,
             fields: ["place_id", "photos", "rating", "user_ratings_total"],
           },
-          (results, status) => {
+          (results: any[], status: string) => {
             if (
-              status === window.google.maps.places.PlacesServiceStatus.OK &&
+              status === winG.maps.places.PlacesServiceStatus.OK &&
               results &&
               results[0]
             ) {
@@ -765,8 +477,8 @@ export function DedicatedMapsView() {
               if (pId) {
                 service.getDetails(
                   { placeId: pId, fields: ["photos", "reviews", "formatted_phone_number"] },
-                  (details, dStatus) => {
-                    if (dStatus === window.google.maps.places.PlacesServiceStatus.OK && details) {
+                  (details: any, dStatus: string) => {
+                    if (dStatus === winG.maps.places.PlacesServiceStatus.OK && details) {
                       if (details.photos && details.photos.length > 0) {
                         setDynamicPhotoUrl(
                           details.photos[0].getUrl({ maxWidth: 800, maxHeight: 600 }),
@@ -788,13 +500,11 @@ export function DedicatedMapsView() {
     }
   }, [selectedPharmacy?.id, selectedPharmacy?.name]);
 
-  // Stable photo fallback
+  // Stable photo fallback from Wikimedia Commons
   const activePhotoUrl = useMemo(() => {
-    if (!selectedPharmacy) return FACILITY_PHOTOS.hospital;
-    if (selectedPharmacy.facilityType === "hospital") return FACILITY_PHOTOS.hospital;
-    if (selectedPharmacy.facilityType === "clinic") return FACILITY_PHOTOS.clinic;
-    return FACILITY_PHOTOS.pharmacy;
-  }, [selectedPharmacy?.id, selectedPharmacy?.facilityType]);
+    if (!selectedPharmacy) return WIKIMEDIA_FALLBACKS.hospital[0];
+    return getWikimediaFallbackPhoto(selectedPharmacy.facilityType, selectedPharmacy.name?.charCodeAt(0) || 0);
+  }, [selectedPharmacy?.id, selectedPharmacy?.facilityType, selectedPharmacy?.name]);
 
   // Stable review snippet fallback
   const activeReviewText = useMemo(() => {
@@ -1016,112 +726,14 @@ export function DedicatedMapsView() {
             }`}
           >
             <div className="relative flex-1 w-full h-full">
-              {useGoogleMapsEngine ? (
-                <GoogleMap
-                  mapContainerStyle={containerStyle}
-                  center={mapCenter}
-                  zoom={14}
-                  onLoad={onLoad}
-                  onUnmount={onUnmount}
-                  options={{
-                    mapTypeControl: false,
-                    streetViewControl: false,
-                    fullscreenControl: false,
-                    zoomControl: false,
-                  }}
-                >
-                  {/* User Location Marker */}
-                  {userLocation && (
-                    <Marker
-                      position={{ lat: userLocation[0], lng: userLocation[1] }}
-                      icon={{
-                        url: userLocationSvg,
-                        scaledSize: new google.maps.Size(36, 36),
-                        anchor: new google.maps.Point(18, 18),
-                      }}
-                    />
-                  )}
-
-                  {/* Facility Markers */}
-                  {pharmacies.map((pharm) => {
-                    const isSelected = selectedPharmacy?.id === pharm.id;
-                    const isHospital = pharm.facilityType === "hospital";
-                    const isClinic = pharm.facilityType === "clinic";
-
-                    const pinUrl = isHospital
-                      ? isSelected
-                        ? hospitalActivePinSvg
-                        : hospitalPinSvg
-                      : isClinic
-                        ? isSelected
-                          ? clinicActivePinSvg
-                          : clinicPinSvg
-                        : isSelected
-                          ? pharmacyActivePinSvg
-                          : pharmacyPinSvg;
-
-                    return (
-                      <Marker
-                        key={pharm.id}
-                        position={{ lat: pharm.lat, lng: pharm.lon }}
-                        onClick={() => handleSelectPharmacy(pharm)}
-                        icon={{
-                          url: pinUrl,
-                          scaledSize: isSelected
-                            ? new google.maps.Size(46, 54)
-                            : new google.maps.Size(34, 42),
-                          anchor: isSelected
-                            ? new google.maps.Point(23, 48)
-                            : new google.maps.Point(17, 42),
-                        }}
-                      />
-                    );
-                  })}
-
-                  <MapRouteRenderer map={map} routeInfo={routeInfo} />
-                </GoogleMap>
-              ) : (
-                <OpenStreetMapCanvas
-                  userLocation={userLocation}
-                  pharmacies={pharmacies}
-                  selectedPharmacy={selectedPharmacy}
-                  routeInfo={routeInfo}
-                  onSelectPharmacy={handleSelectPharmacy}
-                />
-              )}
-
-              {/* Map Controls */}
-              <div className="absolute top-4 right-4 z-20 flex flex-col gap-1.5 shadow-md">
-                <button
-                  type="button"
-                  onClick={() => map?.setZoom((map.getZoom() || 14) + 1)}
-                  className="grid h-9 w-9 place-items-center rounded-xl bg-[#FFFFFF] text-[#379FD2] hover:bg-[#ABE2FE]/20 border border-[#E5E7EB] transition cursor-pointer shadow-xs"
-                  title="Perbesar"
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => map?.setZoom((map.getZoom() || 14) - 1)}
-                  className="grid h-9 w-9 place-items-center rounded-xl bg-[#FFFFFF] text-[#379FD2] hover:bg-[#ABE2FE]/20 border border-[#E5E7EB] transition cursor-pointer shadow-xs"
-                  title="Perkecil"
-                >
-                  <Minus className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (userLocation && map) {
-                      map.panTo({ lat: userLocation[0], lng: userLocation[1] });
-                      map.setZoom(15);
-                    }
-                  }}
-                  className="grid h-9 w-9 place-items-center rounded-xl bg-[#FFFFFF] text-[#379FD2] hover:bg-[#ABE2FE]/20 border border-[#E5E7EB] transition cursor-pointer shadow-xs"
-                  title="Posisi Saya"
-                >
-                  <Crosshair className="h-4 w-4" />
-                </button>
-              </div>
+              <OpenStreetMapCanvas
+                userLocation={userLocation}
+                pharmacies={pharmacies}
+                selectedPharmacy={selectedPharmacy}
+                routeInfo={routeInfo}
+                onSelectPharmacy={handleSelectPharmacy}
+                className="w-full h-full"
+              />
             </div>
           </div>
 

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
+import { OpenStreetMapCanvas } from "./OpenStreetMapCanvas";
 import {
   DEFAULT_CENTER,
   fetchNearbyPharmacies,
@@ -38,7 +38,7 @@ const containerStyle = {
 };
 
 interface ExtendedRouteInfo extends RouteInfo {
-  directionsResult?: google.maps.DirectionsResult | null;
+  directionsResult?: any;
 }
 
 type Libraries = ("places" | "drawing" | "geometry" | "visualization")[];
@@ -112,97 +112,6 @@ const pharmacyActivePinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURICompon
 /**
  * Route Renderer with White Underlay and landing-page blue Route Polyline
  */
-function MapRouteRenderer({
-  map,
-  routeInfo,
-}: {
-  map: google.maps.Map | null;
-  routeInfo: ExtendedRouteInfo | null;
-}) {
-  const directionsRendererRef = useRef<google.maps.DirectionsRenderer | null>(null);
-  const underlayPolylineRef = useRef<google.maps.Polyline | null>(null);
-  const foregroundPolylineRef = useRef<google.maps.Polyline | null>(null);
-
-  useEffect(() => {
-    if (directionsRendererRef.current) {
-      directionsRendererRef.current.setMap(null);
-      directionsRendererRef.current = null;
-    }
-    if (underlayPolylineRef.current) {
-      underlayPolylineRef.current.setMap(null);
-      underlayPolylineRef.current = null;
-    }
-    if (foregroundPolylineRef.current) {
-      foregroundPolylineRef.current.setMap(null);
-      foregroundPolylineRef.current = null;
-    }
-
-    if (!map || !routeInfo) return;
-
-    if (routeInfo.directionsResult) {
-      const renderer = new google.maps.DirectionsRenderer({
-        map: map,
-        directions: routeInfo.directionsResult,
-        suppressMarkers: true,
-        polylineOptions: {
-          strokeColor: "#4A6FA5",
-          strokeWeight: 5,
-          strokeOpacity: 0.95,
-        },
-      });
-      directionsRendererRef.current = renderer;
-    } else if (routeInfo.coordinates && routeInfo.coordinates.length > 0) {
-      const path = routeInfo.coordinates.map((c) => ({ lat: c[0], lng: c[1] }));
-
-      // 1. Subtle White Underlay
-      const underlay = new google.maps.Polyline({
-        map: map,
-        path: path,
-        strokeColor: "#FFFFFF",
-        strokeWeight: 9,
-        strokeOpacity: 0.95,
-        zIndex: 1,
-      });
-      underlayPolylineRef.current = underlay;
-
-      // 2. Primary Route landing-page blue
-      const foreground = new google.maps.Polyline({
-        map: map,
-        path: path,
-        strokeColor: "#4A6FA5",
-        strokeWeight: 5,
-        strokeOpacity: 1,
-        zIndex: 2,
-      });
-      foregroundPolylineRef.current = foreground;
-
-      // Auto fit bounds
-      if (window.google && window.google.maps && path.length > 1) {
-        const bounds = new window.google.maps.LatLngBounds();
-        path.forEach((pt) => bounds.extend(pt));
-        map.fitBounds(bounds, { top: 60, right: 60, bottom: 60, left: 60 });
-      }
-    }
-
-    return () => {
-      if (directionsRendererRef.current) {
-        directionsRendererRef.current.setMap(null);
-        directionsRendererRef.current = null;
-      }
-      if (underlayPolylineRef.current) {
-        underlayPolylineRef.current.setMap(null);
-        underlayPolylineRef.current = null;
-      }
-      if (foregroundPolylineRef.current) {
-        foregroundPolylineRef.current.setMap(null);
-        foregroundPolylineRef.current = null;
-      }
-    };
-  }, [map, routeInfo]);
-
-  return null;
-}
-
 interface PharmacyMapProps {
   dangerLevel?: DangerLevelType;
   conditionName?: string;
@@ -233,30 +142,6 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
-
-  const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: googleApiKey,
-    libraries: GOOGLE_MAPS_LIBRARIES,
-  });
-
-  const onLoad = useCallback(
-    function callback(mapInstance: google.maps.Map) {
-      setMap(mapInstance);
-      if (userLocation) {
-        mapInstance.panTo({ lat: userLocation[0], lng: userLocation[1] });
-        mapInstance.setZoom(14);
-      }
-    },
-    [userLocation],
-  );
-
-  const onUnmount = useCallback(function callback() {
-    setMap(null);
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -313,10 +198,6 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
       setUserLocation(coords);
       setLocationSource(source);
       setLoadingLocation(false);
-      if (map) {
-        map.panTo({ lat: coords[0], lng: coords[1] });
-        map.setZoom(14);
-      }
       let addressName = "";
       try {
         addressName = (await reverseGeocode(coords[0], coords[1])) || "";
@@ -391,13 +272,6 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
     setShowSearchResults(false);
     setSelectedPharmacy(null);
     setSelectedPlace(null);
-    setRouteInfo(null);
-
-    if (map) {
-      map.panTo({ lat: result.lat, lng: result.lon });
-      map.setZoom(14);
-    }
-
     try {
       sessionStorage.setItem(
         SAVED_LOCATION_KEY,
@@ -417,9 +291,6 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
     setSelectedPharmacy(null);
     setSelectedPlace(null);
     setRouteInfo(null);
-    if (map) {
-      map.panTo({ lat: coords[0], lng: coords[1] });
-    }
 
     let newAddress = "";
     try {
@@ -463,7 +334,7 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
       const nodes = await fetchNearbyPharmacies(
         lat,
         lon,
-        map || undefined,
+        undefined,
         currentAddress,
         dangerLevel,
       );
@@ -567,64 +438,19 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
     const startLoc = origin || userLocation || DEFAULT_CENTER;
     setLoadingRoute(true);
 
-    const useOSRMRoute = async () => {
-      try {
-        const osrmData = await fetchOSRMRoute(startLoc, pharmacy, mode);
-        setRouteInfo({
-          coordinates: osrmData.coordinates,
-          distanceKm: osrmData.distanceKm,
-          durationMin: osrmData.durationMin,
-          directionsResult: null,
-          mode: mode,
-        });
-      } catch (e) {
-        console.error("OSRM Route Error:", e);
-      } finally {
-        setLoadingRoute(false);
-      }
-    };
-
     try {
-      if (
-        googleApiKey &&
-        window.google &&
-        window.google.maps &&
-        window.google.maps.DirectionsService
-      ) {
-        const directionsService = new window.google.maps.DirectionsService();
-        const googleTravelMode = window.google.maps.TravelMode.DRIVING;
-
-        directionsService.route(
-          {
-            origin: new window.google.maps.LatLng(startLoc[0], startLoc[1]),
-            destination: new window.google.maps.LatLng(pharmacy.lat, pharmacy.lon),
-            travelMode: googleTravelMode,
-          },
-          async (result, status) => {
-            if (status === window.google.maps.DirectionsStatus.OK && result) {
-              const leg = result.routes[0].legs[0];
-              setRouteInfo({
-                coordinates: [],
-                distanceKm: leg.distance
-                  ? Number((leg.distance.value / 1000).toFixed(2))
-                  : pharmacy.distanceKm,
-                durationMin: leg.duration
-                  ? Math.ceil(leg.duration.value / 60)
-                  : Math.ceil(pharmacy.distanceKm * 4),
-                directionsResult: result,
-                mode: mode,
-              });
-              setLoadingRoute(false);
-            } else {
-              await useOSRMRoute();
-            }
-          },
-        );
-      } else {
-        await useOSRMRoute();
-      }
-    } catch {
-      await useOSRMRoute();
+      const osrmData = await fetchOSRMRoute(startLoc, pharmacy, mode);
+      setRouteInfo({
+        coordinates: osrmData.coordinates,
+        distanceKm: osrmData.distanceKm,
+        durationMin: osrmData.durationMin,
+        directionsResult: null,
+        mode: mode,
+      });
+    } catch (e) {
+      console.error("OSRM Route Error:", e);
+    } finally {
+      setLoadingRoute(false);
     }
   };
 
@@ -843,126 +669,21 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
           />
         </div>
 
-        {/* 03. Google Maps Canvas Area */}
+        {/* 03. OpenStreetMap Canvas Area */}
         <div
           className={`relative flex-1 min-w-0 h-[420px] sm:h-[480px] lg:h-full rounded-2xl overflow-hidden border border-[#E5E7EB] bg-[#FFFFFF] shadow-inner ${
             mobileTab === "map" ? "block" : "hidden lg:block"
           }`}
         >
-          {isLoaded ? (
-            <GoogleMap
-              mapContainerStyle={containerStyle}
-              center={mapCenter}
-              zoom={14}
-              onLoad={onLoad}
-              onUnmount={onUnmount}
-              options={{
-                mapTypeControl: false,
-                streetViewControl: false,
-                fullscreenControl: false,
-                zoomControl: false,
-              }}
-              onClick={(e) => {
-                if (e.latLng) {
-                  handleManualLocationChange([e.latLng.lat(), e.latLng.lng()]);
-                }
-              }}
-            >
-              {/* User Location Marker */}
-              {userLocation && (
-                <Marker
-                  position={{ lat: userLocation[0], lng: userLocation[1] }}
-                  draggable={true}
-                  onDragEnd={(e) => {
-                    if (e.latLng) {
-                      handleManualLocationChange([e.latLng.lat(), e.latLng.lng()]);
-                    }
-                  }}
-                  icon={{
-                    url: userLocationSvg,
-                    scaledSize: new google.maps.Size(36, 36),
-                    anchor: new google.maps.Point(18, 18),
-                  }}
-                />
-              )}
-
-              {/* Clinic / Pharmacy / Hospital Markers */}
-              {pharmacies.map((pharm) => {
-                const isSelected = selectedPharmacy?.id === pharm.id;
-                const isHospital = pharm.facilityType === "hospital";
-                const isClinic = pharm.facilityType === "clinic";
-
-                const pinUrl = isHospital
-                  ? isSelected
-                    ? hospitalActivePinSvg
-                    : hospitalPinSvg
-                  : isClinic
-                    ? isSelected
-                      ? clinicActivePinSvg
-                      : clinicPinSvg
-                    : isSelected
-                      ? pharmacyActivePinSvg
-                      : pharmacyPinSvg;
-
-                return (
-                  <Marker
-                    key={pharm.id}
-                    position={{ lat: pharm.lat, lng: pharm.lon }}
-                    onClick={() => handleSelectPharmacy(pharm)}
-                    icon={{
-                      url: pinUrl,
-                      scaledSize: isSelected
-                        ? new google.maps.Size(46, 54)
-                        : new google.maps.Size(34, 42),
-                      anchor: isSelected
-                        ? new google.maps.Point(23, 48)
-                        : new google.maps.Point(17, 42),
-                    }}
-                  />
-                );
-              })}
-
-              <MapRouteRenderer map={map} routeInfo={routeInfo} />
-            </GoogleMap>
-          ) : (
-            <div className="flex h-full min-h-[340px] flex-col items-center justify-center gap-2 text-xs text-[#379FD2]">
-              <RefreshCw className="h-5 w-5 animate-spin text-[#379FD2]" />
-              <span>Memuat Peta Fasilitas Kesehatan...</span>
-            </div>
-          )}
-
-          {/* Floating Map Custom Controls (Zoom + Recenter) */}
-          <div className="absolute top-4 right-4 z-20 flex flex-col gap-1.5 shadow-md">
-            <button
-              type="button"
-              onClick={() => map?.setZoom((map.getZoom() || 14) + 1)}
-              className="grid h-8 w-8 place-items-center rounded-xl bg-[#FFFFFF] text-[#379FD2] hover:bg-[#ABE2FE]/20 border border-[#E5E7EB] transition cursor-pointer shadow-xs"
-              title="Perbesar"
-            >
-              <Plus className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => map?.setZoom((map.getZoom() || 14) - 1)}
-              className="grid h-8 w-8 place-items-center rounded-xl bg-[#FFFFFF] text-[#379FD2] hover:bg-[#ABE2FE]/20 border border-[#E5E7EB] transition cursor-pointer shadow-xs"
-              title="Perkecil"
-            >
-              <Minus className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (userLocation && map) {
-                  map.panTo({ lat: userLocation[0], lng: userLocation[1] });
-                  map.setZoom(15);
-                }
-              }}
-              className="grid h-8 w-8 place-items-center rounded-xl bg-[#FFFFFF] text-[#379FD2] hover:bg-[#ABE2FE]/20 border border-[#E5E7EB] transition cursor-pointer shadow-xs"
-              title="Posisi Saya"
-            >
-              <Crosshair className="h-4 w-4" />
-            </button>
-          </div>
+          <OpenStreetMapCanvas
+            userLocation={userLocation}
+            pharmacies={pharmacies}
+            selectedPharmacy={selectedPharmacy}
+            routeInfo={routeInfo}
+            onSelectPharmacy={handleSelectPharmacy}
+            onManualLocationChange={handleManualLocationChange}
+            className="w-full h-full"
+          />
         </div>
       </div>
     </div>

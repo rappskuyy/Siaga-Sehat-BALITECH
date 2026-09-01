@@ -25,13 +25,14 @@ const facilityDescriptionCache = new Map<string, string>();
  * @param useCache - Gunakan cache untuk consistency
  * @returns URL foto
  */
-export function getFacilityPhotoConsistent(facilityId: string, useCache = true): string {
-  if (useCache && facilityPhotoCache.has(facilityId)) {
-    return facilityPhotoCache.get(facilityId)!;
+export function getFacilityPhotoConsistent(facilityId?: string, useCache = true): string {
+  const key = facilityId || "default";
+  if (useCache && facilityPhotoCache.has(key)) {
+    return facilityPhotoCache.get(key)!;
   }
 
   const photo = getRandomFacilityPhoto();
-  facilityPhotoCache.set(facilityId, photo);
+  facilityPhotoCache.set(key, photo);
   return photo;
 }
 
@@ -41,13 +42,14 @@ export function getFacilityPhotoConsistent(facilityId: string, useCache = true):
  * @param useCache - Gunakan cache untuk consistency
  * @returns Deskripsi fasilitas
  */
-export function getFacilityDescriptionConsistent(facilityId: string, useCache = true): string {
-  if (useCache && facilityDescriptionCache.has(facilityId)) {
-    return facilityDescriptionCache.get(facilityId)!;
+export function getFacilityDescriptionConsistent(facilityId?: string, useCache = true): string {
+  const key = facilityId || "default";
+  if (useCache && facilityDescriptionCache.has(key)) {
+    return facilityDescriptionCache.get(key)!;
   }
 
   const description = getRandomFacilityDescription();
-  facilityDescriptionCache.set(facilityId, description);
+  facilityDescriptionCache.set(key, description);
   return description;
 }
 

@@ -2,16 +2,16 @@
 // Random selection for realistic presentation
 
 export const FACILITY_PHOTOS_ARRAY = [
-  "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=600&h=400&auto=format&fit=crop&q=80", // Hospital 1
-  "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=400&auto=format&fit=crop&q=80", // Hospital 2
-  "https://images.unsplash.com/photo-1631217314707-eb6eca3dd189?w=600&h=400&auto=format&fit=crop&q=80", // Clinic 1
-  "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&h=400&auto=format&fit=crop&q=80", // Clinic 2
-  "https://images.unsplash.com/photo-1581594545050-75e40c9b0f21?w=600&h=400&auto=format&fit=crop&q=80", // Clinic 3
-  "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=600&h=400&auto=format&fit=crop&q=80", // Pharmacy 1
-  "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=400&auto=format&fit=crop&q=80", // Pharmacy 2
-  "https://images.unsplash.com/photo-1576091160396-112ba8d25d1d?w=600&h=400&auto=format&fit=crop&q=80", // Hospital 3
-  "https://images.unsplash.com/photo-1631217314707-eb6eca3dd189?w=600&h=400&auto=format&fit=crop&q=80", // Clinic 4
-  "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=600&h=400&auto=format&fit=crop&q=80", // Hospital 4
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/RSUD_Dr._Soetomo_Surabaya.jpg/800px-RSUD_Dr._Soetomo_Surabaya.jpg", // RSUD Soetomo (Wikimedia)
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/RSUP_Dr._Sardjito.jpg/800px-RSUP_Dr._Sardjito.jpg", // RSUP Sardjito (Wikimedia)
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Gedung_RSCM_Kencana.jpg/800px-Gedung_RSCM_Kencana.jpg", // RSCM Kencana (Wikimedia)
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Puskesmas_Pecangaan.jpg/800px-Puskesmas_Pecangaan.jpg", // Puskesmas Klinik (Wikimedia)
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Puskesmas_Kecamatan_Menteng.jpg/800px-Puskesmas_Kecamatan_Menteng.jpg", // Puskesmas Menteng (Wikimedia)
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Apotek_K-24_Tlogosari.jpg/800px-Apotek_K-24_Tlogosari.jpg", // Apotek K-24 (Wikimedia)
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Apotek_Kimia_Farma_Indonesia.jpg/800px-Apotek_Kimia_Farma_Indonesia.jpg", // Apotek Kimia Farma (Wikimedia)
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Rumah_Sakit_General_Hospital_Indonesia.jpg/800px-Rumah_Sakit_General_Hospital_Indonesia.jpg", // RS General Hospital (Wikimedia)
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Klinik_Kesehatan_Masyarakat_Indonesia.jpg/800px-Klinik_Kesehatan_Masyarakat_Indonesia.jpg", // Klinik Kesehatan (Wikimedia)
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Pharmacy_storefront_Indonesia.jpg/800px-Pharmacy_storefront_Indonesia.jpg", // Apotek Storefront (Wikimedia)
 ];
 
 export const FACILITY_DESCRIPTIONS_ARRAY = [

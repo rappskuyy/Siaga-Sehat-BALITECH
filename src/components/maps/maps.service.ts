@@ -198,10 +198,10 @@ export async function fetchNearbyPharmacies(
     console.warn("[MAPS PIPELINE] OSM Server error:", osmErr);
   }
 
-  // 2. SUPPLEMENT: Local Verified Dataset (Enrichment)
+  // 2. SUPPLEMENT: Local Verified Dataset (Enrichment - Radius 60km)
   try {
     const localResults = await searchFacilitiesFromLocalDataset({
-      data: { lat, lon, dangerLevel, maxDistanceKm: 30 },
+      data: { lat, lon, dangerLevel, maxDistanceKm: 60 },
     });
     if (localResults && localResults.length > 0) {
       for (const loc of localResults) {
@@ -220,17 +220,9 @@ export async function fetchNearbyPharmacies(
     console.warn("[MAPS PIPELINE] Local dataset search error:", localErr);
   }
 
-  // If we have live or merged results, save to cache and return sorted by distance
+  // Sort merged results by distance
   if (combinedResults.length > 0) {
-    combinedResults.sort((a, b) => {
-      if (dangerLevel === "tinggi") {
-        const aH = a.facilityType === "hospital" ? 0 : 1;
-        const bH = b.facilityType === "hospital" ? 0 : 1;
-        if (aH !== bH) return aH - bH;
-      }
-      return a.distanceKm - b.distanceKm;
-    });
-
+    combinedResults.sort((a, b) => a.distanceKm - b.distanceKm);
     savePharmaciesToCache(lat, lon, combinedResults, address);
     return combinedResults;
   }
