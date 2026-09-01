@@ -267,41 +267,6 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             })}
           </div>
         </div>
-
-        {/* Selected Organ Glassmorphic Spotlight Banner */}
-        {selectedRegion && (
-          <div className="absolute bottom-2.5 sm:bottom-3 left-2 right-2 xs:left-4 xs:right-4 z-30 max-w-md mx-auto flex items-center justify-between gap-2.5 rounded-2xl backdrop-blur-xl bg-white/95 p-2.5 sm:p-3 text-xs font-medium text-[color:var(--color-clinic-ink)] shadow-[0_12px_32px_rgba(15,23,42,0.15)] border-2 border-[color:var(--color-clinic-blue)] ring-2 ring-[color:var(--color-clinic-blue-soft)] transition-all duration-300 animate-in fade-in slide-in-from-bottom-3">
-            {/* Organ Icon & Details */}
-            <div className="flex items-center gap-2.5 min-w-0 flex-1">
-              <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white shadow-xs font-bold">
-                {getRegionIcon(selectedRegion.id)}
-              </div>
-              <div className="flex flex-col min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[color:var(--color-clinic-blue)]">
-                    Organ Terpilih:
-                  </span>
-                </div>
-                <h4 className="font-display font-bold text-xs sm:text-sm text-[color:var(--color-clinic-ink)] truncate leading-tight">
-                  {selectedRegion.nameIndonesian}
-                </h4>
-                <span className="text-[10px] font-semibold text-[color:var(--color-clinic-muted)]">
-                  {selectedRegion.symptoms.length} Gejala Tersedia
-                </span>
-              </div>
-            </div>
-
-            {/* Quick Action Button */}
-            <button
-              type="button"
-              onClick={() => onSelectRegion(selectedRegion)}
-              className="flex items-center gap-1 shrink-0 rounded-xl bg-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue-dark)] px-3 py-1.5 text-xs font-bold text-white shadow-sm transition-transform active:scale-95 cursor-pointer"
-            >
-              <Check className="h-3.5 w-3.5 stroke-[3]" />
-              <span className="hidden xs:inline">Lanjut Tandai</span>
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
