@@ -46,7 +46,20 @@ export function AnatomyHotspot({
 }: AnatomyHotspotProps) {
   const [isHovered, setIsHovered] = useState(false);
   const symptomCount = region.symptoms?.length || 0;
-  const isRightSide = position.x >= 50;
+
+  // Boundary-safe tooltip position logic to prevent any clipping on any device
+  const getTooltipPositionClass = () => {
+    let vertical = position.y >= 65 ? "bottom-full mb-2.5" : "top-full mt-2.5";
+    let horizontal = "left-1/2 -translate-x-1/2 origin-top";
+
+    if (position.x >= 78) {
+      horizontal = "right-0 origin-top-right";
+    } else if (position.x <= 22) {
+      horizontal = "left-0 origin-top-left";
+    }
+
+    return `${vertical} ${horizontal}`;
+  };
 
   return (
     <div
@@ -58,12 +71,12 @@ export function AnatomyHotspot({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Precision Medical Hotspot Pin */}
+      {/* Precision Medical Hotspot Pin - Touch Ergonomic Target */}
       <button
         type="button"
         onClick={() => onSelect(region)}
         aria-label={`Pilih ${region.nameIndonesian}. Terdapat ${symptomCount} gejala.`}
-        className={`group relative flex items-center justify-center rounded-full transition-transform duration-200 focus:outline-none cursor-pointer ${
+        className={`group relative flex items-center justify-center p-2 rounded-full transition-transform duration-200 focus:outline-none cursor-pointer ${
           isSelected ? "scale-125 z-40" : "hover:scale-120 z-20"
         }`}
       >
@@ -99,15 +112,11 @@ export function AnatomyHotspot({
         </span>
       </button>
 
-      {/* Floating Modern Clinical Tooltip Card */}
+      {/* Floating Clinical Tooltip Card - Guaranteed Boundary Safe */}
       {(isHovered || isSelected || showAlwaysLabel) && (
         <div
           onClick={() => onSelect(region)}
-          className={`absolute cursor-pointer transition-all duration-200 pointer-events-auto select-none ${
-            isRightSide
-              ? "left-full ml-3 top-1/2 -translate-y-1/2 origin-left"
-              : "right-full mr-3 top-1/2 -translate-y-1/2 origin-right"
-          } ${
+          className={`absolute cursor-pointer transition-all duration-200 pointer-events-auto select-none w-max max-w-[210px] sm:max-w-[260px] ${getTooltipPositionClass()} ${
             isSelected
               ? "scale-105 z-50 animate-in fade-in zoom-in-95"
               : isHovered
@@ -116,15 +125,15 @@ export function AnatomyHotspot({
           }`}
         >
           <div
-            className={`flex items-center gap-2.5 rounded-2xl px-3.5 py-2.5 text-xs transition-all duration-200 ${
+            className={`flex items-center gap-2 rounded-xl sm:rounded-2xl px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs transition-all duration-200 ${
               isSelected
-                ? "bg-white/98 backdrop-blur-xl text-[color:var(--color-clinic-ink)] shadow-[0_12px_32px_rgba(74,111,165,0.2)] border-2 border-[color:var(--color-clinic-blue)] ring-4 ring-[color:var(--color-clinic-blue-soft)]"
+                ? "bg-white/98 backdrop-blur-xl text-[color:var(--color-clinic-ink)] shadow-[0_12px_32px_rgba(74,111,165,0.2)] border-2 border-[color:var(--color-clinic-blue)] ring-2 ring-[color:var(--color-clinic-blue-soft)]"
                 : "bg-white/95 backdrop-blur-xl text-[color:var(--color-clinic-ink)] shadow-[0_8px_24px_rgba(15,23,42,0.1)] border border-black/10 hover:border-[color:var(--color-clinic-blue)]/50"
             }`}
           >
             {/* Medical Icon Badge */}
             <div
-              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-xl border transition-colors ${
+              className={`flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-xl border transition-colors ${
                 isSelected
                   ? "bg-[color:var(--color-clinic-blue)] text-white border-[color:var(--color-clinic-blue)] shadow-xs"
                   : "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] border-[color:var(--color-clinic-blue)]/20"
@@ -134,24 +143,24 @@ export function AnatomyHotspot({
             </div>
 
             {/* Organ Title & Details */}
-            <div className="flex flex-col min-w-[75px] pr-1">
-              <span className="font-display font-bold tracking-tight text-xs leading-tight text-[color:var(--color-clinic-ink)]">
+            <div className="flex flex-col min-w-0 flex-1 pr-1">
+              <span className="font-display font-bold tracking-tight text-[11px] sm:text-xs leading-tight text-[color:var(--color-clinic-ink)] truncate">
                 {region.nameIndonesian}
               </span>
-              <span className="text-[10px] font-medium leading-tight mt-0.5 text-[color:var(--color-clinic-muted)]">
+              <span className="text-[9px] sm:text-[10px] font-medium leading-tight mt-0.5 text-[color:var(--color-clinic-muted)]">
                 {symptomCount} Gejala
               </span>
             </div>
 
             {/* Status / Action Indicator */}
             {isSelected ? (
-              <div className="flex items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue)] px-2.5 py-1 text-[10px] font-bold text-white shadow-xs">
-                <Check className="h-3 w-3 stroke-[3]" />
-                <span>Dipilih</span>
+              <div className="flex items-center gap-0.5 sm:gap-1 rounded-full bg-[color:var(--color-clinic-blue)] px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-white shadow-xs shrink-0">
+                <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3 stroke-[3]" />
+                <span className="hidden xs:inline">Dipilih</span>
               </div>
             ) : (
-              <div className="flex items-center gap-0.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-2 py-1 text-[10px] font-semibold text-[color:var(--color-clinic-blue)] group-hover:bg-[color:var(--color-clinic-blue)] group-hover:text-white transition">
-                <ChevronRight className="h-3 w-3" />
+              <div className="flex items-center gap-0.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold text-[color:var(--color-clinic-blue)] group-hover:bg-[color:var(--color-clinic-blue)] group-hover:text-white transition shrink-0">
+                <ChevronRight className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
               </div>
             )}
           </div>

@@ -66,55 +66,55 @@ export function AnatomyGuideCard({ onSelectRegion }: AnatomyGuideCardProps) {
     ].includes(r.id),
   );
 
-  return (
-    <div className="flex flex-col h-full rounded-[28px] bg-white p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 animate-fade-up justify-between">
+   return (
+    <div className="flex flex-col h-full rounded-[20px] sm:rounded-[28px] bg-white p-3 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 animate-fade-up justify-between w-full max-w-full overflow-hidden min-w-0 box-border">
       {/* Header Section */}
-      <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-4 shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="grid h-8 w-8 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white text-xs font-extrabold shadow-sm">
+      <div className="flex items-start justify-between gap-2 border-b border-black/5 pb-3 shrink-0 w-full min-w-0 overflow-hidden">
+        <div className="flex items-start gap-2.5 min-w-0 flex-1">
+          <div className="grid h-7 w-7 sm:h-8 sm:w-8 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white text-xs font-extrabold shadow-sm shrink-0 mt-0.5">
             <Layers className="h-4 w-4" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="font-display text-lg font-bold text-[color:var(--color-clinic-ink)]">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <h2 className="font-display text-sm sm:text-lg font-bold text-[color:var(--color-clinic-ink)] break-words min-w-0">
                 Panduan Pemeriksaan Anatomi
               </h2>
-              <span className="rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2.5 py-0.5 text-[10px] font-bold text-[color:var(--color-clinic-blue-dark)] uppercase tracking-wider">
+              <span className="rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-[color:var(--color-clinic-blue-dark)] uppercase tracking-wider shrink-0">
                 Langkah Mudah
               </span>
             </div>
-            <p className="text-xs text-[color:var(--color-clinic-muted)]">
+            <p className="text-[11px] sm:text-xs text-[color:var(--color-clinic-muted)] mt-0.5 break-words">
               Ikuti tahapan berikut untuk melakukan evaluasi gejala tubuh berbasis AI
             </p>
           </div>
         </div>
       </div>
 
-      {/* Main Steps List (Compact, Clean & Natural Spacing) */}
-      <div className="mt-4 space-y-2.5">
+      {/* Main Steps List */}
+      <div className="mt-3 space-y-2 sm:space-y-2.5 w-full min-w-0 overflow-hidden">
         {steps.map((item) => {
           const Icon = item.icon;
           return (
             <div
               key={item.step}
-              className="flex items-start gap-3 rounded-2xl border border-black/5 bg-[#f8fafc] p-3 transition-all hover:bg-white hover:border-[color:var(--color-clinic-blue)]/30 hover:shadow-xs"
+              className="flex items-start gap-2.5 sm:gap-3 rounded-2xl border border-black/5 bg-[#f8fafc] p-2.5 sm:p-3 transition-all hover:bg-white hover:border-[color:var(--color-clinic-blue)]/30 hover:shadow-xs min-w-0 overflow-hidden"
             >
               <div
-                className={`grid h-7 w-7 shrink-0 place-items-center rounded-xl font-display font-extrabold text-xs shadow-2xs ${item.color}`}
+                className={`grid h-6 w-6 sm:h-7 sm:w-7 shrink-0 place-items-center rounded-xl font-display font-extrabold text-xs shadow-2xs mt-0.5 ${item.color}`}
               >
-                <Icon className="h-3.5 w-3.5" />
+                <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               </div>
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <div className="flex flex-wrap items-center gap-1.5">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-[color:var(--color-clinic-muted)]">
                     Langkah {item.step}
                   </span>
-                  <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${item.badgeStyle}`}>
+                  <span className={`rounded-full px-2 py-0.5 text-[9px] sm:text-[10px] font-bold ${item.badgeStyle}`}>
                     {item.badge}
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-[color:var(--color-clinic-muted)] leading-relaxed">
+                <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-[color:var(--color-clinic-muted)] leading-relaxed break-words">
                   {item.desc}
                 </p>
               </div>
@@ -124,34 +124,34 @@ export function AnatomyGuideCard({ onSelectRegion }: AnatomyGuideCardProps) {
       </div>
 
       {/* Quick Select Popular Regions Section */}
-      <div className="mt-4 pt-3.5 border-t border-black/5 space-y-2">
+      <div className="mt-3 pt-3 border-t border-black/5 space-y-2 w-full min-w-0 overflow-hidden shrink-0">
         <div className="flex items-center gap-1.5 text-xs font-bold text-[color:var(--color-clinic-ink)]">
-          <Activity className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)]" />
-          <span>Atau Pilih Cepat Bagian Tubuh:</span>
+          <Activity className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)] shrink-0" />
+          <span className="truncate">Atau Pilih Cepat Bagian Tubuh:</span>
         </div>
 
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1.5 w-full max-w-full overflow-hidden">
           {popularRegions.map((region) => (
             <button
               key={region.id}
               type="button"
               onClick={() => onSelectRegion(region)}
-              className="inline-flex items-center gap-1 rounded-full bg-[#f1f5f9] px-3 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-ink)] hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition shadow-2xs border border-black/5 group cursor-pointer"
+              className="inline-flex items-center gap-1 rounded-full bg-[#f1f5f9] px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold text-[color:var(--color-clinic-ink)] hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition shadow-2xs border border-black/5 group cursor-pointer max-w-full min-w-0 shrink"
             >
-              <span>{region.nameIndonesian}</span>
-              <ArrowRight className="h-3 w-3 opacity-50 group-hover:translate-x-0.5 group-hover:opacity-100 transition-all" />
+              <span className="truncate max-w-[140px] xs:max-w-[180px] sm:max-w-none">{region.nameIndonesian}</span>
+              <ArrowRight className="h-3 w-3 opacity-50 group-hover:translate-x-0.5 group-hover:opacity-100 transition-all shrink-0" />
             </button>
           ))}
         </div>
       </div>
 
       {/* Footer Banner */}
-      <div className="mt-3 pt-3 border-t border-black/5 flex items-center justify-between gap-2 text-[11px] text-[color:var(--color-clinic-muted)] shrink-0">
-        <div className="flex items-center gap-1.5 font-medium text-slate-600">
+      <div className="mt-3 pt-3 border-t border-black/5 flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-[11px] text-[color:var(--color-clinic-muted)] shrink-0 w-full min-w-0 overflow-hidden">
+        <div className="flex items-center gap-1.5 font-medium text-slate-600 min-w-0 flex-1">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-          <span>Analisis didukung AI medis & referensi klinis terpercaya</span>
+          <span className="truncate">Analisis didukung AI medis & referensi klinis terpercaya</span>
         </div>
-        <span className="text-[10px] font-semibold text-[color:var(--color-clinic-blue)] bg-[color:var(--color-clinic-blue-soft)]/40 px-2.5 py-0.5 rounded-full">
+        <span className="text-[10px] font-semibold text-[color:var(--color-clinic-blue)] bg-[color:var(--color-clinic-blue-soft)]/40 px-2.5 py-0.5 rounded-full shrink-0">
           SiagaSehat AI
         </span>
       </div>

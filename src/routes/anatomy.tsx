@@ -27,7 +27,7 @@ function AnatomyPage() {
         <SiteHeader />
 
         {/* Content Container */}
-        <div className="px-3 py-4 md:px-6 md:py-6">
+        <div className="px-2 py-3 sm:px-4 sm:py-5 md:px-6 md:py-6 max-w-full overflow-x-hidden">
           <AnatomyExplorer />
         </div>
       </div>

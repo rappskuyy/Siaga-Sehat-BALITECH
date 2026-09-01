@@ -48,23 +48,23 @@ export function SymptomSelectorCard({
   const totalSelected = selectedSymptoms.length + selectedConditions.length;
 
   return (
-    <div className="flex flex-col h-full rounded-[28px] bg-white p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5">
+    <div className="flex flex-col h-full rounded-[24px] sm:rounded-[28px] bg-white p-3.5 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 max-w-full overflow-hidden">
       {/* Header Info */}
-      <div className="flex items-start justify-between gap-4 border-b border-black/5 pb-4 shrink-0">
-        <div className="flex items-start gap-3">
+      <div className="flex items-start justify-between gap-3 border-b border-black/5 pb-3.5 shrink-0">
+        <div className="flex items-start gap-2.5 min-w-0">
           <div className="grid h-7 w-7 shrink-0 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white text-xs font-extrabold shadow-sm mt-0.5">
             2
           </div>
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="font-display text-xl md:text-2xl font-bold text-[color:var(--color-clinic-ink)]">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold text-[color:var(--color-clinic-ink)] truncate">
                 {region.nameIndonesian}
               </h2>
-              <span className="rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2.5 py-0.5 text-[11px] font-semibold text-[color:var(--color-clinic-blue-dark)]">
+              <span className="rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold text-[color:var(--color-clinic-blue-dark)] shrink-0">
                 {region.category.toUpperCase()}
               </span>
             </div>
-            <p className="mt-1 text-xs text-[color:var(--color-clinic-muted)] leading-relaxed">
+            <p className="mt-1 text-xs text-[color:var(--color-clinic-muted)] leading-relaxed line-clamp-2">
               {region.description}
             </p>
           </div>
@@ -73,16 +73,16 @@ export function SymptomSelectorCard({
         <button
           type="button"
           onClick={onReset}
-          className="inline-flex items-center gap-1.5 rounded-full bg-[#f1f5f9] px-3.5 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-muted)] hover:bg-[color:var(--color-clinic-blue-soft)] hover:text-[color:var(--color-clinic-blue-dark)] transition shrink-0 border border-black/5"
+          className="inline-flex items-center gap-1 rounded-full bg-[#f1f5f9] px-3 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-muted)] hover:bg-[color:var(--color-clinic-blue-soft)] hover:text-[color:var(--color-clinic-blue-dark)] transition shrink-0 border border-black/5"
           title="Reset semua pilihan gejala & catatan"
         >
           <RotateCcw className="h-3 w-3" />
-          <span>Reset</span>
+          <span className="hidden xs:inline">Reset</span>
         </button>
       </div>
 
       {/* Search & Tabs Filter */}
-      <div className="mt-4 space-y-3 shrink-0">
+      <div className="mt-3.5 space-y-2.5 shrink-0">
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[color:var(--color-clinic-muted)]" />
           <input
@@ -96,42 +96,45 @@ export function SymptomSelectorCard({
             <button
               type="button"
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 flex items-center justify-center transition"
+              className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 flex items-center justify-center transition cursor-pointer"
             >
               <X className="h-3 w-3" />
             </button>
           )}
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-2 border-b border-black/5 pb-2.5 text-xs">
+        {/* Scrollable Filter Tabs */}
+        <div className="flex items-center gap-2 border-b border-black/5 pb-2 text-xs overflow-x-auto no-scrollbar">
           <button
             type="button"
             onClick={() => setActiveTab("all")}
-            className={`rounded-full px-3.5 py-1.5 font-semibold text-xs whitespace-nowrap transition-all ${activeTab === "all"
+            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all cursor-pointer ${
+              activeTab === "all"
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-sm"
                 : "bg-[#f1f5f9] text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
-              }`}
+            }`}
           >
             Semua ({region.symptoms.length + region.conditions.length})
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("symptoms")}
-            className={`rounded-full px-3.5 py-1.5 font-semibold text-xs whitespace-nowrap transition-all ${activeTab === "symptoms"
+            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all cursor-pointer ${
+              activeTab === "symptoms"
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-sm"
                 : "bg-[#f1f5f9] text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
-              }`}
+            }`}
           >
             Gejala ({region.symptoms.length})
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("conditions")}
-            className={`rounded-full px-3.5 py-1.5 font-semibold text-xs whitespace-nowrap transition-all ${activeTab === "conditions"
+            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all cursor-pointer ${
+              activeTab === "conditions"
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-sm"
                 : "bg-[#f1f5f9] text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
-              }`}
+            }`}
           >
             Kondisi ({region.conditions.length})
           </button>
@@ -139,7 +142,7 @@ export function SymptomSelectorCard({
       </div>
 
       {/* Symptoms & Conditions Interactive List */}
-      <div className="mt-3 flex-1 overflow-y-auto min-h-[220px] max-h-[420px] lg:max-h-[480px] pr-1.5 space-y-4 scrollbar-thin scrollbar-thumb-slate-200">
+      <div className="mt-3 flex-1 overflow-y-auto min-h-[200px] max-h-[380px] sm:max-h-[440px] lg:max-h-[480px] pr-1 space-y-3 scrollbar-thin scrollbar-thumb-slate-200">
         {/* Symptoms Section */}
         {(activeTab === "all" || activeTab === "symptoms") && (
           <div>
@@ -153,7 +156,7 @@ export function SymptomSelectorCard({
             </div>
 
             {filteredSymptoms.length === 0 ? (
-              <div className="rounded-xl bg-[#f8fafc] p-4 text-center text-xs text-[color:var(--color-clinic-muted)]">
+              <div className="rounded-xl bg-[#f8fafc] p-3 text-center text-xs text-[color:var(--color-clinic-muted)]">
                 Tidak ada gejala yang cocok dengan pencarian.
               </div>
             ) : (
@@ -173,25 +176,27 @@ export function SymptomSelectorCard({
                           onToggleSymptom(symptom.name);
                         }
                       }}
-                      className={`group flex items-center justify-between rounded-xl border p-3 cursor-pointer transition-all duration-150 select-none ${isChecked
+                      className={`group flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 rounded-xl border p-2.5 sm:p-3 cursor-pointer transition-all duration-150 select-none ${
+                        isChecked
                           ? "border-[color:var(--color-clinic-blue)] bg-[color:var(--color-clinic-blue-soft)]/25 text-[color:var(--color-clinic-ink)] shadow-xs ring-1 ring-[color:var(--color-clinic-blue)]/30"
                           : "border-black/5 bg-[#f8fafc] text-[color:var(--color-clinic-ink)] hover:border-[color:var(--color-clinic-blue)]/40 hover:bg-white"
-                        }`}
+                      }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2.5 min-w-0">
                         <div
-                          className={`grid h-5 w-5 shrink-0 place-items-center rounded-lg border transition-all ${isChecked
+                          className={`grid h-5 w-5 shrink-0 place-items-center rounded-lg border transition-all ${
+                            isChecked
                               ? "bg-[color:var(--color-clinic-blue)] border-[color:var(--color-clinic-blue)] text-white shadow-xs"
                               : "border-black/20 bg-white group-hover:border-[color:var(--color-clinic-blue)]"
-                            }`}
+                          }`}
                         >
                           {isChecked && <Check className="h-3.5 w-3.5 stroke-[3]" />}
                         </div>
-                        <span className="text-xs font-semibold">{symptom.name}</span>
+                        <span className="text-xs font-semibold leading-tight">{symptom.name}</span>
                       </div>
 
                       {symptom.isEmergencyWarning && (
-                        <span className="flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-0.5 text-[10px] font-bold text-red-700 border border-red-200/60">
+                        <span className="flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700 border border-red-200/60 shrink-0">
                           <AlertTriangle className="h-3 w-3 shrink-0" />
                           Tanda Bahaya
                         </span>
@@ -217,7 +222,7 @@ export function SymptomSelectorCard({
             </div>
 
             {filteredConditions.length === 0 ? (
-              <div className="rounded-xl bg-[#f8fafc] p-4 text-center text-xs text-[color:var(--color-clinic-muted)]">
+              <div className="rounded-xl bg-[#f8fafc] p-3 text-center text-xs text-[color:var(--color-clinic-muted)]">
                 Tidak ada kondisi yang cocok dengan pencarian.
               </div>
             ) : (
@@ -237,26 +242,28 @@ export function SymptomSelectorCard({
                           onToggleCondition(condition.name);
                         }
                       }}
-                      className={`group rounded-xl border p-3 cursor-pointer transition-all duration-150 select-none ${isChecked
+                      className={`group rounded-xl border p-2.5 sm:p-3 cursor-pointer transition-all duration-150 select-none ${
+                        isChecked
                           ? "border-[color:var(--color-clinic-blue)] bg-[color:var(--color-clinic-blue-soft)]/30 shadow-xs ring-1 ring-[color:var(--color-clinic-blue)]/30"
                           : "border-black/5 bg-[#f8fafc] hover:bg-white hover:border-[color:var(--color-clinic-blue)]/40"
-                        }`}
+                      }`}
                     >
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-start gap-2.5">
                         <div
-                          className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-lg border transition-all ${isChecked
+                          className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-lg border transition-all ${
+                            isChecked
                               ? "bg-[color:var(--color-clinic-blue)] border-[color:var(--color-clinic-blue)] text-white shadow-xs"
                               : "border-black/20 bg-white group-hover:border-[color:var(--color-clinic-blue)]"
-                            }`}
+                          }`}
                         >
                           {isChecked && <Check className="h-3.5 w-3.5 stroke-[3]" />}
                         </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-xs font-bold text-[color:var(--color-clinic-ink)]">
                               {condition.name}
                             </span>
-                            <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--color-clinic-muted)] border border-black/5">
+                            <span className="rounded-full bg-white px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-[color:var(--color-clinic-muted)] border border-black/5">
                               {condition.category}
                             </span>
                           </div>
@@ -276,7 +283,7 @@ export function SymptomSelectorCard({
 
       {/* Additional Notes Field */}
       <div className="mt-3 pt-3 border-t border-black/5 shrink-0">
-        <label className="block text-xs font-bold text-[color:var(--color-clinic-ink)] mb-1.5">
+        <label className="block text-xs font-bold text-[color:var(--color-clinic-ink)] mb-1">
           Keluhan atau Catatan Tambahan <span className="font-normal text-[color:var(--color-clinic-muted)]">(Opsional)</span>:
         </label>
         <textarea
@@ -288,9 +295,9 @@ export function SymptomSelectorCard({
         />
       </div>
 
-      {/* Sticky Bottom Action Footer */}
-      <div className="mt-3 flex items-center justify-between gap-3 pt-3 border-t border-black/5 shrink-0">
-        <div className="text-xs text-[color:var(--color-clinic-muted)]">
+      {/* Action Footer - Responsive Full Width Button on Mobile */}
+      <div className="mt-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3 border-t border-black/5 shrink-0">
+        <div className="text-xs text-[color:var(--color-clinic-muted)] text-center sm:text-left">
           <span className="font-semibold text-[color:var(--color-clinic-ink)]">Total Pilihan:</span>{" "}
           <strong className="text-[color:var(--color-clinic-blue-dark)] font-extrabold text-sm">
             {totalSelected}
@@ -300,7 +307,7 @@ export function SymptomSelectorCard({
         <Button
           onClick={onAnalyze}
           disabled={totalSelected === 0 || isLoading}
-          className="gap-2 rounded-full bg-[color:var(--color-clinic-blue)] px-6 py-4 text-xs font-bold text-white hover:bg-[color:var(--color-clinic-blue-dark)] shadow-md shadow-[color:var(--color-clinic-blue)]/25 transition-all duration-200 disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
+          className="w-full sm:w-auto gap-2 rounded-full bg-[color:var(--color-clinic-blue)] px-6 py-3.5 text-xs font-bold text-white hover:bg-[color:var(--color-clinic-blue-dark)] shadow-md shadow-[color:var(--color-clinic-blue)]/25 transition-all duration-200 disabled:opacity-50 cursor-pointer"
         >
           <Sparkles className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
           <span>{isLoading ? "Sedang Menganalisis..." : "Mulai Analisis AI →"}</span>
