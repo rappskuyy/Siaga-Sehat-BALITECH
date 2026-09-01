@@ -31,22 +31,18 @@
   background-image:
     radial-gradient(120% 90% at 18% -10%, rgba(46, 230, 196, 0.16), transparent 55%),
     radial-gradient(90% 70% at 88% 0%, rgba(160, 139, 255, 0.2), transparent 55%),
-    linear-gradient(
-      180deg,
+    linear-gradient(180deg,
       var(--color-siaga-void) 0%,
       var(--color-siaga-navy) 46%,
-      var(--color-siaga-indigo) 100%
-    );
+      var(--color-siaga-indigo) 100%);
 }
 
 @utility siaga-rays {
-  background-image: repeating-linear-gradient(
-    100deg,
-    rgba(255, 255, 255, 0.05) 0px,
-    rgba(255, 255, 255, 0.05) 1px,
-    transparent 1px,
-    transparent 42px
-  );
+  background-image: repeating-linear-gradient(100deg,
+      rgba(255, 255, 255, 0.05) 0px,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px,
+      transparent 42px);
   mask-image: linear-gradient(180deg, transparent, black 20%, black 75%, transparent);
 }
 
@@ -58,42 +54,51 @@
 }
 
 @keyframes siagaPulseGlow {
+
   0%,
   100% {
     opacity: 0.55;
     transform: scale(1);
   }
+
   50% {
     opacity: 1;
     transform: scale(1.06);
   }
 }
+
 @utility animate-siaga-glow {
   animation: siagaPulseGlow 2.8s ease-in-out infinite;
 }
 
 @keyframes siagaDrift {
+
   0%,
   100% {
     transform: translateY(0) rotate(var(--siaga-rot, 0deg));
   }
+
   50% {
     transform: translateY(-10px) rotate(var(--siaga-rot, 0deg));
   }
 }
+
 @utility animate-siaga-drift {
   animation: siagaDrift 5s ease-in-out infinite;
 }
 
 @keyframes phoneFloat {
+
   0%,
   100% {
     transform: translateY(0) rotate(-1deg);
   }
+
   50% {
     transform: translateY(-12px) rotate(1deg);
   }
 }
+
 @utility animate-phone-float {
   animation: phoneFloat 6s ease-in-out infinite;
 }
@@ -103,11 +108,13 @@
     opacity: 0;
     transform: scale(0.95) translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
 }
+
 @utility animate-phone-switch {
   animation: phoneSwitch 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -117,6 +124,7 @@
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -128,9 +136,11 @@
     transform: rotate(360deg);
   }
 }
+
 @utility animate-orbit-spin {
   animation: orbitSpin 22s linear infinite;
 }
+
 @utility animate-orbit-spin-reverse {
   animation: orbitSpin 22s linear infinite reverse;
 }
@@ -140,15 +150,18 @@
     opacity: 0;
     transform: scale(0.85);
   }
+
   60% {
     opacity: 1;
     transform: scale(1.04);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
   }
 }
+
 @utility animate-ring-pop {
   animation: ringPop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -157,23 +170,28 @@
   from {
     transform: translateX(0);
   }
+
   to {
     transform: translateX(-50%);
   }
 }
+
 @utility animate-vitals-scroll {
   animation: vitalsScroll 7s linear infinite;
 }
 
 @keyframes vitalsBlink {
+
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.25;
   }
 }
+
 @utility animate-vitals-blink {
   animation: vitalsBlink 1.6s ease-in-out infinite;
 }
@@ -183,6 +201,7 @@
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 @utility accordion-grid-open {
   grid-template-rows: 1fr;
 }
@@ -193,14 +212,17 @@
 }
 
 @keyframes clinicFloat {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-4px);
   }
 }
+
 @utility animate-float {
   animation: clinicFloat 3s ease-in-out infinite;
 }
@@ -210,11 +232,40 @@
     opacity: 0;
     transform: translateY(24px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
+@keyframes tech-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes toast-slide-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.96);
+  }
+
+  65% {
+    opacity: 1;
+    transform: translate3d(0, -2px, 0) scale(1.01);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
 @utility animate-fade-up {
   animation: clinicFadeUp 0.6s ease-out both;
 }
@@ -224,17 +275,21 @@
     top: -6%;
     opacity: 0;
   }
+
   8% {
     opacity: 1;
   }
+
   92% {
     opacity: 1;
   }
+
   100% {
     top: 104%;
     opacity: 0;
   }
 }
+
 @utility animate-scanner-sweep {
   animation: scannerSweep 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
@@ -244,11 +299,13 @@
     transform: scale(0.85);
     opacity: 0.9;
   }
+
   100% {
     transform: scale(1.35);
     opacity: 0;
   }
 }
+
 @utility animate-scanner-ring {
   animation: scannerRingPulse 1.8s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
 }
@@ -258,24 +315,29 @@
     transform: rotate(360deg);
   }
 }
+
 @utility animate-scanner-spin {
   animation: scannerSpin 6s linear infinite;
 }
+
 @utility animate-scanner-spin-reverse {
   animation: scannerSpin 4s linear infinite reverse;
 }
 
 @keyframes scannerPulseDot {
+
   0%,
   100% {
     opacity: 0.3;
     transform: scale(0.8);
   }
+
   50% {
     opacity: 1;
     transform: scale(1.15);
   }
 }
+
 @utility animate-scanner-dot {
   animation: scannerPulseDot 1.2s ease-in-out infinite;
 }
@@ -284,10 +346,12 @@
   from {
     transform: scaleX(0);
   }
+
   to {
     transform: scaleX(1);
   }
 }
+
 @utility animate-progress-fill {
   transform-origin: left;
   animation: clinicProgressFill linear forwards;
@@ -297,10 +361,12 @@
   0% {
     background-position: -400px 0;
   }
+
   100% {
     background-position: 400px 0;
   }
 }
+
 @utility animate-scanner-shimmer {
   background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
   background-size: 400px 100%;

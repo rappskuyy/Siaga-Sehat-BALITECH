@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import {
   AlertCircle,
   ArrowLeft,
@@ -79,6 +80,13 @@ function ScannerPage() {
 
   const handleScan = async () => {
     if (!image) return;
+
+    if (!user) {
+      toast.info("Kamu belum login. Hasil scan masih bisa dilihat, tetapi riwayat scan dan penyimpanan data tidak akan disimpan.", {
+        duration: 5000,
+      });
+    }
+
     setStage("scanning");
     setErrorMessage(null);
     setScanStep(0);

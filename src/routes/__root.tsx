@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "../lib/auth/auth-context";
 import { SmoothScroll } from "@/components/ui/SmoothScroll";
 import { NotFoundView } from "@/components/ui/NotFoundView";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return <NotFoundView />;
@@ -115,6 +116,7 @@ function RootComponent() {
         <SmoothScroll>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
+          <Toaster richColors position="top-right" closeButton />
         </SmoothScroll>
       </AuthProvider>
     </QueryClientProvider>

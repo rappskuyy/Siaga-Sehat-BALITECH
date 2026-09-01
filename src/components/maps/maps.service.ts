@@ -42,7 +42,7 @@ export interface PlaceNode {
   description?: string;
   reviews?: string[];
   url?: string;
-  _dataSource?: "google" | "osm" | "gemini" | "cache" | "unknown";
+  _dataSource?: "google" | "osm" | "gemini" | "cache" | "unknown" | "koboldllm";
   _dataSourceLabel?: string;
   _trustScore?: number;
   _cacheAge?: string;

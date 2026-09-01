@@ -10,6 +10,21 @@ const SYSTEM_PROMPT =
   "- Jika ada tanda bahaya (nyeri dada hebat, sesak napas berat, pendarahan hebat, penurunan kesadaran, dll), segera sarankan ke IGD tanpa menunggu info lain.\n" +
   "- Jawaban singkat, ramah, dan empatik.";
 
+/**
+ * Helper: resolve OpenAI-compatible base URL.
+ * Supports KoboiLLM via OPENAI_BASE_URL env var.
+ */
+function getOpenAIBaseUrl(): string {
+  const customBase = process.env.OPENAI_BASE_URL?.trim();
+  if (customBase) {
+    // Normalize: ensure it ends with /v1
+    if (customBase.endsWith("/v1")) return customBase;
+    if (customBase.endsWith("/")) return `${customBase}v1`;
+    return customBase;
+  }
+  return "https://api.openai.com/v1";
+}
+
 async function chatWithGemini(prompt: string): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) throw new Error("GEMINI_API_KEY belum dikonfigurasi di server.");
@@ -64,7 +79,9 @@ async function chatWithOpenAI(prompt: string): Promise<string> {
   if (!apiKey) throw new Error("OPENAI_API_KEY belum dikonfigurasi di server.");
 
   const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+  const baseUrl = getOpenAIBaseUrl();
+
+  const res = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -82,12 +99,12 @@ async function chatWithOpenAI(prompt: string): Promise<string> {
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    throw new Error(`OpenAI error ${res.status}: ${txt.slice(0, 200)}`);
+    throw new Error(`OpenAI/KoboiLLM error ${res.status}: ${txt.slice(0, 200)}`);
   }
 
   const payload = await res.json();
   const text = payload.choices?.[0]?.message?.content;
-  if (!text) throw new Error("OpenAI tidak mengembalikan respon valid.");
+  if (!text) throw new Error("OpenAI/KoboiLLM tidak mengembalikan respon valid.");
 
   return text;
 }
@@ -110,7 +127,7 @@ export const chatWithAI = createServerFn({ method: "POST" })
           const reply = await chatWithOpenAI(prompt);
           return { reply };
         } catch (err) {
-          console.warn("OpenAI chat failed, trying Gemini as fallback:", err);
+          console.warn("OpenAI/KoboiLLM chat failed, trying Gemini as fallback:", err);
           lastError = err instanceof Error ? err : new Error(String(err));
         }
       }
@@ -148,7 +165,7 @@ export const chatWithAI = createServerFn({ method: "POST" })
     throw (
       lastError ||
       new Error(
-        "API AI belum dikonfigurasi di server. Tambahkan GEMINI_API_KEY atau OPENAI_API_KEY ke file .env lalu restart server.",
+        "API AI belum dikonfigurasi di server. Tambahkan OPENAI_API_KEY atau GEMINI_API_KEY ke file .env lalu restart server.",
       )
     );
   });

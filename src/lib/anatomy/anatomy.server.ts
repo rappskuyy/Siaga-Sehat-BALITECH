@@ -123,11 +123,24 @@ Tolong lakukan AI Health Assessment dan kembalikan JSON sesuai skema yang ditent
   throw new Error(`Gagal menghubungi Gemini API (${lastErr})`);
 }
 
-async function assessWithOpenAI(input: AssessmentInput): Promise<AIAssessmentResult> {
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
-  if (!apiKey) throw new Error("OPENAI_API_KEY belum dikonfigurasi di server.");
+async function assessWithKoboiLLM(input: AssessmentInput): Promise<AIAssessmentResult> {
+  const apiKey = (process.env.KOBOILLM_API_KEY || process.env.OPENAI_API_KEY)?.trim();
+  if (!apiKey) throw new Error("KOBOILLM_API_KEY belum dikonfigurasi di server.");
 
-  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+  let baseUrl = (process.env.KOBOILLM_BASE_URL || process.env.OPENAI_BASE_URL)?.trim() || "https://api.koboillm.com/v1";
+  let url = baseUrl;
+  if (!url.endsWith("/chat/completions")) {
+    if (url.endsWith("/v1")) {
+      url = `${url}/chat/completions`;
+    } else if (url.endsWith("/")) {
+      url = `${url}v1/chat/completions`;
+    } else {
+      url = `${url}/v1/chat/completions`;
+    }
+  }
+
+  const model = process.env.KOBOILLM_MODEL || "gemini-2.5-flash";
+
   const symptomsList =
     input.symptoms && input.symptoms.length > 0
       ? input.symptoms.join(", ")
@@ -146,7 +159,7 @@ Catatan Tambahan Pengguna: ${input.additionalNotes || "Tidak ada"}
 
 Tolong lakukan AI Health Assessment dan kembalikan JSON.`;
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+  const res = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -165,12 +178,75 @@ Tolong lakukan AI Health Assessment dan kembalikan JSON.`;
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    throw new Error(`OpenAI error ${res.status}: ${txt.slice(0, 200)}`);
+    throw new Error(`KoboiLLM error ${res.status}: ${txt.slice(0, 200)}`);
   }
 
   const payload = await res.json();
   const text = payload.choices?.[0]?.message?.content;
-  if (!text) throw new Error("OpenAI tidak mengembalikan respon valid.");
+  if (!text) throw new Error("KoboiLLM tidak mengembalikan respon valid.");
+
+  return parseResultJson(text);
+}
+
+function getOpenAIBaseUrl(): string {
+  const customBase = process.env.OPENAI_BASE_URL?.trim() || process.env.KOBOILLM_BASE_URL?.trim();
+  if (customBase) {
+    if (customBase.endsWith("/v1")) return customBase;
+    if (customBase.endsWith("/")) return `${customBase}v1`;
+    return customBase;
+  }
+  return "https://api.openai.com/v1";
+}
+
+async function assessWithOpenAI(input: AssessmentInput): Promise<AIAssessmentResult> {
+  const apiKey = (process.env.OPENAI_API_KEY || process.env.KOBOILLM_API_KEY)?.trim();
+  if (!apiKey) throw new Error("OPENAI_API_KEY belum dikonfigurasi di server.");
+
+  const model = process.env.OPENAI_MODEL || process.env.KOBOILLM_MODEL || "gpt-4o-mini";
+  const baseUrl = getOpenAIBaseUrl();
+  const symptomsList =
+    input.symptoms && input.symptoms.length > 0
+      ? input.symptoms.join(", ")
+      : "Tidak ada gejala spesifik (hanya kondisi/keluhan umum)";
+
+  const conditionsList =
+    input.selectedConditions && input.selectedConditions.length > 0
+      ? input.selectedConditions.join(", ")
+      : "Tidak ada";
+
+  const userPrompt = `
+Bagian Tubuh: ${input.regionName} (ID: ${input.regionId})
+Gejala Terpilih: ${symptomsList}
+Kondisi Terkait Terpilih: ${conditionsList}
+Catatan Tambahan Pengguna: ${input.additionalNotes || "Tidak ada"}
+
+Tolong lakukan AI Health Assessment dan kembalikan JSON.`;
+
+  const res = await fetch(`${baseUrl}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: userPrompt },
+      ],
+      response_format: { type: "json_object" },
+      max_tokens: 1000,
+    }),
+  });
+
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    throw new Error(`OpenAI/KoboiLLM error ${res.status}: ${txt.slice(0, 200)}`);
+  }
+
+  const payload = await res.json();
+  const text = payload.choices?.[0]?.message?.content;
+  if (!text) throw new Error("OpenAI/KoboiLLM tidak mengembalikan respon valid.");
 
   return parseResultJson(text);
 }
@@ -221,7 +297,30 @@ export const assessHealthAnatomy = createServerFn({ method: "POST" })
     const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase().trim();
     let lastError: Error | null = null;
 
-    if (provider === "openai") {
+    if (provider === "koboillm" || provider === "koboldllm") {
+      try {
+        return await assessWithKoboiLLM(input);
+      } catch (err) {
+        console.warn("KoboiLLM assessment failed, trying Gemini as fallback:", err);
+        lastError = err instanceof Error ? err : new Error(String(err));
+      }
+      if (process.env.GEMINI_API_KEY?.trim()) {
+        try {
+          return await assessWithGemini(input);
+        } catch (err) {
+          console.warn("Gemini assessment fallback failed, trying OpenAI:", err);
+          lastError = err instanceof Error ? err : new Error(String(err));
+        }
+      }
+      if (process.env.OPENAI_API_KEY?.trim()) {
+        try {
+          return await assessWithOpenAI(input);
+        } catch (err) {
+          console.error("OpenAI assessment fallback failed:", err);
+          lastError = err instanceof Error ? err : new Error(String(err));
+        }
+      }
+    } else if (provider === "openai") {
       if (process.env.OPENAI_API_KEY?.trim()) {
         try {
           return await assessWithOpenAI(input);

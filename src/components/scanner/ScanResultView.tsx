@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   AlertTriangle,
-  Building2,
   CheckCircle2,
   ChevronDown,
   Leaf,
-  MapPin,
   Pill,
   RotateCcw,
   ShieldAlert,
@@ -69,46 +67,66 @@ const ResultCard = ({
   title,
   icon: Icon,
   className,
-  defaultOpen = false,
   children,
 }: {
   title: string;
   icon: typeof Stethoscope;
   className?: string;
-  defaultOpen?: boolean;
   children: React.ReactNode;
 }) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <motion.div
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.2 }}
-      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border shadow-sm transition-shadow hover:shadow-md ${className}`}
+    <div
+      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border shadow-sm transition-shadow duration-200 hover:shadow-md ${className}`}
     >
+      {/* Mobile toggle header */}
       <button
         type="button"
         onClick={() => setIsOpen((o) => !o)}
         aria-expanded={isOpen}
-        className="flex w-full shrink-0 items-center gap-2.5 px-4 py-3.5 text-left sm:px-7 sm:py-5 md:pointer-events-none md:justify-center md:px-7 md:pt-7 md:pb-0"
+        className="flex w-full shrink-0 items-center gap-2.5 px-4 py-3.5 text-left sm:px-5 sm:py-4 md:hidden"
       >
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-800/5 text-slate-700 md:hidden">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-800/5 text-slate-700">
           <Icon className="h-4 w-4" />
         </span>
-        <h3 className="flex-1 font-display text-base font-bold text-slate-800 sm:text-lg md:mx-auto md:flex-none md:text-center md:text-2xl">
+        <h3 className="flex-1 font-display text-base font-bold text-slate-800">
           {title}
         </h3>
         <ChevronDown
-          className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200 md:hidden ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+            }`}
         />
       </button>
 
-      <div className={`${isOpen ? "block" : "hidden"} md:block`}>
-        <div className="px-4 pb-4 sm:px-7 sm:pb-7 md:pt-8">{children}</div>
+      {/* Desktop header - always visible */}
+      <div className="hidden shrink-0 items-center justify-center px-7 pt-7 pb-0 md:flex">
+        <h3 className="font-display text-2xl font-bold text-slate-800 text-center">
+          {title}
+        </h3>
       </div>
-    </motion.div>
+
+      {/* Mobile: animated collapsible */}
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            key="mobile-content"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22, ease: "easeInOut" }}
+            className="overflow-hidden md:hidden"
+          >
+            <div className="px-4 pb-4 sm:px-5 sm:pb-5">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Desktop: always visible */}
+      <div className="hidden md:block">
+        <div className="px-7 pb-7 pt-6">{children}</div>
+      </div>
+    </div>
   );
 };
 
@@ -161,6 +179,8 @@ export function ScanResultView({
           <img
             src={previewUrl}
             alt="Foto yang dianalisis"
+            loading="lazy"
+            decoding="async"
             className="aspect-square w-full object-cover max-h-[340px] md:max-h-none"
           />
           <span
@@ -211,21 +231,26 @@ export function ScanResultView({
         <ResultCard
           title="Kemungkinan Penyebab"
           icon={Stethoscope}
-          defaultOpen={false}
           className="col-span-12 border-slate-200 bg-slate-50 md:col-span-4"
         >
           <div
             className={`flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-white shadow-md ${danger.panel}`}
           >
             <Stethoscope className={`hidden h-7 w-7 shrink-0 md:block ${danger.accent}`} />
-            <ul className="space-y-1.5 text-xs sm:text-sm font-medium text-white leading-relaxed w-full">
-              {result.penyebab.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 bg-white/15 rounded-xl p-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--color-clinic-blue-soft)]" />
-                  <span className="text-xs sm:text-sm font-semibold">{item}</span>
-                </li>
-              ))}
-            </ul>
+            {result.penyebab && result.penyebab.length > 0 ? (
+              <ul className="space-y-1.5 text-xs sm:text-sm font-medium text-white leading-relaxed w-full">
+                {result.penyebab.map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 bg-white/15 rounded-xl p-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--color-clinic-blue-soft)]" />
+                    <span className="text-xs sm:text-sm font-semibold">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <span className="text-xs sm:text-sm font-semibold text-white/80">
+                Tidak ada data penyebab yang tersedia.
+              </span>
+            )}
           </div>
         </ResultCard>
 
@@ -233,26 +258,31 @@ export function ScanResultView({
         <ResultCard
           title="Pencegahan Mandiri"
           icon={CheckCircle2}
-          defaultOpen={false}
           className="col-span-12 border-slate-200 bg-slate-50 md:col-span-8"
         >
           <div
             className={`flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
           >
             <CheckCircle2 className="hidden h-7 w-7 shrink-0 text-white md:block" />
-            <div className="grid gap-2 text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed sm:grid-cols-2 w-full">
-              {result.pencegahan_mandiri.map((item, i) => (
-                <div
-                  key={i}
-                  className="flex items-start gap-2 bg-white/40 rounded-xl p-2 border border-white/30"
-                >
-                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
-                  <span className="text-xs sm:text-sm text-[color:var(--color-clinic-ink)]">
-                    {item}
-                  </span>
-                </div>
-              ))}
-            </div>
+            {result.pencegahan_mandiri && result.pencegahan_mandiri.length > 0 ? (
+              <div className="grid gap-2 text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed sm:grid-cols-2 w-full">
+                {result.pencegahan_mandiri.map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-2 bg-white/40 rounded-xl p-2 border border-white/30"
+                  >
+                    <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
+                    <span className="text-xs sm:text-sm text-[color:var(--color-clinic-ink)]">
+                      {item}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <span className="text-xs sm:text-sm font-semibold text-white/80">
+                Tidak ada data pencegahan yang tersedia.
+              </span>
+            )}
           </div>
         </ResultCard>
       </div>
@@ -262,15 +292,14 @@ export function ScanResultView({
         <ResultCard
           title="Rekomendasi Obat & Medis"
           icon={Pill}
-          defaultOpen={false}
           className="col-span-12 border-slate-200 bg-slate-50 md:col-span-8"
         >
           <div
             className={`flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
           >
             <Pill className="hidden h-7 w-7 shrink-0 text-white md:block" />
-            {result.obat_rekomendasi.length === 0 ? (
-              <span className="text-xs sm:text-sm font-semibold text-[color:var(--color-clinic-ink)]">
+            {!result.obat_rekomendasi || result.obat_rekomendasi.length === 0 ? (
+              <span className="text-xs sm:text-sm font-semibold text-white/80">
                 Tidak ada saran obat bebas untuk kondisi ini — konsultasikan ke dokter/apoteker.
               </span>
             ) : (
@@ -302,27 +331,28 @@ export function ScanResultView({
         <ResultCard
           title="Obat Herbal Alami"
           icon={Leaf}
-          defaultOpen={false}
           className="col-span-12 border-slate-200 bg-slate-50 md:col-span-4"
         >
           <div
             className={`flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
           >
             <Leaf className="hidden h-7 w-7 shrink-0 text-white md:block" />
-            {result.obat_herbal.length === 0 ? (
-              <span className="text-xs sm:text-sm font-semibold text-[color:var(--color-clinic-ink)]">
+            {!result.obat_herbal || result.obat_herbal.length === 0 ? (
+              <span className="text-xs sm:text-sm font-semibold text-white/80">
                 Tidak ada saran obat herbal spesifik.
               </span>
             ) : (
-              <div className="space-y-2 text-xs sm:text-sm font-semibold text-slate-900 w-full">
+              <div className="grid gap-2 text-xs sm:text-sm font-semibold text-[#111111] sm:grid-cols-2 w-full">
                 {result.obat_herbal.map((herb, i) => (
                   <div
                     key={i}
-                    className="flex flex-col gap-0.5 bg-white/40 rounded-xl p-2 border border-white/30"
+                    className="flex flex-col gap-1 bg-white/50 rounded-xl p-2.5 border border-white/40 shadow-2xs"
                   >
-                    <span className="text-xs font-bold text-[color:var(--color-clinic-ink)] sm:text-sm">
-                      {herb.nama}
-                    </span>
+                    <div className="flex flex-wrap items-center justify-between gap-1.5">
+                      <span className="text-xs font-bold text-[color:var(--color-clinic-ink)] sm:text-sm">
+                        {herb.nama}
+                      </span>
+                    </div>
                     <span className="text-xs text-[color:var(--color-clinic-ink)]">
                       {herb.cara_pakai}
                     </span>

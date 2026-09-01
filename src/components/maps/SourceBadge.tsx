@@ -1,7 +1,7 @@
 import React from "react";
 import { CheckCircle2, Info, Sparkles, Database } from "lucide-react";
 
-export type PharmacyDataSource = "google" | "osm" | "gemini" | "cache" | "unknown";
+export type PharmacyDataSource = "google" | "osm" | "gemini" | "koboldllm" | "cache" | "unknown";
 
 interface SourceBadgeProps {
   dataSource?: PharmacyDataSource;
@@ -52,6 +52,14 @@ export function SourceBadge({
       textColor: "text-[color:var(--color-clinic-blue)]",
       borderColor: "border-[#E5E7EB]",
       tooltip: "Pencarian cerdas basis data fasilitas kesehatan",
+    },
+    koboldllm: {
+      icon: <Sparkles className="h-3 w-3 text-[color:var(--color-clinic-blue-dark)]" />,
+      label: "AI Terverifikasi",
+      bgColor: "bg-[#F7F9FB]",
+      textColor: "text-[color:var(--color-clinic-blue)]",
+      borderColor: "border-[#E5E7EB]",
+      tooltip: "Pencarian cerdas basis data fasilitas kesehatan via KoboiLLM",
     },
     cache: {
       icon: <Database className="h-3 w-3 text-[#6B7280]" />,

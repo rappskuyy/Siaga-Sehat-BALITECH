@@ -25,11 +25,11 @@ import { Footer } from "@/components/clinic/Footer";
 export const Route = createFileRoute("/dev")({
   head: () => ({
     meta: [
-      { title: "Tim Pengembang — Siaga Sehat BALITECH" },
+      { title: "Tim Pengembang — Siaga Sehat " },
       {
         name: "description",
         content:
-          "Mengenal tim pengembang di balik platform kesehatan digital Siaga Sehat BALITECH.",
+          "Mengenal tim pengembang di balik platform kesehatan digital Siaga Sehat.",
       },
     ],
   }),
@@ -38,56 +38,65 @@ export const Route = createFileRoute("/dev")({
 
 const TEAM_MEMBERS = [
   {
-    name: "Rakha",
-    role: "Lead Developer & System Architect",
+    name: "Raffasya Javas Niscala Widjaja",
+    role: "Lead Developer & System Architect & UI/UX",
     specialty: "Fullstack Architecture & AI Integration",
     skills: ["React 19", "Vite", "AI Integration", "TypeScript"],
-    bio: "Membangun landasan arsitektur sistem SiagaSehat dan memadukan model kecerdasan buatan dengan UI yang adaptif.",
+    bio: "Merancang arsitektur sistem SiagaSehat, mengembangkan fitur utama dan integrasi AI, serta merancang antarmuka yang responsif, intuitif, dan adaptif terhadap kebutuhan pengguna.",
     icon: Terminal,
-    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=faces",
+    avatar: "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Raffasya%20Javas%20Niscala%20Widjaja.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvUmFmZmFzeWEgSmF2YXMgTmlzY2FsYSBXaWRqYWphLmF2aWYiLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4MjI3NzAyLCJleHAiOjE4MTk3NjM3MDJ9.HIn4-zAuQTHyk4wTnhzjkyE54v1QpsW72CDghC1GaYg",
     gradient: "from-blue-600 to-indigo-700",
     accent: "#4a6fa5",
   },
   {
-    name: "Bintang",
+    name: "Ahmad Rhezki Prasetya",
     role: "UI/UX & Frontend Engineer",
     specialty: "Responsive Styling & Motion Design",
     skills: ["Tailwind CSS", "Framer Motion", "Responsive Layouts", "Aesthetics"],
     bio: "Berfokus menghadirkan estetika premium, transisi dinamis (SlideTabs), serta kegunaan tata letak di segala perangkat display.",
     icon: Palette,
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=faces",
+    avatar: "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Ahmad%20Rhezki%20Prasetya.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvQWhtYWQgUmhlemtpIFByYXNldHlhLmF2aWYiLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4MjI3NzgxLCJleHAiOjE4MTk3NjM3ODF9.uR1PPi7HtQUaEIJ9fvWg7xhQOh8XttTFQEn6cYOaKV8",
     gradient: "from-emerald-500 to-teal-600",
     accent: "#17a690",
   },
   {
-    name: "Adit",
+    name: "Muhamad Fedliansyah Ilham",
     role: "Backend & Database Engineer",
     specialty: "Data Pipeline & Infrastructure",
     skills: ["Supabase", "PostgreSQL", "API Security", "Patient Data Flow"],
     bio: "Mengelola keandalan data klinis, infrastruktur autentikasi aman, serta performa pertukaran data triase medis.",
     icon: Database,
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=faces",
+    avatar: "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Muhamad%20Fedliansyah%20Ilham.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvTXVoYW1hZCBGZWRsaWFuc3lhaCBJbGhhbS5hdmlmIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODIyNzc2NiwiZXhwIjoxODE5NzYzNzY2fQ.6TKpgDEEZ5tktyEv_ZB-WkIcPda0jjbc3rYtlDEPPv4",
     gradient: "from-violet-600 to-purple-700",
     accent: "#35517d",
   },
 ];
 
 const TECH_STACK = [
-  { name: "React 19", sub: "& Vite", icon: Code2 },
-  { name: "TanStack", sub: "Router & Start", icon: Server },
-  { name: "Tailwind", sub: "CSS v4", icon: Palette },
+  { name: "React 19", sub: "Vite + UI", icon: Code2 },
+  { name: "TypeScript", sub: "DX & Safety", icon: Terminal },
+  { name: "TanStack", sub: "Router + Start", icon: Server },
+  { name: "Tailwind", sub: "Design System", icon: Palette },
   { name: "Framer", sub: "Motion", icon: Sparkles },
-  { name: "Supabase", sub: "& Postgres", icon: Database },
-  { name: "Gemini AI", sub: "SDK", icon: Cpu },
-  { name: "Leaflet", sub: "Maps API", icon: Globe },
+  { name: "Supabase", sub: "Auth + DB", icon: Database },
+  { name: "PostgreSQL", sub: "Relational data", icon: Database },
+  { name: "Gemini API", sub: "AI Vision", icon: Cpu },
+  { name: "OpenAI / GPT", sub: "LLM inference", icon: Cpu },
+  { name: "Leaflet", sub: "Interactive Maps", icon: Globe },
+  { name: "Cloudflare", sub: "Deployment", icon: Server },
+  { name: "Bun", sub: "Runtime", icon: Zap },
 ];
 
-const fadeUp = {
+const TECH_STACK_MARQUEE = [...TECH_STACK, ...TECH_STACK];
+
+import type { Variants } from "framer-motion";
+
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 40 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.12, duration: 0.6, ease: [0.22, 1, 0.36, 1] as any },
+    transition: { delay: i * 0.12, duration: 0.6, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
   }),
 };
 
@@ -128,7 +137,7 @@ function DevPage() {
             >
               <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue)]/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-clinic-blue)]">
                 <Heart className="h-3 w-3" />
-                BALITECH DEV TEAM
+                SIAGA SEHAT DEV TEAM
               </span>
               <h1 className="font-display text-4xl font-extrabold tracking-tight text-[color:var(--color-clinic-ink)] sm:text-5xl md:text-6xl mt-5 leading-[1.1]">
                 Di Balik Layar
@@ -157,10 +166,10 @@ function DevPage() {
                 </div>
                 <div>
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue)]/10 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[color:var(--color-clinic-blue)]">
-                    <Award className="h-3 w-3" /> Karya Rekayasa Perangkat Lunak
+                    <Award className="h-3 w-3" /> Karya Pengembangan Perangkat Lunak & Gim ( PPLG )
                   </span>
                   <h3 className="font-display text-lg sm:text-xl font-bold text-[color:var(--color-clinic-ink)] mt-1">
-                    Karya Inovasi Siswa BALITECH
+                    Karya Inovasi Siswa SMK Wikrama Bogor
                   </h3>
                   <p className="text-xs sm:text-sm text-[color:var(--color-clinic-muted)] mt-1 max-w-xl leading-relaxed">
                     Aplikasi SiagaSehat merupakan proyek inovasi kesehatan digital yang dirancang dan dikembangkan oleh tim siswa bertalenta sebagai bagian dari wujud apresiasi rekayasa teknologi informasi dan kecerdasan buatan.
@@ -170,8 +179,8 @@ function DevPage() {
               <div className="flex shrink-0 items-center gap-3 rounded-2xl bg-[#f7f4ee] px-4 py-3 border border-black/5 w-full md:w-auto">
                 <School className="h-5 w-5 text-[color:var(--color-clinic-blue)] shrink-0" />
                 <div className="text-left">
-                  <div className="text-[10px] text-[color:var(--color-clinic-muted)] font-medium">Institusi & Kompetisi</div>
-                  <div className="text-xs font-bold text-[color:var(--color-clinic-ink)]">SMK BALITECH Showcase</div>
+                  <div className="text-[10px] text-[color:var(--color-clinic-muted)] font-medium">Sekolah</div>
+                  <div className="text-xs font-bold text-[color:var(--color-clinic-ink)]">SMK Wikrama Bogor</div>
                 </div>
               </div>
             </div>
@@ -194,10 +203,10 @@ function DevPage() {
                   {/* Gradient header strip */}
                   <div className={`relative h-28 rounded-t-[24px] bg-gradient-to-br ${member.gradient} overflow-hidden`}>
                     {/* Animated geometric decoration */}
-                    <div className="absolute inset-0 opacity-20">
+                    <div className="absolute inset-0 opacity-25">
                       <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full border-[3px] border-white/30" />
-                      <div className="absolute -right-2 -top-2 h-16 w-16 rounded-full border-[3px] border-white/20" />
-                      <div className="absolute left-6 bottom-3 h-8 w-8 rounded-lg rotate-45 border-2 border-white/20" />
+                      <div className="absolute -right-2 -top-2 h-16 w-16 rounded-full border-[3px] border-white/25" />
+                      <div className="absolute left-6 bottom-3 h-8 w-8 rounded-lg rotate-45 border-2 border-white/25" />
                     </div>
 
                     {/* Specialty tag */}
@@ -220,11 +229,11 @@ function DevPage() {
                     <h2 className="font-display text-xl font-extrabold text-[color:var(--color-clinic-ink)]">
                       {member.name}
                     </h2>
-                    <p className="text-xs font-semibold mt-0.5" style={{ color: member.accent }}>
+                    <p className="mt-0.5 text-xs font-semibold text-slate-700">
                       {member.role}
                     </p>
 
-                    <p className="mt-4 flex-1 text-[13px] leading-relaxed text-[color:var(--color-clinic-muted)]">
+                    <p className="mt-4 flex-1 text-[13px] leading-relaxed text-slate-600">
                       {member.bio}
                     </p>
 
@@ -233,7 +242,7 @@ function DevPage() {
                       {member.skills.map((skill) => (
                         <span
                           key={skill}
-                          className="rounded-full bg-slate-50 border border-slate-200/80 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600"
+                          className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-semibold text-slate-700"
                         >
                           {skill}
                         </span>
@@ -283,30 +292,30 @@ function DevPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
-              {TECH_STACK.map((tech, i) => {
-                const Icon = tech.icon;
-                return (
-                  <motion.div
-                    key={tech.name}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.6 + i * 0.06, duration: 0.35 }}
-                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                    className="group flex flex-col items-center text-center p-4 rounded-2xl bg-white border border-black/5 shadow-2xs hover:shadow-sm hover:border-[color:var(--color-clinic-blue)]/20 transition-all duration-200"
-                  >
-                    <div className="grid h-10 w-10 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] mb-2.5 group-hover:bg-[color:var(--color-clinic-blue)] group-hover:text-white transition-colors duration-200">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <h3 className="text-xs font-bold text-[color:var(--color-clinic-ink)] leading-tight">
-                      {tech.name}
-                    </h3>
-                    <p className="text-[10px] text-[color:var(--color-clinic-muted)] mt-0.5">
-                      {tech.sub}
-                    </p>
-                  </motion.div>
-                );
-              })}
+            <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white/80 p-3 shadow-[0_18px_45px_rgba(15,23,42,0.06)] backdrop-blur-sm">
+              <div className="flex min-w-max gap-3 motion-safe:animate-[tech-scroll_24s_linear_infinite]">
+                {TECH_STACK_MARQUEE.map((tech, i) => {
+                  const Icon = tech.icon;
+                  return (
+                    <motion.div
+                      key={`${tech.name}-${i}`}
+                      initial={{ opacity: 0, scale: 0.96 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: (i % TECH_STACK.length) * 0.04, duration: 0.35 }}
+                      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                      className="group flex min-w-[170px] flex-col items-center text-center rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm transition-all duration-200 hover:border-sky-200 hover:bg-white"
+                    >
+                      <div className="mb-2.5 grid h-10 w-10 place-items-center rounded-xl bg-sky-100 text-sky-700 transition-colors duration-200 group-hover:bg-[color:var(--color-clinic-blue)] group-hover:text-white">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <h3 className="text-xs font-bold leading-tight text-slate-800">
+                        {tech.name}
+                      </h3>
+                      <p className="mt-0.5 text-[10px] text-slate-500">{tech.sub}</p>
+                    </motion.div>
+                  );
+                })}
+              </div>
             </div>
           </motion.div>
         </div>

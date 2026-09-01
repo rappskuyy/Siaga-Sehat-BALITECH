@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import {
   ArrowLeft,
@@ -75,13 +76,21 @@ function RegisterPage() {
     setLoading(false);
 
     if (signUpError) {
-      setError(signUpError.message);
+      const translated =
+        signUpError.message.toLowerCase().includes("user already registered") ||
+          signUpError.message.toLowerCase().includes("already registered")
+          ? "Email ini sudah terdaftar. Silakan masuk atau gunakan email lain."
+          : signUpError.message;
+      setError(translated);
       return;
     }
 
     // Jika project Supabase mewajibkan konfirmasi email, tidak ada session langsung.
     if (!data.session) {
-      setInfo("Akun berhasil dibuat. Silakan cek email kamu untuk konfirmasi sebelum masuk.");
+      const successText = "Akun berhasil dibuat. Silakan cek email kamu untuk konfirmasi sebelum masuk.";
+      window.sessionStorage.setItem("siagasehat_success_message", successText);
+      toast.success(successText, { duration: 5000 });
+      navigate({ to: "/login" });
       return;
     }
 

@@ -76,26 +76,480 @@ ATURAN ANALISIS INFORMASI PENYAKIT:
 const USER_PROMPT =
   "Analisis foto ini dan berikan hasil skrining kesehatan awal sesuai skema yang telah ditentukan.";
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function splitTextList(value: string): string[] {
+  return value
+    .split(/[;\n|]+|\s*\.\s*|\s*,\s*/)
+    .map((token) => token.trim())
+    .filter(Boolean)
+    .filter((token) => token.length > 1);
+}
+
+function toStringArray(value: unknown): string[] {
+  if (typeof value === "string") {
+    return splitTextList(value);
+  }
+
+  if (!Array.isArray(value)) return [];
+  return value
+    .flatMap((item) => {
+      if (typeof item === "string") return splitTextList(item);
+      if (item && typeof item === "object") {
+        const candidate = item as Record<string, unknown>;
+        const text =
+          typeof candidate.text === "string"
+            ? candidate.text
+            : typeof candidate.nama === "string"
+              ? candidate.nama
+              : typeof candidate.name === "string"
+                ? candidate.name
+                : "";
+        return text ? splitTextList(text) : [];
+      }
+      return [];
+    })
+    .filter(Boolean);
+}
+
+function normalizeMedicineList(value: unknown): ScanResult["obat_rekomendasi"] {
+  if (typeof value === "string") {
+    const items = value
+      .split(/[;\n|]+/)
+      .map((part) => part.trim())
+      .filter(Boolean);
+
+    if (items.length === 0) return [];
+
+    return items.map((item) => ({
+      nama: item.includes(":") ? item.split(":", 2)[0].trim() : item,
+      dosis: item.includes(":") ? item.split(":", 2)[1].trim() : "Ikuti petunjuk penggunaan",
+      catatan: "Konsultasikan dengan dokter/apoteker bila perlu.",
+    }));
+  }
+
+  if (!Array.isArray(value)) return [];
+
+  return value.flatMap((item) => {
+    // Handle string items in array (e.g. KoboiLLM output)
+    if (typeof item === "string") {
+      const text = item.trim();
+      if (!text) return [];
+      // Try to extract name and dosage from patterns like "Nama (dosis info)"
+      const parenStart = text.indexOf("(");
+      const colonIdx = text.indexOf(":");
+      let nama = text;
+      let dosis = "Ikuti petunjuk penggunaan";
+      if (parenStart > 2) {
+        nama = text.slice(0, parenStart).trim().replace(/[.,]$/, "");
+        dosis = text.slice(parenStart).replace(/^\(|\)$/g, "").trim() || dosis;
+      } else if (colonIdx > 2) {
+        nama = text.slice(0, colonIdx).trim();
+        dosis = text.slice(colonIdx + 1).trim() || dosis;
+      }
+      return [{ nama, dosis, catatan: "Konsultasikan dengan dokter/apoteker bila perlu." }];
+    }
+
+    if (!isRecord(item)) return [];
+
+    const nama =
+      typeof item.nama === "string"
+        ? item.nama
+        : typeof item.name === "string"
+          ? item.name
+          : "";
+
+    if (!nama) return [];
+
+    return [{
+      nama,
+      dosis:
+        typeof item.dosis === "string"
+          ? item.dosis
+          : typeof item.dose === "string"
+            ? item.dose
+            : typeof item.dosis_obat === "string"
+              ? item.dosis_obat
+              : "Ikuti petunjuk penggunaan",
+      catatan:
+        typeof item.catatan === "string"
+          ? item.catatan
+          : typeof item.keterangan === "string"
+            ? item.keterangan
+            : typeof item.note === "string"
+              ? item.note
+              : typeof item.deskripsi === "string"
+                ? item.deskripsi
+                : "Konsultasikan dengan dokter/apoteker bila perlu.",
+    }];
+  });
+}
+
+function normalizeHerbalList(value: unknown): ScanResult["obat_herbal"] {
+  if (typeof value === "string") {
+    const items = value
+      .split(/[;\n|]+/)
+      .map((part) => part.trim())
+      .filter(Boolean);
+
+    if (items.length === 0) return [];
+
+    return items.map((item) => {
+      const [nama, ...rest] = item.split(/\s*:\s*|\s*-\s*/);
+      return {
+        nama: nama || item,
+        cara_pakai: rest.join(": ").trim() || "Gunakan sesuai kebutuhan dan konsultasikan ke ahli bila perlu.",
+      };
+    });
+  }
+
+  if (!Array.isArray(value)) return [];
+
+  return value.flatMap((item) => {
+    // Handle string items in array (e.g. KoboiLLM output)
+    if (typeof item === "string") {
+      const text = item.trim();
+      if (!text) return [];
+      // Split on common separators: "Nama - cara pakai" or "Nama: cara pakai"
+      const sepMatch = text.match(/^(.+?)\s+(?:dioleskan|digunakan|dikonsumsi|diminum|ditempelkan|dibalurkan|sebagai|untuk)\s+(.+)$/i);
+      if (sepMatch) {
+        return [{ nama: sepMatch[1].trim(), cara_pakai: sepMatch[2].trim() }];
+      }
+      const colonIdx = text.indexOf(":");
+      const dashIdx = text.indexOf(" - ");
+      if (colonIdx > 2) {
+        return [{ nama: text.slice(0, colonIdx).trim(), cara_pakai: text.slice(colonIdx + 1).trim() }];
+      }
+      if (dashIdx > 2) {
+        return [{ nama: text.slice(0, dashIdx).trim(), cara_pakai: text.slice(dashIdx + 3).trim() }];
+      }
+      return [{ nama: text, cara_pakai: "Gunakan sesuai kebutuhan dan konsultasikan ke ahli bila perlu." }];
+    }
+
+    if (!isRecord(item)) return [];
+
+    const nama =
+      typeof item.nama === "string"
+        ? item.nama
+        : typeof item.name === "string"
+          ? item.name
+          : "";
+
+    if (!nama) return [];
+
+    return [{
+      nama,
+      cara_pakai:
+        typeof item.cara_pakai === "string"
+          ? item.cara_pakai
+          : typeof item.cara_penggunaan === "string"
+            ? item.cara_penggunaan
+            : typeof item.cara === "string"
+              ? item.cara
+              : typeof item.penggunaan === "string"
+                ? item.penggunaan
+                : "Gunakan sesuai kebutuhan dan konsultasikan ke ahli bila perlu.",
+    }];
+  });
+}
+
+function normalizeDangerLevel(value: unknown): ScanResult["tingkat_bahaya"] {
+  const normalized = typeof value === "string" ? value.toLowerCase() : "rendah";
+  return normalized === "sedang" || normalized === "tinggi" ? normalized : "rendah";
+}
+
+export function parseStructuredJson(text: string): Record<string, unknown> {
+  const rawText = String(text ?? "").trim();
+  if (!rawText) {
+    throw new Error("AI tidak mengembalikan hasil analisis yang valid.");
+  }
+
+  const withoutFence = rawText
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/```\s*$/i, "")
+    .trim();
+
+  const candidates = [withoutFence];
+
+  const objectStart = withoutFence.indexOf("{");
+  const objectEnd = withoutFence.lastIndexOf("}");
+  if (objectStart !== -1 && objectEnd > objectStart) {
+    candidates.push(withoutFence.slice(objectStart, objectEnd + 1));
+  }
+
+  const arrayStart = withoutFence.indexOf("[");
+  const arrayEnd = withoutFence.lastIndexOf("]");
+  if (arrayStart !== -1 && arrayEnd > arrayStart) {
+    candidates.push(withoutFence.slice(arrayStart, arrayEnd + 1));
+  }
+
+  for (const candidate of candidates) {
+    try {
+      const parsed = JSON.parse(candidate);
+      if (parsed && typeof parsed === "object") return parsed as Record<string, unknown>;
+    } catch {
+      // continue to next candidate
+    }
+  }
+
+  throw new Error("AI mengembalikan format JSON yang tidak valid.");
+}
+
+export function normalizeScanResultPayload(value: unknown): ScanResult {
+  if (!isRecord(value)) {
+    return {
+      gambar_dapat_dianalisis: true,
+      nama_penyakit: "Kondisi tidak spesifik",
+      ringkasan: "AI tidak mengembalikan data yang valid untuk hasil scan.",
+      tingkat_bahaya: "rendah",
+      penyebab: [],
+      pencegahan_mandiri: [],
+      harus_ke_dokter: false,
+      alasan_ke_dokter: "",
+      obat_rekomendasi: [],
+      obat_herbal: [],
+      catatan_tambahan: "",
+      tingkat_keyakinan: "rendah",
+    };
+  }
+
+  const raw = value as Record<string, unknown>;
+
+  const getFirstStringValue = (...keys: string[]) => {
+    for (const key of keys) {
+      const value = raw[key];
+      if (typeof value === "string" && value.trim()) return value;
+    }
+    return "";
+  };
+
+  const getFirstBooleanValue = (...keys: string[]) => {
+    for (const key of keys) {
+      const value = raw[key];
+      if (typeof value === "boolean") return value;
+    }
+    return false;
+  };
+
+  const medicineSource =
+    Array.isArray(raw.obat_rekomendasi)
+      ? raw.obat_rekomendasi
+      : Array.isArray(raw.rekomendasi_obat)
+        ? raw.rekomendasi_obat
+        : Array.isArray(raw.rekomendasi)
+          ? raw.rekomendasi
+          : Array.isArray(raw.obat)
+            ? raw.obat
+            : Array.isArray(raw["Rekomendasi Obat & Medis"])
+              ? raw["Rekomendasi Obat & Medis"]
+              : Array.isArray(raw["Rekomendasi Obat"])
+                ? raw["Rekomendasi Obat"]
+                : Array.isArray(raw["Obat Rekomendasi"])
+                  ? raw["Obat Rekomendasi"]
+                  : typeof raw["Rekomendasi Obat & Medis"] === "string"
+                    ? raw["Rekomendasi Obat & Medis"]
+                    : typeof raw["Rekomendasi Obat"] === "string"
+                      ? raw["Rekomendasi Obat"]
+                      : typeof raw["Obat Rekomendasi"] === "string"
+                        ? raw["Obat Rekomendasi"]
+                        : [];
+
+  const herbalSource =
+    Array.isArray(raw.obat_herbal)
+      ? raw.obat_herbal
+      : Array.isArray(raw.obat_herbal_alami)
+        ? raw.obat_herbal_alami
+        : Array.isArray(raw.herbal)
+          ? raw.herbal
+          : Array.isArray(raw.herbal_alami)
+            ? raw.herbal_alami
+            : Array.isArray(raw["Obat Herbal Alami"])
+              ? raw["Obat Herbal Alami"]
+              : Array.isArray(raw["Obat Herbal"])
+                ? raw["Obat Herbal"]
+                : typeof raw["Obat Herbal Alami"] === "string"
+                  ? raw["Obat Herbal Alami"]
+                  : typeof raw["Obat Herbal"] === "string"
+                    ? raw["Obat Herbal"]
+                    : [];
+
+  return {
+    gambar_dapat_dianalisis:
+      typeof raw.gambar_dapat_dianalisis === "boolean"
+        ? raw.gambar_dapat_dianalisis
+        : typeof raw["Gambar Dapat Dianalisis"] === "boolean"
+          ? raw["Gambar Dapat Dianalisis"]
+          : true,
+    nama_penyakit:
+      getFirstStringValue("nama_penyakit", "Nama Penyakit") || "Kondisi tidak spesifik",
+    ringkasan:
+      getFirstStringValue("ringkasan", "Ringkasan") || "AI belum menilai kondisi dengan detail yang cukup.",
+    tingkat_bahaya: normalizeDangerLevel(
+      getFirstStringValue("tingkat_bahaya", "Tingkat Bahaya", "level") || "rendah",
+    ),
+    penyebab: toStringArray(
+      raw.penyebab ??
+        raw.kemungkinan_penyebab ??
+        raw.kemungkinan ??
+        raw.cause ??
+        // KoboiLLM may return "gejala" instead of "penyebab"
+        raw.gejala ??
+        raw.symptoms ??
+        raw["Kemungkinan Penyebab"] ??
+        raw["Kemungkinan Penyebabnya"],
+    ),
+    pencegahan_mandiri: toStringArray(
+      raw.pencegahan_mandiri ??
+        raw.pencegahan ??
+        raw.prevention ??
+        raw.preventive ??
+        // KoboiLLM may return "saran_perawatan" instead of "pencegahan_mandiri"
+        raw.saran_perawatan ??
+        raw.saran ??
+        raw.tips ??
+        raw["Pencegahan Mandiri"] ??
+        raw["Pencegahan"],
+    ),
+    harus_ke_dokter: getFirstBooleanValue("harus_ke_dokter", "Harus Ke Dokter"),
+    alasan_ke_dokter:
+      getFirstStringValue("alasan_ke_dokter", "Alasan Ke Dokter") || "",
+    obat_rekomendasi: normalizeMedicineList(medicineSource),
+    obat_herbal: normalizeHerbalList(herbalSource),
+    catatan_tambahan:
+      getFirstStringValue("catatan_tambahan", "Catatan Tambahan") || "",
+    tingkat_keyakinan: normalizeDangerLevel(
+      getFirstStringValue("tingkat_keyakinan", "Tingkat Keyakinan", "keyakinan") || "sedang",
+    ),
+  };
+}
+
+async function analyzeWithKoboiLLM(data: {
+  imageBase64: string;
+  mediaType: string;
+}): Promise<ScanResult> {
+  const apiKey = (process.env.KOBOILLM_API_KEY || process.env.OPENAI_API_KEY)?.trim();
+  if (!apiKey) throw new Error("KOBOILLM_API_KEY belum dikonfigurasi di server.");
+
+  let baseUrl = (process.env.KOBOILLM_BASE_URL || process.env.OPENAI_BASE_URL)?.trim() || "https://api.koboillm.com/v1";
+  let url = baseUrl;
+  if (!url.endsWith("/chat/completions")) {
+    if (url.endsWith("/v1")) {
+      url = `${url}/chat/completions`;
+    } else if (url.endsWith("/")) {
+      url = `${url}v1/chat/completions`;
+    } else {
+      url = `${url}/v1/chat/completions`;
+    }
+  }
+
+  const model = process.env.KOBOILLM_MODEL || "gemini-2.5-flash";
+
+  let lastKoboError: Error | null = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        signal: AbortSignal.timeout(60000),
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            {
+              role: "user",
+              content: [
+                {
+                  type: "image_url",
+                  image_url: { url: `data:${data.mediaType};base64,${data.imageBase64}` },
+                },
+                { type: "text", text: USER_PROMPT },
+              ],
+            },
+          ],
+          max_tokens: 1500,
+        }),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        throw new Error(`KoboiLLM (status ${res.status}). ${errText.slice(0, 250)}`);
+      }
+
+      const payload = (await res.json()) as {
+        choices?: Array<{ message?: { content?: string | null; refusal?: string | null } }>;
+      };
+
+      const message = payload.choices?.[0]?.message;
+      if (message?.refusal) {
+        throw new Error(
+          "AI menolak menganalisis gambar ini. Coba unggah foto yang lebih jelas dan relevan dengan kondisi kesehatan.",
+        );
+      }
+
+      const text = message?.content;
+      if (!text) {
+        throw new Error("AI tidak mengembalikan hasil analisis yang valid.");
+      }
+
+      return normalizeScanResultPayload(parseStructuredJson(text));
+    } catch (err) {
+      lastKoboError = err instanceof Error ? err : new Error(String(err));
+      if (lastKoboError.message.includes("menolak menganalisis")) throw lastKoboError;
+      if (isRetryableNetworkError(lastKoboError) && attempt < 3) {
+        console.warn(`[KoboiLLM] Network error on attempt ${attempt}, retrying in ${attempt * 2000}ms:`, lastKoboError.message);
+        await delayMs(attempt * 2000);
+        continue;
+      }
+      if (isRetryableNetworkError(lastKoboError)) {
+        throw new Error("Koneksi ke KoboiLLM terputus akibat gangguan jaringan. Pastikan koneksi internet stabil lalu coba lagi.");
+      }
+      throw lastKoboError;
+    }
+  }
+  throw lastKoboError ?? new Error("Gagal menghubungi KoboiLLM API.");
+}
+
+function getOpenAIBaseUrl(): string {
+  const customBase = process.env.OPENAI_BASE_URL?.trim() || process.env.KOBOILLM_BASE_URL?.trim();
+  if (customBase) {
+    if (customBase.endsWith("/v1")) return customBase;
+    if (customBase.endsWith("/")) return `${customBase}v1`;
+    return customBase;
+  }
+  return "https://api.openai.com/v1";
+}
+
 async function analyzeWithOpenAI(data: {
   imageBase64: string;
   mediaType: string;
 }): Promise<ScanResult> {
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
+  const apiKey = (process.env.OPENAI_API_KEY || process.env.KOBOILLM_API_KEY)?.trim();
   if (!apiKey) {
     throw new Error(
       "OPENAI_API_KEY belum dikonfigurasi di server. Tambahkan API key OpenAI ke file .env lalu restart server.",
     );
   }
 
+  const baseUrl = getOpenAIBaseUrl();
   const models = Array.from(
-    new Set([process.env.OPENAI_MODEL, "gpt-4o", "gpt-4o-mini"].filter((m): m is string => Boolean(m))),
+    new Set(
+      [process.env.OPENAI_MODEL, process.env.KOBOILLM_MODEL, "gpt-4o", "gpt-4o-mini"].filter(
+        (m): m is string => Boolean(m),
+      ),
+    ),
   );
 
   let lastError: Error | null = null;
 
   for (const model of models) {
     try {
-      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      const isCustomBase = baseUrl !== "https://api.openai.com/v1";
+      const res = await fetch(`${baseUrl}/chat/completions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -116,20 +570,22 @@ async function analyzeWithOpenAI(data: {
               ],
             },
           ],
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "scan_result",
-              strict: true,
-              schema: SCAN_RESULT_JSON_SCHEMA,
-            },
-          },
+          response_format: isCustomBase
+            ? { type: "json_object" }
+            : {
+                type: "json_schema",
+                json_schema: {
+                  name: "scan_result",
+                  strict: true,
+                  schema: SCAN_RESULT_JSON_SCHEMA,
+                },
+              },
         }),
       });
 
       if (!res.ok) {
         const errText = await res.text().catch(() => "");
-        throw new Error(`OpenAI ${model} (status ${res.status}). ${errText.slice(0, 250)}`);
+        throw new Error(`OpenAI/KoboiLLM ${model} (status ${res.status}). ${errText.slice(0, 250)}`);
       }
 
       const payload = (await res.json()) as {
@@ -148,7 +604,7 @@ async function analyzeWithOpenAI(data: {
         throw new Error("AI tidak mengembalikan hasil analisis yang valid.");
       }
 
-      return JSON.parse(text) as ScanResult;
+      return normalizeScanResultPayload(parseStructuredJson(text));
     } catch (err) {
       lastError = err instanceof Error ? err : new Error(String(err));
       if (lastError.message.includes("menolak menganalisis")) {
@@ -195,6 +651,29 @@ const GEMINI_RESULT_SCHEMA = toGeminiSchema(SCAN_RESULT_JSON_SCHEMA);
 
 const delayMs = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * Returns true for transient network errors that are safe to retry:
+ * - Windows WSARECV / stream reading error (connection aborted by host)
+ * - ECONNABORTED / ECONNRESET (TCP reset)
+ * - AbortError from timeout
+ * - fetch failed (generic network failure)
+ */
+function isRetryableNetworkError(err: Error): boolean {
+  const msg = err.message.toLowerCase();
+  return (
+    msg.includes("wsarecv") ||
+    msg.includes("stream reading error") ||
+    msg.includes("econnaborted") ||
+    msg.includes("econnreset") ||
+    msg.includes("econnrefused") ||
+    msg.includes("etimedout") ||
+    msg.includes("fetch failed") ||
+    msg.includes("network error") ||
+    err.name === "AbortError" ||
+    err.name === "TimeoutError"
+  );
+}
+
 async function analyzeWithGemini(data: {
   imageBase64: string;
   mediaType: string;
@@ -217,7 +696,7 @@ async function analyzeWithGemini(data: {
   let lastError: Error | null = null;
 
   for (const model of models) {
-    for (let attempt = 1; attempt <= 2; attempt++) {
+    for (let attempt = 1; attempt <= 3; attempt++) {
       try {
         const res = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
@@ -227,7 +706,7 @@ async function analyzeWithGemini(data: {
               "Content-Type": "application/json",
               "x-goog-api-key": apiKey,
             },
-            signal: AbortSignal.timeout(15000),
+            signal: AbortSignal.timeout(45000),
             body: JSON.stringify({
               contents: [
                 {
@@ -259,21 +738,19 @@ async function analyzeWithGemini(data: {
         if (res.status === 404) {
           const errText = await res.text().catch(() => "");
           lastError = new Error(`Gemini ${model} (status 404). ${errText.slice(0, 200)}`);
-          break;
+          break; // skip to next model
         }
 
         if (res.status === 503 || res.status === 500 || res.status === 502 || res.status === 504) {
-          const errText = await res.text().catch(() => "");
           lastError = new Error(
             `Gemini API (${model}) sedang mengalami lonjakan beban (status ${res.status}).`,
           );
-          // High demand or server error on this specific model -> skip to next model immediately
-          break;
+          break; // skip to next model
         }
 
         if (res.status === 429) {
           if (attempt < 3) {
-            await delayMs(attempt * 1500);
+            await delayMs(attempt * 2000);
             continue;
           }
           lastError = new Error(
@@ -290,7 +767,7 @@ async function analyzeWithGemini(data: {
 
         const payload = (await res.json()) as {
           candidates?: Array<{
-            content?: { parts?: Array<{ text?: string }> };
+            content?: { parts?: Array<{ text?: string }>};
             finishReason?: string;
           }>;
         };
@@ -306,15 +783,30 @@ async function analyzeWithGemini(data: {
           throw new Error("AI tidak mengembalikan hasil analisis yang valid.");
         }
 
-        const parsedResult = JSON.parse(text) as ScanResult;
+        const parsedResult = normalizeScanResultPayload(parseStructuredJson(text));
         SCAN_CACHE.set(cacheKey, { result: parsedResult, timestamp: Date.now() });
         return parsedResult;
       } catch (err) {
         lastError = err instanceof Error ? err : new Error(String(err));
-        if (
-          lastError.message.includes("menolak menganalisis")
-        ) {
+
+        // Always rethrow safety refusals immediately
+        if (lastError.message.includes("menolak menganalisis")) {
           throw lastError;
+        }
+
+        // Retry transient network errors with exponential backoff
+        if (isRetryableNetworkError(lastError) && attempt < 3) {
+          const backoffMs = attempt * 2000; // 2s, 4s
+          console.warn(`[Gemini ${model}] Network error on attempt ${attempt}, retrying in ${backoffMs}ms:`, lastError.message);
+          await delayMs(backoffMs);
+          continue;
+        }
+
+        // For non-retryable errors or exhausted retries, set friendly message and skip model
+        if (isRetryableNetworkError(lastError)) {
+          lastError = new Error(
+            "Koneksi ke server AI terputus akibat gangguan jaringan. Pastikan koneksi internet stabil lalu coba lagi."
+          );
         }
       }
     }
@@ -341,6 +833,14 @@ export const analyzeHealthImage = createServerFn({ method: "POST" })
   .validator((data: unknown) => scanInputSchema.parse(data))
   .handler(async ({ data }): Promise<ScanResult> => {
     const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase().trim();
+    if (provider === "koboillm" || provider === "koboldllm") {
+      try {
+        return await analyzeWithKoboiLLM(data);
+      } catch (err) {
+        console.warn("KoboiLLM scan analysis failed, attempting Gemini fallback:", err);
+        return await analyzeWithGemini(data);
+      }
+    }
     if (provider === "openai" && process.env.OPENAI_API_KEY?.trim()) {
       try {
         return await analyzeWithOpenAI(data);

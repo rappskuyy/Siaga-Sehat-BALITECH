@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import {
   ArrowLeft,
@@ -46,6 +47,16 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const message = window.sessionStorage.getItem("siagasehat_success_message");
+    if (message) {
+      setSuccessMessage(message);
+      toast.success(message, { duration: 5000 });
+      window.sessionStorage.removeItem("siagasehat_success_message");
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -264,6 +275,17 @@ function LoginPage() {
             </motion.div>
 
             <AnimatePresence>
+              {successMessage && (
+                <motion.p
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="rounded-xl bg-emerald-50 px-3.5 py-2.5 text-sm text-emerald-700 border border-emerald-200/60"
+                  role="status"
+                >
+                  {successMessage}
+                </motion.p>
+              )}
               {error && (
                 <motion.p
                   initial={{ opacity: 0, height: 0 }}

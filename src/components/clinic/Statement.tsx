@@ -117,7 +117,7 @@ export function Statement() {
       </p>
 
       <p className="mx-auto mt-3 max-w-xl text-sm text-[color:var(--color-clinic-muted)]">
-        Dipercaya oleh masyarakat sejak 2020.
+        Dipercaya oleh masyarakat sejak 2026.
       </p>
 
       <a

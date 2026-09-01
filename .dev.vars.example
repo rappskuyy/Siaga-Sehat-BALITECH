@@ -5,8 +5,13 @@
 #   npx wrangler secret put OPENAI_API_KEY
 #   npx wrangler secret put GEMINI_API_KEY
 
-# Pilih provider AI untuk fitur scan: "openai" atau "gemini"
+# Pilih provider AI untuk semua fitur: "openai", "gemini", atau "koboillm"
 AI_PROVIDER=openai
+
+# KoboiLLM Config
+KOBOILLM_BASE_URL=https://api.koboillm.com/v1
+KOBOILLM_API_KEY=
+KOBOILLM_MODEL=gemini-2.5-flash
 
 # Isi salah satu sesuai AI_PROVIDER yang dipilih di atas
 OPENAI_API_KEY=
