@@ -13,23 +13,23 @@ const Toaster = ({ ...props }: ToasterProps) => {
       closeButton
       icons={{
         info: (
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(59,130,246,0.12)] text-[#3B82F6]">
-            <Info className="h-5 w-5" strokeWidth={2} />
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[rgba(59,130,246,0.12)] text-[#3B82F6] sm:h-10 sm:w-10">
+            <Info className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2} />
           </div>
         ),
         success: (
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(22,163,74,0.12)] text-[#16A34A]">
-            <Check className="h-5 w-5" strokeWidth={2.5} />
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[rgba(22,163,74,0.12)] text-[#16A34A] sm:h-10 sm:w-10">
+            <Check className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2.5} />
           </div>
         ),
         warning: (
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(245,158,11,0.14)] text-[#F59E0B]">
-            <TriangleAlert className="h-5 w-5" strokeWidth={2} />
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[rgba(245,158,11,0.14)] text-[#F59E0B] sm:h-10 sm:w-10">
+            <TriangleAlert className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2} />
           </div>
         ),
         error: (
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(239,68,68,0.12)] text-[#EF4444]">
-            <CircleAlert className="h-5 w-5" strokeWidth={2} />
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[rgba(239,68,68,0.12)] text-[#EF4444] sm:h-10 sm:w-10">
+            <CircleAlert className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2} />
           </div>
         ),
       }}
@@ -37,14 +37,14 @@ const Toaster = ({ ...props }: ToasterProps) => {
         duration: 6000,
         classNames: {
           toast:
-            "group toast relative w-[min(92vw,420px)] overflow-hidden rounded-[18px] border border-slate-200 bg-white px-5 py-4 pr-10 text-slate-700 shadow-[0_4px_20px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] motion-safe:animate-[toast-slide-in_320ms_cubic-bezier(0.16,1,0.3,1)] before:pointer-events-none before:absolute before:inset-0 before:content-['']",
-          title: "relative z-10 text-[15px] font-semibold leading-snug text-gray-900",
-          description: "relative z-10 mt-0.5 text-[13.5px] leading-snug text-gray-400",
+            "group toast relative w-[min(92vw,420px)] overflow-hidden rounded-xl border border-slate-200 bg-white px-3.5 py-3 pr-8 text-slate-700 shadow-[0_4px_20px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] motion-safe:animate-[toast-slide-in_320ms_cubic-bezier(0.16,1,0.3,1)] before:pointer-events-none before:absolute before:inset-0 before:content-[''] sm:rounded-[18px] sm:px-5 sm:py-4 sm:pr-10",
+          title: "relative z-10 text-sm font-semibold leading-snug text-gray-900 sm:text-[15px]",
+          description: "relative z-10 mt-0.5 text-xs leading-snug text-gray-400 sm:text-[13.5px]",
           closeButton:
-            "!absolute !left-auto !right-3 !top-3 !m-0 !flex !h-7 !w-7 !items-center !justify-center !rounded-full !border-0 !bg-transparent !p-0 !text-gray-400 !shadow-none hover:!bg-gray-100 hover:!text-gray-600",
+            "!absolute !left-auto !right-2 !top-2 !m-0 !flex !h-6 !w-6 !items-center !justify-center !rounded-full !border-0 !bg-transparent !p-0 !text-gray-400 !shadow-none hover:!bg-gray-100 hover:!text-gray-600 sm:!right-3 sm:!top-3 sm:!h-7 sm:!w-7",
           actionButton: "bg-[color:var(--color-clinic-blue)] text-white hover:bg-[color:var(--color-clinic-blue-dark)]",
           cancelButton: "bg-slate-100 text-slate-600 hover:bg-slate-200",
-          icon: "!mr-3 !mt-0.5 !h-10 !w-10 !rounded-full !bg-transparent !border-0 !shadow-none !text-current",
+          icon: "!mr-2.5 !mt-0.5 !h-8 !w-8 !rounded-full !bg-transparent !border-0 !shadow-none !text-current sm:!mr-3 sm:!h-10 sm:!w-10",
           info: "before:bg-[radial-gradient(120px_90px_at_0%_0%,rgba(59,130,246,0.16),transparent_70%)] border-slate-200 text-sky-900",
           success: "before:bg-[radial-gradient(120px_90px_at_0%_0%,rgba(22,163,74,0.16),transparent_70%)] border-slate-200 text-emerald-900",
           warning: "before:bg-[radial-gradient(120px_90px_at_0%_0%,rgba(245,158,11,0.18),transparent_70%)] border-slate-200 text-amber-900",

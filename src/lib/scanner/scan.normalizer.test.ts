@@ -87,3 +87,50 @@ test("extracts valid JSON from model text that wraps the response with markdown 
   assert.equal(parsed.gambar_dapat_dianalisis, true);
   assert.equal((parsed.obat_rekomendasi as Array<{ nama: string }>)[0].nama, "Hydrocortisone 1%");
 });
+
+test("normalizes KoboiLLM's multi-candidate 'kemungkinan_penyakit' wrapper", () => {
+  const raw = {
+    gambar_dapat_dianalisis: true,
+    ringkasan:
+      "Berdasarkan gambar, terlihat adanya banyak bintil kemerahan yang berisi nanah (pustula) keputihan/kekuningan.",
+    kemungkinan_penyakit: [
+      {
+        nama_penyakit: "Folikulitis",
+        tingkat_bahaya: "sedang",
+        harus_ke_dokter: true,
+        alasan_analisis: "Terdapat pustula multipel yang berpusat pada folikel rambut.",
+        obat_rekomendasi: ["Povidone Iodine (oleskan tipis 2x sehari)"],
+        obat_herbal: ["Tea Tree Oil (dioleskan tipis setelah bersih)"],
+        saran_perawatan: [
+          "JANGAN memencet atau memecahkan bintil.",
+          "Jaga area tetap bersih dan kering.",
+        ],
+      },
+      {
+        nama_penyakit: "Jerawat Pustul (Acne Vulgaris)",
+        tingkat_bahaya: "rendah",
+        harus_ke_dokter: false,
+        alasan_analisis: "Meski mirip, jerawat pustul biasanya tidak sebanyak ini.",
+        obat_rekomendasi: ["Gel Benzoil Peroksida 2.5%"],
+        obat_herbal: ["Tea Tree Oil"],
+        saran_perawatan: ["Jangan dipencet."],
+      },
+    ],
+  };
+
+  const result = normalizeScanResultPayload(raw);
+
+  // Should pick the higher-danger candidate (Folikulitis, "sedang") as primary.
+  assert.equal(result.nama_penyakit, "Folikulitis");
+  assert.equal(result.tingkat_bahaya, "sedang");
+  assert.equal(result.harus_ke_dokter, true);
+  assert.equal(result.obat_rekomendasi[0].nama, "Povidone Iodine");
+  assert.ok(result.obat_herbal[0].nama.includes("Tea Tree Oil"));
+  assert.ok(result.pencegahan_mandiri.length > 0);
+  assert.ok(result.penyebab.length > 0);
+  // Top-level ringkasan must win over anything inside the candidate array.
+  assert.equal(
+    result.ringkasan,
+    "Berdasarkan gambar, terlihat adanya banyak bintil kemerahan yang berisi nanah (pustula) keputihan/kekuningan.",
+  );
+});

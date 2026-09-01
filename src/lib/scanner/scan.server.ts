@@ -255,6 +255,27 @@ function normalizeHerbalList(value: unknown): ScanResult["obat_herbal"] {
   });
 }
 
+/**
+ * Some providers (observed with KoboiLLM's Gemini passthrough when no strict
+ * response schema is enforced) ignore the flat schema and instead wrap the
+ * result in a multi-candidate array such as "kemungkinan_penyakit",
+ * "diagnosis", or "differential_diagnosis". Each entry in that array carries
+ * its own nama_penyakit/tingkat_bahaya/obat_rekomendasi/etc. This picks the
+ * most relevant single candidate (preferring the most dangerous one) so the
+ * rest of the normalizer can treat it like a flat payload.
+ */
+function pickPrimaryCandidate(list: unknown[]): Record<string, unknown> | null {
+  const candidates = list.filter(isRecord);
+  if (candidates.length === 0) return null;
+
+  const dangerRank: Record<string, number> = { tinggi: 3, sedang: 2, rendah: 1 };
+  return candidates.reduce((best, current) => {
+    const bestRank = dangerRank[String(best.tingkat_bahaya ?? "").toLowerCase()] ?? 0;
+    const currentRank = dangerRank[String(current.tingkat_bahaya ?? "").toLowerCase()] ?? 0;
+    return currentRank > bestRank ? current : best;
+  }, candidates[0]);
+}
+
 function normalizeDangerLevel(value: unknown): ScanResult["tingkat_bahaya"] {
   const normalized = typeof value === "string" ? value.toLowerCase() : "rendah";
   return normalized === "sedang" || normalized === "tinggi" ? normalized : "rendah";
@@ -315,7 +336,29 @@ export function normalizeScanResultPayload(value: unknown): ScanResult {
     };
   }
 
-  const raw = value as Record<string, unknown>;
+  const originalRaw = value as Record<string, unknown>;
+
+  // Handle providers that wrap the answer in a multi-candidate array
+  // (e.g. "kemungkinan_penyakit") instead of the flat schema. Merge the
+  // best candidate underneath the top-level fields so anything already
+  // present at the root (like "ringkasan" or "gambar_dapat_dianalisis")
+  // still wins.
+  const multiCandidateSource =
+    Array.isArray(originalRaw.kemungkinan_penyakit)
+      ? originalRaw.kemungkinan_penyakit
+      : Array.isArray(originalRaw.diagnosis)
+        ? originalRaw.diagnosis
+        : Array.isArray(originalRaw.differential_diagnosis)
+          ? originalRaw.differential_diagnosis
+          : Array.isArray(originalRaw.kemungkinan_diagnosis)
+            ? originalRaw.kemungkinan_diagnosis
+            : null;
+
+  const primaryCandidate = multiCandidateSource ? pickPrimaryCandidate(multiCandidateSource) : null;
+
+  const raw: Record<string, unknown> = primaryCandidate
+    ? { ...primaryCandidate, ...originalRaw }
+    : originalRaw;
 
   const getFirstStringValue = (...keys: string[]) => {
     for (const key of keys) {
@@ -397,6 +440,9 @@ export function normalizeScanResultPayload(value: unknown): ScanResult {
         // KoboiLLM may return "gejala" instead of "penyebab"
         raw.gejala ??
         raw.symptoms ??
+        // Multi-candidate providers (see pickPrimaryCandidate) explain
+        // their reasoning per-candidate in "alasan_analisis"
+        raw.alasan_analisis ??
         raw["Kemungkinan Penyebab"] ??
         raw["Kemungkinan Penyebabnya"],
     ),
@@ -447,6 +493,11 @@ async function analyzeWithKoboiLLM(data: {
   const model = process.env.KOBOILLM_MODEL || "gemini-2.5-flash";
 
   let lastKoboError: Error | null = null;
+  // Force the flat schema so the model can't fall back to a multi-candidate
+  // shape like "kemungkinan_penyakit" (which normalizeScanResultPayload only
+  // handles as a best-effort fallback, not the primary path). If the
+  // endpoint rejects response_format outright, we drop it and retry.
+  let useSchema = true;
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       const res = await fetch(url, {
@@ -472,11 +523,34 @@ async function analyzeWithKoboiLLM(data: {
             },
           ],
           max_tokens: 1500,
+          ...(useSchema
+            ? {
+                response_format: {
+                  type: "json_schema",
+                  json_schema: {
+                    name: "scan_result",
+                    strict: true,
+                    schema: SCAN_RESULT_JSON_SCHEMA,
+                  },
+                },
+              }
+            : {}),
         }),
       });
 
       if (!res.ok) {
         const errText = await res.text().catch(() => "");
+        // Some KoboiLLM/litellm routes don't support strict json_schema
+        // response_format for certain models. Drop it and retry once.
+        if (
+          useSchema &&
+          (res.status === 400 || res.status === 422) &&
+          /response_format|json_schema/i.test(errText)
+        ) {
+          useSchema = false;
+          lastKoboError = new Error(`KoboiLLM (status ${res.status}). ${errText.slice(0, 250)}`);
+          continue;
+        }
         throw new Error(`KoboiLLM (status ${res.status}). ${errText.slice(0, 250)}`);
       }
 
