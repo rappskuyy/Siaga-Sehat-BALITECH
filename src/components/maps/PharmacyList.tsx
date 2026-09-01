@@ -114,7 +114,7 @@ export function PharmacyList({
     return list;
   }, [pharmacies, maxRadius, typeFilter, sortBy]);
 
-  const INITIAL_DISPLAY_COUNT = 4;
+  const INITIAL_DISPLAY_COUNT = 50;
   const displayedPharmacies = showAllItems
     ? processedPharmacies
     : processedPharmacies.slice(0, INITIAL_DISPLAY_COUNT);
@@ -263,7 +263,12 @@ export function PharmacyList({
       </div>
 
       {/* Daftar Fasilitas Scrollable */}
-      <div className="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto pr-1">
+      <div
+        onWheel={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
+        className="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto pr-1 touch-pan-y overscroll-contain scrollbar-thin scrollbar-thumb-[#379FD2]/30"
+      >
         {loadingPharmacies ? (
           <div className="space-y-2.5 py-2">
             <div className="text-center py-1 text-xs text-[#379FD2] font-medium animate-pulse">

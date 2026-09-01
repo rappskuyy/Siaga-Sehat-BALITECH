@@ -35,6 +35,7 @@ export function AnatomyExplorer() {
       window.scrollTo({ top: Math.max(0, absoluteTop), behavior: "smooth" });
     }
   };
+  const scrollToTop = scrollToStep2;
 
   const triggerAutoLockScroll = () => {
     scrollToStep2();

@@ -537,13 +537,13 @@ export function MobileMapView() {
             {/* Header */}
             <div className="flex items-start justify-between gap-3 mb-4">
               <div>
-                <span className="text-xs font-bold uppercase text-[#4a6fa5] block mb-1">
+                <span className="text-xs font-bold uppercase text-[#4a6fa5] flex items-center gap-1.5 mb-1">
                   {selectedPharmacy.facilityType === "hospital" ? (
-                    <>🏥 RUMAH SAKIT</>
+                    <><Building2 className="h-3.5 w-3.5 text-red-500 shrink-0" /> RUMAH SAKIT</>
                   ) : selectedPharmacy.facilityType === "clinic" ? (
-                    <>🩺 KLINIK</>
+                    <><Stethoscope className="h-3.5 w-3.5 text-amber-500 shrink-0" /> KLINIK</>
                   ) : (
-                    <>💊 APOTEK</>
+                    <><Pill className="h-3.5 w-3.5 text-blue-500 shrink-0" /> APOTEK</>
                   )}
                 </span>
                 <h2 className="text-lg font-bold text-[#111111]">{selectedPharmacy.name}</h2>
@@ -560,15 +560,22 @@ export function MobileMapView() {
             </div>
 
             {/* Photo */}
-            <div className="relative h-40 w-full rounded-2xl overflow-hidden mb-4 bg-slate-200">
-              {finalPhotoUrl && (
-                <img src={finalPhotoUrl} alt={selectedPharmacy.name} className="w-full h-full object-cover" />
-              )}
+            <div className="relative h-44 w-full rounded-2xl overflow-hidden mb-4 bg-slate-100 border border-[#E5E7EB] shadow-xs">
+              <img
+                src={finalPhotoUrl || getWikimediaFallbackPhoto(selectedPharmacy.facilityType, selectedPharmacy.name.charCodeAt(0) || 0)}
+                alt={selectedPharmacy.name}
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = getWikimediaFallbackPhoto(selectedPharmacy.facilityType, 0);
+                }}
+                className="w-full h-full object-cover"
+              />
             </div>
 
             {/* Rating */}
             <div className="flex items-center gap-2 mb-4 pb-4 border-b border-[#E5E7EB]">
-              <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+              <Star className="h-4 w-4 fill-amber-400 text-amber-400 shrink-0" />
               <span className="font-bold text-[#111111]">{selectedPharmacy.rating ? Number(selectedPharmacy.rating).toFixed(1) : "4.8"}</span>
               <span className="text-xs text-[#6B7280]">
                 ({selectedPharmacy.userRatingsTotal || "128"} ulasan)
@@ -578,8 +585,11 @@ export function MobileMapView() {
             {/* Address */}
             <div className="mb-4">
               <p className="text-xs text-[#6B7280] font-medium mb-1">Lokasi</p>
-              <p className="text-sm text-[#111111]">
-                📍 {selectedPharmacy.address || `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
+              <p className="text-sm text-[#111111] flex items-start gap-1.5">
+                <MapPin className="h-4 w-4 text-[#4a6fa5] shrink-0 mt-0.5" />
+                <span>
+                  {selectedPharmacy.address || `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
+                </span>
               </p>
             </div>
 

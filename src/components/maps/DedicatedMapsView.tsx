@@ -82,68 +82,7 @@ const FACILITY_REVIEWS = {
     "Obat resep lengkap, pelayanan petugas racik obat cepat, lokasi strategis dan harga terjangkau.",
 };
 
-// SVG Marker Icons (Identical to Scanner)
-const userLocationSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
-  <circle cx="18" cy="18" r="16" fill="rgba(37,99,235,0.25)"/>
-  <circle cx="18" cy="18" r="10" fill="#2563EB" stroke="#FFFFFF" stroke-width="3"/>
-  <circle cx="18" cy="18" r="4" fill="#FFFFFF"/>
-</svg>
-`)}`;
-
-// 🏥 Hospital Markers (Red)
-const hospitalPinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 34 42" fill="none">
-  <path d="M17 0C7.611 0 0 7.611 0 17C0 29.75 17 42 17 42C17 42 34 29.75 34 17C34 7.611 26.389 0 17 0Z" fill="#EF4444"/>
-  <circle cx="17" cy="16" r="8" fill="#FFFFFF"/>
-  <path d="M15.5 11.5H18.5V14.5H21.5V17.5H18.5V20.5H15.5V17.5H12.5V14.5H15.5V11.5Z" fill="#EF4444"/>
-</svg>
-`)}`;
-
-const hospitalActivePinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" width="46" height="54" viewBox="0 0 46 54" fill="none">
-  <circle cx="23" cy="19" r="19" fill="rgba(239, 68, 68, 0.40)"/>
-  <path d="M23 2C14.163 2 7 9.163 7 18C7 30 23 48 23 48C23 48 39 30 39 18C39 9.163 31.837 2 23 2Z" fill="#DC2626" stroke="#FFFFFF" stroke-width="2.5"/>
-  <circle cx="23" cy="17" r="8" fill="#FFFFFF"/>
-  <path d="M21.5 12.5H24.5V15.5H27.5V18.5H24.5V21.5H21.5V18.5H18.5V15.5H21.5V12.5Z" fill="#DC2626"/>
-</svg>
-`)}`;
-
-// 🩺 Clinic Markers (Yellow)
-const clinicPinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 34 42" fill="none">
-  <path d="M17 0C7.611 0 0 7.611 0 17C0 29.75 17 42 17 42C17 42 34 29.75 34 17C34 7.611 26.389 0 17 0Z" fill="#F59E0B"/>
-  <circle cx="17" cy="16" r="7.5" fill="#FFFFFF"/>
-  <circle cx="17" cy="16" r="4" fill="#D97706"/>
-</svg>
-`)}`;
-
-const clinicActivePinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" width="46" height="54" viewBox="0 0 46 54" fill="none">
-  <circle cx="23" cy="19" r="19" fill="rgba(245, 158, 11, 0.40)"/>
-  <path d="M23 2C14.163 2 7 9.163 7 18C7 30 23 48 23 48C23 48 39 30 39 18C39 9.163 31.837 2 23 2Z" fill="#D97706" stroke="#FFFFFF" stroke-width="2.5"/>
-  <circle cx="23" cy="17" r="8" fill="#FFFFFF"/>
-  <circle cx="23" cy="17" r="4" fill="#D97706"/>
-</svg>
-`)}`;
-
-// 💊 Pharmacy Markers (Blue)
-const pharmacyPinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 34 42" fill="none">
-  <path d="M17 0C7.611 0 0 7.611 0 17C0 29.75 17 42 17 42C17 42 34 29.75 34 17C34 7.611 26.389 0 17 0Z" fill="#379FD2"/>
-  <circle cx="17" cy="16" r="7.5" fill="#FFFFFF"/>
-  <circle cx="17" cy="16" r="4" fill="#2563EB"/>
-</svg>
-`)}`;
-
-const pharmacyActivePinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" width="46" height="54" viewBox="0 0 46 54" fill="none">
-  <circle cx="23" cy="19" r="19" fill="rgba(55, 159, 210, 0.45)"/>
-  <path d="M23 2C14.163 2 7 9.163 7 18C7 30 23 48 23 48C23 48 39 30 39 18C39 9.163 31.837 2 23 2Z" fill="#2563EB" stroke="#FFFFFF" stroke-width="2.5"/>
-  <circle cx="23" cy="17" r="8" fill="#FFFFFF"/>
-  <circle cx="23" cy="17" r="4" fill="#2563EB"/>
-</svg>
-`)}`;
+// Legacy SVG Markers removed - using OpenStreetMapCanvas with dynamic SVG teardrop pins
 
 
 
@@ -532,9 +471,6 @@ export function DedicatedMapsView() {
         <div className="rounded-3xl bg-[#FFFFFF] p-3.5 sm:p-5 border border-[#E5E7EB] shadow-[0_10px_35px_rgba(55,159,210,0.08)] flex flex-col gap-3">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <div className="flex items-center gap-2">
-              <span className="grid h-8 w-8 sm:h-9 sm:w-9 place-items-center rounded-2xl bg-gradient-blue-primary text-[#FFFFFF] shadow-xs">
-                <Compass className="h-4 w-4 sm:h-5 sm:w-5" />
-              </span>
               <div>
                 <h1 className="font-display text-sm sm:text-lg font-bold text-[#111111] leading-tight">
                   Peta Fasilitas Kesehatan
@@ -577,7 +513,7 @@ export function DedicatedMapsView() {
               <Button
                 type="submit"
                 size="sm"
-                className="h-10 sm:h-11 px-4 sm:px-5 rounded-2xl text-xs sm:text-sm font-bold bg-gradient-blue-primary text-[#FFFFFF] hover:opacity-95 shadow-xs cursor-pointer shrink-0"
+                className="h-10 sm:h-11 px-4 sm:px-5 rounded-2xl text-xs sm:text-sm font-bold bg-[#379FD2] text-white shadow-xs cursor-pointer shrink-0 hover:bg-[#379FD2] active:scale-[0.98] transition-transform"
               >
                 {isSearching ? "..." : "Cari"}
               </Button>
@@ -649,14 +585,14 @@ export function DedicatedMapsView() {
           </div>
 
           {/* Mobile View Toggle Bar (Responsive Segment Switcher) */}
-          <div className="flex lg:hidden items-center p-1 bg-[#FFFFFF] rounded-2xl border border-[#E5E7EB] shadow-2xs">
+          <div className="flex lg:hidden items-center p-1 bg-[#EBF5FB] rounded-2xl border border-[#C3DFF0] shadow-2xs gap-1">
             <button
               type="button"
               onClick={() => setMobileTab("map")}
               className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
                 mobileTab === "map"
-                  ? "bg-[#379FD2] text-white shadow-xs"
-                  : "text-[#6B7280] hover:text-[#379FD2]"
+                  ? "bg-[#379FD2] text-white shadow-sm"
+                  : "bg-white/70 text-[#379FD2] border border-[#C3DFF0] hover:bg-white"
               }`}
             >
               <Compass className="h-4 w-4" />
@@ -667,8 +603,8 @@ export function DedicatedMapsView() {
               onClick={() => setMobileTab("list")}
               className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
                 mobileTab === "list"
-                  ? "bg-[#379FD2] text-white shadow-xs"
-                  : "text-[#6B7280] hover:text-[#379FD2]"
+                  ? "bg-[#379FD2] text-white shadow-sm"
+                  : "bg-white/70 text-[#379FD2] border border-[#C3DFF0] hover:bg-white"
               }`}
             >
               <Building2 className="h-4 w-4" />
@@ -680,8 +616,8 @@ export function DedicatedMapsView() {
                 onClick={() => setMobileTab("detail")}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
                   mobileTab === "detail"
-                    ? "bg-[#F59E0B] text-white shadow-xs"
-                    : "text-[#6B7280] hover:text-[#F59E0B]"
+                    ? "bg-[#F59E0B] text-white shadow-sm"
+                    : "bg-white/70 text-[#F59E0B] border border-amber-200 hover:bg-white"
                 }`}
               >
                 <Info className="h-4 w-4" />
@@ -756,11 +692,11 @@ export function DedicatedMapsView() {
                   }`}
                 >
                   {selectedPharmacy.facilityType === "hospital" ? (
-                    <>🏥 RUMAH SAKIT</>
+                    <><Building2 className="h-3 w-3 inline mr-1 shrink-0" /> RUMAH SAKIT</>
                   ) : selectedPharmacy.facilityType === "clinic" ? (
-                    <>🩺 KLINIK</>
+                    <><Stethoscope className="h-3 w-3 inline mr-1 shrink-0" /> KLINIK</>
                   ) : (
-                    <>💊 APOTEK</>
+                    <><Pill className="h-3 w-3 inline mr-1 shrink-0" /> APOTEK</>
                   )}
                 </span>
 
@@ -793,8 +729,13 @@ export function DedicatedMapsView() {
               {/* Clean Full Photo Header */}
               <div className="relative h-36 sm:h-40 w-full rounded-2xl overflow-hidden mb-3 border border-[#E5E7EB] bg-slate-100 shrink-0 shadow-xs">
                 <img
-                  src={finalPhotoUrl}
+                  src={finalPhotoUrl || getWikimediaFallbackPhoto(selectedPharmacy.facilityType, selectedPharmacy.name.charCodeAt(0) || 0)}
                   alt={selectedPharmacy.name}
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = getWikimediaFallbackPhoto(selectedPharmacy.facilityType, 0);
+                  }}
                   className="h-full w-full object-cover"
                 />
               </div>
@@ -804,10 +745,12 @@ export function DedicatedMapsView() {
                 <h3 className="text-lg font-bold text-[#111111] leading-snug">
                   {selectedPharmacy.name}
                 </h3>
-                <p className="text-xs text-[#6B7280] mt-1.5 leading-relaxed">
-                  📍{" "}
-                  {selectedPharmacy.address ||
-                    `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
+                <p className="text-xs text-[#6B7280] mt-1.5 leading-relaxed flex items-start gap-1">
+                  <MapPin className="h-3.5 w-3.5 text-[#379FD2] shrink-0 mt-0.5" />
+                  <span>
+                    {selectedPharmacy.address ||
+                      `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
+                  </span>
                 </p>
               </div>
 

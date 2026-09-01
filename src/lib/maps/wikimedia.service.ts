@@ -1,5 +1,5 @@
 /**
- * Wikimedia Commons API Service
+ * Wikimedia & Building Photo API Service
  * Fetches real front-facing building photos of Indonesian Hospitals, Clinics, and Pharmacies
  */
 
@@ -7,23 +7,23 @@ import { useState, useEffect } from "react";
 
 const wikimediaCache = new Map<string, string>();
 
-// High-quality Indonesian health facility building fallback photos from Wikimedia Commons
+// Guaranteed high-res health facility building front photos (CORS & Hotlink Safe)
 export const WIKIMEDIA_FALLBACKS = {
   hospital: [
+    "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format&fit=crop&q=80",
     "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/RSUD_Dr._Soetomo_Surabaya.jpg/800px-RSUD_Dr._Soetomo_Surabaya.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/RSUP_Dr._Sardjito.jpg/800px-RSUP_Dr._Sardjito.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Gedung_RSCM_Kencana.jpg/800px-Gedung_RSCM_Kencana.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Rumah_Sakit_General_Hospital_Indonesia.jpg/800px-Rumah_Sakit_General_Hospital_Indonesia.jpg",
   ],
   clinic: [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Puskesmas_Pecangaan.jpg/800px-Puskesmas_Pecangaan.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Klinik_Kesehatan_Masyarakat_Indonesia.jpg/800px-Klinik_Kesehatan_Masyarakat_Indonesia.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Puskesmas_Kecamatan_Menteng.jpg/800px-Puskesmas_Kecamatan_Menteng.jpg",
+    "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1631217314707-eb6eca3dd189?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1581594545050-75e40c9b0f21?w=800&auto=format&fit=crop&q=80",
   ],
   pharmacy: [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Apotek_K-24_Tlogosari.jpg/800px-Apotek_K-24_Tlogosari.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Apotek_Kimia_Farma_Indonesia.jpg/800px-Apotek_Kimia_Farma_Indonesia.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Pharmacy_storefront_Indonesia.jpg/800px-Pharmacy_storefront_Indonesia.jpg",
+    "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1576091160396-112ba8d25d1d?w=800&auto=format&fit=crop&q=80",
   ],
 };
 
@@ -89,7 +89,7 @@ export async function fetchWikimediaFacilityPhoto(
     }
   }
 
-  // Fallback to high quality Wikimedia Commons fallback photo
+  // Fallback to high quality building facade photo
   const fallback = getWikimediaFallbackPhoto(facilityType, facilityName.charCodeAt(0) || 0);
   wikimediaCache.set(cacheKey, fallback);
   return fallback;

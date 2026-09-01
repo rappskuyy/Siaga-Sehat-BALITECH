@@ -1,6 +1,7 @@
-import { Star, MapPin, Clock, Phone } from "lucide-react";
+import { Star, MapPin, Clock, Phone, Building2, Stethoscope, Pill } from "lucide-react";
 import { PharmacyNode } from "./maps.service";
-import { getFacilityPhotoConsistent, getFacilityDescriptionConsistent } from "@/data/facilitiesDummyUtils";
+import { getFacilityDescriptionConsistent } from "@/data/facilitiesDummyUtils";
+import { getWikimediaFallbackPhoto } from "@/lib/maps/wikimedia.service";
 
 /**
  * Floating Facility Bubble Card untuk mobile view
@@ -14,7 +15,7 @@ export function FacilityBubbleCard({
   isSelected?: boolean;
   onClick: () => void;
 }) {
-  const photo = getFacilityPhotoConsistent(facility.placeId);
+  const photo = getWikimediaFallbackPhoto(facility.facilityType, facility.name.charCodeAt(0) || 0);
 
   return (
     <button
@@ -26,7 +27,16 @@ export function FacilityBubbleCard({
       }`}
     >
       <div className="w-full h-20 rounded-lg overflow-hidden bg-slate-200">
-        <img src={photo} alt={facility.name} className="w-full h-full object-cover" />
+        <img
+          src={photo}
+          alt={facility.name}
+          referrerPolicy="no-referrer"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = getWikimediaFallbackPhoto(facility.facilityType, 0);
+          }}
+          className="w-full h-full object-cover"
+        />
       </div>
       <div className="text-left">
         <h4 className="text-xs font-bold text-[#111111] line-clamp-2">{facility.name}</h4>
@@ -43,14 +53,23 @@ export function FacilityBubbleCard({
  * Facility Detail Card untuk bottom sheet / detail panel
  */
 export function FacilityDetailCard({ facility }: { facility: PharmacyNode }) {
-  const photo = getFacilityPhotoConsistent(facility.placeId);
+  const photo = getWikimediaFallbackPhoto(facility.facilityType, facility.name.charCodeAt(0) || 0);
   const description = getFacilityDescriptionConsistent(facility.placeId);
 
   return (
     <div className="space-y-4">
       {/* Photo */}
       <div className="relative h-40 w-full rounded-2xl overflow-hidden bg-slate-200 shadow-sm">
-        {photo && <img src={photo} alt={facility.name} className="w-full h-full object-cover" />}
+        <img
+          src={photo}
+          alt={facility.name}
+          referrerPolicy="no-referrer"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = getWikimediaFallbackPhoto(facility.facilityType, 0);
+          }}
+          className="w-full h-full object-cover"
+        />
       </div>
 
       {/* Rating */}
@@ -114,9 +133,7 @@ export function FacilityMiniCard({
   facility: PharmacyNode;
   onClick: () => void;
 }) {
-  const photo = getFacilityPhotoConsistent(facility.placeId);
-  const typeEmoji =
-    facility.facilityType === "hospital" ? "🏥" : facility.facilityType === "clinic" ? "🩺" : "💊";
+  const photo = getWikimediaFallbackPhoto(facility.facilityType, facility.name.charCodeAt(0) || 0);
 
   return (
     <button
@@ -124,12 +141,29 @@ export function FacilityMiniCard({
       className="w-full text-left p-3 bg-white hover:bg-slate-50 rounded-xl flex gap-3 border border-[#E5E7EB] hover:border-[#4a6fa5] transition animate-fade-up"
     >
       <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-slate-200">
-        <img src={photo} alt={facility.name} className="w-full h-full object-cover" />
+        <img
+          src={photo}
+          alt={facility.name}
+          referrerPolicy="no-referrer"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = getWikimediaFallbackPhoto(facility.facilityType, 0);
+          }}
+          className="w-full h-full object-cover"
+        />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2 mb-1">
           <h3 className="text-sm font-bold text-[#111111] line-clamp-1">{facility.name}</h3>
-          <span className="text-xs font-bold text-[#4a6fa5] whitespace-nowrap">{typeEmoji}</span>
+          <span className="text-xs font-bold text-[#4a6fa5] whitespace-nowrap">
+            {facility.facilityType === "hospital" ? (
+              <Building2 className="h-3.5 w-3.5 text-red-500" />
+            ) : facility.facilityType === "clinic" ? (
+              <Stethoscope className="h-3.5 w-3.5 text-amber-500" />
+            ) : (
+              <Pill className="h-3.5 w-3.5 text-blue-500" />
+            )}
+          </span>
         </div>
         <p className="text-xs text-[#6B7280] line-clamp-1 mb-2">{facility.address}</p>
         <div className="flex items-center justify-between gap-2">
