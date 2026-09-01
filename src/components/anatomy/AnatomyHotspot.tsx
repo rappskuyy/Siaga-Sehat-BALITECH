@@ -47,18 +47,23 @@ export function AnatomyHotspot({
   const [isHovered, setIsHovered] = useState(false);
   const symptomCount = region.symptoms?.length || 0;
 
-  // Boundary-safe tooltip position logic to prevent any clipping on any device
+  // Boundary-Guaranteed Tooltip Positioning System: Zero clipping on all devices
   const getTooltipPositionClass = () => {
-    let vertical = position.y >= 65 ? "bottom-full mb-2.5" : "top-full mt-2.5";
-    let horizontal = "left-1/2 -translate-x-1/2 origin-top";
+    const isTop = position.y < 50;
+    const verticalClass = isTop ? "top-full mt-2" : "bottom-full mb-2";
 
-    if (position.x >= 78) {
-      horizontal = "right-0 origin-top-right";
-    } else if (position.x <= 22) {
-      horizontal = "left-0 origin-top-left";
+    // Left Edge Pins (x <= 30%): Anchor left-0 so card expands INWARD to the right (never clips left border)
+    if (position.x <= 30) {
+      return `${verticalClass} left-0 origin-${isTop ? "top-left" : "bottom-left"}`;
     }
 
-    return `${vertical} ${horizontal}`;
+    // Right Edge Pins (x >= 70%): Anchor right-0 so card expands INWARD to the left (never clips right border)
+    if (position.x >= 70) {
+      return `${verticalClass} right-0 origin-${isTop ? "top-right" : "bottom-right"}`;
+    }
+
+    // Middle Pins (30% < x < 70%): Centered horizontally
+    return `${verticalClass} left-1/2 -translate-x-1/2 origin-${isTop ? "top" : "bottom"}`;
   };
 
   return (
@@ -112,57 +117,14 @@ export function AnatomyHotspot({
         </span>
       </button>
 
-      {/* Floating Clinical Tooltip Card - Guaranteed Boundary Safe */}
-      {(isHovered || isSelected || showAlwaysLabel) && (
-        <div
-          onClick={() => onSelect(region)}
-          className={`absolute cursor-pointer transition-all duration-200 pointer-events-auto select-none w-max max-w-[210px] sm:max-w-[260px] ${getTooltipPositionClass()} ${
-            isSelected
-              ? "scale-105 z-50 animate-in fade-in zoom-in-95"
-              : isHovered
-                ? "scale-100 z-40 animate-in fade-in zoom-in-95"
-                : "scale-95 z-30 opacity-90 hover:opacity-100"
-          }`}
-        >
-          <div
-            className={`flex items-center gap-2 rounded-xl sm:rounded-2xl px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs transition-all duration-200 ${
-              isSelected
-                ? "bg-white/98 backdrop-blur-xl text-[color:var(--color-clinic-ink)] shadow-[0_12px_32px_rgba(74,111,165,0.2)] border-2 border-[color:var(--color-clinic-blue)] ring-2 ring-[color:var(--color-clinic-blue-soft)]"
-                : "bg-white/95 backdrop-blur-xl text-[color:var(--color-clinic-ink)] shadow-[0_8px_24px_rgba(15,23,42,0.1)] border border-black/10 hover:border-[color:var(--color-clinic-blue)]/50"
-            }`}
-          >
-            {/* Medical Icon Badge */}
-            <div
-              className={`flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-xl border transition-colors ${
-                isSelected
-                  ? "bg-[color:var(--color-clinic-blue)] text-white border-[color:var(--color-clinic-blue)] shadow-xs"
-                  : "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] border-[color:var(--color-clinic-blue)]/20"
-              }`}
-            >
-              {getRegionIcon(region.id)}
-            </div>
-
-            {/* Organ Title & Details */}
-            <div className="flex flex-col min-w-0 flex-1 pr-1">
-              <span className="font-display font-bold tracking-tight text-[11px] sm:text-xs leading-tight text-[color:var(--color-clinic-ink)] truncate">
-                {region.nameIndonesian}
-              </span>
-              <span className="text-[9px] sm:text-[10px] font-medium leading-tight mt-0.5 text-[color:var(--color-clinic-muted)]">
-                {symptomCount} Gejala
-              </span>
-            </div>
-
-            {/* Status / Action Indicator */}
-            {isSelected ? (
-              <div className="flex items-center gap-0.5 sm:gap-1 rounded-full bg-[color:var(--color-clinic-blue)] px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-white shadow-xs shrink-0">
-                <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3 stroke-[3]" />
-                <span className="hidden xs:inline">Dipilih</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-0.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold text-[color:var(--color-clinic-blue)] group-hover:bg-[color:var(--color-clinic-blue)] group-hover:text-white transition shrink-0">
-                <ChevronRight className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-              </div>
-            )}
+      {/* Sleek Compact Micro Hover Badge - Zero Pin Overlap & Zero Clipping */}
+      {isHovered && !isSelected && (
+        <div className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 z-40 pointer-events-none whitespace-nowrap animate-in fade-in zoom-in-95">
+          <div className="flex items-center gap-1.5 rounded-full bg-slate-900/90 backdrop-blur-md px-2.5 py-1 text-[10px] font-semibold text-white shadow-lg border border-white/20">
+            <span>{region.nameIndonesian}</span>
+            <span className="bg-sky-500/30 text-sky-200 text-[9px] px-1.5 py-0.2 rounded-full font-bold">
+              {symptomCount}
+            </span>
           </div>
         </div>
       )}

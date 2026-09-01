@@ -10,11 +10,35 @@ import {
   RotateCw,
   Filter,
   Check,
+  Brain,
+  Eye,
+  Wind,
+  Stethoscope,
+  Heart,
+  Flame,
+  Activity,
+  Bone,
+  Layers,
+  Footprints,
+  Sparkles,
 } from "lucide-react";
 
 interface AnatomyViewerProps {
   selectedRegion: AnatomyRegion | null;
   onSelectRegion: (region: AnatomyRegion) => void;
+}
+
+function getRegionIcon(regionId: string) {
+  if (regionId.includes("kepala")) return <Brain className="h-4 w-4" />;
+  if (regionId.includes("mata")) return <Eye className="h-4 w-4" />;
+  if (regionId.includes("hidung")) return <Wind className="h-4 w-4" />;
+  if (regionId.includes("leher")) return <Stethoscope className="h-4 w-4" />;
+  if (regionId.includes("dada")) return <Heart className="h-4 w-4" />;
+  if (regionId.includes("perut")) return <Flame className="h-4 w-4" />;
+  if (regionId.includes("punggung")) return <Bone className="h-4 w-4" />;
+  if (regionId.includes("pinggul")) return <Layers className="h-4 w-4" />;
+  if (regionId.includes("kaki")) return <Footprints className="h-4 w-4" />;
+  return <Activity className="h-4 w-4" />;
 }
 
 const FRONT_IMAGE_URL = "/anatomy/human-anatomy-front.png";
@@ -244,22 +268,38 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
           </div>
         </div>
 
-        {/* Selected Region Bottom Glass Pill Indicator */}
+        {/* Selected Organ Glassmorphic Spotlight Banner */}
         {selectedRegion && (
-          <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 z-30 flex max-w-[95%] items-center gap-2 rounded-full backdrop-blur-xl bg-white/95 px-3.5 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-ink)] shadow-[0_10px_25px_-5px_rgba(74,111,165,0.2)] border border-[color:var(--color-clinic-blue)]/30 transition-all duration-200 animate-in fade-in slide-in-from-bottom-2">
-            <span className="relative flex h-2 w-2 shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[color:var(--color-clinic-blue)] opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[color:var(--color-clinic-blue)]" />
-            </span>
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className="text-[color:var(--color-clinic-muted)] font-normal text-[11px] hidden xs:inline">Terpilih:</span>
-              <strong className="text-[color:var(--color-clinic-ink)] font-bold text-xs truncate">
-                {selectedRegion.nameIndonesian}
-              </strong>
+          <div className="absolute bottom-2.5 sm:bottom-3 left-2 right-2 xs:left-4 xs:right-4 z-30 max-w-md mx-auto flex items-center justify-between gap-2.5 rounded-2xl backdrop-blur-xl bg-white/95 p-2.5 sm:p-3 text-xs font-medium text-[color:var(--color-clinic-ink)] shadow-[0_12px_32px_rgba(15,23,42,0.15)] border-2 border-[color:var(--color-clinic-blue)] ring-2 ring-[color:var(--color-clinic-blue-soft)] transition-all duration-300 animate-in fade-in slide-in-from-bottom-3">
+            {/* Organ Icon & Details */}
+            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+              <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white shadow-xs font-bold">
+                {getRegionIcon(selectedRegion.id)}
+              </div>
+              <div className="flex flex-col min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[color:var(--color-clinic-blue)]">
+                    Organ Terpilih:
+                  </span>
+                </div>
+                <h4 className="font-display font-bold text-xs sm:text-sm text-[color:var(--color-clinic-ink)] truncate leading-tight">
+                  {selectedRegion.nameIndonesian}
+                </h4>
+                <span className="text-[10px] font-semibold text-[color:var(--color-clinic-muted)]">
+                  {selectedRegion.symptoms.length} Gejala Tersedia
+                </span>
+              </div>
             </div>
-            <span className="text-[10px] text-[color:var(--color-clinic-blue-dark)] bg-[color:var(--color-clinic-blue-soft)] px-2 py-0.5 rounded-full font-semibold border border-[color:var(--color-clinic-blue)]/20 shrink-0">
-              {selectedRegion.symptoms.length} Gejala
-            </span>
+
+            {/* Quick Action Button */}
+            <button
+              type="button"
+              onClick={() => onSelectRegion(selectedRegion)}
+              className="flex items-center gap-1 shrink-0 rounded-xl bg-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue-dark)] px-3 py-1.5 text-xs font-bold text-white shadow-sm transition-transform active:scale-95 cursor-pointer"
+            >
+              <Check className="h-3.5 w-3.5 stroke-[3]" />
+              <span className="hidden xs:inline">Lanjut Tandai</span>
+            </button>
           </div>
         )}
       </div>
