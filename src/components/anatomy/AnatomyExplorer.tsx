@@ -35,24 +35,28 @@ export function AnatomyExplorer() {
 
   // Precision scroll helper to scroll to top of step container (offset for sticky header)
   const scrollToTopStep = () => {
+    // 1. Immediately reset scroll position to 0 to prevent the browser from clamping scrollY to footer when layout height changes
+    window.scrollTo(0, 0);
+
+    // 2. Smoothly align topAnchorRef under sticky header
     const doScroll = () => {
       if (topAnchorRef.current) {
         topAnchorRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-      } else if (containerRef.current) {
-        containerRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
       } else {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     };
 
-    doScroll();
-    requestAnimationFrame(doScroll);
-    setTimeout(doScroll, 60);
-    setTimeout(doScroll, 180);
+    requestAnimationFrame(() => {
+      doScroll();
+      setTimeout(doScroll, 40);
+      setTimeout(doScroll, 120);
+    });
   };
 
   // Switch / Select region handler (Triggers Step 3: Tandai Gejala)
   const handleSelectRegion = (region: AnatomyRegion) => {
+    scrollToTopStep();
     setSelectedRegion(region);
     setSelectedSymptoms([]);
     setSelectedConditions([]);
@@ -64,14 +68,12 @@ export function AnatomyExplorer() {
       description: "Silakan pilih gejala yang Anda rasakan.",
       duration: 3500,
     });
-
-    scrollToTopStep();
   };
 
   // Move to Model Anatomi (Step 2)
   const handleGoToModel = () => {
-    setActiveStep("model");
     scrollToTopStep();
+    setActiveStep("model");
   };
 
   // Toggle symptom checkbox
@@ -94,6 +96,7 @@ export function AnatomyExplorer() {
 
   // Reset back to Panduan (Step 1)
   const handleReset = () => {
+    scrollToTopStep();
     setSelectedRegion(null);
     setSelectedSymptoms([]);
     setSelectedConditions([]);
@@ -101,7 +104,6 @@ export function AnatomyExplorer() {
     setAssessmentResult(null);
     setErrorMessage(null);
     setActiveStep("guide");
-    scrollToTopStep();
   };
 
   // Trigger AI assessment call (Step 4: Hasil AI)
@@ -135,9 +137,9 @@ export function AnatomyExplorer() {
           additionalNotes,
         },
       });
+      scrollToTopStep();
       setAssessmentResult(result);
       setActiveStep("result");
-      scrollToTopStep();
     } catch (err: unknown) {
       console.error("Gagal melakukan AI Health Assessment:", err);
 
