@@ -430,18 +430,21 @@ export function MobileMapView() {
 
         {/* Floating Facility Cards Horizontal Carousel - Bottom (Shown only when showLocationList is true) */}
         {showLocationList && !showDetailsPanel && filteredPharmacies.length > 0 && (
-          <div className="absolute bottom-[80px] left-3 right-3 z-40 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-[#E5E7EB] shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200 max-h-[220px] flex flex-col">
-            <div className="flex items-center justify-between mb-2 shrink-0">
+          <div className="absolute bottom-[80px] left-3 right-3 z-40 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-[#E5E7EB] shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200 max-h-[230px] flex flex-col">
+            {/* Scroll/Drag Handle Bar to Close Location List */}
+            <div
+              onClick={() => setShowLocationList(false)}
+              className="w-full flex flex-col items-center pb-2 cursor-pointer group"
+              title="Tutup / Geser Ke Bawah"
+            >
+              <div className="w-12 h-1.5 bg-gray-300 group-hover:bg-[#4a6fa5] rounded-full transition-colors" />
+            </div>
+
+            <div className="flex items-center justify-between mb-2 shrink-0 px-1">
               <h3 className="text-xs font-extrabold text-[#111111] flex items-center gap-1.5">
                 <List className="h-4 w-4 text-[#4a6fa5]" />
                 Daftar Lokasi Terdekat ({filteredPharmacies.length})
               </h3>
-              <button
-                onClick={() => setShowLocationList(false)}
-                className="text-xs text-gray-500 hover:text-gray-800 p-1 font-bold"
-              >
-                <X className="h-4 w-4" />
-              </button>
             </div>
             <div className="overflow-y-auto space-y-2 pr-1 max-h-[160px]">
               {filteredPharmacies.map((facility) => {
@@ -459,12 +462,11 @@ export function MobileMapView() {
                     }`}
                   >
                     <div className="flex items-center gap-2.5 overflow-hidden">
-                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-200 shrink-0">
-                        <img
-                          src={getWikimediaFallbackPhoto(facility.facilityType, facility.name.charCodeAt(0) || 0)}
-                          alt={facility.name}
-                          className="w-full h-full object-cover"
-                        />
+                      {/* Facility Category Icon Badge (No broken/useless images) */}
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
+                        isHosp ? "bg-red-50 text-red-600 border-red-200" : isClinic ? "bg-amber-50 text-amber-600 border-amber-200" : "bg-blue-50 text-blue-600 border-blue-200"
+                      }`}>
+                        {isHosp ? <Building2 className="h-4 w-4" /> : isClinic ? <Stethoscope className="h-4 w-4" /> : <Pill className="h-4 w-4" />}
                       </div>
                       <div className="truncate">
                         <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md block w-max mb-0.5 ${
@@ -524,17 +526,21 @@ export function MobileMapView() {
           }`}
           style={{ maxHeight: "70vh" }}
         >
-          {/* Drag Handle */}
+          {/* Scroll / Drag Handle to Close Details Panel */}
           <div
-            className="flex justify-center items-center h-5 cursor-grab active:cursor-grabbing"
-            onClick={() => setShowDetailsPanel(!showDetailsPanel)}
+            className="flex justify-center items-center py-2.5 cursor-pointer group"
+            onClick={() => {
+              setShowDetailsPanel(false);
+              setSelectedPharmacy(null);
+            }}
+            title="Tutup Keterangan / Geser Ke Bawah"
           >
-            <div className="w-10 h-1 bg-[#E5E7EB] rounded-full"></div>
+            <div className="w-12 h-1.5 bg-[#D1D5DB] group-hover:bg-[#4a6fa5] rounded-full transition-colors"></div>
           </div>
 
           {/* Content */}
           <div className={`overflow-y-auto px-4 pb-6 ${showDetailsPanel ? "max-h-[calc(70vh-40px)]" : "hidden"}`}>
-            {/* Header */}
+            {/* Header (No X button) */}
             <div className="flex items-start justify-between gap-3 mb-4">
               <div>
                 <span className="text-xs font-bold uppercase text-[#4a6fa5] flex items-center gap-1.5 mb-1">
@@ -548,15 +554,6 @@ export function MobileMapView() {
                 </span>
                 <h2 className="text-lg font-bold text-[#111111]">{selectedPharmacy.name}</h2>
               </div>
-              <button
-                onClick={() => {
-                  setSelectedPharmacy(null);
-                  setShowDetailsPanel(false);
-                }}
-                className="p-1.5 text-[#6B7280] hover:text-[#111111] hover:bg-slate-100 rounded-full transition"
-              >
-                <X className="h-5 w-5" />
-              </button>
             </div>
 
             {/* Photo */}
@@ -566,8 +563,10 @@ export function MobileMapView() {
                 alt={selectedPharmacy.name}
                 referrerPolicy="no-referrer"
                 onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = getWikimediaFallbackPhoto(selectedPharmacy.facilityType, 0);
+                  e.currentTarget.style.display = "none";
+                  if (e.currentTarget.parentElement) {
+                    e.currentTarget.parentElement.style.display = "none";
+                  }
                 }}
                 className="w-full h-full object-cover"
               />

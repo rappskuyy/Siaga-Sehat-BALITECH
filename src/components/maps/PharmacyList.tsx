@@ -14,7 +14,6 @@ import {
   Pill,
   CheckCircle2,
   AlertCircle,
-  ArrowUpDown,
   MapPin,
 } from "lucide-react";
 import type { PlaceNode, PharmacyNode, RouteInfo, TransportMode, DangerLevelType } from "./maps.service";
@@ -219,7 +218,7 @@ export function PharmacyList({
           )}
         </div>
 
-        {/* Row 2: Sort & Filter Radius */}
+        {/* Row 2: Filter Radius */}
         <div className="flex items-center justify-between gap-1 flex-wrap pt-0.5">
           <div className="flex items-center gap-1 flex-wrap">
             <span className="text-[10px] text-[#6B7280] font-medium mr-0.5">Jarak:</span>
@@ -244,20 +243,6 @@ export function PharmacyList({
                 </button>
               );
             })}
-          </div>
-
-          <div className="flex items-center gap-1">
-            <ArrowUpDown className="h-3 w-3 text-[#6B7280]" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="text-[10px] font-semibold bg-[#F7F9FB] text-[#379FD2] rounded-lg px-1.5 py-0.5 border border-[#E5E7EB] outline-none cursor-pointer"
-            >
-              <option value="distance">Jarak Terdekat</option>
-              <option value="hospital_first">RS Dulu</option>
-              <option value="pharmacy_first">Apotek Dulu</option>
-              <option value="rating">Rating Tertinggi</option>
-            </select>
           </div>
         </div>
       </div>

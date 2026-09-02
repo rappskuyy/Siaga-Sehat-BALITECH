@@ -13,7 +13,6 @@ export const WIKIMEDIA_FALLBACKS = {
     "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=800&auto=format&fit=crop&q=80",
     "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&auto=format&fit=crop&q=80",
     "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format&fit=crop&q=80",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/RSUD_Dr._Soetomo_Surabaya.jpg/800px-RSUD_Dr._Soetomo_Surabaya.jpg",
   ],
   clinic: [
     "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&auto=format&fit=crop&q=80",

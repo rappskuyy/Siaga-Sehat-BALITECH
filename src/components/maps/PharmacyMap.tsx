@@ -480,9 +480,6 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
       <div className="mb-3.5 flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-blue-primary text-[#FFFFFF] shadow-xs">
-              <Compass className="h-4 w-4" />
-            </span>
             <div>
               <h3 className="font-display text-sm font-bold text-[#111111]">
                 {dangerLevel === "tinggi"
@@ -531,7 +528,7 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
             <Button
               type="submit"
               size="sm"
-              className="h-10 px-4 rounded-xl text-xs font-semibold bg-gradient-blue-primary text-[#FFFFFF] hover:opacity-95 shadow-xs cursor-pointer"
+              className="h-10 px-4 rounded-xl text-xs font-semibold bg-[#379FD2] text-white shadow-xs cursor-pointer hover:bg-[#379FD2] active:scale-[0.98] transition-transform"
             >
               {isSearching ? "Mencari..." : "Cari Alamat"}
             </Button>
@@ -606,14 +603,14 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
         </div>
 
         {/* Mobile View Toggle Bar (Only visible on mobile screens) */}
-        <div className="flex lg:hidden items-center p-1 bg-[#FFFFFF] rounded-xl border border-[#E5E7EB] mb-2 shadow-2xs">
+        <div className="flex lg:hidden items-center p-1 bg-[#EBF5FB] rounded-2xl border border-[#C3DFF0] mb-2 shadow-2xs gap-1">
           <button
             type="button"
             onClick={() => setMobileTab("map")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
               mobileTab === "map"
-                ? "bg-[#379FD2] text-white shadow-xs"
-                : "text-[#6B7280] hover:text-[#379FD2]"
+                ? "bg-[#379FD2] text-white shadow-sm"
+                : "bg-white/70 text-[#379FD2] border border-[#C3DFF0] hover:bg-white"
             }`}
           >
             <Compass className="h-4 w-4" />
@@ -622,10 +619,10 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
           <button
             type="button"
             onClick={() => setMobileTab("list")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
               mobileTab === "list"
-                ? "bg-[#379FD2] text-white shadow-xs"
-                : "text-[#6B7280] hover:text-[#379FD2]"
+                ? "bg-[#379FD2] text-white shadow-sm"
+                : "bg-white/70 text-[#379FD2] border border-[#C3DFF0] hover:bg-white"
             }`}
           >
             <Building2 className="h-4 w-4" />
