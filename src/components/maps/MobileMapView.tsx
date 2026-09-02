@@ -216,6 +216,96 @@ export function MobileMapView() {
     });
   }, [pharmacies, facilityTypeFilter]);
 
+  // Hardware-Accelerated 120FPS Drag Physics (Detail Panel)
+  const detailSheetRef = useRef<HTMLDivElement>(null);
+  const detailStartY = useRef<number>(0);
+  const detailCurrentY = useRef<number>(0);
+
+  const handleDetailTouchStart = (e: React.TouchEvent) => {
+    detailStartY.current = e.touches[0].clientY;
+    detailCurrentY.current = 0;
+    if (detailSheetRef.current) {
+      detailSheetRef.current.style.transition = "none";
+    }
+  };
+
+  const handleDetailTouchMove = (e: React.TouchEvent) => {
+    const deltaY = e.touches[0].clientY - detailStartY.current;
+    if (deltaY > 0) {
+      detailCurrentY.current = deltaY;
+      if (detailSheetRef.current) {
+        detailSheetRef.current.style.transform = `translate3d(0, ${deltaY}px, 0)`;
+      }
+    }
+  };
+
+  const handleDetailTouchEnd = () => {
+    const sheet = detailSheetRef.current;
+    if (!sheet) return;
+
+    sheet.style.transition = "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)";
+    if (detailCurrentY.current > 75) {
+      sheet.style.transform = "translate3d(0, 100%, 0)";
+      setTimeout(() => {
+        setShowDetailsPanel(false);
+        setSelectedPharmacy(null);
+        setRouteInfo(null);
+      }, 300);
+    } else {
+      sheet.style.transform = "translate3d(0, 0, 0)";
+    }
+  };
+
+  // Hardware-Accelerated 120FPS Drag Physics (Location List Sheet)
+  const listSheetRef = useRef<HTMLDivElement>(null);
+  const listStartY = useRef<number>(0);
+  const listCurrentY = useRef<number>(0);
+
+  const handleListTouchStart = (e: React.TouchEvent) => {
+    listStartY.current = e.touches[0].clientY;
+    listCurrentY.current = 0;
+    if (listSheetRef.current) {
+      listSheetRef.current.style.transition = "none";
+    }
+  };
+
+  const handleListTouchMove = (e: React.TouchEvent) => {
+    const deltaY = e.touches[0].clientY - listStartY.current;
+    if (deltaY > 0) {
+      listCurrentY.current = deltaY;
+      if (listSheetRef.current) {
+        listSheetRef.current.style.transform = `translate3d(0, ${deltaY}px, 0)`;
+      }
+    }
+  };
+
+  const handleListTouchEnd = () => {
+    const sheet = listSheetRef.current;
+    if (!sheet) return;
+
+    sheet.style.transition = "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)";
+    if (listCurrentY.current > 70) {
+      sheet.style.transform = "translate3d(0, 100%, 0)";
+      setTimeout(() => {
+        setShowLocationList(false);
+      }, 300);
+    } else {
+      sheet.style.transform = "translate3d(0, 0, 0)";
+    }
+  };
+
+  const handleCloseDetails = useCallback(() => {
+    if (detailSheetRef.current) {
+      detailSheetRef.current.style.transition = "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)";
+      detailSheetRef.current.style.transform = "translate3d(0, 100%, 0)";
+    }
+    setTimeout(() => {
+      setShowDetailsPanel(false);
+      setSelectedPharmacy(null);
+      setRouteInfo(null);
+    }, 300);
+  }, []);
+
   const handleSelectFacility = async (facility: PharmacyNode) => {
     setSelectedPharmacy(facility);
     setShowDetailsPanel(true);
@@ -430,14 +520,29 @@ export function MobileMapView() {
 
         {/* Floating Facility Cards Horizontal Carousel - Bottom (Shown only when showLocationList is true) */}
         {showLocationList && !showDetailsPanel && filteredPharmacies.length > 0 && (
-          <div className="absolute bottom-[80px] left-3 right-3 z-40 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-[#E5E7EB] shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200 max-h-[230px] flex flex-col">
+          <div
+            ref={listSheetRef}
+            className="absolute bottom-[80px] left-3 right-3 z-40 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-[#E5E7EB] shadow-2xl max-h-[250px] flex flex-col will-change-transform translate-y-0"
+          >
             {/* Scroll/Drag Handle Bar to Close Location List */}
             <div
-              onClick={() => setShowLocationList(false)}
-              className="w-full flex flex-col items-center pb-2 cursor-pointer group"
-              title="Tutup / Geser Ke Bawah"
+              onTouchStart={handleListTouchStart}
+              onTouchMove={handleListTouchMove}
+              onTouchEnd={handleListTouchEnd}
+              onClick={() => {
+                if (listCurrentY.current < 5) {
+                  if (listSheetRef.current) {
+                    listSheetRef.current.style.transition = "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)";
+                    listSheetRef.current.style.transform = "translate3d(0, 100%, 0)";
+                  }
+                  setTimeout(() => setShowLocationList(false), 300);
+                }
+              }}
+              className="w-full py-2.5 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing active:bg-slate-100/80 rounded-t-2xl shrink-0 select-none border-b border-gray-100 mb-2 touch-none"
+              title="Geser ke Bawah untuk Menutup"
             >
-              <div className="w-12 h-1.5 bg-gray-300 group-hover:bg-[#4a6fa5] rounded-full transition-colors" />
+              <div className="w-14 h-1.5 bg-slate-300 hover:bg-[#4a6fa5] rounded-full transition-colors" />
+              <span className="text-[10px] font-semibold text-gray-400 mt-0.5">Geser ke bawah untuk menutup</span>
             </div>
 
             <div className="flex items-center justify-between mb-2 shrink-0 px-1">
@@ -519,27 +624,28 @@ export function MobileMapView() {
       </div>
 
       {/* Details Panel - Bottom Sheet */}
-      {selectedPharmacy && (
+      {selectedPharmacy && showDetailsPanel && (
         <div
-          className={`absolute bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl border-t border-[#E5E7EB] shadow-2xl transition-transform duration-300 ${
-            showDetailsPanel ? "translate-y-0" : "translate-y-[calc(100%-80px)]"
-          }`}
-          style={{ maxHeight: "70vh" }}
+          ref={detailSheetRef}
+          className="absolute bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl border-t border-[#E5E7EB] shadow-2xl flex flex-col max-h-[75vh] will-change-transform translate-y-0 animate-in slide-in-from-bottom-full duration-300"
         >
-          {/* Scroll / Drag Handle to Close Details Panel */}
+          {/* Scroll / Drag Handle Bar to Close Details Panel */}
           <div
-            className="flex justify-center items-center py-2.5 cursor-pointer group"
+            onTouchStart={handleDetailTouchStart}
+            onTouchMove={handleDetailTouchMove}
+            onTouchEnd={handleDetailTouchEnd}
             onClick={() => {
-              setShowDetailsPanel(false);
-              setSelectedPharmacy(null);
+              if (detailCurrentY.current < 5) handleCloseDetails();
             }}
-            title="Tutup Keterangan / Geser Ke Bawah"
+            className="w-full py-3.5 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing active:bg-slate-100 rounded-t-3xl shrink-0 select-none border-b border-gray-100 touch-none"
+            title="Geser ke Bawah untuk Menutup"
           >
-            <div className="w-12 h-1.5 bg-[#D1D5DB] group-hover:bg-[#4a6fa5] rounded-full transition-colors"></div>
+            <div className="w-14 h-1.5 bg-slate-300 hover:bg-[#4a6fa5] rounded-full transition-colors" />
+            <span className="text-[10px] font-semibold text-gray-400 mt-1">Geser ke bawah untuk menutup</span>
           </div>
 
           {/* Content */}
-          <div className={`overflow-y-auto px-4 pb-6 ${showDetailsPanel ? "max-h-[calc(70vh-40px)]" : "hidden"}`}>
+          <div className="overflow-y-auto px-4 pb-6 pt-3 max-h-[calc(75vh-55px)]">
             {/* Header (No X button) */}
             <div className="flex items-start justify-between gap-3 mb-4">
               <div>
