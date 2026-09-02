@@ -22,12 +22,12 @@ export const Route = createFileRoute("/anatomy")({
 
 function AnatomyPage() {
   return (
-    <main className="min-h-screen bg-[#f7f4ee] font-sans flex flex-col justify-between">
-      <div>
+    <main className="min-h-screen bg-[#f7f4ee] font-sans flex flex-col justify-between w-full max-w-full overflow-x-hidden">
+      <div className="w-full max-w-full overflow-x-hidden">
         <SiteHeader />
 
         {/* Content Container */}
-        <div className="px-2 py-3 sm:px-4 sm:py-5 md:px-6 md:py-6 max-w-full overflow-x-hidden">
+        <div className="px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8 max-w-full overflow-x-hidden">
           <AnatomyExplorer />
         </div>
       </div>

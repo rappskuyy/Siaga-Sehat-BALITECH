@@ -52,14 +52,14 @@ export function AIAssessmentResultCard({
   });
 
   return (
-    <div className="flex flex-col h-full rounded-[24px] sm:rounded-[28px] bg-white p-3.5 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 overflow-hidden max-w-full animate-fade-up">
+    <div className="flex flex-col h-full rounded-[24px] sm:rounded-[28px] bg-white p-3.5 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 overflow-hidden max-w-full animate-fade-up min-w-0">
       {/* Header Banner */}
-      <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 border-b border-black/5 pb-3.5 shrink-0">
-        <div className="flex items-center gap-2.5 min-w-0">
+      <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 border-b border-black/5 pb-3.5 shrink-0 min-w-0">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
           <div className="grid h-8 w-8 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white shadow-md shrink-0">
             <Sparkles className="h-4 w-4" />
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[color:var(--color-clinic-blue-dark)] uppercase tracking-wider">
               Hasil Analisis Kesehatan AI
             </span>
@@ -72,10 +72,10 @@ export function AIAssessmentResultCard({
         <Button
           onClick={onReset}
           variant="outline"
-          className="rounded-full gap-1 border-black/10 text-xs font-semibold text-[color:var(--color-clinic-muted)] hover:bg-[#f7f9fb] px-3 py-1 h-8 shrink-0 cursor-pointer"
+          className="rounded-full gap-1 border border-[color:var(--color-clinic-blue)]/30 bg-white text-xs font-semibold text-[color:var(--color-clinic-blue-dark)] hover:bg-[color:var(--color-clinic-blue-soft)] px-3 py-1 h-8 shrink-0 cursor-pointer shadow-2xs"
         >
           <RefreshCw className="h-3 w-3" />
-          <span>Periksa Lagi</span>
+          <span>Periksa Organ Lain</span>
         </Button>
       </div>
 

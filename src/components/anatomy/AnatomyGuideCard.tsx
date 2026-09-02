@@ -9,24 +9,35 @@ import {
   ArrowRight,
   Activity,
   Layers,
+  BookOpen,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface AnatomyGuideCardProps {
   onSelectRegion: (region: AnatomyRegion) => void;
+  onGoToModel?: () => void;
 }
 
-export function AnatomyGuideCard({ onSelectRegion }: AnatomyGuideCardProps) {
+export function AnatomyGuideCard({ onSelectRegion, onGoToModel }: AnatomyGuideCardProps) {
   const steps = [
     {
       step: "1",
-      icon: MousePointerClick,
+      icon: BookOpen,
       color: "bg-[color:var(--color-clinic-blue)] text-white",
-      badge: "Pilih Bagian Tubuh",
+      badge: "Pahami Panduan",
       badgeStyle: "bg-[color:var(--color-clinic-blue-soft)]/60 text-[color:var(--color-clinic-blue-dark)]",
-      desc: "Klik salah satu titik lingkaran biru pada model anatomi di sebelah kanan (Tampak Depan atau Belakang).",
+      desc: "Baca tahapan singkat pemeriksaan di sini, lalu klik tombol 'Mulai & Pilih Model Anatomi'.",
     },
     {
       step: "2",
+      icon: MousePointerClick,
+      color: "bg-indigo-600 text-white",
+      badge: "Pilih Bagian Tubuh",
+      badgeStyle: "bg-indigo-50 text-indigo-700 border border-indigo-200/60",
+      desc: "Klik salah satu titik lingkaran biru pada model anatomi (Tampak Depan atau Belakang).",
+    },
+    {
+      step: "3",
       icon: CheckSquare2,
       color: "bg-teal-600 text-white",
       badge: "Tandai Gejala",
@@ -34,20 +45,12 @@ export function AnatomyGuideCard({ onSelectRegion }: AnatomyGuideCardProps) {
       desc: "Pilih gejala, tanda klinis, atau keluhan fisik spesifik yang sedang Anda rasakan pada organ tersebut.",
     },
     {
-      step: "3",
-      icon: Sparkles,
-      color: "bg-amber-500 text-white",
-      badge: "Analisis AI Medis",
-      badgeStyle: "bg-amber-50 text-amber-800 border border-amber-200/60",
-      desc: "Tambahkan catatan keluhan tambahan (opsional) lalu klik tombol 'Mulai Analisis AI'.",
-    },
-    {
       step: "4",
-      icon: Stethoscope,
+      icon: Sparkles,
       color: "bg-emerald-600 text-white",
-      badge: "Hasil & Rujukan",
+      badge: "Analisis AI Medis",
       badgeStyle: "bg-emerald-50 text-emerald-800 border border-emerald-200/60",
-      desc: "Dapatkan ringkasan kemungkinan kondisi, deteksi tanda bahaya darurat, dan rekomendasi rujukan konsultasi medis.",
+      desc: "Dapatkan ringkasan kemungkinan kondisi, deteksi tanda bahaya darurat, dan rekomendasi rujukan RS.",
     },
   ];
 
@@ -67,12 +70,12 @@ export function AnatomyGuideCard({ onSelectRegion }: AnatomyGuideCardProps) {
   );
 
    return (
-    <div className="flex flex-col h-full rounded-[20px] sm:rounded-[28px] bg-white p-3 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 animate-fade-up justify-between w-full max-w-full overflow-hidden min-w-0 box-border">
+    <div className="flex flex-col h-full rounded-[20px] sm:rounded-[28px] bg-white p-3.5 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 animate-fade-up justify-between w-full max-w-full overflow-hidden min-w-0 box-border">
       {/* Header Section */}
       <div className="flex items-start justify-between gap-2 border-b border-black/5 pb-3 shrink-0 w-full min-w-0 overflow-hidden">
         <div className="flex items-start gap-2.5 min-w-0 flex-1">
           <div className="grid h-7 w-7 sm:h-8 sm:w-8 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white text-xs font-extrabold shadow-sm shrink-0 mt-0.5">
-            <Layers className="h-4 w-4" />
+            <BookOpen className="h-4 w-4" />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-1.5">
@@ -123,11 +126,24 @@ export function AnatomyGuideCard({ onSelectRegion }: AnatomyGuideCardProps) {
         })}
       </div>
 
+      {/* Primary CTA Button: Lanjut ke Model Anatomi (Mobile Only) */}
+      {onGoToModel && (
+        <div className="mt-3 pt-3 border-t border-black/5 shrink-0 lg:hidden">
+          <Button
+            onClick={onGoToModel}
+            className="w-full gap-2 rounded-full bg-[color:var(--color-clinic-blue)] py-3.5 text-xs sm:text-sm font-bold text-white hover:bg-[color:var(--color-clinic-blue-dark)] shadow-md shadow-[color:var(--color-clinic-blue)]/20 transition-all cursor-pointer"
+          >
+            <Layers className="h-4 w-4" />
+            <span>Mulai & Pilih Model Anatomi &rarr;</span>
+          </Button>
+        </div>
+      )}
+
       {/* Quick Select Popular Regions Section */}
       <div className="mt-3 pt-3 border-t border-black/5 space-y-2 w-full min-w-0 overflow-hidden shrink-0">
         <div className="flex items-center gap-1.5 text-xs font-bold text-[color:var(--color-clinic-ink)]">
           <Activity className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)] shrink-0" />
-          <span className="truncate">Atau Pilih Cepat Bagian Tubuh:</span>
+          <span className="truncate">Atau Pilih Langsung Bagian Tubuh:</span>
         </div>
 
         <div className="flex flex-wrap gap-1.5 w-full max-w-full overflow-hidden">
@@ -138,7 +154,7 @@ export function AnatomyGuideCard({ onSelectRegion }: AnatomyGuideCardProps) {
               onClick={() => onSelectRegion(region)}
               className="inline-flex items-center gap-1 rounded-full bg-[#f1f5f9] px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold text-[color:var(--color-clinic-ink)] hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition shadow-2xs border border-black/5 group cursor-pointer max-w-full min-w-0 shrink"
             >
-              <span className="truncate max-w-[140px] xs:max-w-[180px] sm:max-w-none">{region.nameIndonesian}</span>
+              <span className="truncate max-w-[130px] sm:max-w-none">{region.nameIndonesian}</span>
               <ArrowRight className="h-3 w-3 opacity-50 group-hover:translate-x-0.5 group-hover:opacity-100 transition-all shrink-0" />
             </button>
           ))}

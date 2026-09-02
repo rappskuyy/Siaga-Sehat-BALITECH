@@ -10,7 +10,7 @@ import { chatWithAI } from "@/lib/ai/chat.server";
 export function AiConsultation({ initialContext }: { initialContext: string }) {
   const chat = useServerFn(chatWithAI);
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; text: string }>>( [] );
+  const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; text: string }>>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 

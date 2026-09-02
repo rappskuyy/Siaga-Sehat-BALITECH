@@ -85,18 +85,18 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
   };
 
   return (
-    <div className="flex flex-col h-full rounded-[20px] sm:rounded-[28px] bg-white p-3 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 justify-between select-none max-w-full overflow-hidden">
+    <div className="flex flex-col h-full rounded-[20px] sm:rounded-[28px] bg-white p-3 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 justify-between select-none max-w-full overflow-hidden min-w-0">
       {/* Top Header Bar */}
-      <div className="flex items-center justify-between gap-2 border-b border-black/5 pb-3 shrink-0 max-w-full overflow-hidden">
+      <div className="flex items-center justify-between gap-2 border-b border-black/5 pb-3 shrink-0 max-w-full min-w-0 overflow-hidden">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <div className="grid h-6 w-6 sm:h-7 sm:w-7 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white text-[11px] sm:text-xs font-bold shadow-xs shrink-0">
             1
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h2 className="font-display text-xs sm:text-base font-bold text-[color:var(--color-clinic-ink)] truncate">
               Model Anatomi Tubuh Interaktif
             </h2>
-            <p className="text-[10px] sm:text-[11px] text-[color:var(--color-clinic-muted)] truncate hidden xs:block">
+            <p className="text-[10px] sm:text-[11px] text-[color:var(--color-clinic-muted)] truncate hidden sm:block">
               Perbesar model, putar tampak, atau pilih bagian tubuh
             </p>
           </div>
@@ -107,7 +107,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
           <button
             type="button"
             onClick={() => setView("front")}
-            className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer min-h-[32px] sm:min-h-[36px] flex items-center ${
+            className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer min-h-[30px] sm:min-h-[36px] flex items-center ${
               view === "front"
                 ? "bg-white text-[color:var(--color-clinic-ink)] shadow-xs border border-black/5 font-bold"
                 : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
@@ -118,7 +118,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
           <button
             type="button"
             onClick={() => setView("back")}
-            className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer min-h-[32px] sm:min-h-[36px] flex items-center ${
+            className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer min-h-[30px] sm:min-h-[36px] flex items-center ${
               view === "back"
                 ? "bg-white text-[color:var(--color-clinic-ink)] shadow-xs border border-black/5 font-bold"
                 : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
@@ -130,7 +130,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
       </div>
 
       {/* Interactive Category Filter Pills */}
-      <div className="mt-2.5 flex items-center gap-1 overflow-x-auto no-scrollbar pb-1 text-xs shrink-0 max-w-full">
+      <div className="mt-2.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs shrink-0 max-w-full min-w-0">
         <span className="text-[9px] sm:text-[10px] font-bold text-[color:var(--color-clinic-muted)] uppercase tracking-wider flex items-center gap-1 shrink-0 mr-0.5">
           <Filter className="h-3 w-3" /> Filter:
         </span>
@@ -145,7 +145,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             key={cat.id}
             type="button"
             onClick={() => setCategoryFilter(cat.id as CategoryFilter)}
-            className={`rounded-full px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold whitespace-nowrap transition-all cursor-pointer ${
+            className={`rounded-full px-2.5 py-0.5 text-[10px] sm:text-[11px] font-semibold whitespace-nowrap transition-all cursor-pointer ${
               categoryFilter === cat.id
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-xs"
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -157,7 +157,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
       </div>
 
       {/* Guide hint & Mobile Quick Select Dropdown */}
-      <div className="mt-2 flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-1.5 text-xs text-slate-600 bg-slate-50/80 px-2.5 py-1.5 rounded-xl border border-slate-200/60 shrink-0 max-w-full overflow-hidden">
+      <div className="mt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-1.5 text-xs text-slate-600 bg-slate-50/80 px-2.5 py-1.5 rounded-xl border border-slate-200/60 shrink-0 max-w-full overflow-hidden min-w-0">
         <div className="flex items-center gap-1.5 font-medium text-slate-700 min-w-0">
           <MousePointerClick className="h-3.5 w-3.5 text-sky-600 shrink-0" />
           <span className="text-[10px] sm:text-[11px] truncate">Klik organ atau pilih dari daftar:</span>
@@ -170,7 +170,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             const found = ANATOMY_REGIONS.find((r) => r.id === e.target.value);
             if (found) onSelectRegion(found);
           }}
-          className="w-full xs:w-auto max-w-full min-w-0 rounded-lg border border-slate-300 bg-white px-2 py-1 text-[11px] sm:text-xs font-semibold text-[color:var(--color-clinic-ink)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-clinic-blue)]/20 cursor-pointer shadow-2xs truncate"
+          className="w-full sm:w-auto max-w-full min-w-0 rounded-lg border border-slate-300 bg-white px-2 py-1 text-[11px] sm:text-xs font-semibold text-[color:var(--color-clinic-ink)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-clinic-blue)]/20 cursor-pointer shadow-2xs truncate"
         >
           <option value="" disabled>
             -- Pilih Organ Tubuh --
@@ -184,7 +184,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
       </div>
 
       {/* Interactive Anatomy Viewport Container */}
-      <div className="relative mt-3 flex-1 w-full min-h-[420px] sm:min-h-[500px] md:min-h-[560px] lg:min-h-[620px] rounded-2xl bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0]/60 p-2 sm:p-4 border border-slate-200/60 shadow-inner flex flex-col justify-center items-center overflow-hidden select-none">
+      <div className="relative mt-3 flex-1 w-full min-h-[340px] sm:min-h-[480px] md:min-h-[540px] lg:min-h-[600px] rounded-2xl bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0]/60 p-2 sm:p-4 border border-slate-200/60 shadow-inner flex flex-col justify-center items-center overflow-hidden select-none max-w-full min-w-0">
         {/* Subtle Blueprint Dot Grid */}
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[radial-gradient(#0f172a_1px,transparent_1px)] [background-size:20px_20px]" />
 
@@ -236,7 +236,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
 
         {/* Relative wrapper matching image bounds with smooth transform scale */}
         <div
-          className="relative inline-flex justify-center items-center transition-transform duration-300 ease-out"
+          className="relative inline-flex justify-center items-center transition-transform duration-300 ease-out max-w-full"
           style={{ transform: `scale(${zoomLevel})` }}
         >
           {/* Base Layer Anatomy PNG Image with fluid height */}
@@ -244,7 +244,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             key={view}
             src={activeImageUrl}
             alt={view === "front" ? "Anatomi Tubuh Tampak Depan" : "Anatomi Tubuh Tampak Belakang"}
-            className="h-[380px] xs:h-[440px] sm:h-[520px] md:h-[580px] lg:h-[620px] w-auto max-w-none object-contain select-none drop-shadow-[0_12px_24px_rgba(15,23,42,0.12)] pointer-events-none transition-all duration-300"
+            className="h-[320px] sm:h-[480px] md:h-[540px] lg:h-[600px] w-auto max-w-full object-contain select-none drop-shadow-[0_12px_24px_rgba(15,23,42,0.12)] pointer-events-none transition-all duration-300"
             loading="eager"
             draggable={false}
           />

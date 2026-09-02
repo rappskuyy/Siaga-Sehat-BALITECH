@@ -48,37 +48,39 @@ export function SymptomSelectorCard({
   const totalSelected = selectedSymptoms.length + selectedConditions.length;
 
   return (
-    <div className="flex flex-col h-full rounded-[24px] sm:rounded-[28px] bg-white p-3.5 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 max-w-full overflow-hidden">
+    <div className="flex flex-col h-full rounded-[24px] sm:rounded-[28px] bg-white p-3.5 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 max-w-full overflow-hidden min-w-0">
       {/* Header Info */}
-      <div className="flex items-start justify-between gap-3 border-b border-black/5 pb-3.5 shrink-0">
-        <div className="flex items-start gap-2.5 min-w-0">
+      <div className="flex items-start justify-between gap-2.5 border-b border-black/5 pb-3.5 shrink-0 min-w-0">
+        <div className="flex items-start gap-2.5 min-w-0 flex-1">
           <div className="grid h-7 w-7 shrink-0 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white text-xs font-extrabold shadow-sm mt-0.5">
             2
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-              <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold text-[color:var(--color-clinic-ink)] truncate">
+              <h2 className="font-display text-base sm:text-xl md:text-2xl font-bold text-[color:var(--color-clinic-ink)] truncate max-w-full">
                 {region.nameIndonesian}
               </h2>
-              <span className="rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold text-[color:var(--color-clinic-blue-dark)] shrink-0">
+              <span className="rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-2 py-0.5 text-[9px] sm:text-[11px] font-semibold text-[color:var(--color-clinic-blue-dark)] shrink-0">
                 {region.category.toUpperCase()}
               </span>
             </div>
-            <p className="mt-1 text-xs text-[color:var(--color-clinic-muted)] leading-relaxed line-clamp-2">
+            <p className="mt-0.5 sm:mt-1 text-xs text-[color:var(--color-clinic-muted)] leading-relaxed line-clamp-2">
               {region.description}
             </p>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={onReset}
-          className="inline-flex items-center gap-1 rounded-full bg-[#f1f5f9] px-3 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-muted)] hover:bg-[color:var(--color-clinic-blue-soft)] hover:text-[color:var(--color-clinic-blue-dark)] transition shrink-0 border border-black/5"
-          title="Reset semua pilihan gejala & catatan"
-        >
-          <RotateCcw className="h-3 w-3" />
-          <span className="hidden xs:inline">Reset</span>
-        </button>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            type="button"
+            onClick={onReset}
+            className="inline-flex items-center gap-1 rounded-full bg-[#f1f5f9] px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold text-[color:var(--color-clinic-blue-dark)] hover:bg-[color:var(--color-clinic-blue-soft)] transition shrink-0 border border-black/5 cursor-pointer shadow-2xs"
+            title="Pilih bagian tubuh yang lain"
+          >
+            <RotateCcw className="h-3 w-3" />
+            <span>Ganti Organ</span>
+          </button>
+        </div>
       </div>
 
       {/* Search & Tabs Filter */}
