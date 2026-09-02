@@ -214,7 +214,7 @@ export function AnatomyExplorer() {
                 : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
             }`}
           >
-            <Layers className="h-3.5 w-3.5 shrink-0 text-indigo-600" />
+            <Layers className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
             <span className="truncate text-[11px] sm:text-xs">2. Model Anatomi</span>
           </button>
 
@@ -237,7 +237,7 @@ export function AnatomyExplorer() {
                 : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
             }`}
           >
-            <Stethoscope className="h-3.5 w-3.5 shrink-0 text-teal-600" />
+            <Stethoscope className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
             <span className="truncate text-[11px] sm:text-xs">
               3. Gejala {selectedSymptoms.length > 0 && `(${selectedSymptoms.length})`}
             </span>
@@ -249,11 +249,11 @@ export function AnatomyExplorer() {
           <div
             className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl transition ${
               stepNumber === 4
-                ? "bg-emerald-50 text-emerald-800 font-bold shadow-2xs border border-emerald-200"
+                ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
                 : "text-[color:var(--color-clinic-muted)]"
             }`}
           >
-            <Sparkles className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+            <Sparkles className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
             <span className="truncate text-[11px] sm:text-xs">4. Hasil AI</span>
           </div>
         </div>
