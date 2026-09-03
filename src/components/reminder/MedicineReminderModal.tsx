@@ -467,8 +467,7 @@ export function MedicineReminderModal({ open, onClose }: Props) {
                         Pengingat otomatis diatur{" "}
                         <strong className="text-[color:var(--color-clinic-ink)]">
                           setiap {intervalForDosis(cfg.dosis_per_hari)} jam
-                        </strong>{" "}
-                        — mengikuti dosis di atas.
+                        </strong>, mengikuti dosis di atas.
                       </span>
                     </div>
                   </div>

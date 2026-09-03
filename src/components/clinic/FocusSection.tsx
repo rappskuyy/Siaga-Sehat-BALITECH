@@ -20,7 +20,7 @@ const STEPS = [
     n: "01",
     icon: Camera,
     title: "Pilih Caramu",
-    desc: "Foto keluhan, ketuk bagian tubuh, atau ketik/ucapkan gejala — sesuai yang paling nyaman.",
+    desc: "Foto keluhan, ketuk bagian tubuh, atau ketik/ucapkan gejala, sesuai yang paling nyaman.",
   },
   {
     n: "02",
@@ -391,7 +391,7 @@ export function FocusSection() {
             </h2>
           </div>
           <p className="max-w-[240px] text-sm leading-relaxed text-[color:var(--color-clinic-muted)]">
-            Sama-sama diproses AI, sama-sama gratis dicoba — tinggal pilih yang paling nyaman
+            Sama-sama diproses AI, sama-sama gratis dicoba, tinggal pilih yang paling nyaman
             buatmu.
           </p>
         </Reveal>

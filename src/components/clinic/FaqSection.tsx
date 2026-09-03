@@ -27,7 +27,7 @@ const FAQS: Record<CategoryKey, Array<{ q: string; a: string }>> = {
   umum: [
     {
       q: "Apakah SiagaSehat menggantikan dokter?",
-      a: "Tidak. SiagaSehat membantu triase awal — mengenali kemungkinan kondisi dan tingkat urgensinya — agar kamu bisa memutuskan langkah selanjutnya dengan lebih cepat. Untuk diagnosis dan pengobatan resmi, tetap perlu konsultasi dengan dokter berlisensi.",
+      a: "Tidak. SiagaSehat membantu triase awal, mengenali kemungkinan kondisi dan tingkat urgensinya, agar kamu bisa memutuskan langkah selanjutnya dengan lebih cepat. Untuk diagnosis dan pengobatan resmi, tetap perlu konsultasi dengan dokter berlisensi.",
     },
     {
       q: "Apakah layanan ini berbayar?",
@@ -35,7 +35,7 @@ const FAQS: Record<CategoryKey, Array<{ q: string; a: string }>> = {
     },
     {
       q: "Seberapa cepat saya mendapat hasil?",
-      a: "Rata-rata di bawah 30 detik untuk Scan AI, dan hampir instan untuk setiap balasan di Konsultasi AI — tergantung kecepatan koneksi internet kamu.",
+      a: "Rata-rata di bawah 30 detik untuk Scan , dan hampir instan untuk setiap balasan di Konsultasi AI, tergantung kecepatan koneksi internet kamu.",
     },
   ],
   scan: [
@@ -45,11 +45,11 @@ const FAQS: Record<CategoryKey, Array<{ q: string; a: string }>> = {
     },
     {
       q: "Seberapa akurat hasil Scan AI?",
-      a: "Model kami mencapai skor akurasi triase awal sekitar 98% berdasarkan evaluasi berkala tim medis, namun hasil tetap berupa estimasi awal — bukan diagnosis final.",
+      a: "Model kami mencapai skor akurasi triase awal sekitar 98% berdasarkan evaluasi berkala tim medis, namun hasil tetap berupa estimasi awal, bukan diagnosis final.",
     },
     {
       q: "Apakah foto saya disimpan dengan aman?",
-      a: "Ya. Foto hanya diproses untuk analisis dan hasil ringkasannya disimpan di riwayat akunmu dengan proteksi Row Level Security — hanya kamu yang bisa mengaksesnya.",
+      a: "Ya. Foto hanya diproses untuk analisis dan hasil ringkasannya disimpan di riwayat akunmu dengan proteksi Row Level Security, hanya kamu yang bisa mengaksesnya.",
     },
   ],
   konsultasi: [
@@ -59,7 +59,7 @@ const FAQS: Record<CategoryKey, Array<{ q: string; a: string }>> = {
     },
     {
       q: "Bisakah saya melampirkan riwayat penyakit?",
-      a: "Bisa. Ceritakan riwayat penyakit, alergi, atau obat yang sedang dikonsumsi langsung di chat — AI akan mempertimbangkannya dalam rekomendasi.",
+      a: "Bisa. Ceritakan riwayat penyakit, alergi, atau obat yang sedang dikonsumsi langsung di chat, AI akan mempertimbangkannya dalam rekomendasi.",
     },
     {
       q: "Apa yang terjadi jika gejala saya termasuk darurat?",
@@ -69,11 +69,11 @@ const FAQS: Record<CategoryKey, Array<{ q: string; a: string }>> = {
   akun: [
     {
       q: "Apakah saya wajib membuat akun?",
-      a: "Tidak wajib untuk mencoba sekali, tapi disarankan — dengan akun, riwayat scan dan konsultasimu tersimpan rapi dan bisa dipantau perkembangannya dari waktu ke waktu.",
+      a: "Tidak wajib untuk mencoba sekali, tapi disarankan, dengan akun, riwayat scan dan konsultasimu tersimpan rapi dan bisa dipantau perkembangannya dari waktu ke waktu.",
     },
     {
       q: "Bagaimana data kesehatan saya dilindungi?",
-      a: "Semua data disimpan di Supabase dengan Row Level Security aktif di setiap tabel — artinya secara teknis hanya akunmu sendiri yang bisa membaca atau mengubah datamu.",
+      a: "Semua data disimpan di Supabase dengan Row Level Security aktif di setiap tabel, artinya secara teknis hanya akunmu sendiri yang bisa membaca atau mengubah datamu.",
     },
     {
       q: "Bisakah saya menghapus riwayat saya?",

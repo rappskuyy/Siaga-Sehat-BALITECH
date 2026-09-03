@@ -32,11 +32,11 @@ export const Route = createFileRoute("/consultation")({
   }),
   head: () => ({
     meta: [
-      { title: "Konsultasi Dokter AI — Siaga Sehat" },
+      { title: "Konsultasi | Siaga Sehat" },
       {
         name: "description",
         content:
-          "Konsultasi interaktif dengan asisten kesehatan AI SiagaSehat. Jelaskan keluhan atau gejala Anda dan dapatkan analisis kesehatan terpercaya.",
+          "Konsultasi interaktif dengan asisten kesehatan SiagaSehat. Jelaskan keluhan atau gejala Anda dan dapatkan analisis kesehatan terpercaya.",
       },
     ],
   }),

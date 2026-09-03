@@ -97,7 +97,7 @@ export function ReminderCard({ reminder, logs, onMarkTaken, onSkip, onDeactivate
         {isDepleted && reminder.is_active && (
           <div className="mt-3.5 flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-700">
             <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-            <span>Tablet habis — segera beli lagi</span>
+            <span>Tablet habis, segera beli lagi</span>
           </div>
         )}
 

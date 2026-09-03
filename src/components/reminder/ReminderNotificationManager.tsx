@@ -9,8 +9,8 @@ function scheduleNotification(reminder: MedicineReminder) {
   const intervalMs = reminder.interval_jam * 60 * 60 * 1000;
   const id = setInterval(() => {
     if (Notification.permission === "granted") {
-      new Notification("💊 Waktunya Minum Obat!", {
-        body: `${reminder.nama_obat} — ${reminder.dosis_per_minum}\nTablet tersisa: ${reminder.tablet_tersisa ?? "?"}`,
+      new Notification(" Waktunya Minum Obat!", {
+        body: `${reminder.nama_obat} (${reminder.dosis_per_minum})\nTablet tersisa: ${reminder.tablet_tersisa ?? "?"}`,
         icon: "/favicon.ico",
         tag: `reminder-${reminder.id}`,
         requireInteraction: true,

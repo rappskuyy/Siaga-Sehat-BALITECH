@@ -11,13 +11,13 @@ import { Reveal } from "@/components/clinic/Reveal";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Siaga Sehat — Klinik Inovasi Digital" },
+      { title: "Siaga Sehat" },
       {
         name: "description",
         content:
-          "Siaga Sehat — diagnostik kecerdasan buatan dengan pendekatan manusiawi. Layanan kesehatan terpadu dengan dokter berlisensi dan skrining AI.",
+          "Siaga Sehat: diagnostik kecerdasan buatan dengan pendekatan manusiawi. Layanan kesehatan terpadu dengan dokter berlisensi dan skrining AI.",
       },
-      { property: "og:title", content: "Siaga Sehat — Klinik Inovasi Digital" },
+      { property: "og:title", content: "Siaga Sehat" },
       {
         property: "og:description",
         content:

@@ -66,11 +66,11 @@ ATURAN ANALISIS INFORMASI PENYAKIT:
 - Jika gambar tidak menunjukkan kondisi kesehatan/kulit (buram, foto benda, tangan yang tidak nuduhake kondisi kulit, dsb), set "gambar_dapat_dianalisis" ke false dan berikan petunjuk di "ringkasan".
 - Jika kondisi tidak tercakup dalam contoh di atas, tetap analisis berdasarkan ciri visual dan sebutkan "kemungkinan" atau "mungkin".
 - Jika kamu tidak yakin, gunakan istilah umum seperti "Ruam kulit tidak spesifik" atau "Iritasi kulit kemungkinan akibat..." di "nama_penyakit" dan tetap beri rekomendasi aman.
-- "penyebab": WAJIB diisi 2-4 poin kemungkinan penyebab/pemicu kondisi tersebut (mis. kontak iritan, infeksi bakteri/jamur, reaksi alergi, gesekan, kelembapan berlebih, dsb) berdasarkan ciri visual yang terlihat. Field ini TIDAK BOLEH berupa array kosong — bahkan jika gambar tidak jelas, isi dengan kemungkinan umum seperti "Belum dapat dipastikan tanpa pemeriksaan langsung; kemungkinan terkait iritasi, infeksi, atau alergi kulit".
+- "penyebab": WAJIB diisi 2-4 poin kemungkinan penyebab/pemicu kondisi tersebut (mis. kontak iritan, infeksi bakteri/jamur, reaksi alergi, gesekan, kelembapan berlebih, dsb) berdasarkan ciri visual yang terlihat. Field ini TIDAK BOLEH berupa array kosong; bahkan jika gambar tidak jelas, isi dengan kemungkinan umum seperti "Belum dapat dipastikan tanpa pemeriksaan langsung; kemungkinan terkait iritasi, infeksi, atau alergi kulit".
 - Klasifikasikan "tingkat_bahaya" ("rendah", "sedang", "tinggi") secara akurat. Jika "tinggi", set "harus_ke_dokter" ke true.
 - "obat_rekomendasi": Hanya cantumkan obat bebas/OTC umum di Indonesia beserta dosis aman; kalau tidak yakin dengan penyakit spesifik, gunakan rekomendasi untuk gejala yang muncul (misalnya gatal, merah, kering).
 - "obat_herbal": Cantumkan tanaman obat atau cara alami tradisional yang relatif aman dan sesuai gejala.
-- Jangan pernah membuat diagnosis pasti 100% — gunakan bahasa "kemungkinan", "berdasarkan gambar terlihat seperti", "mirip dengan".
+- Jangan pernah membuat diagnosis pasti 100%, gunakan bahasa "kemungkinan", "berdasarkan gambar terlihat seperti", "mirip dengan".
 - Jika kamu tidak bisa yakin karena kualitas gambar buruk, set "gambar_dapat_dianalisis" ke false.
 - Keluarkan HANYA data terstruktur sesuai skema JSON tanpa teks tambahan di luar skema.`;
 

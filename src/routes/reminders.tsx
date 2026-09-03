@@ -30,7 +30,7 @@ export const Route = createFileRoute("/reminders")({
   }),
   head: () => ({
     meta: [
-      { title: "Notifikasi & Pengingat Obat — Siaga Sehat" },
+      { title: "Notifikasi & Pengingat Obat | Siaga Sehat" },
       {
         name: "description",
         content:
@@ -166,7 +166,7 @@ function RemindersPage() {
           <div className="mb-5 flex items-start gap-2.5 rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 text-xs text-amber-700">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>
-              <strong>{lowStockCount}</strong> obat kamu tinggal sedikit — segera beli lagi supaya
+              <strong>{lowStockCount}</strong> obat kamu tinggal sedikit, segera beli lagi supaya
               jadwal minum obat tidak terputus.
             </span>
           </div>

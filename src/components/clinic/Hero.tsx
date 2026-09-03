@@ -30,7 +30,7 @@ export function Hero() {
                 <span className="font-semibold text-[color:var(--color-clinic-ink)]">
                   Kami tidak hanya mengobati gejala
                 </span>{" "}
-                — kami peduli dengan setiap orang, didukung skrining AI yang cepat dan akurat.
+                , kami peduli dengan setiap orang, didukung skrining AI yang cepat dan akurat.
               </p>
 
               <div className="mt-5 flex flex-wrap items-center gap-2">
@@ -197,7 +197,7 @@ export function Hero() {
                     </div>
                     <p className="text-xs leading-snug text-[color:var(--color-clinic-ink)]">
                       <span className="font-semibold">Memindai 500+ pola gejala</span> secara
-                      real-time — estimasi akurasi triase awal.
+                      real-time, estimasi akurasi triase awal.
                     </p>
                   </div>
                 </div>
@@ -226,7 +226,7 @@ export function Hero() {
                   Buatan
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-[color:var(--color-clinic-muted)]">
-                  Peralatan generasi terbaru, diagnostik digital, dan kecerdasan buatan — semua bekerja
+                  Peralatan generasi terbaru, diagnostik digital, dan kecerdasan buatan, semua bekerja
                   untuk kesehatan Anda.
                 </p>
               </div>

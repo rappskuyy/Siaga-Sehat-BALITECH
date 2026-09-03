@@ -34,7 +34,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
-    meta: [{ title: "Profil Saya — Siaga Sehat" }],
+    meta: [{ title: "Profil Saya | Siaga Sehat" }],
   }),
   component: ProfilePage,
 });
@@ -257,12 +257,12 @@ function ProfilePage() {
             </div>
             <div className="flex-1 rounded-2xl bg-white/10 px-4 py-2.5 text-center backdrop-blur">
               <p className="font-display text-lg font-extrabold text-white">
-                {lastScanMeta?.label ?? "—"}
+                {lastScanMeta?.label ?? " "}
               </p>
               <p className="text-[10px] text-white/70">Risiko Terakhir</p>
             </div>
             <div className="flex-1 rounded-2xl bg-white/10 px-4 py-2.5 text-center backdrop-blur">
-              <p className="font-display text-lg font-extrabold text-white">{bmi ?? "—"}</p>
+              <p className="font-display text-lg font-extrabold text-white">{bmi ?? " "}</p>
               <p className="text-[10px] text-white/70">BMI</p>
             </div>
           </div>

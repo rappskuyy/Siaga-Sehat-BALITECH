@@ -38,7 +38,7 @@ export function NotFoundView() {
           transition={{ delay: 0.15, duration: 0.6 }}
         >
           <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue)]/10 px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-[color:var(--color-clinic-blue)]">
-            <Activity className="h-3.5 w-3.5" /> Error 404 — Not Found
+            <Activity className="h-3.5 w-3.5" /> Error 404 | Not Found
           </span>
           <h1 className="mt-3 font-display text-7xl font-extrabold tracking-tight text-[color:var(--color-clinic-ink)] sm:text-8xl md:text-9xl">
             4<span className="text-[color:var(--color-clinic-blue)]">0</span>4
@@ -136,7 +136,7 @@ export function NotFoundView() {
         transition={{ delay: 0.6 }}
         className="relative z-10 mt-8 text-center text-xs text-[color:var(--color-clinic-muted)]/70"
       >
-        © {new Date().getFullYear()} Siaga Sehat — Peduli Kesehatan Anda
+        © {new Date().getFullYear()} Siaga Sehat | Peduli Kesehatan Anda
       </motion.p>
     </main>
   );

@@ -24,7 +24,7 @@ import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/register")({
   head: () => ({
-    meta: [{ title: "Daftar — Siaga Sehat" }],
+    meta: [{ title: "Daftar | Siaga Sehat" }],
   }),
   component: RegisterPage,
 });
@@ -195,7 +195,7 @@ function RegisterPage() {
             transition={{ delay: 1 }}
             className="text-xs text-white/30"
           >
-            © SiagaSehat — Peduli Kesehatan
+            © SiagaSehat | Peduli Kesehatan
           </motion.p>
         </div>
       </div>

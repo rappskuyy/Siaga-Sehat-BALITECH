@@ -300,7 +300,7 @@ export function ScanResultView({
             <Pill className="hidden h-7 w-7 shrink-0 text-white md:block" />
             {!result.obat_rekomendasi || result.obat_rekomendasi.length === 0 ? (
               <span className="text-xs sm:text-sm font-semibold text-white/80">
-                Tidak ada saran obat bebas untuk kondisi ini — konsultasikan ke dokter/apoteker.
+                Tidak ada saran obat bebas untuk kondisi ini, konsultasikan ke dokter/apoteker.
               </span>
             ) : (
               <div className="grid gap-2 text-xs sm:text-sm font-semibold text-slate-900 sm:grid-cols-2 w-full">

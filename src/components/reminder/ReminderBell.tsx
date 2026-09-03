@@ -57,7 +57,7 @@ export function ReminderBell({ variant = "dark", className = "" }: Props) {
         id="reminder-bell-btn"
         onClick={handleBellClick}
         className={`relative grid h-10 w-10 place-items-center rounded-full transition ${bgClass} ${className}`}
-        aria-label={`Pengingat obat${badgeCount > 0 ? ` — ${badgeCount} aktif` : ""}`}
+        aria-label={`Pengingat obat${badgeCount > 0 ? `, ${badgeCount} aktif` : ""}`}
         title="Pengingat Obat"
       >
         <Bell className="h-4 w-4" />

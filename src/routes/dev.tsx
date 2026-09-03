@@ -25,7 +25,7 @@ import { Footer } from "@/components/clinic/Footer";
 export const Route = createFileRoute("/dev")({
   head: () => ({
     meta: [
-      { title: "Tim Pengembang — Siaga Sehat " },
+      { title: "Tim Pengembang | Siaga Sehat" },
       {
         name: "description",
         content:
@@ -146,7 +146,7 @@ function DevPage() {
               </h1>
               <p className="mt-5 mx-auto max-w-lg text-sm md:text-base text-[color:var(--color-clinic-muted)] leading-relaxed">
                 Inovasi rekayasa perangkat lunak, keindahan visual, dan kecerdasan
-                buatan — mempermudah triase kesehatan awal bagi masyarakat Indonesia.
+                buatan, mempermudah triase kesehatan awal bagi masyarakat Indonesia.
               </p>
             </motion.div>
           </div>
