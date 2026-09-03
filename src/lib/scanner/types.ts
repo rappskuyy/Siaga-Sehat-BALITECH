@@ -55,7 +55,12 @@ export const SCAN_RESULT_JSON_SCHEMA = {
       description: "Penjelasan singkat tentang kondisi yang terlihat pada gambar",
     },
     tingkat_bahaya: { type: "string", enum: ["rendah", "sedang", "tinggi"] },
-    penyebab: { type: "array", items: { type: "string" } },
+    penyebab: {
+      type: "array",
+      items: { type: "string" },
+      description:
+        "Wajib diisi minimal 1 kemungkinan penyebab/pemicu kondisi; tidak boleh array kosong.",
+    },
     pencegahan_mandiri: { type: "array", items: { type: "string" } },
     harus_ke_dokter: {
       type: "boolean",

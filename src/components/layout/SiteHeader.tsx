@@ -161,28 +161,52 @@ export function SiteHeader() {
               <Bell className="h-4 w-4" />
             </Link>
           )}
-          <Link
-            to={user ? "/profile" : "/login"}
-            className="hidden items-center gap-2 rounded-full bg-white/80 py-1 pl-1 pr-3.5 text-sm font-medium text-[color:var(--color-clinic-ink)] shadow-xs transition hover:bg-white sm:inline-flex"
-          >
-            {user ? (
-              <>
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
-                  <User className="h-3.5 w-3.5" />
-                </span>
-                {profile?.full_name?.split(" ")[0] || "Profil"}
-              </>
-            ) : (
-              "Masuk"
-            )}
-          </Link>
-          <Link
-            to={user ? "/profile" : "/login"}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] sm:hidden"
-            aria-label="Akun"
-          >
-            <User className="h-4 w-4" />
-          </Link>
+
+          {!user ? (
+            <>
+              <Link
+                to="/login"
+                className="hidden items-center justify-center rounded-full bg-[color:var(--color-clinic-blue)] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-[color:var(--color-clinic-blue)]/20 transition hover:bg-[color:var(--color-clinic-blue-dark)] sm:inline-flex"
+              >
+                Masuk
+              </Link>
+              <Link
+                to="/register"
+                className="hidden items-center justify-center rounded-full border border-[color:var(--color-clinic-blue)]/15 bg-[color:var(--color-clinic-blue-soft)] px-4 py-2 text-sm font-semibold text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)] hover:text-white sm:inline-flex"
+              >
+                Daftar
+              </Link>
+            </>
+          ) : (
+            <Link
+              to="/profile"
+              className="hidden items-center gap-2 rounded-full bg-white/80 py-1 pl-1 pr-3.5 text-sm font-medium text-[color:var(--color-clinic-ink)] shadow-xs transition hover:bg-white sm:inline-flex"
+            >
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
+                <User className="h-3.5 w-3.5" />
+              </span>
+              {profile?.full_name?.split(" ")[0] || "Profil"}
+            </Link>
+          )}
+
+          {!user && (
+            <Link
+              to="/login"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue)] text-white shadow-lg shadow-[color:var(--color-clinic-blue)]/20 sm:hidden"
+              aria-label="Masuk"
+            >
+              <User className="h-4 w-4" />
+            </Link>
+          )}
+          {user && (
+            <Link
+              to="/profile"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] sm:hidden"
+              aria-label="Akun"
+            >
+              <User className="h-4 w-4" />
+            </Link>
+          )}
           <button
             type="button"
             onClick={() => setIsMenuOpen((open) => !open)}
@@ -244,14 +268,34 @@ export function SiteHeader() {
                 Notifikasi
               </Link>
             )}
-            <Link
-              to={user ? "/profile" : "/login"}
-              onClick={() => setIsMenuOpen(false)}
-              className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl border border-black/10 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
-            >
-              <User className="h-4 w-4" />
-              {user ? profile?.full_name?.split(" ")[0] || "Profil Saya" : "Masuk / Daftar"}
-            </Link>
+            {!user ? (
+              <>
+                <Link
+                  to="/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[color:var(--color-clinic-blue)] px-3 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[color:var(--color-clinic-blue)]/20"
+                >
+                  <User className="h-4 w-4" />
+                  Masuk
+                </Link>
+                <Link
+                  to="/register"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl border border-[color:var(--color-clinic-blue)]/15 bg-[color:var(--color-clinic-blue-soft)] px-3 py-2.5 text-sm font-semibold text-[color:var(--color-clinic-blue)]"
+                >
+                  Daftar
+                </Link>
+              </>
+            ) : (
+              <Link
+                to="/profile"
+                onClick={() => setIsMenuOpen(false)}
+                className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl border border-black/10 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
+              >
+                <User className="h-4 w-4" />
+                {profile?.full_name?.split(" ")[0] || "Profil Saya"}
+              </Link>
+            )}
           </nav>
         </div>
       )}

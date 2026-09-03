@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { SCAN_RESULT_JSON_SCHEMA, type ScanResult } from "./types";
+import { SCAN_RESULT_JSON_SCHEMA, type ScanResult, type ScanMedicine, type ScanHerbal } from "./types";
 
 const ALLOWED_MEDIA_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 
@@ -66,6 +66,7 @@ ATURAN ANALISIS INFORMASI PENYAKIT:
 - Jika gambar tidak menunjukkan kondisi kesehatan/kulit (buram, foto benda, tangan yang tidak nuduhake kondisi kulit, dsb), set "gambar_dapat_dianalisis" ke false dan berikan petunjuk di "ringkasan".
 - Jika kondisi tidak tercakup dalam contoh di atas, tetap analisis berdasarkan ciri visual dan sebutkan "kemungkinan" atau "mungkin".
 - Jika kamu tidak yakin, gunakan istilah umum seperti "Ruam kulit tidak spesifik" atau "Iritasi kulit kemungkinan akibat..." di "nama_penyakit" dan tetap beri rekomendasi aman.
+- "penyebab": WAJIB diisi 2-4 poin kemungkinan penyebab/pemicu kondisi tersebut (mis. kontak iritan, infeksi bakteri/jamur, reaksi alergi, gesekan, kelembapan berlebih, dsb) berdasarkan ciri visual yang terlihat. Field ini TIDAK BOLEH berupa array kosong — bahkan jika gambar tidak jelas, isi dengan kemungkinan umum seperti "Belum dapat dipastikan tanpa pemeriksaan langsung; kemungkinan terkait iritasi, infeksi, atau alergi kulit".
 - Klasifikasikan "tingkat_bahaya" ("rendah", "sedang", "tinggi") secara akurat. Jika "tinggi", set "harus_ke_dokter" ke true.
 - "obat_rekomendasi": Hanya cantumkan obat bebas/OTC umum di Indonesia beserta dosis aman; kalau tidak yakin dengan penyakit spesifik, gunakan rekomendasi untuk gejala yang muncul (misalnya gatal, merah, kering).
 - "obat_herbal": Cantumkan tanaman obat atau cara alami tradisional yang relatif aman dan sesuai gejala.
@@ -81,8 +82,54 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function splitTextList(value: string): string[] {
-  return value
-    .split(/[;\n|]+|\s*\.\s*|\s*,\s*/)
+  // A plain regex split on "," "." ";" etc. doesn't know about parentheses,
+  // so a single sentence like "Hindari meminjamkan barang pribadi bersama
+  // (handuk, pakaian)" gets cut at the comma *inside* the parentheses,
+  // producing two broken fragments: "...(handuk" and "pakaian)". Walk the
+  // string manually and only treat these characters as separators while
+  // we're not inside a "(...)"/"[...]" group. While at it, don't split a
+  // "." that's part of a decimal number like "2.5%".
+  const tokens: string[] = [];
+  let current = "";
+  let depth = 0;
+
+  for (let i = 0; i < value.length; i++) {
+    const ch = value[i];
+
+    if (ch === "(" || ch === "[") {
+      depth++;
+      current += ch;
+      continue;
+    }
+    if (ch === ")" || ch === "]") {
+      depth = Math.max(0, depth - 1);
+      current += ch;
+      continue;
+    }
+
+    if (depth === 0) {
+      if (ch === ";" || ch === "\n" || ch === "|" || ch === ",") {
+        tokens.push(current);
+        current = "";
+        continue;
+      }
+      if (ch === ".") {
+        const prev = value[i - 1];
+        const next = value[i + 1];
+        const isDecimalNumber = prev !== undefined && next !== undefined && /\d/.test(prev) && /\d/.test(next);
+        if (!isDecimalNumber) {
+          tokens.push(current);
+          current = "";
+          continue;
+        }
+      }
+    }
+
+    current += ch;
+  }
+  tokens.push(current);
+
+  return tokens
     .map((token) => token.trim())
     .filter(Boolean)
     .filter((token) => token.length > 1);
@@ -276,6 +323,227 @@ function pickPrimaryCandidate(list: unknown[]): Record<string, unknown> | null {
   }, candidates[0]);
 }
 
+/**
+ * Unlike `??`, this treats an empty string or empty array as "no value" and
+ * keeps checking later candidates. This matters because providers sometimes
+ * return a syntactically valid but empty array (e.g. "penyebab": []) for a
+ * required field instead of omitting it — a plain `??` chain would stop at
+ * that empty array and never fall through to a field that actually has data.
+ */
+function firstNonEmptySource(...candidates: unknown[]): unknown {
+  for (const candidate of candidates) {
+    if (typeof candidate === "string" && candidate.trim()) return candidate;
+    if (Array.isArray(candidate) && candidate.length > 0) return candidate;
+  }
+  return undefined;
+}
+
+/**
+ * Mirrors the DATASET INFORMASI PENYAKIT ACUAN baked into SYSTEM_PROMPT.
+ * Used as a last-resort, offline fallback: if the model correctly identifies
+ * a condition in its free-text "ringkasan" (or leaves "nama_penyakit" too
+ * generic/empty) but fails to populate the structured fields — which keeps
+ * happening even under a strict JSON schema, since the model can satisfy
+ * "required" with an empty string/array — we look the condition up here
+ * instead of showing "Tidak ada data ... yang tersedia." for something we
+ * actually have a reference answer for.
+ */
+interface DiseaseKnowledge {
+  nama: string;
+  keywords: RegExp;
+  penyebab: string[];
+  pencegahan: string[];
+  obat_rekomendasi: ScanMedicine[];
+  obat_herbal: ScanHerbal[];
+}
+
+const DISEASE_KNOWLEDGE_BASE: DiseaseKnowledge[] = [
+  {
+    nama: "Dermatitis Kontak & Eksim",
+    keywords: /dermatitis|eksim(?!\s*dishidrotik)|atopik/i,
+    penyebab: ["Kontak dengan bahan iritan atau alergen", "Kulit terlalu kering", "Reaksi alergi terhadap sabun/deterjen"],
+    pencegahan: ["Hindari sabun atau bahan yang memicu iritasi", "Gunakan pelembap secara rutin", "Jaga kulit tetap lembap dan bersih"],
+    obat_rekomendasi: [
+      { nama: "Krim Hydrocortisone 1%", dosis: "Oles tipis 1-2 kali sehari pada area gatal", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Pelembap Hypoallergenic", dosis: "Gunakan rutin setelah mandi", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Lotion Kalamin", dosis: "Oles pada area yang gatal", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+    ],
+    obat_herbal: [
+      { nama: "Gel Lidah Buaya (Aloe Vera)", cara_pakai: "Oleskan tipis pada area yang teriritasi" },
+      { nama: "Kompres Minyak Zaitun", cara_pakai: "Kompres lembut pada kulit kering" },
+    ],
+  },
+  {
+    nama: "Tinea & Infeksi Jamur Kulit",
+    keywords: /tinea|panu|kadas|kurap|jamur/i,
+    penyebab: ["Infeksi jamur dermatofita", "Kelembapan berlebih pada kulit", "Berbagi pakaian/handuk dengan orang lain"],
+    pencegahan: ["Jaga area tetap kering", "Hindari berbagi handuk/pakaian", "Ganti pakaian setelah berkeringat"],
+    obat_rekomendasi: [
+      { nama: "Krim Mikonazol 2%", dosis: "Oles 2 kali sehari selama 2-4 minggu", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Krim Ketokonazol 2%", dosis: "Oles 1-2 kali sehari", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Salep 2-4", dosis: "Oles tipis pada area yang terkena", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+    ],
+    obat_herbal: [
+      { nama: "Ekstrak Daun Sirih", cara_pakai: "Tempelkan air rebusan daun sirih pada area yang terkena" },
+      { nama: "Minyak Kelapa Murni (VCO)", cara_pakai: "Oleskan tipis 1-2 kali sehari" },
+    ],
+  },
+  {
+    nama: "Acne Vulgaris (Jerawat)",
+    keywords: /acne|jerawat|komedo|pustul/i,
+    penyebab: ["Produksi minyak berlebih (sebum)", "Penyumbatan pori oleh sel kulit mati", "Pertumbuhan bakteri penyebab jerawat"],
+    pencegahan: ["Bersihkan wajah 2 kali sehari dengan sabun lembut", "Hindari memencet jerawat", "Gunakan produk berlabel non-comedogenic"],
+    obat_rekomendasi: [
+      { nama: "Asam Salisilat topikal", dosis: "Oles tipis pada area berjerawat", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Benzoil Peroksida 2.5%", dosis: "Oles tipis 1 kali sehari, mulai dari frekuensi rendah", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Gel Sulfur", dosis: "Oles tipis pada bintil jerawat", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+    ],
+    obat_herbal: [
+      { nama: "Tea Tree Oil", cara_pakai: "Oleskan tipis dengan cotton bud tepat pada bintil" },
+      { nama: "Masker Kunyit & Madu", cara_pakai: "Gunakan sebagai masker 2-3 kali seminggu" },
+    ],
+  },
+  {
+    nama: "Urtikaria (Biduran)",
+    keywords: /urtikaria|biduran|kaligata/i,
+    penyebab: ["Reaksi alergi terhadap makanan/obat/lingkungan", "Perubahan suhu mendadak", "Stres atau kelelahan"],
+    pencegahan: ["Hindari pemicu alergi yang diketahui", "Kompres dingin pada area yang bentol", "Kenakan pakaian longgar dan sejuk"],
+    obat_rekomendasi: [
+      { nama: "Cetirizine 10mg", dosis: "1 kali sehari (malam hari)", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Loratadine 10mg", dosis: "1 kali sehari", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Lotion Kalamin", dosis: "Oles pada area yang gatal", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+    ],
+    obat_herbal: [
+      { nama: "Air Kelapa Hijau", cara_pakai: "Diminum untuk membantu meredakan reaksi alergi" },
+      { nama: "Kompres Air Dingin", cara_pakai: "Kompres pada area bentol selama 10-15 menit" },
+    ],
+  },
+  {
+    nama: "Scabies (Kudis)",
+    keywords: /scabies|kudis|tungau/i,
+    penyebab: ["Infeksi tungau Sarcoptes scabiei", "Kontak kulit langsung dengan penderita", "Berbagi pakaian/sprei yang terkontaminasi"],
+    pencegahan: ["Cuci pakaian dan sprei dengan air panas", "Hindari kontak kulit langsung dengan penderita", "Rawat seluruh anggota keluarga serumah bersamaan"],
+    obat_rekomendasi: [
+      { nama: "Salep Permethrin 5%", dosis: "Sesuai resep dokter, dioleskan ke seluruh tubuh", catatan: "Perlu resep dan pemantauan dokter." },
+    ],
+    obat_herbal: [
+      { nama: "Minyak Mimba (Neem Oil)", cara_pakai: "Oleskan tipis pada area yang gatal" },
+      { nama: "Minyak Cengkeh terencerkan", cara_pakai: "Oleskan tipis, hindari kontak dengan mata" },
+    ],
+  },
+  {
+    nama: "Impetigo & Infeksi Bakteri Kulit (Bisul/Folikulitis)",
+    keywords: /impetigo|bisul|folikulitis|folikel/i,
+    penyebab: ["Infeksi bakteri (Staphylococcus/Streptococcus) pada folikel rambut", "Kebersihan kulit yang kurang terjaga", "Gesekan atau pencukuran pada kulit yang teriritasi"],
+    pencegahan: ["Jaga area tetap bersih dan kering", "Jangan memencet atau memecahkan bintil", "Hindari mencukur area yang terinfeksi sampai sembuh", "Gunakan pakaian longgar untuk menghindari gesekan"],
+    obat_rekomendasi: [
+      { nama: "Salep Povidone Iodine", dosis: "Oles tipis 2 kali sehari pada area yang terkena", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Chlorhexidine", dosis: "Gunakan sebagai antiseptik pembersih area", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+    ],
+    obat_herbal: [
+      { nama: "Ekstrak Bawang Putih terencerkan", cara_pakai: "Oleskan tipis pada area yang terkena" },
+      { nama: "Air Daun Sirih", cara_pakai: "Gunakan sebagai kompres antiseptik alami" },
+    ],
+  },
+  {
+    nama: "Herpes Zoster & Virus Kulit",
+    keywords: /herpes|cacar/i,
+    penyebab: ["Reaktivasi virus varicella-zoster", "Daya tahan tubuh yang menurun", "Stres atau kelelahan berlebih"],
+    pencegahan: ["Istirahat cukup dan jaga daya tahan tubuh", "Hindari menggaruk gelembung", "Segera periksa ke dokter untuk terapi antivirus"],
+    obat_rekomendasi: [
+      { nama: "Parasetamol 500mg", dosis: "Sesuai kebutuhan untuk nyeri, maksimal 3-4 kali sehari", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Bedak Salisil", dosis: "Tabur tipis pada area yang gatal", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+    ],
+    obat_herbal: [
+      { nama: "Kompres Dingin Antiseptik", cara_pakai: "Kompres lembut pada area yang nyeri" },
+    ],
+  },
+  {
+    nama: "Psoriasis",
+    keywords: /psoriasis/i,
+    penyebab: ["Gangguan autoimun yang mempercepat regenerasi kulit", "Faktor genetik/keturunan", "Stres atau cuaca dingin dan kering"],
+    pencegahan: ["Jaga kulit tetap lembap", "Kelola stres dengan baik", "Hindari menggaruk atau mengelupas plak"],
+    obat_rekomendasi: [
+      { nama: "Petroleum Jelly", dosis: "Oles tipis untuk menjaga kelembapan kulit", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Salep Asam Salisilat", dosis: "Oles tipis pada plak bersisik", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+    ],
+    obat_herbal: [
+      { nama: "Lidah Buaya", cara_pakai: "Oleskan gel tipis pada plak" },
+      { nama: "Mandi Garam Epsom", cara_pakai: "Rendam area yang terkena 10-15 menit" },
+    ],
+  },
+  {
+    nama: "Gigitan Serangga & Dermatitis Venenata",
+    keywords: /gigitan|serangga|racun|venenata/i,
+    penyebab: ["Gigitan atau sengatan serangga", "Kontak dengan racun/bulu serangga", "Reaksi alergi terhadap air liur serangga"],
+    pencegahan: ["Hindari menggaruk area gigitan", "Gunakan losion anti-nyamuk saat beraktivitas di luar", "Kompres dingin segera setelah tergigit"],
+    obat_rekomendasi: [
+      { nama: "Krim Hydrocortisone", dosis: "Oles tipis pada area gigitan", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Kompres Dingin NaCl", dosis: "Kompres 10-15 menit pada area yang bengkak", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+    ],
+    obat_herbal: [
+      { nama: "Gel Aloe Vera", cara_pakai: "Oleskan tipis pada area gigitan" },
+    ],
+  },
+  {
+    nama: "Eksim Dishidrotik / Miliaria",
+    keywords: /dishidrotik|miliaria|biang keringat/i,
+    penyebab: ["Penyumbatan kelenjar keringat", "Kelembapan dan panas berlebih", "Reaksi stres atau alergi pada kulit tangan"],
+    pencegahan: ["Jaga kulit tetap sejuk dan kering", "Kenakan pakaian yang menyerap keringat", "Hindari paparan panas berlebih"],
+    obat_rekomendasi: [
+      { nama: "Krim Klorokuinon", dosis: "Sesuai anjuran dokter/apoteker", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Pelembap ringan", dosis: "Gunakan rutin setelah mandi", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+    ],
+    obat_herbal: [
+      { nama: "Kompres Daun Sirih", cara_pakai: "Gunakan sebagai kompres pada area yang gatal" },
+    ],
+  },
+  {
+    nama: "Dermatitis Seboroik",
+    keywords: /seboroik|ketombe/i,
+    penyebab: ["Produksi minyak berlebih di kulit kepala", "Pertumbuhan jamur Malassezia", "Kulit kepala kurang terjaga kebersihannya"],
+    pencegahan: ["Cuci rambut secara teratur", "Hindari produk rambut yang terlalu berat/berminyak", "Kelola stres yang dapat memicu kekambuhan"],
+    obat_rekomendasi: [
+      { nama: "Sampo Selenium Sulfida", dosis: "Gunakan 2-3 kali seminggu", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Krim Ketokonazol", dosis: "Oles tipis pada area yang gatal", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+    ],
+    obat_herbal: [
+      { nama: "Minyak Pohon Teh encer", cara_pakai: "Campurkan sedikit ke sampo sebelum digunakan" },
+    ],
+  },
+  {
+    nama: "Ruam Alergi / Eksim Kontak Ringan",
+    keywords: /ruam|alergi kulit/i,
+    penyebab: ["Kontak dengan bahan alergen ringan", "Iritasi akibat gesekan atau keringat", "Reaksi sensitif kulit terhadap produk tertentu"],
+    pencegahan: ["Hindari pemicu yang diketahui", "Gunakan pelembap hipoalergenik", "Kompres dingin bila terasa panas/gatal"],
+    obat_rekomendasi: [
+      { nama: "Krim Hidrokortison", dosis: "Oles tipis 1-2 kali sehari", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+      { nama: "Gel Aloe Vera", dosis: "Oles tipis pada area yang merah", catatan: "Konsultasikan dengan dokter/apoteker bila perlu." },
+    ],
+    obat_herbal: [
+      { nama: "Kompres Daun Lidah Buaya", cara_pakai: "Kompres lembut pada area yang teriritasi" },
+    ],
+  },
+];
+
+function matchDiseaseKnowledge(...texts: Array<string | undefined>): DiseaseKnowledge | null {
+  const haystack = texts.filter(Boolean).join(" ");
+  if (!haystack) return null;
+
+  let best: { entry: DiseaseKnowledge; score: number } | null = null;
+  for (const entry of DISEASE_KNOWLEDGE_BASE) {
+    const globalFlags = entry.keywords.flags.includes("g")
+      ? entry.keywords.flags
+      : `${entry.keywords.flags}g`;
+    const matches = haystack.match(new RegExp(entry.keywords.source, globalFlags));
+    const score = matches ? matches.length : 0;
+    if (score > 0 && (!best || score > best.score)) {
+      best = { entry, score };
+    }
+  }
+  return best?.entry ?? null;
+}
+
 function normalizeDangerLevel(value: unknown): ScanResult["tingkat_bahaya"] {
   const normalized = typeof value === "string" ? value.toLowerCase() : "rendah";
   return normalized === "sedang" || normalized === "tinggi" ? normalized : "rendah";
@@ -377,46 +645,89 @@ export function normalizeScanResultPayload(value: unknown): ScanResult {
   };
 
   const medicineSource =
-    Array.isArray(raw.obat_rekomendasi)
-      ? raw.obat_rekomendasi
-      : Array.isArray(raw.rekomendasi_obat)
-        ? raw.rekomendasi_obat
-        : Array.isArray(raw.rekomendasi)
-          ? raw.rekomendasi
-          : Array.isArray(raw.obat)
-            ? raw.obat
-            : Array.isArray(raw["Rekomendasi Obat & Medis"])
-              ? raw["Rekomendasi Obat & Medis"]
-              : Array.isArray(raw["Rekomendasi Obat"])
-                ? raw["Rekomendasi Obat"]
-                : Array.isArray(raw["Obat Rekomendasi"])
-                  ? raw["Obat Rekomendasi"]
-                  : typeof raw["Rekomendasi Obat & Medis"] === "string"
-                    ? raw["Rekomendasi Obat & Medis"]
-                    : typeof raw["Rekomendasi Obat"] === "string"
-                      ? raw["Rekomendasi Obat"]
-                      : typeof raw["Obat Rekomendasi"] === "string"
-                        ? raw["Obat Rekomendasi"]
-                        : [];
+    firstNonEmptySource(
+      raw.obat_rekomendasi,
+      raw.rekomendasi_obat,
+      raw.rekomendasi,
+      raw.obat,
+      raw["Rekomendasi Obat & Medis"],
+      raw["Rekomendasi Obat"],
+      raw["Obat Rekomendasi"],
+    ) ?? [];
 
   const herbalSource =
-    Array.isArray(raw.obat_herbal)
-      ? raw.obat_herbal
-      : Array.isArray(raw.obat_herbal_alami)
-        ? raw.obat_herbal_alami
-        : Array.isArray(raw.herbal)
-          ? raw.herbal
-          : Array.isArray(raw.herbal_alami)
-            ? raw.herbal_alami
-            : Array.isArray(raw["Obat Herbal Alami"])
-              ? raw["Obat Herbal Alami"]
-              : Array.isArray(raw["Obat Herbal"])
-                ? raw["Obat Herbal"]
-                : typeof raw["Obat Herbal Alami"] === "string"
-                  ? raw["Obat Herbal Alami"]
-                  : typeof raw["Obat Herbal"] === "string"
-                    ? raw["Obat Herbal"]
-                    : [];
+    firstNonEmptySource(
+      raw.obat_herbal,
+      raw.obat_herbal_alami,
+      raw.herbal,
+      raw.herbal_alami,
+      raw["Obat Herbal Alami"],
+      raw["Obat Herbal"],
+    ) ?? [];
+
+  const namaPenyakitRaw = getFirstStringValue("nama_penyakit", "Nama Penyakit");
+  const ringkasanValue =
+    getFirstStringValue("ringkasan", "Ringkasan") || "AI belum menilai kondisi dengan detail yang cukup.";
+
+  // Flatten any array/object source into plain text so it can be searched
+  // for keywords, without assuming a particular shape.
+  const flattenToText = (value: unknown): string => {
+    if (typeof value === "string") return value;
+    if (Array.isArray(value)) return value.map(flattenToText).join(" ");
+    if (isRecord(value)) return Object.values(value).map(flattenToText).join(" ");
+    return "";
+  };
+
+  // The model sometimes leaves "nama_penyakit"/"penyebab" blank (or too
+  // generic) even while clearly naming or implying a condition elsewhere —
+  // inside "ringkasan", or inside its own obat/herbal suggestions (e.g.
+  // "...jika dicurigai akibat gigitan serangga"). Search everything we have
+  // before giving up to the generic default, matched against the same
+  // knowledge base as SYSTEM_PROMPT.
+  const knowledgeMatch = matchDiseaseKnowledge(
+    namaPenyakitRaw,
+    ringkasanValue,
+    getFirstStringValue("alasan_ke_dokter", "Alasan Ke Dokter"),
+    flattenToText(medicineSource),
+    flattenToText(herbalSource),
+  );
+
+  const namaPenyakitValue = namaPenyakitRaw || knowledgeMatch?.nama || "Kondisi tidak spesifik";
+
+  const penyebabList = toStringArray(
+    firstNonEmptySource(
+      raw.penyebab,
+      raw.kemungkinan_penyebab,
+      raw.kemungkinan,
+      raw.cause,
+      // KoboiLLM may return "gejala" instead of "penyebab"
+      raw.gejala,
+      raw.symptoms,
+      // Multi-candidate providers (see pickPrimaryCandidate) explain
+      // their reasoning per-candidate in "alasan_analisis"
+      raw.alasan_analisis,
+      raw["Kemungkinan Penyebab"],
+      raw["Kemungkinan Penyebabnya"],
+    ),
+  );
+
+  const pencegahanList = toStringArray(
+    firstNonEmptySource(
+      raw.pencegahan_mandiri,
+      raw.pencegahan,
+      raw.prevention,
+      raw.preventive,
+      // KoboiLLM may return "saran_perawatan" instead of "pencegahan_mandiri"
+      raw.saran_perawatan,
+      raw.saran,
+      raw.tips,
+      raw["Pencegahan Mandiri"],
+      raw["Pencegahan"],
+    ),
+  );
+
+  const modelMedicineList = normalizeMedicineList(medicineSource);
+  const modelHerbalList = normalizeHerbalList(herbalSource);
 
   return {
     gambar_dapat_dianalisis:
@@ -425,44 +736,46 @@ export function normalizeScanResultPayload(value: unknown): ScanResult {
         : typeof raw["Gambar Dapat Dianalisis"] === "boolean"
           ? raw["Gambar Dapat Dianalisis"]
           : true,
-    nama_penyakit:
-      getFirstStringValue("nama_penyakit", "Nama Penyakit") || "Kondisi tidak spesifik",
-    ringkasan:
-      getFirstStringValue("ringkasan", "Ringkasan") || "AI belum menilai kondisi dengan detail yang cukup.",
+    nama_penyakit: namaPenyakitValue,
+    ringkasan: ringkasanValue,
     tingkat_bahaya: normalizeDangerLevel(
       getFirstStringValue("tingkat_bahaya", "Tingkat Bahaya", "level") || "rendah",
     ),
-    penyebab: toStringArray(
-      raw.penyebab ??
-        raw.kemungkinan_penyebab ??
-        raw.kemungkinan ??
-        raw.cause ??
-        // KoboiLLM may return "gejala" instead of "penyebab"
-        raw.gejala ??
-        raw.symptoms ??
-        // Multi-candidate providers (see pickPrimaryCandidate) explain
-        // their reasoning per-candidate in "alasan_analisis"
-        raw.alasan_analisis ??
-        raw["Kemungkinan Penyebab"] ??
-        raw["Kemungkinan Penyebabnya"],
-    ),
-    pencegahan_mandiri: toStringArray(
-      raw.pencegahan_mandiri ??
-        raw.pencegahan ??
-        raw.prevention ??
-        raw.preventive ??
-        // KoboiLLM may return "saran_perawatan" instead of "pencegahan_mandiri"
-        raw.saran_perawatan ??
-        raw.saran ??
-        raw.tips ??
-        raw["Pencegahan Mandiri"] ??
-        raw["Pencegahan"],
-    ),
+    // Never surface a truly empty cause list to the UI: fall back to the
+    // matched reference dataset first, then to a generic message grounded
+    // in whatever diagnosis text we do have — rather than "Tidak ada data
+    // penyebab yang tersedia."
+    penyebab:
+      penyebabList.length > 0
+        ? penyebabList
+        : knowledgeMatch
+          ? knowledgeMatch.penyebab
+          : [
+              `Belum dapat dipastikan tanpa pemeriksaan langsung; kemungkinan terkait iritasi, infeksi, atau reaksi alergi kulit yang berkaitan dengan ${namaPenyakitValue.toLowerCase()}.`,
+            ],
+    pencegahan_mandiri:
+      pencegahanList.length > 0
+        ? pencegahanList
+        : knowledgeMatch
+          ? knowledgeMatch.pencegahan
+          : [
+              "Jaga kebersihan dan kelembapan area yang terkena, hindari memencet/menggaruk, dan pantau perkembangan gejala selama beberapa hari.",
+            ],
     harus_ke_dokter: getFirstBooleanValue("harus_ke_dokter", "Harus Ke Dokter"),
     alasan_ke_dokter:
       getFirstStringValue("alasan_ke_dokter", "Alasan Ke Dokter") || "",
-    obat_rekomendasi: normalizeMedicineList(medicineSource),
-    obat_herbal: normalizeHerbalList(herbalSource),
+    obat_rekomendasi:
+      modelMedicineList.length > 0
+        ? modelMedicineList
+        : knowledgeMatch
+          ? knowledgeMatch.obat_rekomendasi
+          : [],
+    obat_herbal:
+      modelHerbalList.length > 0
+        ? modelHerbalList
+        : knowledgeMatch
+          ? knowledgeMatch.obat_herbal
+          : [],
     catatan_tambahan:
       getFirstStringValue("catatan_tambahan", "Catatan Tambahan") || "",
     tingkat_keyakinan: normalizeDangerLevel(
