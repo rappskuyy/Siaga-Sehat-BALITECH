@@ -42,7 +42,7 @@ export const Route = createFileRoute("/scanner")({
       {
         name: "description",
         content:
-          "Unggah atau foto kondisi kulit/tubuhmu dan dapatkan skrining kesehatan awal berbasis AI dari Siaga Sehat, lengkap dengan penyebab, pencegahan, dan rekomendasi obat.",
+          "Unggah atau foto kondisi kulit/tubuhmu dan dapatkan skrining kesehatan awal dari Siaga Sehat, lengkap dengan penyebab, pencegahan, dan rekomendasi obat.",
       },
       { property: "og:title", content: "Siaga Sehat" },
       { property: "og:type", content: "website" },
@@ -146,7 +146,7 @@ function ScannerPage() {
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between">
           <h1 className="flex items-center gap-2 text-sm font-semibold text-[color:var(--color-clinic-ink)]">
             <ScanLine className="h-4 w-4 text-[color:var(--color-clinic-blue)]" />
-            Scan AI
+            Scan
           </h1>
           <Link
             to="/"
@@ -244,7 +244,7 @@ function ScannerPage() {
       </div>
 
       <footer className="pt-10 text-center text-xs text-[color:var(--color-clinic-muted)]">
-        © {new Date().getFullYear()} SiagaSehat. Fitur ini menggunakan AI dan tidak menggantikan
+        © {new Date().getFullYear()} SiagaSehat. Fitur ini tidak menggantikan
         konsultasi medis profesional.
       </footer>
     </main>

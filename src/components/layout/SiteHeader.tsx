@@ -10,7 +10,7 @@ const TABS = [
   { label: "Peta Lokasi", path: "/maps" },
   { label: "Konsultasi", path: "/consultation", search: { anatomy: undefined } },
   { label: "Anatomi", path: "/anatomy" },
-  { label: "Scan AI", path: "/scanner" },
+  { label: "Scan", path: "/scanner" },
 ];
 
 function SlideTabs() {
@@ -256,7 +256,7 @@ export function SiteHeader() {
               onClick={() => setIsMenuOpen(false)}
               className="mt-1 inline-flex items-center justify-center rounded-xl bg-[color:var(--color-clinic-blue)] px-3 py-2.5 text-sm font-semibold text-white"
             >
-              Scan AI
+              Scan
             </Link>
             {user && (
               <Link

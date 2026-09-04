@@ -145,7 +145,7 @@ function ConsultationPage() {
       setMessages(next);
       setLoading(true);
       try {
-        const prompt = `Kamu adalah Asisten Dokter AI SiagaSehat yang ramah, empati, dan profesional dalam Bahasa Indonesia. Berikut riwayat percakapan sejauh ini:\n${buildContext(
+        const prompt = `Kamu adalah Asisten Kesehatan SiagaSehat yang ramah, empati, dan profesional dalam Bahasa Indonesia. Berikut riwayat percakapan sejauh ini:\n${buildContext(
           next,
         )}\n\nLanjutkan percakapan secara natural: jika informasi (usia, lama gejala, tingkat keparahan, riwayat penyakit) belum lengkap, tanyakan satu per satu secara sopan. Jika sudah cukup informasi, berikan Analisis Awal Kemungkinan Kondisi, Tingkat Risiko, dan Rekomendasi Tindakan / Perawatan yang aman dan terstruktur.`;
         const res = await chat({ data: { prompt } });
@@ -156,7 +156,7 @@ function ConsultationPage() {
         setMessages((m) =>
           m.concat({
             role: "assistant",
-            text: "Terjadi gangguan saat menghubungi layanan AI. Silakan coba kirim kembali.",
+            text: "Terjadi gangguan saat menghubungi sistem. Silakan coba kirim kembali.",
             time: formatTime(),
           }),
         );
@@ -207,7 +207,7 @@ function ConsultationPage() {
       `Gejala yang dirasakan: ${context.selectedSymptoms?.join(", ") || "tidak ada"}`,
       `Kondisi yang dicurigai: ${context.selectedConditions?.join(", ") || "tidak ada"}`,
       context.additionalNotes ? `Catatan tambahan: ${context.additionalNotes}` : "",
-      context.primaryCondition ? `Hasil awal AI: ${context.primaryCondition}` : "",
+      context.primaryCondition ? `Hasil awal: ${context.primaryCondition}` : "",
     ]
       .filter(Boolean)
       .join("\n");
@@ -256,7 +256,7 @@ function ConsultationPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h1 className="font-display text-sm sm:text-base font-bold text-[color:var(--color-clinic-ink)]">
-                      Konsultasi Dokter AI
+                      Konsultasi
                     </h1>
                     <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200/60">
                       Aktif 24 Jam
@@ -312,7 +312,7 @@ function ConsultationPage() {
                     Bagaimana kondisi kesehatan Anda hari ini?
                   </h3>
                   <p className="mt-1.5 text-xs text-[color:var(--color-clinic-muted)] leading-relaxed">
-                    Ceritakan keluhan, rasa nyeri, atau pertanyaan kesehatan yang sedang Anda rasakan untuk mendapatkan analisis awal dari dokter AI.
+                    Ceritakan keluhan, rasa nyeri, atau pertanyaan kesehatan yang sedang Anda rasakan untuk mendapatkan analisis awal.
                   </p>
 
                   {/* Quick Prompts */}
@@ -359,7 +359,7 @@ function ConsultationPage() {
                       </div>
                       <div className="flex items-center gap-2 rounded-2xl rounded-bl-xs bg-white border border-black/5 px-4 py-2.5 text-xs text-[color:var(--color-clinic-muted)] shadow-xs">
                         <Loader2 className="h-3.5 w-3.5 animate-spin text-[color:var(--color-clinic-blue)]" />
-                        <span>Dokter AI sedang menganalisis respons...</span>
+                        <span>Sedang menganalisis respons...</span>
                       </div>
                     </div>
                   )}

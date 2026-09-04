@@ -863,7 +863,7 @@ export function DedicatedMapsView() {
           className="flex flex-col items-center gap-0.5 text-[#6B7280] hover:text-[#379FD2] transition"
         >
           <ScanLine className="h-5 w-5" />
-          <span className="text-[10px] font-semibold">Scan AI</span>
+          <span className="text-[10px] font-semibold">Scan</span>
         </Link>
 
         <Link
