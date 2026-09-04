@@ -639,7 +639,7 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
       </div>
 
       {/* Main Composition: Desktop Layout & Mobile Responsive Mode */}
-      <div className="flex flex-col lg:flex-row gap-3 min-h-[480px] lg:h-[720px] items-stretch">
+      <div className="flex flex-col lg:flex-row gap-3 lg:h-[720px] items-stretch">
         {/* 02. Clinic List Column */}
         <div
           className={`w-full lg:w-[420px] shrink-0 h-[480px] sm:h-[520px] lg:h-full flex-col ${
@@ -668,7 +668,7 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
 
         {/* 03. OpenStreetMap Canvas Area */}
         <div
-          className={`relative flex-1 min-w-0 h-[420px] sm:h-[480px] lg:h-full rounded-2xl overflow-hidden border border-[#E5E7EB] bg-[#FFFFFF] shadow-inner ${
+          className={`relative flex-1 min-w-0 aspect-square w-full h-auto lg:aspect-auto lg:h-full rounded-2xl overflow-hidden border border-[#E5E7EB] bg-[#FFFFFF] shadow-inner ${
             mobileTab === "map" ? "block" : "hidden lg:block"
           }`}
         >
@@ -679,7 +679,7 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
             routeInfo={routeInfo}
             onSelectPharmacy={handleSelectPharmacy}
             onManualLocationChange={handleManualLocationChange}
-            className="w-full h-full"
+            className="w-full h-full min-h-0"
           />
         </div>
       </div>

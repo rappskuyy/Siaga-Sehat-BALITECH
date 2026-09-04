@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Camera, ImagePlus, RotateCcw, UploadCloud, X } from "lucide-react";
+import { Camera, FlipHorizontal, ImagePlus, RotateCcw, UploadCloud, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -39,6 +39,7 @@ function fileToSelectedImage(file: File): Promise<SelectedImage> {
 export function ImageCapture({ image, onChange, disabled }: ImageCaptureProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("environment");
   const [cameraError, setCameraError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -50,6 +51,10 @@ export function ImageCapture({ image, onChange, disabled }: ImageCaptureProps) {
     streamRef.current = null;
   }, []);
 
+  const toggleCamera = useCallback(() => {
+    setFacingMode((prev) => (prev === "environment" ? "user" : "environment"));
+  }, []);
+
   useEffect(() => {
     if (!cameraOpen) {
       stopCamera();
@@ -57,8 +62,11 @@ export function ImageCapture({ image, onChange, disabled }: ImageCaptureProps) {
     }
     setCameraError(null);
     let cancelled = false;
+
+    stopCamera();
+
     navigator.mediaDevices
-      ?.getUserMedia({ video: { facingMode: "environment" }, audio: false })
+      ?.getUserMedia({ video: { facingMode }, audio: false })
       .then((stream) => {
         if (cancelled) {
           stream.getTracks().forEach((track) => track.stop());
@@ -69,18 +77,36 @@ export function ImageCapture({ image, onChange, disabled }: ImageCaptureProps) {
           videoRef.current.srcObject = stream;
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.warn("getUserMedia facingMode failed, retrying fallback:", err);
         if (!cancelled) {
-          setCameraError(
-            "Tidak bisa mengakses kamera. Pastikan izin kamera diaktifkan, atau gunakan opsi unggah foto.",
-          );
+          navigator.mediaDevices
+            ?.getUserMedia({ video: true, audio: false })
+            .then((stream) => {
+              if (cancelled) {
+                stream.getTracks().forEach((track) => track.stop());
+                return;
+              }
+              streamRef.current = stream;
+              if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+              }
+            })
+            .catch(() => {
+              if (!cancelled) {
+                setCameraError(
+                  "Tidak bisa mengakses kamera. Pastikan izin kamera diaktifkan, atau gunakan opsi unggah foto.",
+                );
+              }
+            });
         }
       });
+
     return () => {
       cancelled = true;
       stopCamera();
     };
-  }, [cameraOpen, stopCamera]);
+  }, [cameraOpen, facingMode, stopCamera]);
 
   const handleFiles = useCallback(
     async (fileList: FileList | null) => {
@@ -104,12 +130,18 @@ export function ImageCapture({ image, onChange, disabled }: ImageCaptureProps) {
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    if (facingMode === "user") {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
+
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
     const [, base64] = dataUrl.split(",");
     onChange({ base64, mediaType: "image/jpeg", previewUrl: dataUrl });
     setCameraOpen(false);
-  }, [onChange]);
+  }, [facingMode, onChange]);
 
   if (image) {
     return (
@@ -187,11 +219,21 @@ export function ImageCapture({ image, onChange, disabled }: ImageCaptureProps) {
 
       <Dialog open={cameraOpen} onOpenChange={setCameraOpen}>
         <DialogContent className="max-w-md">
-          <DialogHeader>
+          <DialogHeader className="flex flex-row items-center justify-between pr-6">
             <DialogTitle className="flex items-center gap-2 font-display">
               <Camera className="h-5 w-5 text-[color:var(--color-clinic-blue)]" />
               Ambil Foto
             </DialogTitle>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={toggleCamera}
+              className="gap-1.5 rounded-full text-xs font-semibold border-[color:var(--color-clinic-blue)]/30 text-[color:var(--color-clinic-ink)] hover:bg-[color:var(--color-clinic-blue-soft)]"
+            >
+              <FlipHorizontal className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)]" />
+              {facingMode === "user" ? "Kamera Depan" : "Kamera Belakang"}
+            </Button>
           </DialogHeader>
 
           {cameraError ? (
@@ -203,9 +245,20 @@ export function ImageCapture({ image, onChange, disabled }: ImageCaptureProps) {
                 autoPlay
                 playsInline
                 muted
-                className="aspect-[4/3] w-full object-cover"
+                className={`aspect-[4/3] w-full object-cover ${
+                  facingMode === "user" ? "scale-x-[-1]" : ""
+                }`}
               />
               <div className="pointer-events-none absolute inset-6 rounded-xl border-2 border-white/60" />
+
+              <button
+                type="button"
+                onClick={toggleCamera}
+                className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5 text-xs font-medium text-white backdrop-blur transition hover:bg-black/80"
+              >
+                <FlipHorizontal className="h-3.5 w-3.5" />
+                <span>{facingMode === "user" ? "Kamera Depan" : "Kamera Belakang"}</span>
+              </button>
             </div>
           )}
           <canvas ref={canvasRef} className="hidden" />

@@ -36,6 +36,7 @@ export function OpenStreetMapCanvas({
     if (typeof window === "undefined" || !mapContainerRef.current) return;
 
     isMountedRef.current = true;
+    let resizeObserver: ResizeObserver | null = null;
 
     import("leaflet").then((L) => {
       if (!isMountedRef.current || !mapContainerRef.current) return;
@@ -71,11 +72,22 @@ export function OpenStreetMapCanvas({
 
         leafletMapRef.current = map;
         markersLayerRef.current = L.layerGroup().addTo(map);
+
+        // ResizeObserver to handle aspect ratio / mobile layout changes
+        if (typeof ResizeObserver !== "undefined" && mapContainerRef.current) {
+          resizeObserver = new ResizeObserver(() => {
+            map.invalidateSize();
+          });
+          resizeObserver.observe(mapContainerRef.current);
+        }
       }
     });
 
     return () => {
       isMountedRef.current = false;
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
       if (leafletMapRef.current) {
         leafletMapRef.current.remove();
         leafletMapRef.current = null;
@@ -233,7 +245,7 @@ export function OpenStreetMapCanvas({
 
   return (
     <div className={`relative overflow-hidden rounded-2xl ${className}`}>
-      <div ref={mapContainerRef} className="w-full h-full min-h-[350px] z-0" />
+      <div ref={mapContainerRef} className="w-full h-full min-h-0 z-0" />
     </div>
   );
 }
