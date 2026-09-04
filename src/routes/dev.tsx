@@ -56,6 +56,8 @@ const TEAM_MEMBERS = [
     bio: "Merancang arsitektur utama platform SiagaSehat, mengintegrasikan inferensi AI (Gemini Vision & LLM Medis), membangun pertukaran data real-time, serta mengarahkan standar teknis rekayasa perangkat lunak.",
     icon: Terminal,
     avatar: "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Raffasya%20Javas%20Niscala%20Widjaja.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvUmFmZmFzeWEgSmF2YXMgTmlzY2FsYSBXaWRqYWphLmF2aWYiLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4MjI3NzAyLCJleHAiOjE4MTk3NjM3MDJ9.HIn4-zAuQTHyk4wTnhzjkyE54v1QpsW72CDghC1GaYg",
+    linkedin: "https://www.linkedin.com/in/rappskuyy/",
+    github: "https://github.com/rappskuyy/Siaga-Sehat-BALITECH",
     gradient: "from-blue-600 to-indigo-700",
     accent: "#4a6fa5",
   },
@@ -67,6 +69,8 @@ const TEAM_MEMBERS = [
     bio: "Merancang antarmuka pengguna (UI/UX) berstandar tinggi, mengimplementasikan sistem komponen interaktif, transisi mikro dinamis, serta mengoptimalkan performa tata letak yang responsif di seluruh perangkat.",
     icon: Palette,
     avatar: "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Ahmad%20Rhezki%20Prasetya.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvQWhtYWQgUmhlemtpIFByYXNldHlhLmF2aWYiLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4MjI3NzgxLCJleHAiOjE4MTk3NjM3ODF9.uR1PPi7HtQUaEIJ9fvWg7xhQOh8XttTFQEn6cYOaKV8",
+    linkedin: "https://www.linkedin.com/in/ahmad-rhezki-prasetya-153079388/",
+    github: "https://github.com/rappskuyy/Siaga-Sehat-BALITECH",
     gradient: "from-emerald-500 to-teal-600",
     accent: "#17a690",
   },
@@ -78,6 +82,8 @@ const TEAM_MEMBERS = [
     bio: "Mengarsitekturi infrastruktur database PostgreSQL & Supabase, membangun sistem autentikasi aman, mengelola alur data triase medis, serta menjamin keandalan dan keamanan data pasien secara komprehensif.",
     icon: Database,
     avatar: "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Muhamad%20Fedliansyah%20Ilham.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvTXVoYW1hZCBGZWRsaWFuc3lhaCBJbGhhbS5hdmlmIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODIyNzc2NiwiZXhwIjoxODE5NzYzNzY2fQ.6TKpgDEEZ5tktyEv_ZB-WkIcPda0jjbc3rYtlDEPPv4",
+    linkedin: "https://www.linkedin.com/in/muhammad-fedliansyah-ilham-b7b27a388/",
+    github: "https://github.com/rappskuyy/Siaga-Sehat-BALITECH",
     gradient: "from-violet-600 to-purple-700",
     accent: "#35517d",
   },
@@ -426,16 +432,20 @@ function DevPage() {
                     <span className="text-[11px] font-medium text-slate-500">SMK Wikrama Bogor</span>
                     <div className="flex items-center gap-2">
                       <a
-                        href="#"
+                        href={member.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition-all duration-200"
-                        title="GitHub"
+                        title="GitHub Profile"
                       >
                         <Github className="h-3.5 w-3.5" />
                       </a>
                       <a
-                        href="#"
+                        href={member.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition-all duration-200"
-                        title="LinkedIn"
+                        title="LinkedIn Profile"
                       >
                         <Linkedin className="h-3.5 w-3.5" />
                       </a>
