@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
@@ -18,6 +19,15 @@ import {
   School,
   Award,
   SparkleIcon,
+  Info,
+  Stethoscope,
+  Eye,
+  Activity,
+  MapPin,
+  Bell,
+  ShieldCheck,
+  Target,
+  Lightbulb,
 } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { Footer } from "@/components/clinic/Footer";
@@ -101,6 +111,10 @@ const fadeUp: Variants = {
 };
 
 function DevPage() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <main className="min-h-screen bg-[#f7f4ee] font-sans flex flex-col justify-between">
       <div>
@@ -182,6 +196,156 @@ function DevPage() {
                   <div className="text-[10px] text-[color:var(--color-clinic-muted)] font-medium">Sekolah</div>
                   <div className="text-xs font-bold text-[color:var(--color-clinic-ink)]">SMK Wikrama Bogor</div>
                 </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Tentang Website / Platform Showcase Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 35 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="mb-16 rounded-[32px] border border-black/5 bg-white p-6 sm:p-10 shadow-[var(--shadow-clinic)] relative overflow-hidden"
+          >
+            <div className="text-center max-w-3xl mx-auto mb-10">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[color:var(--color-clinic-blue)]">
+                <Info className="h-3.5 w-3.5" /> Tentang Website & Platform
+              </span>
+              <h2 className="font-display text-2xl font-extrabold text-[color:var(--color-clinic-ink)] sm:text-3xl md:text-4xl mt-3 leading-tight">
+                Mengenal Platform <span className="text-[color:var(--color-clinic-blue)]">SiagaSehat</span>
+              </h2>
+              <p className="mt-3 text-xs sm:text-sm text-[color:var(--color-clinic-muted)] leading-relaxed">
+                SiagaSehat adalah platform kesehatan digital terpadu yang memadukan keandalan <strong>Kecerdasan Buatan (AI)</strong> dengan <strong>pendekatan manusiawi</strong>. Platform ini hadir sebagai garda terdepan untuk pertolongan kesehatan awal, analisis gejala medis, dan navigasi fasilitas kesehatan yang aman, cepat, dan mudah diakses oleh seluruh lapisan masyarakat Indonesia.
+              </p>
+            </div>
+
+            {/* Core Pillars / Mission */}
+            <div className="grid gap-4 sm:grid-cols-3 mb-10">
+              <div className="rounded-2xl bg-[#faf9f6] p-5 border border-black/[0.05] hover:border-[color:var(--color-clinic-blue)]/30 hover:bg-white transition-all">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] mb-3">
+                  <Target className="h-5 w-5" />
+                </div>
+                <h3 className="font-display text-base font-bold text-[color:var(--color-clinic-ink)]">
+                  Visi Triase Inklusif
+                </h3>
+                <p className="mt-1 text-xs text-[color:var(--color-clinic-muted)] leading-relaxed">
+                  Memberikan akses pertolongan awal dan evaluasi keluhan kesehatan secara merata tanpa kendala waktu dan jarak.
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-[#faf9f6] p-5 border border-black/[0.05] hover:border-[color:var(--color-clinic-blue)]/30 hover:bg-white transition-all">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] mb-3">
+                  <Lightbulb className="h-5 w-5" />
+                </div>
+                <h3 className="font-display text-base font-bold text-[color:var(--color-clinic-ink)]">
+                  Teknologi Berempati
+                </h3>
+                <p className="mt-1 text-xs text-[color:var(--color-clinic-muted)] leading-relaxed">
+                  Menyajikan komunikasi responsif yang ramah dan menenangkan pasien saat menghadapi situasi kesehatan.
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-[#faf9f6] p-5 border border-black/[0.05] hover:border-[color:var(--color-clinic-blue)]/30 hover:bg-white transition-all">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] mb-3">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <h3 className="font-display text-base font-bold text-[color:var(--color-clinic-ink)]">
+                  Keamanan & Privasi
+                </h3>
+                <p className="mt-1 text-xs text-[color:var(--color-clinic-muted)] leading-relaxed">
+                  Menjaga kerahasiaan data medis dan data pribadi pengguna dengan enkripsi serta standar infrastruktur aman.
+                </p>
+              </div>
+            </div>
+
+            {/* Fitur Utama Ekosistem Grid */}
+            <div className="border-t border-black/5 pt-8">
+              <h3 className="font-display text-center text-lg font-bold text-[color:var(--color-clinic-ink)] mb-6">
+                Ekosistem Fitur Utama SiagaSehat
+              </h3>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="flex items-start gap-3 rounded-2xl border border-black/[0.05] bg-white p-4 transition-all hover:border-[color:var(--color-clinic-blue)]/30 hover:shadow-xs">
+                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
+                    <Stethoscope className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-[color:var(--color-clinic-ink)]">Konsultasi AI Medis 24/7</h4>
+                    <p className="mt-0.5 text-[11px] text-[color:var(--color-clinic-muted)] leading-normal">
+                      Tanya jawab langsung dengan AI responsif untuk rekomendasi awal dan pertolongan pertama.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 rounded-2xl border border-black/[0.05] bg-white p-4 transition-all hover:border-[color:var(--color-clinic-blue)]/30 hover:shadow-xs">
+                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
+                    <Eye className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-[color:var(--color-clinic-ink)]">Scan Penyakit Visual (AI Vision)</h4>
+                    <p className="mt-0.5 text-[11px] text-[color:var(--color-clinic-muted)] leading-normal">
+                      Analisis citra visual fisik untuk mendeteksi indikasi kondisi kulit dan keluhan luar secara cepat.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 rounded-2xl border border-black/[0.05] bg-white p-4 transition-all hover:border-[color:var(--color-clinic-blue)]/30 hover:shadow-xs">
+                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
+                    <Activity className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-[color:var(--color-clinic-ink)]">Visualisasi Anatomi Interaktif</h4>
+                    <p className="mt-0.5 text-[11px] text-[color:var(--color-clinic-muted)] leading-normal">
+                      Panduan eksplorasi anatomi tubuh 3D/2D untuk memahami titik gangguan kesehatan.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 rounded-2xl border border-black/[0.05] bg-white p-4 transition-all hover:border-[color:var(--color-clinic-blue)]/30 hover:shadow-xs">
+                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
+                    <MapPin className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-[color:var(--color-clinic-ink)]">Peta Faskes & Rujukan</h4>
+                    <p className="mt-0.5 text-[11px] text-[color:var(--color-clinic-muted)] leading-normal">
+                      Pencarian lokasi rumah sakit, puskesmas, apotek terdekat dengan rute navigasi presisi.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 rounded-2xl border border-black/[0.05] bg-white p-4 transition-all hover:border-[color:var(--color-clinic-blue)]/30 hover:shadow-xs sm:col-span-2 lg:col-span-2">
+                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
+                    <Bell className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-[color:var(--color-clinic-ink)]">Pengingat Obat & Dosis Medis</h4>
+                    <p className="mt-0.5 text-[11px] text-[color:var(--color-clinic-muted)] leading-normal">
+                      Sistem pengingat konsumsi obat berkala untuk menjaga kepatuhan dan jadwal pengobatan pasien.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Fast Stats Bar */}
+            <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 rounded-2xl bg-[#f7f4ee] p-4 text-center border border-black/5">
+              <div>
+                <div className="font-display text-lg sm:text-xl font-black text-[color:var(--color-clinic-blue-dark)]">24/7</div>
+                <div className="text-[10px] sm:text-xs font-medium text-[color:var(--color-clinic-muted)]">Respon AI Medis</div>
+              </div>
+              <div>
+                <div className="font-display text-lg sm:text-xl font-black text-[color:var(--color-clinic-blue-dark)] inline-flex items-center justify-center gap-1.5">
+                  <Zap className="h-4 w-4 text-[color:var(--color-clinic-blue-dark)] fill-[color:var(--color-clinic-blue-dark)]" />
+                  <span>Fast</span>
+                </div>
+                <div className="text-[10px] sm:text-xs font-medium text-[color:var(--color-clinic-muted)]">Analisis Real-time</div>
+              </div>
+              <div>
+                <div className="font-display text-lg sm:text-xl font-black text-[color:var(--color-clinic-blue-dark)]">100%</div>
+                <div className="text-[10px] sm:text-xs font-medium text-[color:var(--color-clinic-muted)]">Akses Edukasi Gratis</div>
+              </div>
+              <div>
+                <div className="font-display text-lg sm:text-xl font-black text-[color:var(--color-clinic-blue-dark)]">BALITECH</div>
+                <div className="text-[10px] sm:text-xs font-medium text-[color:var(--color-clinic-muted)]">Ajang Inovasi 2026</div>
               </div>
             </div>
           </motion.div>

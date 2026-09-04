@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import { useInView } from "@/hooks/use-in-view";
 
@@ -120,15 +121,15 @@ export function Statement() {
         Dipercaya oleh masyarakat sejak 2026.
       </p>
 
-      <a
-        href="#about"
+      <Link
+        to="/dev"
         className="mt-4 inline-flex items-center gap-2 rounded-full border border-black/15 py-2 pl-6 pr-2 text-sm font-medium text-[color:var(--color-clinic-ink)] transition hover:bg-black/5"
       >
         Lebih lanjut tentang kami
         <span className="grid h-8 w-8 place-items-center rounded-full bg-[color:var(--color-clinic-ink)] text-white">
           <ArrowUpRight className="h-3.5 w-3.5" />
         </span>
-      </a>
+      </Link>
     </section>
   );
 }
