@@ -50,10 +50,10 @@ export const Route = createFileRoute("/dev")({
 const TEAM_MEMBERS = [
   {
     name: "Raffasya Javas Niscala Widjaja",
-    role: "Lead Developer & System Architect",
-    specialty: "Fullstack Architecture & AI Integration",
-    skills: ["React 19", "Vite", "AI Integration", "TypeScript", "TanStack Router"],
-    bio: "Merancang arsitektur sistem SiagaSehat, mengembangkan fitur utama dan integrasi AI, serta merancang antarmuka yang responsif, intuitif, dan adaptif terhadap kebutuhan pengguna.",
+    role: "Lead System Architect & AI Integration Engineer",
+    specialty: "Fullstack Architecture & Medical AI",
+    skills: ["React 19", "Vite", "TypeScript", "AI Integration", "TanStack Router", "Fullstack System"],
+    bio: "Merancang arsitektur utama platform SiagaSehat, mengintegrasikan inferensi AI (Gemini Vision & LLM Medis), membangun pertukaran data real-time, serta mengarahkan standar teknis rekayasa perangkat lunak.",
     icon: Terminal,
     avatar: "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Raffasya%20Javas%20Niscala%20Widjaja.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvUmFmZmFzeWEgSmF2YXMgTmlzY2FsYSBXaWRqYWphLmF2aWYiLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4MjI3NzAyLCJleHAiOjE4MTk3NjM3MDJ9.HIn4-zAuQTHyk4wTnhzjkyE54v1QpsW72CDghC1GaYg",
     gradient: "from-blue-600 to-indigo-700",
@@ -61,7 +61,7 @@ const TEAM_MEMBERS = [
   },
   {
     name: "Ahmad Rhezki Prasetya",
-    role: "UI/UX & Lead Frontend Engineer",
+    role: "UI/UX Designer & Lead Frontend Engineer",
     specialty: "Frontend Architecture & Motion UX",
     skills: ["React 19", "Tailwind CSS", "UI/UX Design", "Framer Motion", "Component System", "Responsive Layouts"],
     bio: "Merancang antarmuka pengguna (UI/UX) berstandar tinggi, mengimplementasikan sistem komponen interaktif, transisi mikro dinamis, serta mengoptimalkan performa tata letak yang responsif di seluruh perangkat.",
@@ -72,10 +72,10 @@ const TEAM_MEMBERS = [
   },
   {
     name: "Muhamad Fedliansyah Ilham",
-    role: "Backend & Database Engineer",
-    specialty: "Data Pipeline & Infrastructure",
-    skills: ["Supabase", "PostgreSQL", "API Security", "Patient Data Flow", "Auth Systems"],
-    bio: "Mengelola keandalan data klinis, infrastruktur autentikasi aman, serta performa pertukaran data triase medis.",
+    role: "Lead Backend & Cloud Infrastructure Engineer",
+    specialty: "Database Security & Data Pipeline",
+    skills: ["Supabase", "PostgreSQL", "API Security", "Database Architecture", "Auth Systems", "Data Pipeline"],
+    bio: "Mengarsitekturi infrastruktur database PostgreSQL & Supabase, membangun sistem autentikasi aman, mengelola alur data triase medis, serta menjamin keandalan dan keamanan data pasien secara komprehensif.",
     icon: Database,
     avatar: "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Muhamad%20Fedliansyah%20Ilham.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvTXVoYW1hZCBGZWRsaWFuc3lhaCBJbGhhbS5hdmlmIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODIyNzc2NiwiZXhwIjoxODE5NzYzNzY2fQ.6TKpgDEEZ5tktyEv_ZB-WkIcPda0jjbc3rYtlDEPPv4",
     gradient: "from-violet-600 to-purple-700",
