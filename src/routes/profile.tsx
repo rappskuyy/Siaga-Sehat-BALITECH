@@ -230,7 +230,7 @@ function ProfilePage() {
     <main className="min-h-screen bg-[#f7f4ee] pb-16 font-sans">
       <SiteHeader />
 
-      <div className="mx-auto max-w-4xl px-4 pt-4 sm:pt-6 md:px-6">
+      <div className="mx-auto max-w-4xl px-4 pt-4 sm:pt-6 md:px-6 w-full overflow-hidden">
         {/* Profile hero card — avatar, name, email and mobile quick actions */}
         <div className="overflow-hidden rounded-3xl border border-black/5 bg-[color:var(--color-clinic-blue)] shadow-[var(--shadow-clinic)]">
           <div className="relative px-5 py-6 sm:px-8 sm:py-7">
@@ -304,11 +304,11 @@ function ProfilePage() {
         </div>
 
         {/* Mobile Navigation Segmented Tabs (Visible on screens < 1024px) */}
-        <div className="mt-4 flex items-center gap-1 rounded-2xl bg-white p-1.5 shadow-[var(--shadow-clinic)] lg:hidden overflow-x-auto">
+        <div className="mt-4 grid grid-cols-4 gap-1 rounded-2xl bg-white p-1.5 shadow-[var(--shadow-clinic)] lg:hidden text-center">
           <button
             type="button"
             onClick={() => setMobileTab("semua")}
-            className={`flex-1 min-w-[65px] rounded-xl py-2 px-2 text-center text-xs font-bold transition select-none cursor-pointer ${
+            className={`rounded-xl py-2 px-1 text-center text-[11px] sm:text-xs font-bold transition select-none cursor-pointer truncate ${
               mobileTab === "semua"
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-xs"
                 : "text-[color:var(--color-clinic-muted)] hover:bg-[color:var(--color-clinic-blue-soft)]/50"
@@ -319,47 +319,47 @@ function ProfilePage() {
           <button
             type="button"
             onClick={() => setMobileTab("data")}
-            className={`flex-1 min-w-[95px] rounded-xl py-2 px-2 text-center text-xs font-bold transition select-none cursor-pointer ${
+            className={`rounded-xl py-2 px-1 text-center text-[11px] sm:text-xs font-bold transition select-none cursor-pointer truncate ${
               mobileTab === "data"
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-xs"
                 : "text-[color:var(--color-clinic-muted)] hover:bg-[color:var(--color-clinic-blue-soft)]/50"
             }`}
           >
-            Data Kesehatan
+            Data
           </button>
           <button
             type="button"
             onClick={() => setMobileTab("scan")}
-            className={`flex-1 min-w-[85px] rounded-xl py-2 px-2 text-center text-xs font-bold transition select-none cursor-pointer ${
+            className={`rounded-xl py-2 px-1 text-center text-[11px] sm:text-xs font-bold transition select-none cursor-pointer truncate ${
               mobileTab === "scan"
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-xs"
                 : "text-[color:var(--color-clinic-muted)] hover:bg-[color:var(--color-clinic-blue-soft)]/50"
             }`}
           >
-            Riwayat Scan
+            Scan
           </button>
           <button
             type="button"
             onClick={() => setMobileTab("anatomy")}
-            className={`flex-1 min-w-[95px] rounded-xl py-2 px-2 text-center text-xs font-bold transition select-none cursor-pointer ${
+            className={`rounded-xl py-2 px-1 text-center text-[11px] sm:text-xs font-bold transition select-none cursor-pointer truncate ${
               mobileTab === "anatomy"
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-xs"
                 : "text-[color:var(--color-clinic-muted)] hover:bg-[color:var(--color-clinic-blue-soft)]/50"
             }`}
           >
-            Riwayat Anatomi
+            Anatomi
           </button>
         </div>
 
-        <div className="mt-4 sm:mt-6 grid gap-5 sm:gap-6 lg:grid-cols-[1fr_1.2fr]">
+        <div className="mt-4 sm:mt-6 grid gap-5 sm:gap-6 lg:grid-cols-[1fr_1.2fr] w-full">
           {/* Edit profile form */}
           <div
-            className={`rounded-3xl border border-black/5 bg-white p-5 sm:p-6 shadow-[var(--shadow-clinic)] ${
+            className={`rounded-3xl border border-black/5 bg-white p-4 sm:p-6 shadow-[var(--shadow-clinic)] w-full overflow-hidden ${
               mobileTab === "semua" || mobileTab === "data" ? "block" : "hidden lg:block"
             }`}
           >
             <div className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] shrink-0">
                 <UserIcon className="h-4 w-4" />
               </span>
               <div>
@@ -372,22 +372,22 @@ function ProfilePage() {
               </div>
             </div>
 
-            <form onSubmit={handleSave} className="mt-4 sm:mt-5 flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
+            <form onSubmit={handleSave} className="mt-4 sm:mt-5 flex flex-col gap-4 w-full">
+              <div className="flex flex-col gap-1.5 w-full">
                 <Label htmlFor="fullName">Nama Lengkap</Label>
                 <Input
                   id="fullName"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Nama kamu"
-                  className="h-10 text-sm"
+                  className="h-10 text-sm w-full"
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              <div className="grid grid-cols-3 gap-1.5 sm:gap-3 w-full">
                 <div className="flex flex-col gap-1.5 min-w-0">
-                  <Label htmlFor="height" className="flex items-center gap-1 text-[11px] sm:text-xs truncate">
-                    <Ruler className="h-3.5 w-3.5 shrink-0" /> Tinggi (cm)
+                  <Label htmlFor="height" className="flex items-center gap-1 text-[10px] sm:text-xs truncate">
+                    <Ruler className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" /> Tinggi (cm)
                   </Label>
                   <Input
                     id="height"
@@ -395,12 +395,12 @@ function ProfilePage() {
                     min={0}
                     value={heightCm}
                     onChange={(e) => setHeightCm(e.target.value)}
-                    className="h-10 text-xs sm:text-sm px-2 sm:px-3"
+                    className="h-10 text-xs sm:text-sm px-2 sm:px-3 w-full"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5 min-w-0">
-                  <Label htmlFor="weight" className="flex items-center gap-1 text-[11px] sm:text-xs truncate">
-                    <Weight className="h-3.5 w-3.5 shrink-0" /> Berat (kg)
+                  <Label htmlFor="weight" className="flex items-center gap-1 text-[10px] sm:text-xs truncate">
+                    <Weight className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" /> Berat (kg)
                   </Label>
                   <Input
                     id="weight"
@@ -408,12 +408,12 @@ function ProfilePage() {
                     min={0}
                     value={weightKg}
                     onChange={(e) => setWeightKg(e.target.value)}
-                    className="h-10 text-xs sm:text-sm px-2 sm:px-3"
+                    className="h-10 text-xs sm:text-sm px-2 sm:px-3 w-full"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5 min-w-0">
-                  <Label htmlFor="age" className="flex items-center gap-1 text-[11px] sm:text-xs truncate">
-                    <Calendar className="h-3.5 w-3.5 shrink-0" /> Umur
+                  <Label htmlFor="age" className="flex items-center gap-1 text-[10px] sm:text-xs truncate">
+                    <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" /> Umur
                   </Label>
                   <Input
                     id="age"
@@ -421,20 +421,20 @@ function ProfilePage() {
                     min={0}
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
-                    className="h-10 text-xs sm:text-sm px-2 sm:px-3"
+                    className="h-10 text-xs sm:text-sm px-2 sm:px-3 w-full"
                   />
                 </div>
               </div>
 
               {bmi && (
-                <p className="rounded-xl bg-[color:var(--color-clinic-blue-soft)] px-3 py-2 text-xs sm:text-sm text-[color:var(--color-clinic-ink)] font-medium">
+                <p className="rounded-xl bg-[color:var(--color-clinic-blue-soft)] px-3 py-2 text-xs sm:text-sm text-[color:var(--color-clinic-ink)] font-medium w-full">
                   Estimasi BMI: <span className="font-bold text-[color:var(--color-clinic-blue)]">{bmi}</span>
                 </p>
               )}
 
               {message && (
                 <p
-                  className={`rounded-xl px-3 py-2 text-xs sm:text-sm ${
+                  className={`rounded-xl px-3 py-2 text-xs sm:text-sm w-full ${
                     message.startsWith("Gagal")
                       ? "bg-red-50 text-red-600"
                       : "bg-emerald-50 text-emerald-700 font-medium"
@@ -447,7 +447,7 @@ function ProfilePage() {
               <Button
                 type="submit"
                 disabled={saving}
-                className="mt-1 gap-2 rounded-full bg-[color:var(--color-clinic-blue)] py-5 text-sm font-semibold hover:bg-[color:var(--color-clinic-blue-dark)] cursor-pointer"
+                className="w-full mt-1 gap-2 rounded-full bg-[color:var(--color-clinic-blue)] py-5 text-sm font-semibold hover:bg-[color:var(--color-clinic-blue-dark)] cursor-pointer"
               >
                 <Save className="h-4 w-4" /> {saving ? "Menyimpan..." : "Simpan Perubahan"}
               </Button>
