@@ -585,43 +585,47 @@ export function DedicatedMapsView() {
           </div>
 
           {/* Mobile View Toggle Bar (Responsive Segment Switcher) */}
-          <div className="flex lg:hidden items-center p-1 bg-[#EBF5FB] rounded-2xl border border-[#C3DFF0] shadow-2xs gap-1">
+          <div
+            className={`grid lg:hidden p-1 bg-[#EBF5FB] rounded-2xl border border-[#C3DFF0] shadow-2xs gap-1.5 ${
+              selectedPharmacy ? "grid-cols-3" : "grid-cols-2"
+            }`}
+          >
             <button
               type="button"
               onClick={() => setMobileTab("map")}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
+              className={`flex items-center justify-center gap-1.5 h-9 px-2 text-xs font-bold rounded-xl transition-all cursor-pointer border select-none ${
                 mobileTab === "map"
-                  ? "bg-[#379FD2] text-white shadow-sm"
-                  : "bg-white/70 text-[#379FD2] border border-[#C3DFF0] hover:bg-white"
+                  ? "bg-[#379FD2] text-white border-[#379FD2] shadow-xs font-extrabold"
+                  : "bg-white/80 text-[#379FD2] border-[#C3DFF0]/60 hover:bg-white hover:border-[#C3DFF0]"
               }`}
             >
-              <Compass className="h-4 w-4" />
-              Peta Navigasi
+              <Compass className="h-4 w-4 shrink-0" />
+              <span className="truncate">Peta Navigasi</span>
             </button>
             <button
               type="button"
               onClick={() => setMobileTab("list")}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
+              className={`flex items-center justify-center gap-1.5 h-9 px-2 text-xs font-bold rounded-xl transition-all cursor-pointer border select-none ${
                 mobileTab === "list"
-                  ? "bg-[#379FD2] text-white shadow-sm"
-                  : "bg-white/70 text-[#379FD2] border border-[#C3DFF0] hover:bg-white"
+                  ? "bg-[#379FD2] text-white border-[#379FD2] shadow-xs font-extrabold"
+                  : "bg-white/80 text-[#379FD2] border-[#C3DFF0]/60 hover:bg-white hover:border-[#C3DFF0]"
               }`}
             >
-              <Building2 className="h-4 w-4" />
-              Daftar ({pharmacies.length})
+              <Building2 className="h-4 w-4 shrink-0" />
+              <span className="truncate">Daftar Fasilitas ({pharmacies.length})</span>
             </button>
             {selectedPharmacy && (
               <button
                 type="button"
                 onClick={() => setMobileTab("detail")}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
+                className={`flex items-center justify-center gap-1.5 h-9 px-2 text-xs font-bold rounded-xl transition-all cursor-pointer border select-none ${
                   mobileTab === "detail"
-                    ? "bg-[#F59E0B] text-white shadow-sm"
-                    : "bg-white/70 text-[#F59E0B] border border-amber-200 hover:bg-white"
+                    ? "bg-[#F59E0B] text-white border-[#F59E0B] shadow-xs font-extrabold"
+                    : "bg-white/80 text-[#D97706] border-amber-200/80 hover:bg-white hover:border-amber-300"
                 }`}
               >
-                <Info className="h-4 w-4" />
-                Detail
+                <Info className="h-4 w-4 shrink-0" />
+                <span className="truncate">Detail</span>
               </button>
             )}
           </div>

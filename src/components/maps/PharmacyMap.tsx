@@ -603,30 +603,30 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
         </div>
 
         {/* Mobile View Toggle Bar (Only visible on mobile screens) */}
-        <div className="flex lg:hidden items-center p-1 bg-[#EBF5FB] rounded-2xl border border-[#C3DFF0] mb-2 shadow-2xs gap-1">
+        <div className="grid grid-cols-2 lg:hidden p-1 bg-[#EBF5FB] rounded-2xl border border-[#C3DFF0] mb-2 shadow-2xs gap-1.5">
           <button
             type="button"
             onClick={() => setMobileTab("map")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 h-9 px-2 sm:px-3 text-xs font-bold rounded-xl transition-all cursor-pointer border select-none ${
               mobileTab === "map"
-                ? "bg-[#379FD2] text-white shadow-sm"
-                : "bg-white/70 text-[#379FD2] border border-[#C3DFF0] hover:bg-white"
+                ? "bg-[#379FD2] text-white border-[#379FD2] shadow-xs font-extrabold"
+                : "bg-white/80 text-[#379FD2] border-[#C3DFF0]/60 hover:bg-white hover:border-[#C3DFF0]"
             }`}
           >
-            <Compass className="h-4 w-4" />
-            Peta Navigasi
+            <Compass className="h-4 w-4 shrink-0" />
+            <span className="truncate">Peta Navigasi</span>
           </button>
           <button
             type="button"
             onClick={() => setMobileTab("list")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 h-9 px-2 sm:px-3 text-xs font-bold rounded-xl transition-all cursor-pointer border select-none ${
               mobileTab === "list"
-                ? "bg-[#379FD2] text-white shadow-sm"
-                : "bg-white/70 text-[#379FD2] border border-[#C3DFF0] hover:bg-white"
+                ? "bg-[#379FD2] text-white border-[#379FD2] shadow-xs font-extrabold"
+                : "bg-white/80 text-[#379FD2] border-[#C3DFF0]/60 hover:bg-white hover:border-[#C3DFF0]"
             }`}
           >
-            <Building2 className="h-4 w-4" />
-            Daftar Fasilitas ({pharmacies.length})
+            <Building2 className="h-4 w-4 shrink-0" />
+            <span className="truncate">Daftar Fasilitas ({pharmacies.length})</span>
           </button>
         </div>
 
