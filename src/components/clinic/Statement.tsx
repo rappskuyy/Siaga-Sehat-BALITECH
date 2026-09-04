@@ -4,9 +4,9 @@ import { ArrowUpRight, Sparkles } from "lucide-react";
 import { useInView } from "@/hooks/use-in-view";
 
 const AVATARS = [
-  "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=60&h=60&fit=crop&crop=faces",
-  "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=60&h=60&fit=crop&crop=faces",
-  "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=60&h=60&fit=crop&crop=faces",
+  "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Raffasya%20Javas%20Niscala%20Widjaja.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvUmFmZmFzeWEgSmF2YXMgTmlzY2FsYSBXaWRqYWphLmF2aWYiLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4MjI3NzAyLCJleHAiOjE4MTk3NjM3MDJ9.HIn4-zAuQTHyk4wTnhzjkyE54v1QpsW72CDghC1GaYg",
+  "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Ahmad%20Rhezki%20Prasetya.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvQWhtYWQgUmhlemtpIFByYXNldHlhLmF2aWYiLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4MjI3NzgxLCJleHAiOjE4MTk3NjM3ODF9.uR1PPi7HtQUaEIJ9fvWg7xhQOh8XttTFQEn6cYOaKV8",
+  "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Muhamad%20Fedliansyah%20Ilham.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvTXVoYW1hZCBGZWRsaWFuc3lhaCBJbGhhbS5hdmlmIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODIyNzc2NiwiZXhwIjoxODE5NzYzNzY2fQ.6TKpgDEEZ5tktyEv_ZB-WkIcPda0jjbc3rYtlDEPPv4",
 ];
 
 type Segment =
