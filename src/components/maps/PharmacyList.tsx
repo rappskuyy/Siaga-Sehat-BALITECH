@@ -124,7 +124,7 @@ export function PharmacyList({
       <div className="flex items-center justify-between shrink-0 pb-1.5 border-b border-[#E5E7EB]">
         <div>
           <h4 className="text-xs font-bold uppercase tracking-wider text-[#111111] flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-[#379FD2]" />
+            <span className="h-2 w-2 rounded-full bg-[#4a6fa5]" />
             Daftar Fasilitas ({processedPharmacies.length})
           </h4>
           <p className="text-[10px] text-[#6B7280] mt-0.5">
@@ -136,7 +136,7 @@ export function PharmacyList({
           <button
             type="button"
             onClick={() => onSelectPharmacy(null)}
-            className="text-[11px] font-semibold text-[#379FD2] hover:text-[#5BB4E0] flex items-center gap-1 shrink-0 transition cursor-pointer"
+            className="text-[11px] font-semibold text-[#4a6fa5] hover:text-[#35517d] flex items-center gap-1 shrink-0 transition cursor-pointer"
           >
             <X className="h-3 w-3" /> Bersihkan
           </button>
@@ -155,8 +155,8 @@ export function PharmacyList({
             }}
             className={`inline-flex items-center justify-center rounded-xl px-2.5 py-1.5 text-[11px] font-semibold transition shrink-0 cursor-pointer ${
               typeFilter === "all"
-                ? "bg-[#379FD2] text-[#FFFFFF] shadow-xs"
-                : "bg-[#F7F9FB] text-[#6B7280] hover:bg-[#ABE2FE]/20 hover:text-[#379FD2] border border-[#E5E7EB]"
+                ? "bg-[#4a6fa5] text-[#FFFFFF] shadow-xs"
+                : "bg-[#F7F9FB] text-[#6B7280] hover:bg-[#eef2f8] hover:text-[#4a6fa5] border border-[#E5E7EB]"
             }`}
           >
             Semua ({pharmacies.length})
@@ -191,8 +191,8 @@ export function PharmacyList({
             }}
             className={`inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 text-[11px] font-bold transition shrink-0 cursor-pointer ${
               typeFilter === "pharmacy"
-                ? "bg-[#379FD2] text-[#FFFFFF] shadow-xs"
-                : "bg-blue-50 text-[#379FD2] hover:bg-blue-100 border border-blue-200"
+                ? "bg-[#4a6fa5] text-[#FFFFFF] shadow-xs"
+                : "bg-blue-50 text-[#4a6fa5] hover:bg-blue-100 border border-blue-200"
             }`}
           >
             <Pill className="h-3.5 w-3.5" />
@@ -235,8 +235,8 @@ export function PharmacyList({
                   }}
                   className={`inline-flex items-center justify-center rounded-lg px-2 py-0.5 text-[10px] font-semibold transition shrink-0 cursor-pointer ${
                     isRadiusActive
-                      ? "bg-[#ABE2FE] text-[#379FD2] font-bold border border-[#5BB4E0]/40"
-                      : "bg-[#F7F9FB] text-[#6B7280] hover:bg-[#ABE2FE]/20 border border-[#E5E7EB]"
+                      ? "bg-[#eef2f8] text-[#4a6fa5] font-bold border border-[#d1def0]"
+                      : "bg-[#F7F9FB] text-[#6B7280] hover:bg-[#eef2f8] border border-[#E5E7EB]"
                   }`}
                 >
                   {label}
@@ -252,11 +252,11 @@ export function PharmacyList({
         onWheel={(e) => e.stopPropagation()}
         onTouchMove={(e) => e.stopPropagation()}
         onPointerDown={(e) => e.stopPropagation()}
-        className="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto pr-1 touch-pan-y overscroll-contain scrollbar-thin scrollbar-thumb-[#379FD2]/30"
+        className="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto pr-1 pb-24 lg:pb-0 touch-pan-y overscroll-contain scrollbar-thin scrollbar-thumb-[#4a6fa5]/30"
       >
         {loadingPharmacies ? (
           <div className="space-y-2.5 py-2">
-            <div className="text-center py-1 text-xs text-[#379FD2] font-medium animate-pulse">
+            <div className="text-center py-1 text-xs text-[#4a6fa5] font-medium animate-pulse">
               Memuat data fasilitas terdekat...
             </div>
             {[1, 2, 3].map((n) => (
@@ -270,7 +270,7 @@ export function PharmacyList({
               <button
                 type="button"
                 onClick={() => setMaxRadius(null)}
-                className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#379FD2] hover:underline cursor-pointer"
+                className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#4a6fa5] hover:underline cursor-pointer"
               >
                 Tampilkan Semua Jarak
               </button>
@@ -301,12 +301,12 @@ export function PharmacyList({
                       ? "bg-red-50/80 border-[#EF4444] shadow-sm"
                       : isClinic
                       ? "bg-amber-50/80 border-[#F59E0B] shadow-sm"
-                      : "bg-blue-50/80 border-[#379FD2] shadow-sm"
+                      : "bg-blue-50/80 border-[#4a6fa5] shadow-sm"
                     : isHospital
                     ? "bg-[#FFFFFF] border-red-100 hover:border-red-300 hover:bg-red-50/30 shadow-2xs"
                     : isClinic
                     ? "bg-[#FFFFFF] border-amber-100 hover:border-amber-300 hover:bg-amber-50/30 shadow-2xs"
-                    : "bg-[#FFFFFF] border-[#E5E7EB] hover:border-[#379FD2]/60 hover:bg-blue-50/20 shadow-2xs"
+                    : "bg-[#FFFFFF] border-[#E5E7EB] hover:border-[#4a6fa5]/60 hover:bg-blue-50/20 shadow-2xs"
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
@@ -323,8 +323,8 @@ export function PharmacyList({
                             ? "bg-[#F59E0B] text-[#FFFFFF] shadow-xs"
                             : "bg-amber-100 text-[#D97706] border border-amber-200"
                           : isSelected
-                          ? "bg-[#379FD2] text-[#FFFFFF] shadow-xs"
-                          : "bg-blue-50 text-[#379FD2] border border-blue-200"
+                          ? "bg-[#4a6fa5] text-[#FFFFFF] shadow-xs"
+                          : "bg-blue-50 text-[#4a6fa5] border border-blue-200"
                       }`}
                     >
                       {isHospital ? (
@@ -347,7 +347,7 @@ export function PharmacyList({
                               ? "bg-red-50 text-[#EF4444] border-red-200"
                               : isClinic
                               ? "bg-amber-50 text-[#D97706] border-amber-200"
-                              : "bg-blue-50 text-[#379FD2] border-blue-200"
+                              : "bg-blue-50 text-[#4a6fa5] border-blue-200"
                           }`}
                         >
                           {isHospital ? (
@@ -367,9 +367,9 @@ export function PharmacyList({
 
                       <div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#6B7280] flex-wrap">
                         {pharm.rating && (
-                          <span className="flex items-center gap-0.5 font-bold text-[#379FD2]">
+                          <span className="flex items-center gap-0.5 font-bold text-[#4a6fa5]">
                             {pharm.rating}{" "}
-                            <Star className="h-3 w-3 fill-[#379FD2] text-[#379FD2] inline" />
+                            <Star className="h-3 w-3 fill-[#4a6fa5] text-[#4a6fa5] inline" />
                           </span>
                         )}
                         {pharm.userRatingsTotal && (
@@ -391,7 +391,7 @@ export function PharmacyList({
                             <AlertCircle className="h-2.5 w-2.5" /> Tutup
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 font-semibold text-[#FFFFFF] bg-[#379FD2] px-2 py-0.5 rounded-full text-[9px]">
+                          <span className="inline-flex items-center gap-1 font-semibold text-[#FFFFFF] bg-[#4a6fa5] px-2 py-0.5 rounded-full text-[9px]">
                             <CheckCircle2 className="h-2.5 w-2.5" /> Buka
                           </span>
                         )}
@@ -409,7 +409,7 @@ export function PharmacyList({
                         ? "bg-red-50 text-[#EF4444] border-red-200"
                         : isClinic
                         ? "bg-amber-50 text-[#D97706] border-amber-200"
-                        : "bg-blue-50 text-[#379FD2] border-blue-200"
+                        : "bg-blue-50 text-[#4a6fa5] border-blue-200"
                     }`}
                   >
                     {pharm.distanceKm} km
@@ -419,8 +419,8 @@ export function PharmacyList({
                 {/* Jam Operasional Text & Schedule Toggle */}
                 <div className="mt-2 flex items-center justify-between border-t border-[#E5E7EB] pt-1.5 text-[11px]">
                   {pharm.openingHoursText && (
-                    <span className="flex items-center gap-1 font-medium text-[#379FD2] text-[10px]">
-                      <Clock className="h-3 w-3 shrink-0 text-[#5BB4E0]" />
+                    <span className="flex items-center gap-1 font-medium text-[#4a6fa5] text-[10px]">
+                      <Clock className="h-3 w-3 shrink-0 text-[#35517d]" />
                       <span className="line-clamp-1">{pharm.openingHoursText}</span>
                     </span>
                   )}
@@ -432,7 +432,7 @@ export function PharmacyList({
                         e.stopPropagation();
                         setExpandedScheduleId(isScheduleOpen ? null : pharm.id);
                       }}
-                      className="text-[10px] font-semibold text-[#379FD2] hover:text-[#5BB4E0] flex items-center gap-0.5 transition cursor-pointer"
+                      className="text-[10px] font-semibold text-[#4a6fa5] hover:text-[#35517d] flex items-center gap-0.5 transition cursor-pointer"
                     >
                       {isScheduleOpen ? "Tutup Jadwal" : "Jadwal Lengkap"}
                       {isScheduleOpen ? (
@@ -450,8 +450,8 @@ export function PharmacyList({
                     onClick={(e) => e.stopPropagation()}
                     className="mt-2 rounded-xl bg-[#F7F9FB] p-2.5 text-[10px] text-[#6B7280] space-y-1 border border-[#E5E7EB] animate-fade-in text-left"
                   >
-                    <span className="font-bold text-[#111111] block mb-1">
-                      📅 Jam Operasional:
+                    <span className="font-bold text-[#111111] flex items-center gap-1 mb-1">
+                      <Clock className="h-3 w-3 text-[#4a6fa5]" /> Jam Operasional:
                     </span>
                     {(pharm.operatingHours?.weekdayText ?? []).map((text: string, i: number) => (
                       <div key={i} className="flex items-center justify-between">
@@ -470,7 +470,7 @@ export function PharmacyList({
           <button
             type="button"
             onClick={() => setShowAllItems(!showAllItems)}
-            className="flex items-center justify-center gap-1.5 w-full py-2 px-3 text-xs font-semibold text-[#379FD2] bg-[#F7F9FB] hover:bg-[#ABE2FE]/20 rounded-xl border border-[#E5E7EB] transition shrink-0 cursor-pointer"
+            className="flex items-center justify-center gap-1.5 w-full py-2 px-3 text-xs font-semibold text-[#4a6fa5] bg-[#F7F9FB] hover:bg-[#eef2f8] rounded-xl border border-[#E5E7EB] transition shrink-0 cursor-pointer"
           >
             {showAllItems ? (
               <>
@@ -533,7 +533,7 @@ export function RouteOverlayCard({
           <div className="flex items-center gap-1.5 mb-1 flex-wrap">
             <span
               className={`inline-block rounded-full px-2.5 py-0.5 text-[9px] font-bold text-[#FFFFFF] shadow-xs ${
-                isHospital ? "bg-[#EF4444]" : isClinic ? "bg-[#F59E0B]" : "bg-[#379FD2]"
+                isHospital ? "bg-[#EF4444]" : isClinic ? "bg-[#F59E0B]" : "bg-[#4a6fa5]"
               }`}
             >
               {isHospital ? (
@@ -556,16 +556,16 @@ export function RouteOverlayCard({
 
           <div className="mt-0.5 flex items-center gap-1.5 text-[10px] text-[#6B7280] flex-wrap">
             {selectedPlace.rating && (
-              <span className="flex items-center gap-0.5 font-bold text-[#379FD2]">
+              <span className="flex items-center gap-0.5 font-bold text-[#4a6fa5]">
                 {selectedPlace.rating}{" "}
-                <Star className="h-2.5 w-2.5 fill-[#379FD2] text-[#379FD2] inline" />
+                <Star className="h-2.5 w-2.5 fill-[#4a6fa5] text-[#4a6fa5] inline" />
               </span>
             )}
             {selectedPlace.userRatingsTotal && (
               <span>({selectedPlace.userRatingsTotal})</span>
             )}
             {selectedPlace.rating && <span>•</span>}
-            <span className={`font-semibold ${isHospital ? "text-[#EF4444]" : "text-[#379FD2]"}`}>
+            <span className={`font-semibold ${isHospital ? "text-[#EF4444]" : "text-[#4a6fa5]"}`}>
               {isHospital ? "Pelayanan IGD 24 Jam" : (selectedPlace.openingHoursText || "Buka")}
             </span>
           </div>
@@ -574,7 +574,7 @@ export function RouteOverlayCard({
         <button
           type="button"
           onClick={onClose}
-          className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#FFFFFF] text-[#6B7280] hover:bg-[#ABE2FE]/30 hover:text-[#379FD2] transition border border-[#E5E7EB] cursor-pointer"
+          className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#FFFFFF] text-[#6B7280] hover:bg-[#eef2f8] hover:text-[#4a6fa5] transition border border-[#E5E7EB] cursor-pointer"
           title="Tutup Kartu"
         >
           <X className="h-3.5 w-3.5" />
@@ -583,7 +583,7 @@ export function RouteOverlayCard({
 
       {/* Address */}
       <p className="text-[10px] text-[#6B7280] line-clamp-2 flex items-center gap-1">
-        <MapPin className="h-3 w-3 text-[#379FD2] shrink-0" /> {selectedPlace.address}
+        <MapPin className="h-3 w-3 text-[#4a6fa5] shrink-0" /> {selectedPlace.address}
       </p>
 
       {/* Mode Selector */}
@@ -593,7 +593,7 @@ export function RouteOverlayCard({
           onClick={() => onTransportModeChange("driving")}
           className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1 text-[11px] font-semibold transition cursor-pointer ${
             transportMode === "driving"
-              ? "bg-[#ABE2FE]/30 text-[#379FD2] border border-[#5BB4E0]/40 font-bold"
+              ? "bg-[#eef2f8] text-[#4a6fa5] border border-[#d1def0] font-bold"
               : "text-[#6B7280] hover:text-[#111111]"
           }`}
         >
@@ -605,7 +605,7 @@ export function RouteOverlayCard({
           onClick={() => onTransportModeChange("motorcycle")}
           className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1 text-[11px] font-semibold transition cursor-pointer ${
             transportMode === "motorcycle"
-              ? "bg-[#ABE2FE]/30 text-[#379FD2] border border-[#5BB4E0]/40 font-bold"
+              ? "bg-[#eef2f8] text-[#4a6fa5] border border-[#d1def0] font-bold"
               : "text-[#6B7280] hover:text-[#111111]"
           }`}
         >
@@ -618,13 +618,13 @@ export function RouteOverlayCard({
       <div className="grid grid-cols-2 gap-2 rounded-xl bg-[#FFFFFF] p-2 text-xs border border-[#E5E7EB]">
         <div>
           <span className="block text-[9px] text-[#6B7280] font-medium">Jarak Estimasi</span>
-          <span className="font-bold text-[#379FD2] text-xs">
+          <span className="font-bold text-[#4a6fa5] text-xs">
             {routeInfo ? `${routeInfo.distanceKm} km` : `~${selectedPlace.distanceKm} km`}
           </span>
         </div>
         <div>
           <span className="block text-[9px] text-[#6B7280] font-medium">Waktu Tempuh (ETA)</span>
-          <span className="font-bold text-[#379FD2] text-xs">
+          <span className="font-bold text-[#4a6fa5] text-xs">
             {loadingRoute ? "Menghitung..." : routeInfo ? `~${routeInfo.durationMin} menit` : "Siap rute"}
           </span>
         </div>

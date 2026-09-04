@@ -42,9 +42,11 @@ export function OpenStreetMapCanvas({
       if (!isMountedRef.current || !mapContainerRef.current) return;
 
       if (!leafletMapRef.current) {
-        const initialCenter: [number, number] = selectedPharmacy
+        const initialCenter: [number, number] = userLocation
+          ? userLocation
+          : selectedPharmacy
           ? [selectedPharmacy.lat, selectedPharmacy.lon]
-          : userLocation || DEFAULT_CENTER;
+          : DEFAULT_CENTER;
 
         const map = L.map(mapContainerRef.current, {
           zoomControl: false,
@@ -115,8 +117,8 @@ export function OpenStreetMapCanvas({
           className: "custom-user-pin",
           html: `
             <div style="position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
-              <div style="position: absolute; width: 28px; height: 28px; border-radius: 50%; background: rgba(37, 99, 235, 0.3); animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
-              <div style="width: 18px; height: 18px; border-radius: 50%; background: #2563EB; border: 3px solid #FFFFFF; box-shadow: 0 2px 8px rgba(37,99,235,0.5);"></div>
+              <div style="position: absolute; width: 28px; height: 28px; border-radius: 50%; background: rgba(74, 111, 165, 0.3); animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+              <div style="width: 18px; height: 18px; border-radius: 50%; background: #4a6fa5; border: 3px solid #FFFFFF; box-shadow: 0 2px 8px rgba(74,111,165,0.5);"></div>
             </div>
           `,
           iconSize: [28, 28],
@@ -125,7 +127,7 @@ export function OpenStreetMapCanvas({
 
         L.marker(userLocation, { icon: userIcon, zIndexOffset: 1000 })
           .addTo(markersGroup)
-          .bindPopup("<div style='font-size: 12px; font-weight: bold;'>📍 Lokasi Anda</div>");
+          .bindPopup("<div style='font-size: 12px; font-weight: bold;'>Lokasi Anda</div>");
       }
 
       // Render Health Facilities Pins (Teardrop Location Pin Shape - Clean minimal without emoji)
@@ -138,8 +140,8 @@ export function OpenStreetMapCanvas({
         const isHospital = facility.facilityType === "hospital";
         const isClinic = facility.facilityType === "clinic";
 
-        // Warna: Apotek = Biru (#2563EB), Klinik = Kuning (#F59E0B), Rumah Sakit = Merah (#EF4444)
-        const pinColor = isHospital ? "#EF4444" : isClinic ? "#F59E0B" : "#2563EB";
+        // Warna: Apotek = Biru (#4a6fa5), Klinik = Kuning (#F59E0B), Rumah Sakit = Merah (#EF4444)
+        const pinColor = isHospital ? "#EF4444" : isClinic ? "#F59E0B" : "#4a6fa5";
 
         const width = isMobileScreen ? (isSelected ? 30 : 22) : (isSelected ? 38 : 28);
         const height = isMobileScreen ? (isSelected ? 37 : 27) : (isSelected ? 46 : 34);
@@ -181,7 +183,7 @@ export function OpenStreetMapCanvas({
       if (selectedPharmacy && !renderedFacilityIds.has(String(selectedPharmacy.id))) {
         const isHospital = selectedPharmacy.facilityType === "hospital";
         const isClinic = selectedPharmacy.facilityType === "clinic";
-        const pinColor = isHospital ? "#EF4444" : isClinic ? "#F59E0B" : "#2563EB";
+        const pinColor = isHospital ? "#EF4444" : isClinic ? "#F59E0B" : "#4a6fa5";
         const width = isMobileScreen ? 30 : 38;
         const height = isMobileScreen ? 37 : 46;
         const iconHtml = `

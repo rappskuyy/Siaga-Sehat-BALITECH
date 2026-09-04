@@ -17,6 +17,7 @@ import { ReminderCard } from "@/components/reminder/ReminderCard";
 import { MedicineReminderModal } from "@/components/reminder/MedicineReminderModal";
 import { ReminderNotificationManager } from "@/components/reminder/ReminderNotificationManager";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { Footer } from "@/components/clinic/Footer";
 
 interface RemindersSearch {
   scan?: string;
@@ -306,6 +307,7 @@ function RemindersPage() {
 
       {/* Add reminder modal */}
       <MedicineReminderModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <Footer />
     </main>
   );
 }

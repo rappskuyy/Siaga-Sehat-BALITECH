@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { Footer } from "@/components/clinic/Footer";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -76,6 +77,7 @@ function ProfilePage() {
   const navigate = useNavigate();
   const { user, profile, loading, refreshProfile, signOut } = useAuth();
 
+  const [mobileTab, setMobileTab] = useState<"semua" | "data" | "scan" | "anatomy">("semua");
   const [fullName, setFullName] = useState("");
   const [heightCm, setHeightCm] = useState("");
   const [weightKg, setWeightKg] = useState("");
@@ -94,6 +96,26 @@ function ProfilePage() {
       navigate({ to: "/login" });
     }
   }, [loading, user, navigate]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const tabParam = searchParams.get("tab") || searchParams.get("section");
+      if (tabParam === "scan" || tabParam === "history" || tabParam === "riwayat") {
+        setMobileTab("scan");
+        setTimeout(() => {
+          const el = document.getElementById("riwayat-scan-section");
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }, 300);
+      } else if (tabParam === "anatomy" || tabParam === "anatomi") {
+        setMobileTab("anatomy");
+        setTimeout(() => {
+          const el = document.getElementById("riwayat-anatomi-section");
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }, 300);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (profile) {
@@ -208,75 +230,140 @@ function ProfilePage() {
     <main className="min-h-screen bg-[#f7f4ee] pb-16 font-sans">
       <SiteHeader />
 
-      <div className="mx-auto max-w-4xl px-4 pt-6 md:px-6">
-        {/* Profile hero card — avatar, name and email live together in one block */}
+      <div className="mx-auto max-w-4xl px-4 pt-4 sm:pt-6 md:px-6">
+        {/* Profile hero card — avatar, name, email and mobile quick actions */}
         <div className="overflow-hidden rounded-3xl border border-black/5 bg-[color:var(--color-clinic-blue)] shadow-[var(--shadow-clinic)]">
-          <div className="relative px-6 py-7 sm:px-8">
+          <div className="relative px-5 py-6 sm:px-8 sm:py-7">
             <div
               className="pointer-events-none absolute inset-0 opacity-20"
               style={{ background: "radial-gradient(60% 100% at 15% 0%, #2ee6c4, transparent)" }}
             />
-            <div className="relative z-10 flex items-center gap-4">
-              {/* Avatar IS the logout button — tap the photo to sign out */}
+            <div className="relative z-10 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
+                {/* Avatar IS the logout button — tap the photo to sign out */}
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  title="Ketuk untuk keluar dari akun"
+                  aria-label="Keluar dari akun"
+                  className="group relative grid h-14 w-14 sm:h-16 sm:w-16 shrink-0 place-items-center overflow-hidden rounded-full bg-white/15 text-white shadow-sm ring-2 ring-white/25 backdrop-blur transition active:scale-95 cursor-pointer"
+                >
+                  <UserIcon className="h-6 w-6 sm:h-7 sm:w-7 transition group-hover:opacity-0" />
+                  <span className="absolute inset-0 grid place-items-center bg-red-500/90 text-white opacity-0 transition group-hover:opacity-100">
+                    <LogOut className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </span>
+                  <span className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full border-2 border-[color:var(--color-clinic-blue)] bg-red-500 text-white shadow-sm">
+                    <LogOut className="h-2.5 w-2.5" />
+                  </span>
+                </button>
+
+                <div className="min-w-0">
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-white/70">
+                    Akun Saya
+                  </p>
+                  <h1 className="truncate font-display text-lg font-extrabold text-white sm:text-2xl">
+                    {profile?.full_name || "Profil Saya"}
+                  </h1>
+                  <p className="truncate text-xs sm:text-sm text-white/75">{user.email}</p>
+                </div>
+              </div>
+
+              {/* Explicit logout button on mobile */}
               <button
                 type="button"
                 onClick={handleSignOut}
-                title="Ketuk untuk keluar dari akun"
-                aria-label="Keluar dari akun"
-                className="group relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-full bg-white/15 text-white shadow-sm ring-2 ring-white/25 backdrop-blur transition active:scale-95"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur transition hover:bg-red-500 active:scale-95 cursor-pointer"
               >
-                <UserIcon className="h-7 w-7 transition group-hover:opacity-0" />
-                <span className="absolute inset-0 grid place-items-center bg-red-500/90 text-white opacity-0 transition group-hover:opacity-100">
-                  <LogOut className="h-6 w-6" />
-                </span>
-                <span className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full border-2 border-[color:var(--color-clinic-blue)] bg-red-500 text-white shadow-sm">
-                  <LogOut className="h-2.5 w-2.5" />
-                </span>
+                <LogOut className="h-3.5 w-3.5" />
+                <span>Keluar</span>
               </button>
-
-              <div className="min-w-0">
-                <p className="text-xs font-medium uppercase tracking-wide text-white/70">
-                  Akun Saya
-                </p>
-                <h1 className="mt-0.5 truncate font-display text-xl font-extrabold text-white sm:text-2xl">
-                  {profile?.full_name || "Profil Saya"}
-                </h1>
-                <p className="truncate text-sm text-white/75">{user.email}</p>
-                <p className="mt-1 text-[11px] text-white/55">Ketuk foto untuk keluar dari akun</p>
-              </div>
             </div>
           </div>
 
           {/* Quick stats */}
-          <div className="flex gap-2 border-t border-white/10 bg-white/5 px-6 py-4 sm:px-8">
-            <div className="flex-1 rounded-2xl bg-white/10 px-4 py-2.5 text-center backdrop-blur">
-              <p className="font-display text-lg font-extrabold text-white">
+          <div className="flex gap-1.5 sm:gap-2 border-t border-white/10 bg-white/5 px-4 py-3 sm:px-8 sm:py-4">
+            <div className="flex-1 rounded-2xl bg-white/10 px-2 py-2 sm:px-4 sm:py-2.5 text-center backdrop-blur">
+              <p className="font-display text-base sm:text-lg font-extrabold text-white">
                 {history?.length ?? 0}
               </p>
-              <p className="text-[10px] text-white/70">Total Scan</p>
+              <p className="text-[9px] sm:text-[10px] text-white/70">Total Scan</p>
             </div>
-            <div className="flex-1 rounded-2xl bg-white/10 px-4 py-2.5 text-center backdrop-blur">
-              <p className="font-display text-lg font-extrabold text-white">
-                {lastScanMeta?.label ?? " "}
+            <div className="flex-1 rounded-2xl bg-white/10 px-2 py-2 sm:px-4 sm:py-2.5 text-center backdrop-blur">
+              <p className="font-display text-base sm:text-lg font-extrabold text-white truncate">
+                {lastScanMeta?.label ?? "-"}
               </p>
-              <p className="text-[10px] text-white/70">Risiko Terakhir</p>
+              <p className="text-[9px] sm:text-[10px] text-white/70">Risiko Terakhir</p>
             </div>
-            <div className="flex-1 rounded-2xl bg-white/10 px-4 py-2.5 text-center backdrop-blur">
-              <p className="font-display text-lg font-extrabold text-white">{bmi ?? " "}</p>
-              <p className="text-[10px] text-white/70">BMI</p>
+            <div className="flex-1 rounded-2xl bg-white/10 px-2 py-2 sm:px-4 sm:py-2.5 text-center backdrop-blur">
+              <p className="font-display text-base sm:text-lg font-extrabold text-white">
+                {bmi ?? "-"}
+              </p>
+              <p className="text-[9px] sm:text-[10px] text-white/70">BMI</p>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+        {/* Mobile Navigation Segmented Tabs (Visible on screens < 1024px) */}
+        <div className="mt-4 flex items-center gap-1 rounded-2xl bg-white p-1.5 shadow-[var(--shadow-clinic)] lg:hidden overflow-x-auto">
+          <button
+            type="button"
+            onClick={() => setMobileTab("semua")}
+            className={`flex-1 min-w-[65px] rounded-xl py-2 px-2 text-center text-xs font-bold transition select-none cursor-pointer ${
+              mobileTab === "semua"
+                ? "bg-[color:var(--color-clinic-blue)] text-white shadow-xs"
+                : "text-[color:var(--color-clinic-muted)] hover:bg-[color:var(--color-clinic-blue-soft)]/50"
+            }`}
+          >
+            Semua
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab("data")}
+            className={`flex-1 min-w-[95px] rounded-xl py-2 px-2 text-center text-xs font-bold transition select-none cursor-pointer ${
+              mobileTab === "data"
+                ? "bg-[color:var(--color-clinic-blue)] text-white shadow-xs"
+                : "text-[color:var(--color-clinic-muted)] hover:bg-[color:var(--color-clinic-blue-soft)]/50"
+            }`}
+          >
+            Data Kesehatan
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab("scan")}
+            className={`flex-1 min-w-[85px] rounded-xl py-2 px-2 text-center text-xs font-bold transition select-none cursor-pointer ${
+              mobileTab === "scan"
+                ? "bg-[color:var(--color-clinic-blue)] text-white shadow-xs"
+                : "text-[color:var(--color-clinic-muted)] hover:bg-[color:var(--color-clinic-blue-soft)]/50"
+            }`}
+          >
+            Riwayat Scan
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab("anatomy")}
+            className={`flex-1 min-w-[95px] rounded-xl py-2 px-2 text-center text-xs font-bold transition select-none cursor-pointer ${
+              mobileTab === "anatomy"
+                ? "bg-[color:var(--color-clinic-blue)] text-white shadow-xs"
+                : "text-[color:var(--color-clinic-muted)] hover:bg-[color:var(--color-clinic-blue-soft)]/50"
+            }`}
+          >
+            Riwayat Anatomi
+          </button>
+        </div>
+
+        <div className="mt-4 sm:mt-6 grid gap-5 sm:gap-6 lg:grid-cols-[1fr_1.2fr]">
           {/* Edit profile form */}
-          <div className="rounded-3xl border border-black/5 bg-white p-6 shadow-[var(--shadow-clinic)]">
+          <div
+            className={`rounded-3xl border border-black/5 bg-white p-5 sm:p-6 shadow-[var(--shadow-clinic)] ${
+              mobileTab === "semua" || mobileTab === "data" ? "block" : "hidden lg:block"
+            }`}
+          >
             <div className="flex items-center gap-2.5">
               <span className="grid h-9 w-9 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
                 <UserIcon className="h-4 w-4" />
               </span>
               <div>
-                <h2 className="font-display text-lg font-bold text-[color:var(--color-clinic-ink)]">
+                <h2 className="font-display text-base sm:text-lg font-bold text-[color:var(--color-clinic-ink)]">
                   Data Kesehatan
                 </h2>
                 <p className="text-xs text-[color:var(--color-clinic-muted)]">
@@ -285,7 +372,7 @@ function ProfilePage() {
               </div>
             </div>
 
-            <form onSubmit={handleSave} className="mt-5 flex flex-col gap-4">
+            <form onSubmit={handleSave} className="mt-4 sm:mt-5 flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="fullName">Nama Lengkap</Label>
                 <Input
@@ -293,13 +380,14 @@ function ProfilePage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Nama kamu"
+                  className="h-10 text-sm"
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="height" className="flex items-center gap-1">
-                    <Ruler className="h-3.5 w-3.5" /> Tinggi (cm)
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                <div className="flex flex-col gap-1.5 min-w-0">
+                  <Label htmlFor="height" className="flex items-center gap-1 text-[11px] sm:text-xs truncate">
+                    <Ruler className="h-3.5 w-3.5 shrink-0" /> Tinggi (cm)
                   </Label>
                   <Input
                     id="height"
@@ -307,11 +395,12 @@ function ProfilePage() {
                     min={0}
                     value={heightCm}
                     onChange={(e) => setHeightCm(e.target.value)}
+                    className="h-10 text-xs sm:text-sm px-2 sm:px-3"
                   />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="weight" className="flex items-center gap-1">
-                    <Weight className="h-3.5 w-3.5" /> Berat (kg)
+                <div className="flex flex-col gap-1.5 min-w-0">
+                  <Label htmlFor="weight" className="flex items-center gap-1 text-[11px] sm:text-xs truncate">
+                    <Weight className="h-3.5 w-3.5 shrink-0" /> Berat (kg)
                   </Label>
                   <Input
                     id="weight"
@@ -319,11 +408,12 @@ function ProfilePage() {
                     min={0}
                     value={weightKg}
                     onChange={(e) => setWeightKg(e.target.value)}
+                    className="h-10 text-xs sm:text-sm px-2 sm:px-3"
                   />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="age" className="flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5" /> Umur
+                <div className="flex flex-col gap-1.5 min-w-0">
+                  <Label htmlFor="age" className="flex items-center gap-1 text-[11px] sm:text-xs truncate">
+                    <Calendar className="h-3.5 w-3.5 shrink-0" /> Umur
                   </Label>
                   <Input
                     id="age"
@@ -331,22 +421,23 @@ function ProfilePage() {
                     min={0}
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
+                    className="h-10 text-xs sm:text-sm px-2 sm:px-3"
                   />
                 </div>
               </div>
 
               {bmi && (
-                <p className="rounded-md bg-[color:var(--color-clinic-blue-soft)] px-3 py-2 text-sm text-[color:var(--color-clinic-ink)]">
-                  Estimasi BMI: <span className="font-semibold">{bmi}</span>
+                <p className="rounded-xl bg-[color:var(--color-clinic-blue-soft)] px-3 py-2 text-xs sm:text-sm text-[color:var(--color-clinic-ink)] font-medium">
+                  Estimasi BMI: <span className="font-bold text-[color:var(--color-clinic-blue)]">{bmi}</span>
                 </p>
               )}
 
               {message && (
                 <p
-                  className={`rounded-md px-3 py-2 text-sm ${
+                  className={`rounded-xl px-3 py-2 text-xs sm:text-sm ${
                     message.startsWith("Gagal")
                       ? "bg-red-50 text-red-600"
-                      : "bg-emerald-50 text-emerald-700"
+                      : "bg-emerald-50 text-emerald-700 font-medium"
                   }`}
                 >
                   {message}
@@ -356,7 +447,7 @@ function ProfilePage() {
               <Button
                 type="submit"
                 disabled={saving}
-                className="mt-1 gap-2 rounded-full bg-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue-dark)]"
+                className="mt-1 gap-2 rounded-full bg-[color:var(--color-clinic-blue)] py-5 text-sm font-semibold hover:bg-[color:var(--color-clinic-blue-dark)] cursor-pointer"
               >
                 <Save className="h-4 w-4" /> {saving ? "Menyimpan..." : "Simpan Perubahan"}
               </Button>
@@ -364,25 +455,29 @@ function ProfilePage() {
           </div>
 
           {/* Scan history */}
-          <div className="rounded-3xl border border-black/5 bg-white p-6 shadow-[var(--shadow-clinic)]">
-            <div className="flex items-center justify-between">
+          <div
+            id="riwayat-scan-section"
+            className={`rounded-3xl border border-black/5 bg-white p-5 sm:p-6 shadow-[var(--shadow-clinic)] ${
+              mobileTab === "semua" || mobileTab === "scan" ? "block" : "hidden lg:block"
+            }`}
+          >
+            <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5">
                 <span className="grid h-9 w-9 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
                   <ScanLine className="h-4 w-4" />
                 </span>
                 <div>
-                  <h2 className="font-display text-lg font-bold text-[color:var(--color-clinic-ink)]">
+                  <h2 className="font-display text-base sm:text-lg font-bold text-[color:var(--color-clinic-ink)]">
                     Riwayat Scan AI
                   </h2>
-                  <p className="text-xs text-[color:var(--color-clinic-muted)]">
-                    Ketuk <Bell className="inline h-3 w-3 -translate-y-px" /> untuk atur pengingat
-                    obat
+                  <p className="text-[11px] sm:text-xs text-[color:var(--color-clinic-muted)]">
+                    Ketuk <Bell className="inline h-3 w-3 -translate-y-px" /> untuk pengingat obat
                   </p>
                 </div>
               </div>
               <Link
                 to="/scanner"
-                className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3 py-1.5 text-xs font-medium text-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue)]/10"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue)]/10 shrink-0"
               >
                 Scan Baru
               </Link>
@@ -406,16 +501,16 @@ function ProfilePage() {
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                       data={chartData}
-                      margin={{ top: 5, right: 10, left: -20, bottom: 0 }}
+                      margin={{ top: 5, right: 10, left: -25, bottom: 0 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                      <XAxis dataKey="tanggal" fontSize={11} />
+                      <XAxis dataKey="tanggal" fontSize={10} interval="preserveStartEnd" />
                       <YAxis
                         domain={[0, 3]}
                         ticks={[1, 2, 3]}
                         tickFormatter={(v) => (v === 1 ? "Rendah" : v === 2 ? "Sedang" : "Tinggi")}
-                        fontSize={10}
-                        width={60}
+                        fontSize={9}
+                        width={45}
                       />
                       <Tooltip
                         formatter={(_value, _name, props) => [
@@ -450,10 +545,10 @@ function ProfilePage() {
                         </span>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="truncate text-sm font-semibold text-[color:var(--color-clinic-ink)]">
+                            <p className="truncate text-xs sm:text-sm font-semibold text-[color:var(--color-clinic-ink)]">
                               {h.nama_penyakit}
                             </p>
-                            <span className="shrink-0 text-xs text-[color:var(--color-clinic-muted)]">
+                            <span className="shrink-0 text-[10px] sm:text-xs text-[color:var(--color-clinic-muted)]">
                               {new Date(h.created_at).toLocaleDateString("id-ID", {
                                 day: "2-digit",
                                 month: "short",
@@ -486,24 +581,28 @@ function ProfilePage() {
         </div>
 
         {/* Anatomy / body-part consultation history */}
-        <div className="mt-6 rounded-3xl border border-black/5 bg-white p-6 shadow-[var(--shadow-clinic)]">
-          <div className="flex items-center justify-between">
+        <div
+          className={`mt-5 sm:mt-6 rounded-3xl border border-black/5 bg-white p-5 sm:p-6 shadow-[var(--shadow-clinic)] ${
+            mobileTab === "semua" || mobileTab === "anatomy" ? "block" : "hidden lg:block"
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2.5">
               <span className="grid h-9 w-9 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
                 <Bone className="h-4 w-4" />
               </span>
               <div>
-                <h2 className="font-display text-lg font-bold text-[color:var(--color-clinic-ink)]">
+                <h2 className="font-display text-base sm:text-lg font-bold text-[color:var(--color-clinic-ink)]">
                   Riwayat Anatomi
                 </h2>
-                <p className="text-xs text-[color:var(--color-clinic-muted)]">
+                <p className="text-[11px] sm:text-xs text-[color:var(--color-clinic-muted)]">
                   Sesi pilih-bagian-tubuh dan konsultasi AI kamu
                 </p>
               </div>
             </div>
             <Link
               to="/anatomy"
-              className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3 py-1.5 text-xs font-medium text-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue)]/10"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue)]/10 shrink-0"
             >
               Konsultasi Baru
             </Link>
@@ -532,10 +631,10 @@ function ProfilePage() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="truncate text-sm font-semibold capitalize text-[color:var(--color-clinic-ink)]">
+                      <p className="truncate text-xs sm:text-sm font-semibold capitalize text-[color:var(--color-clinic-ink)]">
                         {h.body_part || "Konsultasi Umum"}
                       </p>
-                      <span className="shrink-0 text-xs text-[color:var(--color-clinic-muted)]">
+                      <span className="shrink-0 text-[10px] sm:text-xs text-[color:var(--color-clinic-muted)]">
                         {new Date(h.created_at).toLocaleDateString("id-ID", {
                           day: "2-digit",
                           month: "short",
@@ -553,6 +652,7 @@ function ProfilePage() {
           )}
         </div>
       </div>
+      <Footer />
     </main>
   );
 }

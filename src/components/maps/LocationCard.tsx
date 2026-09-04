@@ -13,7 +13,7 @@ export const LocationCard: React.FC<LocationCardProps> = ({ place, onSelect, isS
       ? "bg-red-500 text-white border-red-600"
       : place.category === "clinic"
       ? "bg-[#F59E0B] text-white border-amber-600"
-      : "bg-[#379FD2] text-white border-blue-600";
+      : "bg-[#4a6fa5] text-white border-blue-600";
 
   const categoryLabel =
     place.category === "hospital" ? (
@@ -29,8 +29,8 @@ export const LocationCard: React.FC<LocationCardProps> = ({ place, onSelect, isS
       onClick={() => onSelect?.(place)}
       className={`rounded-3xl border p-4 sm:p-5 bg-white transition cursor-pointer flex flex-col justify-between ${
         isSelected
-          ? "border-[#379FD2] ring-2 ring-[#379FD2]/30 shadow-lg"
-          : "border-[#E5E7EB] hover:border-[#379FD2]/50 shadow-sm hover:shadow-md"
+          ? "border-[#4a6fa5] ring-2 ring-[#4a6fa5]/30 shadow-lg"
+          : "border-[#E5E7EB] hover:border-[#4a6fa5]/50 shadow-sm hover:shadow-md"
       }`}
     >
       <div>
@@ -64,18 +64,18 @@ export const LocationCard: React.FC<LocationCardProps> = ({ place, onSelect, isS
             </span>
           </div>
         ) : (
-          <div className="relative h-28 w-full rounded-2xl overflow-hidden mb-3 border border-[#E5E7EB] bg-gradient-to-br from-[#E0F2FE] via-[#F0F9FF] to-[#E0F2FE] p-4 flex flex-col justify-between shrink-0 shadow-xs">
+          <div className="relative h-28 w-full rounded-2xl overflow-hidden mb-3 border border-[#E5E7EB] bg-gradient-to-br from-[#eef2f8] via-[#F0F9FF] to-[#eef2f8] p-4 flex flex-col justify-between shrink-0 shadow-xs">
             <div className="flex items-center justify-between">
-              <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#379FD2] text-white shadow-sm">
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#4a6fa5] text-white shadow-sm">
                 <Building2 className="h-4 w-4" />
               </div>
-              <span className="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/90 text-[#2781AF] border border-[#379FD2]/20">
+              <span className="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/90 text-[#35517d] border border-[#4a6fa5]/20">
                 Tampak Depan Tempat
               </span>
             </div>
             <div>
               <h4 className="text-xs font-bold text-[#111111] line-clamp-1">{place.name}</h4>
-              <p className="text-[10px] text-[#6B7280] flex items-center gap-1"><MapPin className="h-3 w-3 text-[#379FD2] shrink-0" /> {place.address}</p>
+              <p className="text-[10px] text-[#6B7280] flex items-center gap-1"><MapPin className="h-3 w-3 text-[#4a6fa5] shrink-0" /> {place.address}</p>
             </div>
           </div>
         )}
@@ -85,12 +85,12 @@ export const LocationCard: React.FC<LocationCardProps> = ({ place, onSelect, isS
           {place.name}
         </h3>
         <p className="text-xs text-[#6B7280] mt-1 leading-relaxed line-clamp-2 flex items-center gap-1">
-          <MapPin className="h-3 w-3 text-[#379FD2] shrink-0" /> {place.address}
+          <MapPin className="h-3 w-3 text-[#4a6fa5] shrink-0" /> {place.address}
         </p>
 
         {/* Hours & Distance */}
         <div className="mt-3 pt-2.5 border-t border-[#E5E7EB] flex items-center justify-between text-xs">
-          <span className="flex items-center gap-1.5 text-[#379FD2] font-semibold">
+          <span className="flex items-center gap-1.5 text-[#4a6fa5] font-semibold">
             <Clock className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
             {place.openingHours}
           </span>
@@ -113,7 +113,7 @@ export const LocationCard: React.FC<LocationCardProps> = ({ place, onSelect, isS
         target="_blank"
         rel="noreferrer"
         onClick={(e) => e.stopPropagation()}
-        className="mt-4 w-full h-10 bg-gradient-to-r from-[#379FD2] to-[#2563EB] text-white font-extrabold text-xs rounded-2xl flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer"
+        className="mt-4 w-full h-10 bg-[#4a6fa5] hover:bg-[#35517d] text-white font-extrabold text-xs rounded-2xl flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer"
       >
         <Navigation className="h-3.5 w-3.5" />
         <span>Buka Navigasi Google Maps</span>

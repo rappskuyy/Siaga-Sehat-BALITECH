@@ -144,7 +144,7 @@ export function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-black/5 bg-white/95 px-5 py-2.5 shadow-2xs backdrop-blur sm:px-6 md:px-8 lg:px-10">
+    <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white/95 px-5 py-2.5 shadow-xs backdrop-blur sm:px-6 md:px-8 lg:px-10">
       <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-3">
         <BrandLogo size="sm" />
 
@@ -220,7 +220,7 @@ export function SiteHeader() {
       </div>
 
       {isMenuOpen && (
-        <div className="mx-auto mt-3 w-full max-w-[1600px] rounded-2xl border border-black/5 bg-white p-3 shadow-[var(--shadow-clinic)] lg:hidden">
+        <div className="absolute left-4 right-4 top-[calc(100%+8px)] z-50 rounded-2xl border border-black/5 bg-white p-3 shadow-xl lg:hidden">
           <nav className="flex flex-col gap-1">
             <Link
               to="/"
@@ -254,7 +254,7 @@ export function SiteHeader() {
             <Link
               to="/scanner"
               onClick={() => setIsMenuOpen(false)}
-              className="mt-1 inline-flex items-center justify-center rounded-xl bg-[color:var(--color-clinic-blue)] px-3 py-2.5 text-sm font-semibold text-white"
+              className="rounded-xl px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)] transition hover:bg-[color:var(--color-clinic-blue-soft)]"
             >
               Scan
             </Link>
@@ -262,38 +262,10 @@ export function SiteHeader() {
               <Link
                 to="/reminders"
                 onClick={() => setIsMenuOpen(false)}
-                className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl border border-black/10 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
+                className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)] transition hover:bg-[color:var(--color-clinic-blue-soft)]"
               >
-                <Bell className="h-4 w-4" />
+                <Bell className="h-4 w-4 text-[color:var(--color-clinic-blue)]" />
                 Notifikasi
-              </Link>
-            )}
-            {!user ? (
-              <>
-                <Link
-                  to="/login"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[color:var(--color-clinic-blue)] px-3 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[color:var(--color-clinic-blue)]/20"
-                >
-                  <User className="h-4 w-4" />
-                  Masuk
-                </Link>
-                <Link
-                  to="/register"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl border border-[color:var(--color-clinic-blue)]/15 bg-[color:var(--color-clinic-blue-soft)] px-3 py-2.5 text-sm font-semibold text-[color:var(--color-clinic-blue)]"
-                >
-                  Daftar
-                </Link>
-              </>
-            ) : (
-              <Link
-                to="/profile"
-                onClick={() => setIsMenuOpen(false)}
-                className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl border border-black/10 px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)]"
-              >
-                <User className="h-4 w-4" />
-                {profile?.full_name?.split(" ")[0] || "Profil Saya"}
               </Link>
             )}
           </nav>

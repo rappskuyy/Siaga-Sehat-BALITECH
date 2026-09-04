@@ -1,4 +1,4 @@
-import { Star, MapPin, Clock, Phone } from "lucide-react";
+import { Star, MapPin, Clock, Phone, Building2, Stethoscope, Pill } from "lucide-react";
 import { PharmacyNode } from "./maps.service";
 import { getFacilityPhotoConsistent, getFacilityDescriptionConsistent } from "@/data/facilitiesDummyUtils";
 
@@ -67,8 +67,9 @@ export function FacilityDetailCard({ facility }: { facility: PharmacyNode }) {
       {/* Address */}
       <div>
         <p className="text-xs text-[#6B7280] font-medium mb-1">Lokasi</p>
-        <p className="text-sm text-[#111111] leading-relaxed">
-          📍 {facility.address || `Jl. Sekitar (${facility.lat.toFixed(4)}, ${facility.lon.toFixed(4)})`}
+        <p className="text-sm text-[#111111] leading-relaxed flex items-start gap-1.5">
+          <MapPin className="h-4 w-4 shrink-0 text-[#4a6fa5] mt-0.5" />
+          <span>{facility.address || `Jl. Sekitar (${facility.lat.toFixed(4)}, ${facility.lon.toFixed(4)})`}</span>
         </p>
       </div>
 
@@ -115,8 +116,8 @@ export function FacilityMiniCard({
   onClick: () => void;
 }) {
   const photo = getFacilityPhotoConsistent(facility.placeId || String(facility.id));
-  const typeEmoji =
-    facility.facilityType === "hospital" ? "🏥" : facility.facilityType === "clinic" ? "🩺" : "💊";
+  const TypeIcon =
+    facility.facilityType === "hospital" ? Building2 : facility.facilityType === "clinic" ? Stethoscope : Pill;
 
   return (
     <button
@@ -129,7 +130,7 @@ export function FacilityMiniCard({
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2 mb-1">
           <h3 className="text-sm font-bold text-[#111111] line-clamp-1">{facility.name}</h3>
-          <span className="text-xs font-bold text-[#4a6fa5] whitespace-nowrap">{typeEmoji}</span>
+          <TypeIcon className="h-4 w-4 text-[#4a6fa5] shrink-0" />
         </div>
         <p className="text-xs text-[#6B7280] line-clamp-1 mb-2">{facility.address}</p>
         <div className="flex items-center justify-between gap-2">

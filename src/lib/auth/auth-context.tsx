@@ -49,6 +49,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(newSession?.user ?? null);
       if (newSession?.user) {
         await fetchProfile(newSession.user.id);
+
+        // Detect if user returned from an email verification or auth callback link
+        if (typeof window !== "undefined") {
+          const hash = window.location.hash;
+          const search = window.location.search;
+          const isAuthCallback =
+            hash.includes("type=signup") ||
+            hash.includes("type=email_change") ||
+            hash.includes("type=recovery") ||
+            hash.includes("access_token") ||
+            search.includes("type=signup") ||
+            search.includes("code=");
+
+          if (isAuthCallback && !window.location.pathname.startsWith("/profile")) {
+            window.location.href = `${window.location.origin}/profile?tab=scan`;
+          }
+        }
       } else {
         setProfile(null);
       }

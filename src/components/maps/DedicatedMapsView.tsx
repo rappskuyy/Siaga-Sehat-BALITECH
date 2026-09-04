@@ -26,6 +26,7 @@ import {
   Info,
   MessageSquare,
   Home,
+  Phone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,7 @@ import {
 } from "./maps.service";
 import { PharmacyList } from "./PharmacyList";
 import { SourceSummaryBar } from "./SourceBadge";
+import { Footer } from "@/components/clinic/Footer";
 import { useAuth } from "@/lib/auth/auth-context";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
@@ -457,7 +459,7 @@ export function DedicatedMapsView() {
   const finalReviewText = dynamicReviewText || activeReviewText;
 
   return (
-    <div className="min-h-screen bg-[#F7F9FB] font-sans antialiased text-[#111111] flex flex-col justify-between pb-16 md:pb-0">
+    <div className="min-h-screen bg-[#F7F9FB] font-sans antialiased text-[#111111] flex flex-col justify-between pb-24 lg:pb-0">
       {/* ========================================================================= */}
       {/* 01. INTEGRATED WEBSITE HEADER NAVBAR (shared across the whole app)        */}
       {/* ========================================================================= */}
@@ -486,7 +488,7 @@ export function DedicatedMapsView() {
               variant="outline"
               size="sm"
               disabled={loadingLocation}
-              className="h-8 sm:h-9 gap-1.5 rounded-xl text-xs bg-[#FFFFFF] border-[#E5E7EB] text-[#379FD2] hover:bg-[#ABE2FE]/20 cursor-pointer shadow-2xs font-semibold shrink-0"
+              className="h-8 sm:h-9 gap-1.5 rounded-xl text-xs bg-[#FFFFFF] border-[#E5E7EB] text-[#4a6fa5] hover:bg-[#eef2f8] cursor-pointer shadow-2xs font-semibold shrink-0"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${loadingLocation ? "animate-spin" : ""}`} />
               <span className="hidden sm:inline">{loadingLocation ? "GPS..." : "GPS Saya"}</span>
@@ -497,7 +499,7 @@ export function DedicatedMapsView() {
           <div className="relative" ref={searchContainerRef}>
             <form onSubmit={handleAddressSearch} className="flex items-center gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#379FD2]" />
+                <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#4a6fa5]" />
                 <Input
                   type="text"
                   placeholder="Ketik kota/alamat (misal: Bogor, Jakarta, Surabaya)..."
@@ -507,13 +509,13 @@ export function DedicatedMapsView() {
                     setShowSearchResults(true);
                   }}
                   onFocus={() => setShowSearchResults(true)}
-                  className="pl-10 h-10 sm:h-11 text-xs sm:text-sm rounded-2xl bg-[#F7F9FB] border-[#E5E7EB] text-[#111111] focus-visible:border-[#5BB4E0] focus-visible:ring-1 focus-visible:ring-[#5BB4E0]"
+                  className="pl-10 h-10 sm:h-11 text-xs sm:text-sm rounded-2xl bg-[#F7F9FB] border-[#E5E7EB] text-[#111111] focus-visible:border-[#4a6fa5] focus-visible:ring-1 focus-visible:ring-[#4a6fa5]"
                 />
               </div>
               <Button
                 type="submit"
                 size="sm"
-                className="h-10 sm:h-11 px-4 sm:px-5 rounded-2xl text-xs sm:text-sm font-bold bg-[#379FD2] text-white shadow-xs cursor-pointer shrink-0 hover:bg-[#379FD2] active:scale-[0.98] transition-transform"
+                className="h-10 sm:h-11 px-4 sm:px-5 rounded-2xl text-xs sm:text-sm font-bold bg-[#4a6fa5] text-white shadow-xs cursor-pointer shrink-0 hover:bg-[#35517d] active:scale-[0.98] transition-transform"
               >
                 {isSearching ? "..." : "Cari"}
               </Button>
@@ -529,10 +531,10 @@ export function DedicatedMapsView() {
                     getUserGeolocation(true);
                     setShowSearchResults(false);
                   }}
-                  className="w-full text-left p-2.5 bg-blue-50/80 hover:bg-blue-100/80 rounded-xl flex items-center justify-between gap-2.5 border border-blue-200/60 cursor-pointer mb-1 text-[#379FD2] font-semibold transition"
+                  className="w-full text-left p-2.5 bg-[#eef2f8] hover:bg-blue-100/80 rounded-xl flex items-center justify-between gap-2.5 border border-[#d1def0] cursor-pointer mb-1 text-[#4a6fa5] font-semibold transition"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="grid h-7 w-7 place-items-center rounded-lg bg-[#379FD2] text-white shrink-0 shadow-xs">
+                    <div className="grid h-7 w-7 place-items-center rounded-lg bg-[#4a6fa5] text-white shrink-0 shadow-xs">
                       <Crosshair className="h-4 w-4 animate-pulse" />
                     </div>
                     <div className="flex flex-col min-w-0">
@@ -542,7 +544,7 @@ export function DedicatedMapsView() {
                       </span>
                     </div>
                   </div>
-                  <span className="text-[9px] bg-[#379FD2] text-white px-2 py-0.5 rounded-full shrink-0 font-bold">
+                  <span className="text-[9px] bg-[#4a6fa5] text-white px-2 py-0.5 rounded-full shrink-0 font-bold">
                     GPS Anda
                   </span>
                 </button>
@@ -556,7 +558,7 @@ export function DedicatedMapsView() {
                       onClick={() => handleSelectSearchResult(res)}
                       className="w-full text-left p-2.5 hover:bg-[#F7F9FB] rounded-xl flex items-start gap-2 border-b border-[#E5E7EB]/40 last:border-0 cursor-pointer transition text-xs"
                     >
-                      <MapPin className="h-4 w-4 shrink-0 text-[#379FD2] mt-0.5" />
+                      <MapPin className="h-4 w-4 shrink-0 text-[#4a6fa5] mt-0.5" />
                       <span className="text-[#111111] line-clamp-2 leading-relaxed">
                         {res.displayname}
                       </span>
@@ -564,7 +566,7 @@ export function DedicatedMapsView() {
                   ))
                 ) : searchQuery.trim().length > 0 && !isSearching ? (
                   <div className="p-2.5 text-center text-[#6B7280] text-xs">
-                    Tekan <strong className="text-[#379FD2]">Cari</strong> untuk mencari &quot;
+                    Tekan <strong className="text-[#4a6fa5]">Cari</strong> untuk mencari &quot;
                     {searchQuery}&quot;
                   </div>
                 ) : null}
@@ -575,7 +577,7 @@ export function DedicatedMapsView() {
           {/* Active Position Info & Source Summary */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-0.5">
             <div className="flex items-center gap-1.5 font-medium text-[11px] sm:text-xs text-[#6B7280] bg-[#FFFFFF] px-3 py-1.5 rounded-xl border border-[#E5E7EB] truncate">
-              <CheckCircle2 className="h-3.5 w-3.5 text-[#379FD2] shrink-0" />
+              <CheckCircle2 className="h-3.5 w-3.5 text-[#4a6fa5] shrink-0" />
               <span className="truncate">
                 Posisi: <strong className="text-[#111111]">{locationSource}</strong>
               </span>
@@ -586,7 +588,7 @@ export function DedicatedMapsView() {
 
           {/* Mobile View Toggle Bar (Responsive Segment Switcher) */}
           <div
-            className={`grid lg:hidden p-1 bg-[#EBF5FB] rounded-2xl border border-[#C3DFF0] shadow-2xs gap-1.5 ${
+            className={`grid lg:hidden p-1 bg-[#eef2f8] rounded-2xl border border-[#d1def0] shadow-2xs gap-1.5 ${
               selectedPharmacy ? "grid-cols-3" : "grid-cols-2"
             }`}
           >
@@ -595,8 +597,8 @@ export function DedicatedMapsView() {
               onClick={() => setMobileTab("map")}
               className={`flex items-center justify-center gap-1.5 h-9 px-2 text-xs font-bold rounded-xl transition-all cursor-pointer border select-none ${
                 mobileTab === "map"
-                  ? "bg-[#379FD2] text-white border-[#379FD2] shadow-xs font-extrabold"
-                  : "bg-white/80 text-[#379FD2] border-[#C3DFF0]/60 hover:bg-white hover:border-[#C3DFF0]"
+                  ? "bg-[#4a6fa5] text-white border-[#4a6fa5] shadow-xs font-extrabold"
+                  : "bg-white/80 text-[#4a6fa5] border-[#d1def0]/60 hover:bg-white hover:border-[#d1def0]"
               }`}
             >
               <Compass className="h-4 w-4 shrink-0" />
@@ -607,8 +609,8 @@ export function DedicatedMapsView() {
               onClick={() => setMobileTab("list")}
               className={`flex items-center justify-center gap-1.5 h-9 px-2 text-xs font-bold rounded-xl transition-all cursor-pointer border select-none ${
                 mobileTab === "list"
-                  ? "bg-[#379FD2] text-white border-[#379FD2] shadow-xs font-extrabold"
-                  : "bg-white/80 text-[#379FD2] border-[#C3DFF0]/60 hover:bg-white hover:border-[#C3DFF0]"
+                  ? "bg-[#4a6fa5] text-white border-[#4a6fa5] shadow-xs font-extrabold"
+                  : "bg-white/80 text-[#4a6fa5] border-[#d1def0]/60 hover:bg-white hover:border-[#d1def0]"
               }`}
             >
               <Building2 className="h-4 w-4 shrink-0" />
@@ -680,7 +682,7 @@ export function DedicatedMapsView() {
           {/* Column 3 (Right Side Dedicated Detail Panel - Outside the Map!) */}
           {selectedPharmacy && (
             <div
-              className={`w-full lg:w-[380px] xl:w-[420px] shrink-0 h-full bg-[#FFFFFF] border border-[#E5E7EB] rounded-3xl p-4 sm:p-5 shadow-lg flex-col overflow-y-auto animate-fade-in scrollbar-thin scrollbar-thumb-[#379FD2]/20 ${
+              className={`w-full lg:w-[380px] xl:w-[420px] shrink-0 h-full bg-[#FFFFFF] border border-[#E5E7EB] rounded-3xl p-4 sm:p-5 shadow-lg flex-col overflow-y-auto animate-fade-in scrollbar-thin scrollbar-thumb-[#4a6fa5]/20 ${
                 mobileTab === "detail" ? "flex" : "hidden lg:flex"
               }`}
             >
@@ -692,7 +694,7 @@ export function DedicatedMapsView() {
                       ? "bg-red-500 text-white border-red-600"
                       : selectedPharmacy.facilityType === "clinic"
                         ? "bg-[#F59E0B] text-white border-amber-600"
-                        : "bg-[#379FD2] text-white border-blue-600"
+                        : "bg-[#4a6fa5] text-white border-blue-600"
                   }`}
                 >
                   {selectedPharmacy.facilityType === "hospital" ? (
@@ -750,7 +752,7 @@ export function DedicatedMapsView() {
                   {selectedPharmacy.name}
                 </h3>
                 <p className="text-xs text-[#6B7280] mt-1.5 leading-relaxed flex items-start gap-1">
-                  <MapPin className="h-3.5 w-3.5 text-[#379FD2] shrink-0 mt-0.5" />
+                  <MapPin className="h-3.5 w-3.5 text-[#4a6fa5] shrink-0 mt-0.5" />
                   <span>
                     {selectedPharmacy.address ||
                       `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
@@ -761,7 +763,7 @@ export function DedicatedMapsView() {
               {/* Operational Hours & Phone Contact */}
               <div className="mt-1 pt-3 border-t border-[#E5E7EB] flex flex-col gap-1.5 text-xs mb-3">
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-[#379FD2] font-semibold">
+                  <span className="flex items-center gap-1.5 text-[#4a6fa5] font-semibold">
                     <Clock className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
                     {selectedPharmacy.openingHoursText || "Buka 24 Jam (IGD Siaga)"}
                   </span>
@@ -773,15 +775,16 @@ export function DedicatedMapsView() {
                 </div>
 
                 {selectedPharmacy.phone && (
-                  <div className="text-[11px] text-[#6B7280] font-medium">
-                    📞 Telepon: <strong className="text-[#111111]">{selectedPharmacy.phone}</strong>
+                  <div className="text-[11px] text-[#6B7280] font-medium flex items-center gap-1">
+                    <Phone className="h-3 w-3 text-[#4a6fa5] shrink-0" />
+                    <span>Telepon: <strong className="text-[#111111]">{selectedPharmacy.phone}</strong></span>
                   </div>
                 )}
               </div>
 
               {/* Review Comment Snippet */}
-              <div className="mb-3.5 p-3 bg-cyan-50/60 border border-cyan-200/80 rounded-2xl text-xs text-[#2781AF] flex items-start gap-2">
-                <MessageSquare className="h-4 w-4 text-[#379FD2] shrink-0 mt-0.5" />
+              <div className="mb-3.5 p-3 bg-blue-50/60 border border-blue-200/80 rounded-2xl text-xs text-[#35517d] flex items-start gap-2">
+                <MessageSquare className="h-4 w-4 text-[#4a6fa5] shrink-0 mt-0.5" />
                 <p className="italic leading-relaxed">&quot;{finalReviewText}&quot;</p>
               </div>
 
@@ -793,7 +796,7 @@ export function DedicatedMapsView() {
                     onClick={() => handleTransportModeChange("driving")}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${
                       transportMode === "driving"
-                        ? "bg-[#379FD2] text-white shadow-xs"
+                        ? "bg-[#4a6fa5] text-white shadow-xs"
                         : "bg-white text-[#6B7280] border border-[#E5E7EB]"
                     }`}
                   >
@@ -804,7 +807,7 @@ export function DedicatedMapsView() {
                     onClick={() => handleTransportModeChange("motorcycle")}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${
                       transportMode === "motorcycle"
-                        ? "bg-[#379FD2] text-white shadow-xs"
+                        ? "bg-[#4a6fa5] text-white shadow-xs"
                         : "bg-white text-[#6B7280] border border-[#E5E7EB]"
                     }`}
                   >
@@ -813,7 +816,7 @@ export function DedicatedMapsView() {
                 </div>
 
                 <div className="text-right">
-                  <div className="font-extrabold text-[#379FD2] text-sm sm:text-base">
+                  <div className="font-extrabold text-[#4a6fa5] text-sm sm:text-base">
                     {routeInfo
                       ? `${routeInfo.durationMin} Menit`
                       : `${Math.ceil(selectedPharmacy.distanceKm * 4)} Menit`}
@@ -836,6 +839,7 @@ export function DedicatedMapsView() {
             </div>
           )}
         </div>
+        <Footer />
       </main>
 
       {/* ========================================================================= */}
@@ -844,7 +848,7 @@ export function DedicatedMapsView() {
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#E5E7EB] py-2 px-4 flex lg:hidden items-center justify-around shadow-lg">
         <Link
           to="/"
-          className="flex flex-col items-center gap-0.5 text-[#6B7280] hover:text-[#379FD2] transition"
+          className="flex flex-col items-center gap-0.5 text-[#6B7280] hover:text-[#4a6fa5] transition"
         >
           <Home className="h-5 w-5" />
           <span className="text-[10px] font-semibold">Beranda</span>
@@ -852,7 +856,7 @@ export function DedicatedMapsView() {
 
         <Link
           to="/maps"
-          className="flex flex-col items-center gap-0.5 text-[#379FD2] font-bold transition"
+          className="flex flex-col items-center gap-0.5 text-[#4a6fa5] font-bold transition"
         >
           <Compass className="h-5 w-5" />
           <span className="text-[10px] font-extrabold">Peta</span>
@@ -860,7 +864,7 @@ export function DedicatedMapsView() {
 
         <Link
           to="/scanner"
-          className="flex flex-col items-center gap-0.5 text-[#6B7280] hover:text-[#379FD2] transition"
+          className="flex flex-col items-center gap-0.5 text-[#6B7280] hover:text-[#4a6fa5] transition"
         >
           <ScanLine className="h-5 w-5" />
           <span className="text-[10px] font-semibold">Scan</span>
@@ -868,7 +872,7 @@ export function DedicatedMapsView() {
 
         <Link
           to="/anatomy"
-          className="flex flex-col items-center gap-0.5 text-[#6B7280] hover:text-[#379FD2] transition"
+          className="flex flex-col items-center gap-0.5 text-[#6B7280] hover:text-[#4a6fa5] transition"
         >
           <Stethoscope className="h-5 w-5" />
           <span className="text-[10px] font-semibold">Anatomi</span>
@@ -876,7 +880,7 @@ export function DedicatedMapsView() {
 
         <Link
           to="/profile"
-          className="flex flex-col items-center gap-0.5 text-[#6B7280] hover:text-[#379FD2] transition"
+          className="flex flex-col items-center gap-0.5 text-[#6B7280] hover:text-[#4a6fa5] transition"
         >
           <User className="h-5 w-5" />
           <span className="text-[10px] font-semibold">Profil</span>

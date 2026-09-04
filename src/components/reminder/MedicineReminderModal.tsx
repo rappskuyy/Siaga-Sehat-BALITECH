@@ -493,8 +493,8 @@ export function MedicineReminderModal({ open, onClose }: Props) {
                 </div>
               </div>
 
-              <p className="mt-4 font-display text-xl font-extrabold text-[color:var(--color-clinic-ink)]">
-                Pengingat Aktif! 🎉
+              <p className="mt-4 font-display text-xl font-extrabold text-[color:var(--color-clinic-ink)] flex items-center justify-center gap-2">
+                Pengingat Aktif!
               </p>
               <p className="mt-1 max-w-xs text-sm text-[color:var(--color-clinic-muted)]">
                 {configs.length} obat berhasil dijadwalkan. Browser akan mengingatkanmu sesuai

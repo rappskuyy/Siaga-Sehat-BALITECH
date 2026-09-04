@@ -65,6 +65,7 @@ function RegisterPage() {
       email,
       password,
       options: {
+        emailRedirectTo: `${window.location.origin}/profile?tab=scan`,
         data: {
           full_name: fullName,
           height_cm: heightCm ? Number(heightCm) : null,

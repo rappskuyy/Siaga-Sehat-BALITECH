@@ -22,6 +22,7 @@ import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { Footer } from "@/components/clinic/Footer";
 
 const PHOTO_DO = [
   "Gunakan cahaya alami atau lampu terang yang merata",
@@ -243,10 +244,7 @@ function ScannerPage() {
         )}
       </div>
 
-      <footer className="pt-10 text-center text-xs text-[color:var(--color-clinic-muted)]">
-        © {new Date().getFullYear()} SiagaSehat. Fitur ini tidak menggantikan
-        konsultasi medis profesional.
-      </footer>
+      <Footer />
     </main>
   );
 }

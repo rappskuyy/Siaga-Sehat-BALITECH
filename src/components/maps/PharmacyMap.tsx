@@ -55,7 +55,7 @@ const userLocationSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
 </svg>
 `)}`;
 
-// 🏥 Hospital Markers (Red)
+// Hospital Markers (Red)
 const hospitalPinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
 <svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 34 42" fill="none">
   <path d="M17 0C7.611 0 0 7.611 0 17C0 29.75 17 42 17 42C17 42 34 29.75 34 17C34 7.611 26.389 0 17 0Z" fill="#EF4444"/>
@@ -73,7 +73,7 @@ const hospitalActivePinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURICompon
 </svg>
 `)}`;
 
-// 🩺 Clinic Markers (Yellow)
+// Clinic Markers (Yellow)
 const clinicPinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
 <svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 34 42" fill="none">
   <path d="M17 0C7.611 0 0 7.611 0 17C0 29.75 17 42 17 42C17 42 34 29.75 34 17C34 7.611 26.389 0 17 0Z" fill="#F59E0B"/>
@@ -91,7 +91,7 @@ const clinicActivePinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponen
 </svg>
 `)}`;
 
-// 💊 Pharmacy Markers (Blue)
+// Pharmacy Markers (Blue)
 const pharmacyPinSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
 <svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 34 42" fill="none">
   <path d="M17 0C7.611 0 0 7.611 0 17C0 29.75 17 42 17 42C17 42 34 29.75 34 17C34 7.611 26.389 0 17 0Z" fill="#4A6FA5"/>
@@ -522,13 +522,13 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
                   setShowSearchResults(true);
                 }}
                 onFocus={() => setShowSearchResults(true)}
-                className="pl-10 h-10 text-xs rounded-xl bg-[#FFFFFF] border-[#E5E7EB] focus-visible:border-[#5BB4E0] focus-visible:ring-1 focus-visible:ring-[#5BB4E0]"
+                className="pl-10 h-10 text-xs rounded-xl bg-[#FFFFFF] border-[#E5E7EB] focus-visible:border-[#4a6fa5] focus-visible:ring-1 focus-visible:ring-[#4a6fa5]"
               />
             </div>
             <Button
               type="submit"
               size="sm"
-              className="h-10 px-4 rounded-xl text-xs font-semibold bg-[#379FD2] text-white shadow-xs cursor-pointer hover:bg-[#379FD2] active:scale-[0.98] transition-transform"
+              className="h-10 px-4 rounded-xl text-xs font-semibold bg-[#4a6fa5] text-white shadow-xs cursor-pointer hover:bg-[#35517d] active:scale-[0.98] transition-transform"
             >
               {isSearching ? "Mencari..." : "Cari Alamat"}
             </Button>
@@ -571,13 +571,13 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
                     onClick={() => handleSelectSearchResult(res)}
                     className="w-full text-left p-2.5 hover:bg-[#F7F9FB] rounded-xl flex items-start gap-2.5 border-b border-[#E5E7EB]/40 last:border-0 cursor-pointer transition"
                   >
-                    <MapPin className="h-4 w-4 shrink-0 text-[#379FD2] mt-0.5" />
+                    <MapPin className="h-4 w-4 shrink-0 text-[#4a6fa5] mt-0.5" />
                     <span className="text-[#111111] line-clamp-2">{res.displayname}</span>
                   </button>
                 ))
               ) : searchQuery.trim().length > 0 && !isSearching ? (
                 <div className="p-2.5 text-center text-[#6B7280] text-[11px]">
-                  Tekan <strong className="text-[#379FD2]">Cari Alamat</strong> atau Enter untuk
+                  Tekan <strong className="text-[#4a6fa5]">Cari Alamat</strong> atau Enter untuk
                   mencari &quot;{searchQuery}&quot;
                 </div>
               ) : null}
@@ -588,7 +588,7 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
         {/* Active Position Info & Source Summary */}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-1.5 font-medium text-[11px] text-[#6B7280] bg-[#FFFFFF] px-3 py-1.5 rounded-xl border border-[#E5E7EB]">
-            <CheckCircle2 className="h-3.5 w-3.5 text-[#379FD2] shrink-0" />
+            <CheckCircle2 className="h-3.5 w-3.5 text-[#4a6fa5] shrink-0" />
             <span>
               Posisi: <strong className="text-[#111111]">{locationSource}</strong>
             </span>
@@ -603,14 +603,14 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
         </div>
 
         {/* Mobile View Toggle Bar (Only visible on mobile screens) */}
-        <div className="grid grid-cols-2 lg:hidden p-1 bg-[#EBF5FB] rounded-2xl border border-[#C3DFF0] mb-2 shadow-2xs gap-1.5">
+        <div className="grid grid-cols-2 lg:hidden p-1 bg-[#eef2f8] rounded-2xl border border-[#d1def0] mb-2 shadow-2xs gap-1.5">
           <button
             type="button"
             onClick={() => setMobileTab("map")}
             className={`flex items-center justify-center gap-1.5 h-9 px-2 sm:px-3 text-xs font-bold rounded-xl transition-all cursor-pointer border select-none ${
               mobileTab === "map"
-                ? "bg-[#379FD2] text-white border-[#379FD2] shadow-xs font-extrabold"
-                : "bg-white/80 text-[#379FD2] border-[#C3DFF0]/60 hover:bg-white hover:border-[#C3DFF0]"
+                ? "bg-[#4a6fa5] text-white border-[#4a6fa5] shadow-xs font-extrabold"
+                : "bg-white/80 text-[#4a6fa5] border-[#d1def0]/60 hover:bg-white hover:border-[#d1def0]"
             }`}
           >
             <Compass className="h-4 w-4 shrink-0" />
@@ -621,8 +621,8 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
             onClick={() => setMobileTab("list")}
             className={`flex items-center justify-center gap-1.5 h-9 px-2 sm:px-3 text-xs font-bold rounded-xl transition-all cursor-pointer border select-none ${
               mobileTab === "list"
-                ? "bg-[#379FD2] text-white border-[#379FD2] shadow-xs font-extrabold"
-                : "bg-white/80 text-[#379FD2] border-[#C3DFF0]/60 hover:bg-white hover:border-[#C3DFF0]"
+                ? "bg-[#4a6fa5] text-white border-[#4a6fa5] shadow-xs font-extrabold"
+                : "bg-white/80 text-[#4a6fa5] border-[#d1def0]/60 hover:bg-white hover:border-[#d1def0]"
             }`}
           >
             <Building2 className="h-4 w-4 shrink-0" />
@@ -631,8 +631,8 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
         </div>
 
         {locationError && (
-          <div className="flex items-center gap-2 rounded-xl bg-[#F7F9FB] p-3 text-xs text-[#379FD2] border border-[#5BB4E0]/40">
-            <AlertTriangle className="h-4 w-4 shrink-0 text-[#379FD2]" />
+          <div className="flex items-center gap-2 rounded-xl bg-[#F7F9FB] p-3 text-xs text-[#4a6fa5] border border-[#d1def0]">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-[#4a6fa5]" />
             <span>{locationError}</span>
           </div>
         )}

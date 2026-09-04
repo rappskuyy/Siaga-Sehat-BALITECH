@@ -184,7 +184,7 @@ export function MobileMapView() {
     getUserGeolocation();
   }, [getUserGeolocation]);
 
-  // Load nearby facilities and calculate OSRM route for nearest facility
+  // Load nearby facilities around user location
   const loadNearbyFacilities = async (lat: number, lon: number) => {
     setLoadingFacilities(true);
     try {
@@ -192,15 +192,9 @@ export function MobileMapView() {
       const results = await fetchNearbyPharmacies(lat, lon, undefined, undefined, "rendah");
       setPharmacies(results);
 
-      if (results.length > 0) {
-        const nearest = results[0];
-        setSelectedPharmacy(nearest);
-        const route = await fetchOSRMRoute([lat, lon], nearest, transportMode);
-        setRouteInfo(route);
-      } else {
-        setSelectedPharmacy(null);
-        setRouteInfo(null);
-      }
+      // Keep map centered on user's location initially (do not auto-select destination)
+      setSelectedPharmacy(null);
+      setRouteInfo(null);
     } catch (error) {
       console.error("Error fetching facilities:", error);
     } finally {
@@ -522,7 +516,7 @@ export function MobileMapView() {
         {showLocationList && !showDetailsPanel && filteredPharmacies.length > 0 && (
           <div
             ref={listSheetRef}
-            className="absolute bottom-[80px] left-3 right-3 z-40 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-[#E5E7EB] shadow-2xl max-h-[250px] flex flex-col will-change-transform translate-y-0"
+            className="absolute bottom-[112px] left-3 right-3 z-40 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-[#E5E7EB] shadow-2xl max-h-[250px] flex flex-col will-change-transform translate-y-0"
           >
             {/* Scroll/Drag Handle Bar to Close Location List */}
             <div
@@ -587,7 +581,10 @@ export function MobileMapView() {
                       <span className="text-xs font-extrabold text-[#4a6fa5] block">
                         {facility.distanceKm < 1 ? `${(facility.distanceKm * 1000).toFixed(0)} m` : `${facility.distanceKm.toFixed(1)} km`}
                       </span>
-                      <span className="text-[10px] text-amber-500 font-bold">★ {facility.rating || "4.8"}</span>
+                      <span className="text-[10px] text-amber-500 font-bold inline-flex items-center gap-0.5">
+                        <Star className="h-3 w-3 fill-amber-400 text-amber-400 shrink-0" />
+                        {facility.rating || "4.8"}
+                      </span>
                     </div>
                   </button>
                 );
@@ -598,7 +595,7 @@ export function MobileMapView() {
 
         {/* Floating Toggle Button (Bottom Left) when list is hidden */}
         {!showLocationList && !showDetailsPanel && (
-          <div className="absolute bottom-[80px] left-3 z-40">
+          <div className="absolute bottom-[112px] left-3 z-40">
             <button
               onClick={() => setShowLocationList(true)}
               className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-white/95 backdrop-blur-md border border-[#E5E7EB] shadow-xl text-xs font-bold text-[#4a6fa5] hover:bg-slate-50 active:scale-95 transition"
@@ -611,7 +608,7 @@ export function MobileMapView() {
 
         {/* Recenter GPS Floating Button (Bottom Right) */}
         {!showDetailsPanel && (
-          <div className="absolute bottom-[80px] right-3 z-40">
+          <div className="absolute bottom-[112px] right-3 z-40">
             <button
               onClick={() => getUserGeolocation(true)}
               className="p-3 rounded-full bg-[#4a6fa5] text-white border-2 border-white shadow-xl hover:bg-[#35517d] transition active:scale-90 flex items-center justify-center"
@@ -645,7 +642,7 @@ export function MobileMapView() {
           </div>
 
           {/* Content */}
-          <div className="overflow-y-auto px-4 pb-6 pt-3 max-h-[calc(75vh-55px)]">
+          <div className="overflow-y-auto px-4 pb-24 pt-3 max-h-[calc(75vh-55px)]">
             {/* Header (No X button) */}
             <div className="flex items-start justify-between gap-3 mb-4">
               <div>

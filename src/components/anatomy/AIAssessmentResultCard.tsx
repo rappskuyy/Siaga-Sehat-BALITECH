@@ -86,8 +86,8 @@ export function AIAssessmentResultCard({
           <div className="flex items-start gap-2.5 rounded-2xl bg-red-50 p-3 sm:p-3.5 border border-red-200 text-red-900 shadow-xs">
             <AlertOctagon className="mt-0.5 h-5 w-5 shrink-0 text-red-600 animate-pulse" />
             <div>
-              <h4 className="text-xs font-bold text-red-700 uppercase tracking-wide">
-                ⚠️ Perhatian Medis Penting
+              <h4 className="text-xs font-bold text-red-700 uppercase tracking-wide flex items-center gap-1.5">
+                <AlertOctagon className="h-3.5 w-3.5 text-red-600 shrink-0" /> Perhatian Medis Penting
               </h4>
               <p className="mt-1 text-[11px] leading-relaxed text-red-800">
                 {emergencyMessage ||
