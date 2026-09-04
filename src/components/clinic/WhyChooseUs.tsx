@@ -86,7 +86,7 @@ export function WhyChooseUs() {
     <section
       id="doctors"
       ref={ref}
-      className="relative w-full overflow-hidden bg-white px-5 py-14 sm:px-6 md:px-8 md:py-20 lg:px-10"
+      className="relative w-full overflow-hidden bg-white px-4 py-10 sm:px-6 md:px-8 md:py-20 lg:px-10"
     >
       <div className="relative mx-auto max-w-6xl">
         <Reveal className="mx-auto max-w-2xl text-center">

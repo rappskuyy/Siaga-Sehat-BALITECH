@@ -74,7 +74,7 @@ export function Services() {
   return (
     <section
       id="services"
-      className="relative w-full overflow-hidden bg-white px-5 py-14 sm:px-6 md:px-8 md:py-20 lg:px-10"
+      className="relative w-full overflow-hidden bg-white px-4 py-10 sm:px-6 md:px-8 md:py-20 lg:px-10"
     >
       <span className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-[color:var(--color-clinic-blue)]/5 blur-3xl" />
       <span className="pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-[color:var(--color-clinic-blue)]/5 blur-3xl" />

@@ -86,7 +86,7 @@ export function Statement() {
   return (
     <section
       id="about"
-      className="w-full bg-white px-5 py-10 text-center sm:px-6 md:px-8 md:py-14 lg:px-10"
+      className="w-full bg-white px-4 py-10 text-center sm:px-6 md:px-8 md:py-14 lg:px-10"
     >
       <p
         ref={ref}

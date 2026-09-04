@@ -497,22 +497,31 @@ function ProfilePage() {
 
             {!historyLoading && history && history.length > 0 && (
               <>
-                <div className="mt-4 h-40 w-full">
+                <div className="mt-4 h-44 w-full overflow-hidden">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                       data={chartData}
-                      margin={{ top: 5, right: 10, left: -25, bottom: 0 }}
+                      margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                      <XAxis dataKey="tanggal" fontSize={10} interval="preserveStartEnd" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="tanggal" fontSize={10} interval="preserveStartEnd" tick={{ fill: "#64748b" }} />
                       <YAxis
                         domain={[0, 3]}
                         ticks={[1, 2, 3]}
                         tickFormatter={(v) => (v === 1 ? "Rendah" : v === 2 ? "Sedang" : "Tinggi")}
-                        fontSize={9}
-                        width={45}
+                        fontSize={10}
+                        width={48}
+                        tick={{ fill: "#64748b" }}
                       />
                       <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#ffffff",
+                          borderRadius: "12px",
+                          border: "1px solid rgba(0, 0, 0, 0.08)",
+                          boxShadow: "0 4px 14px rgba(0, 0, 0, 0.08)",
+                          fontSize: "11px",
+                          padding: "8px 12px",
+                        }}
                         formatter={(_value, _name, props) => [
                           String(props.payload?.nama ?? ""),
                           "Kondisi",
@@ -521,9 +530,10 @@ function ProfilePage() {
                       <Line
                         type="monotone"
                         dataKey="tingkat"
-                        stroke="#4a6fa5"
-                        strokeWidth={2}
-                        dot={{ r: 3 }}
+                        stroke="#2563eb"
+                        strokeWidth={2.5}
+                        dot={{ r: 4, fill: "#2563eb", strokeWidth: 2, stroke: "#ffffff" }}
+                        activeDot={{ r: 6 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -582,6 +592,7 @@ function ProfilePage() {
 
         {/* Anatomy / body-part consultation history */}
         <div
+          id="riwayat-anatomi-section"
           className={`mt-5 sm:mt-6 rounded-3xl border border-black/5 bg-white p-5 sm:p-6 shadow-[var(--shadow-clinic)] ${
             mobileTab === "semua" || mobileTab === "anatomy" ? "block" : "hidden lg:block"
           }`}

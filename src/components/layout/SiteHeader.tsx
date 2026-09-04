@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
-import { Bell, Menu, User, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -144,7 +144,7 @@ export function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white/95 px-5 py-2.5 shadow-xs backdrop-blur sm:px-6 md:px-8 lg:px-10">
+    <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white/95 px-4 py-2.5 shadow-xs backdrop-blur sm:px-6 md:px-8 lg:px-10">
       <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-3">
         <BrandLogo size="sm" />
 
@@ -154,11 +154,9 @@ export function SiteHeader() {
           {user && (
             <Link
               to="/reminders"
-              className="hidden h-9 w-9 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)]/10 sm:inline-flex"
-              aria-label="Notifikasi"
-              title="Notifikasi"
+              className="hidden items-center justify-center rounded-full border border-[color:var(--color-clinic-blue)]/15 bg-[color:var(--color-clinic-blue-soft)] px-3.5 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)] hover:text-white sm:inline-flex"
             >
-              <Bell className="h-4 w-4" />
+              Notifikasi
             </Link>
           )}
 
@@ -180,11 +178,8 @@ export function SiteHeader() {
           ) : (
             <Link
               to="/profile"
-              className="hidden items-center gap-2 rounded-full bg-white/80 py-1 pl-1 pr-3.5 text-sm font-medium text-[color:var(--color-clinic-ink)] shadow-xs transition hover:bg-white sm:inline-flex"
+              className="hidden items-center justify-center rounded-full border border-[color:var(--color-clinic-blue)]/15 bg-[color:var(--color-clinic-blue-soft)] px-4 py-1.5 text-sm font-semibold text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)] hover:text-white sm:inline-flex"
             >
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
-                <User className="h-3.5 w-3.5" />
-              </span>
               {profile?.full_name?.split(" ")[0] || "Profil"}
             </Link>
           )}
@@ -192,19 +187,17 @@ export function SiteHeader() {
           {!user && (
             <Link
               to="/login"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue)] text-white shadow-lg shadow-[color:var(--color-clinic-blue)]/20 sm:hidden"
-              aria-label="Masuk"
+              className="inline-flex items-center justify-center rounded-full bg-[color:var(--color-clinic-blue)] px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs sm:hidden"
             >
-              <User className="h-4 w-4" />
+              Masuk
             </Link>
           )}
           {user && (
             <Link
               to="/profile"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] sm:hidden"
-              aria-label="Akun"
+              className="inline-flex items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3.5 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-blue)] sm:hidden"
             >
-              <User className="h-4 w-4" />
+              {profile?.full_name?.split(" ")[0] || "Profil"}
             </Link>
           )}
           <button
@@ -262,9 +255,8 @@ export function SiteHeader() {
               <Link
                 to="/reminders"
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)] transition hover:bg-[color:var(--color-clinic-blue-soft)]"
+                className="rounded-xl px-3 py-2.5 text-sm font-medium text-[color:var(--color-clinic-ink)] transition hover:bg-[color:var(--color-clinic-blue-soft)]"
               >
-                <Bell className="h-4 w-4 text-[color:var(--color-clinic-blue)]" />
                 Notifikasi
               </Link>
             )}

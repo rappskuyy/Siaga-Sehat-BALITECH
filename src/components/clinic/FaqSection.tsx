@@ -124,7 +124,7 @@ export function FaqSection() {
   return (
     <section
       id="faq"
-      className="relative w-full overflow-hidden bg-[color:var(--color-clinic-blue-soft)]/40 px-5 py-14 sm:px-6 md:px-8 md:py-20 lg:px-10"
+      className="relative w-full overflow-hidden bg-[color:var(--color-clinic-blue-soft)]/40 px-4 py-10 sm:px-6 md:px-8 md:py-20 lg:px-10"
     >
       <span className="pointer-events-none absolute -left-20 bottom-0 h-72 w-72 rounded-full bg-[color:var(--color-siaga-scan)]/[0.06] blur-3xl" />
       <span className="pointer-events-none absolute -right-16 top-0 h-72 w-72 rounded-full bg-[color:var(--color-siaga-consult)]/[0.07] blur-3xl" />
