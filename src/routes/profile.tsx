@@ -457,7 +457,7 @@ function ProfilePage() {
           {/* Scan history */}
           <div
             id="riwayat-scan-section"
-            className={`rounded-3xl border border-black/5 bg-white p-5 sm:p-6 shadow-[var(--shadow-clinic)] ${
+            className={`rounded-3xl border border-black/5 bg-white p-4 sm:p-6 shadow-[var(--shadow-clinic)] w-full overflow-hidden ${
               mobileTab === "semua" || mobileTab === "scan" ? "block" : "hidden lg:block"
             }`}
           >
@@ -593,7 +593,7 @@ function ProfilePage() {
         {/* Anatomy / body-part consultation history */}
         <div
           id="riwayat-anatomi-section"
-          className={`mt-5 sm:mt-6 rounded-3xl border border-black/5 bg-white p-5 sm:p-6 shadow-[var(--shadow-clinic)] ${
+          className={`mt-4 sm:mt-6 rounded-3xl border border-black/5 bg-white p-4 sm:p-6 shadow-[var(--shadow-clinic)] w-full overflow-hidden ${
             mobileTab === "semua" || mobileTab === "anatomy" ? "block" : "hidden lg:block"
           }`}
         >
