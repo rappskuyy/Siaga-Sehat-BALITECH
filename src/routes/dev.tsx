@@ -28,6 +28,7 @@ import {
   ShieldCheck,
   Target,
   Lightbulb,
+  Users,
 } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { Footer } from "@/components/clinic/Footer";
@@ -350,6 +351,19 @@ function DevPage() {
             </div>
           </motion.div>
 
+          {/* Developer Cards Section Header */}
+          <div className="text-center max-w-2xl mx-auto mb-10 mt-16">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[color:var(--color-clinic-blue)]">
+              <Users className="h-3.5 w-3.5" /> Tim Rekayasa & Pengembang
+            </span>
+            <h2 className="font-display text-2xl font-extrabold text-[color:var(--color-clinic-ink)] sm:text-3xl mt-3">
+              Mengenal Tim di Balik Layar
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-[color:var(--color-clinic-muted)] leading-relaxed">
+              Siswa-siswi bertalenta dari SMK Wikrama Bogor yang mendedikasikan keahlian rekayasa perangkat lunak demi pelayanan kesehatan digital Indonesia.
+            </p>
+          </div>
+
           {/* Developer Cards — Bento-style grid */}
           <div className="grid gap-5 md:grid-cols-3">
             {TEAM_MEMBERS.map((member, i) => {
@@ -362,69 +376,65 @@ function DevPage() {
                   initial="hidden"
                   animate="visible"
                   whileHover={{ y: -6, transition: { duration: 0.25 } }}
-                  className="group relative flex flex-col rounded-[24px] border border-black/[0.04] bg-white shadow-[var(--shadow-clinic)] transition-shadow hover:shadow-[var(--shadow-clinic-lg)]"
+                  className="group relative flex flex-col rounded-[28px] border border-black/[0.06] bg-white p-6 shadow-[var(--shadow-clinic)] transition-all hover:border-[color:var(--color-clinic-blue)]/30 hover:shadow-[var(--shadow-clinic-lg)]"
                 >
-                  {/* Gradient header strip */}
-                  <div className={`relative h-28 rounded-t-[24px] bg-gradient-to-br ${member.gradient} overflow-hidden`}>
-                    {/* Animated geometric decoration */}
-                    <div className="absolute inset-0 opacity-25">
-                      <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full border-[3px] border-white/30" />
-                      <div className="absolute -right-2 -top-2 h-16 w-16 rounded-full border-[3px] border-white/25" />
-                      <div className="absolute left-6 bottom-3 h-8 w-8 rounded-lg rotate-45 border-2 border-white/25" />
+                  {/* Top Row: Avatar & Specialty Tag */}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 border-[color:var(--color-clinic-blue-soft)] shadow-xs group-hover:border-[color:var(--color-clinic-blue)]/50 transition-colors">
+                      <img
+                        src={member.avatar}
+                        alt={member.name}
+                        className="h-full w-full object-cover"
+                      />
                     </div>
-
-                    {/* Specialty tag */}
-                    <span className="absolute right-4 top-4 rounded-full bg-white/20 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
-                      {member.specialty.split(" & ")[0]}
-                    </span>
+                    <div className="flex flex-col items-end">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[color:var(--color-clinic-blue-dark)]">
+                        <Icon className="h-3 w-3" /> {member.specialty.split(" & ")[0]}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Photo avatar — positioned outside the gradient so it won't clip */}
-                  <div className="absolute left-6 top-[112px] -translate-y-1/2 z-10 h-16 w-16 rounded-2xl overflow-hidden bg-white shadow-lg border-[3px] border-white transition-transform duration-300 group-hover:scale-110">
-                    <img
-                      src={member.avatar}
-                      alt={member.name}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-
-                  {/* Card body */}
-                  <div className="flex flex-1 flex-col p-6 pt-12">
-                    <h2 className="font-display text-xl font-extrabold text-[color:var(--color-clinic-ink)]">
+                  {/* Name & Role */}
+                  <div className="mt-5">
+                    <h3 className="font-display text-lg font-extrabold text-[color:var(--color-clinic-ink)] leading-snug">
                       {member.name}
-                    </h2>
-                    <p className="mt-0.5 text-xs font-semibold text-slate-700">
+                    </h3>
+                    <p className="mt-1 text-xs font-bold text-[color:var(--color-clinic-blue)]">
                       {member.role}
                     </p>
+                  </div>
 
-                    <p className="mt-4 flex-1 text-[13px] leading-relaxed text-slate-600">
-                      {member.bio}
-                    </p>
+                  {/* Bio */}
+                  <p className="mt-3 flex-1 text-xs leading-relaxed text-[color:var(--color-clinic-muted)]">
+                    {member.bio}
+                  </p>
 
-                    {/* Skills */}
-                    <div className="mt-6 flex flex-wrap gap-1.5">
-                      {member.skills.map((skill) => (
-                        <span
-                          key={skill}
-                          className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-semibold text-slate-700"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
+                  {/* Skills */}
+                  <div className="mt-5 flex flex-wrap gap-1.5 border-t border-black/5 pt-4">
+                    {member.skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="rounded-full border border-black/[0.06] bg-[#f8fafc] px-2.5 py-1 text-[10px] font-semibold text-slate-700"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
 
-                    {/* Social links */}
-                    <div className="mt-5 flex items-center gap-2 border-t border-black/5 pt-4">
+                  {/* Social Footer */}
+                  <div className="mt-4 flex items-center justify-between border-t border-black/5 pt-4 text-xs text-[color:var(--color-clinic-muted)]">
+                    <span className="text-[11px] font-medium text-slate-500">SMK Wikrama Bogor</span>
+                    <div className="flex items-center gap-2">
                       <a
                         href="#"
-                        className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition-all duration-200"
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition-all duration-200"
                         title="GitHub"
                       >
                         <Github className="h-3.5 w-3.5" />
                       </a>
                       <a
                         href="#"
-                        className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition-all duration-200"
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition-all duration-200"
                         title="LinkedIn"
                       >
                         <Linkedin className="h-3.5 w-3.5" />
