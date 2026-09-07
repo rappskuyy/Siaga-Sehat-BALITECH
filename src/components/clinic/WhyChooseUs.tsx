@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import {
   Activity,
   ArrowRight,
-  Bone,
   CheckCircle2,
   Clock,
   Globe2,
+  Leaf,
   ScanLine,
   ShieldCheck,
   Zap,
@@ -131,43 +131,43 @@ export function WhyChooseUs() {
             </div>
           </Reveal>
 
-          {/* Card 2: 3 Modalitas Input Gejala */}
+          {/* Card 2: Panduan Obat & Herbal Alami */}
           <Reveal delay="0.08s">
             <div className="group relative h-full overflow-hidden rounded-[24px] border border-black/[0.07] bg-white p-6 shadow-xs transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-lg hover:border-[color:var(--color-clinic-blue)]/35 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between">
                   <span className="grid h-11 w-11 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] transition-transform duration-300 ease-out group-hover:scale-110 group-hover:rotate-6">
-                    <Bone className="h-5.5 w-5.5" />
+                    <Leaf className="h-5.5 w-5.5" />
                   </span>
                   <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-[color:var(--color-clinic-muted)]">
-                    Multimodal
+                    Edukasi Herbal
                   </span>
                 </div>
 
                 <div className="mt-5">
                   <StatNumber
-                    value="3"
+                    value="100+"
                     start={inView}
                     className="text-4xl text-[color:var(--color-clinic-ink)] group-hover:text-[color:var(--color-clinic-blue-dark)] transition-colors duration-300"
                   />
                   <span className="ml-1.5 font-display text-base font-bold text-[color:var(--color-clinic-ink)]">
-                    Cara Input Gejala
+                    Panduan Obat & Herbal
                   </span>
                   <p className="mt-2 text-xs leading-relaxed text-[color:var(--color-clinic-muted)]">
-                    Pilihan interaksi fleksibel: foto keluhan pada Scan AI, chat interaktif Konsultasi AI, atau titik Anatomi Tubuh 3D.
+                    Informasi medis umum, penanganan awal mandiri, serta rekomendasi manfaat herbal alami untuk keluarga.
                   </p>
                 </div>
               </div>
 
               <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap gap-1.5">
                 <span className="rounded-md bg-[color:var(--color-clinic-blue-soft)] px-2 py-0.5 text-[10px] font-semibold text-[color:var(--color-clinic-blue-dark)] transition-all duration-200 hover:bg-[color:var(--color-clinic-blue)] hover:text-white hover:scale-105 cursor-default">
-                  Scan Foto
+                  Obat Medis
                 </span>
                 <span className="rounded-md bg-[color:var(--color-clinic-blue-soft)] px-2 py-0.5 text-[10px] font-semibold text-[color:var(--color-clinic-blue-dark)] transition-all duration-200 hover:bg-[color:var(--color-clinic-blue)] hover:text-white hover:scale-105 cursor-default">
-                  Chat Konsultasi
+                  Herbal Alami
                 </span>
                 <span className="rounded-md bg-[color:var(--color-clinic-blue-soft)] px-2 py-0.5 text-[10px] font-semibold text-[color:var(--color-clinic-blue-dark)] transition-all duration-200 hover:bg-[color:var(--color-clinic-blue)] hover:text-white hover:scale-105 cursor-default">
-                  Anatomi 3D
+                  Pengingat Obat
                 </span>
               </div>
             </div>
