@@ -231,9 +231,42 @@ function ConsultationPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const initialContextSent = useRef(false);
 
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior,
+      });
+    }
+  }, []);
+
+  // Auto scroll on new messages, loading state, or visual viewport resize (mobile keyboard popups)
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, loading]);
+    scrollToBottom("smooth");
+
+    const handleViewportResize = () => {
+      scrollToBottom("auto");
+    };
+
+    if (typeof window !== "undefined" && window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleViewportResize);
+      window.visualViewport.addEventListener("scroll", handleViewportResize);
+    }
+
+    return () => {
+      if (typeof window !== "undefined" && window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", handleViewportResize);
+        window.visualViewport.removeEventListener("scroll", handleViewportResize);
+      }
+    };
+  }, [messages, loading, scrollToBottom]);
+
+  // Handle mobile input focus when user opens software keyboard
+  const handleInputFocus = () => {
+    scrollToBottom("smooth");
+    setTimeout(() => scrollToBottom("smooth"), 100);
+    setTimeout(() => scrollToBottom("smooth"), 300);
+  };
 
   const buildContext = (allMessages: ChatMessage[]) =>
     allMessages
@@ -487,6 +520,7 @@ function ConsultationPage() {
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
+                  onFocus={handleInputFocus}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
