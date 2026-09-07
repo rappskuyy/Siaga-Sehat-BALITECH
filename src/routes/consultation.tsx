@@ -1,16 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createFileRoute, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Activity,
   AlertCircle,
+  ArrowRight,
   Bot,
   Brain,
   CheckCircle2,
   Flame,
   Loader2,
+  MapPin,
   MessageSquare,
   RotateCcw,
+  ScanLine,
   Send,
   ShieldAlert,
   Sparkles,
@@ -43,9 +46,37 @@ export const Route = createFileRoute("/consultation")({
   component: ConsultationPage,
 });
 
-type ChatMessage = { role: "user" | "assistant"; text: string; time?: string };
+type ActionCardType = {
+  type: "maps" | "scanner" | "anatomy";
+  title: string;
+  description: string;
+  buttonText: string;
+  href: string;
+};
+
+type ChatMessage = {
+  role: "user" | "assistant";
+  text: string;
+  time?: string;
+  actionCard?: ActionCardType;
+};
 
 const QUICK_PROMPTS = [
+  {
+    icon: MapPin,
+    title: "Cari Apotek Terdekat",
+    desc: "Bisa bantu carikan lokasi apotek terdekat dari posisi saya?",
+  },
+  {
+    icon: ScanLine,
+    title: "Scan Foto / Resep",
+    desc: "Saya ingin melakukan scan foto kondisi fisik atau kemasan obat.",
+  },
+  {
+    icon: UserIcon,
+    title: "Pilih Bagian Tubuh",
+    desc: "Saya ingin memilih lokasi keluhan atau organ tubuh yang sakit.",
+  },
   {
     icon: Thermometer,
     title: "Demam & Lemas",
@@ -61,16 +92,87 @@ const QUICK_PROMPTS = [
     title: "Sakit Kepala",
     desc: "Sakit kepala berdenyut di salah satu sisi",
   },
-  {
-    icon: Wind,
-    title: "Batuk & Tenggorokan",
-    desc: "Batuk berdahak dan tenggorokan terasa sakit",
-  },
 ];
 
 function formatTime() {
   const now = new Date();
   return now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+}
+
+function detectIntentAction(text: string): ActionCardType | undefined {
+  const lower = text.toLowerCase();
+  if (
+    lower.includes("apotek") ||
+    lower.includes("farmasi") ||
+    lower.includes("peta") ||
+    lower.includes("maps") ||
+    lower.includes("lokasi apotek")
+  ) {
+    return {
+      type: "maps",
+      title: "Peta Apotek Terdekat",
+      description: "Temukan lokasi apotek dan faskes terdekat di sekitar Anda lengkap dengan rute navigasi.",
+      buttonText: "Buka Peta Apotek Terdekat",
+      href: "/maps",
+    };
+  }
+  if (
+    lower.includes("scan") ||
+    lower.includes("pindai") ||
+    lower.includes("foto") ||
+    lower.includes("kamera") ||
+    lower.includes("gambar")
+  ) {
+    return {
+      type: "scanner",
+      title: "Pemindai AI (Scanner)",
+      description: "Unggah atau foto resep, kemasan obat, atau kondisi kulit untuk analisis instan.",
+      buttonText: "Buka Fitur Scanner",
+      href: "/scanner",
+    };
+  }
+  if (
+    lower.includes("tubuh") ||
+    lower.includes("anatomi") ||
+    lower.includes("organ") ||
+    lower.includes("bagian tubuh")
+  ) {
+    return {
+      type: "anatomy",
+      title: "Eksplorasi Anatomi Interaktif",
+      description: "Pilih organ atau lokasi keluhan pada model anatomi tubuh interaktif.",
+      buttonText: "Buka Model Anatomi",
+      href: "/anatomy",
+    };
+  }
+  return undefined;
+}
+
+function ActionCard({ card }: { card: ActionCardType }) {
+  const navigate = useNavigate();
+  const Icon = card.type === "maps" ? MapPin : card.type === "scanner" ? ScanLine : UserIcon;
+
+  return (
+    <div className="mt-3 rounded-2xl border border-black/10 bg-slate-50 p-3.5 shadow-2xs text-left">
+      <div className="flex items-center gap-2.5 mb-2">
+        <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white shadow-xs">
+          <Icon className="h-4 w-4" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h4 className="text-xs font-bold text-[color:var(--color-clinic-ink)]">{card.title}</h4>
+          <p className="text-[11px] text-[color:var(--color-clinic-muted)] leading-snug">{card.description}</p>
+        </div>
+      </div>
+      <Button
+        type="button"
+        onClick={() => navigate({ to: card.href as any })}
+        className="w-full h-8.5 mt-1 gap-1.5 rounded-xl bg-[color:var(--color-clinic-blue)] text-white text-xs font-semibold hover:bg-[color:var(--color-clinic-blue-dark)] cursor-pointer shadow-xs"
+      >
+        <span>{card.buttonText}</span>
+        <ArrowRight className="h-3.5 w-3.5" />
+      </Button>
+    </div>
+  );
 }
 
 function ChatBubble({ message }: { message: ChatMessage }) {
@@ -93,6 +195,7 @@ function ChatBubble({ message }: { message: ChatMessage }) {
           }`}
         >
           <div className="whitespace-pre-wrap">{message.text}</div>
+          {message.actionCard && <ActionCard card={message.actionCard} />}
         </div>
 
         {message.time && (
@@ -140,17 +243,26 @@ function ConsultationPage() {
   const sendMessage = useCallback(
     async (text: string) => {
       if (!text.trim()) return;
+
       const userMsg: ChatMessage = { role: "user", text, time: formatTime() };
       const next = messages.concat(userMsg);
       setMessages(next);
       setLoading(true);
+
+      const intentCard = detectIntentAction(text);
+
       try {
         const prompt = `Kamu adalah Asisten Kesehatan SiagaSehat yang ramah, empati, dan profesional dalam Bahasa Indonesia. Berikut riwayat percakapan sejauh ini:\n${buildContext(
           next,
-        )}\n\nLanjutkan percakapan secara natural: jika informasi (usia, lama gejala, tingkat keparahan, riwayat penyakit) belum lengkap, tanyakan satu per satu secara sopan. Jika sudah cukup informasi, berikan Analisis Awal Kemungkinan Kondisi, Tingkat Risiko, dan Rekomendasi Tindakan / Perawatan yang aman dan terstruktur.`;
+        )}\n\nLanjutkan percakapan secara natural. Jika pengguna menanyakan apotek/lokasi, jelaskan bahwa mereka bisa membuka Peta Lokasi. Jika pengguna menanyakan scan obat/kulit, sebutkan fitur Scanner. Jika pengguna ingin memilih area tubuh yang sakit, rekomendasikan fitur Anatomi. Jika informasi gejala belum lengkap, tanyakan secara sopan. Jika sudah cukup, berikan Analisis Awal, Tingkat Risiko, dan Rekomendasi Tindakan yang aman.`;
         const res = await chat({ data: { prompt } });
         const reply = res?.reply?.trim() || "Maaf, saya tidak mendapatkan respons. Silakan coba lagi.";
-        const assistantMsg: ChatMessage = { role: "assistant", text: reply, time: formatTime() };
+        const assistantMsg: ChatMessage = {
+          role: "assistant",
+          text: reply,
+          time: formatTime(),
+          actionCard: intentCard || detectIntentAction(reply),
+        };
         setMessages((m) => m.concat(assistantMsg));
       } catch {
         setMessages((m) =>
@@ -158,6 +270,7 @@ function ConsultationPage() {
             role: "assistant",
             text: "Terjadi gangguan saat menghubungi sistem. Silakan coba kirim kembali.",
             time: formatTime(),
+            actionCard: intentCard,
           }),
         );
       } finally {
@@ -275,7 +388,7 @@ function ConsultationPage() {
                     onClick={handleResetChat}
                     variant="outline"
                     size="sm"
-                    className="h-8 gap-1.5 rounded-full border-black/10 text-xs font-semibold text-[color:var(--color-clinic-muted)] hover:bg-[#f1f5f9] px-3"
+                    className="h-8 gap-1.5 rounded-full border-black/10 text-xs font-semibold text-[color:var(--color-clinic-muted)] hover:bg-[#f1f5f9] px-3 cursor-pointer"
                     title="Mulai sesi percakapan baru"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
@@ -304,7 +417,7 @@ function ConsultationPage() {
               className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-4 sm:p-6 bg-[#fcfdfd] scrollbar-thin scrollbar-thumb-slate-300 hover:scrollbar-thumb-slate-400"
             >
               {messages.length === 0 ? (
-                <div className="flex h-full flex-col items-center justify-center text-center max-w-md mx-auto py-8">
+                <div className="flex h-full flex-col items-center justify-center text-center max-w-md mx-auto py-6">
                   <div className="grid h-14 w-14 place-items-center rounded-3xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] mb-3.5 shadow-xs">
                     <Sparkles className="h-7 w-7" />
                   </div>
@@ -318,7 +431,7 @@ function ConsultationPage() {
                   {/* Quick Prompts */}
                   <div className="mt-6 w-full space-y-2">
                     <p className="text-[11px] font-semibold text-[color:var(--color-clinic-muted)] uppercase tracking-wider text-left">
-                      Pilih Contoh Keluhan Cepat:
+                      Pilih Contoh Keluhan / Pertanyaan:
                     </p>
                     <div className="grid gap-2.5 sm:grid-cols-2">
                       {QUICK_PROMPTS.map((item, idx) => {
@@ -379,7 +492,7 @@ function ConsultationPage() {
                       handleSend();
                     }
                   }}
-                  placeholder="Ketik keluhan, gejala, atau pertanyaan Anda di sini... (Enter untuk kirim)"
+                  placeholder="Ketik keluhan, 'cari apotek', 'nge scan', atau 'pilih tubuh'... (Enter untuk kirim)"
                   className="flex-1 max-h-24 min-h-[42px] resize-none bg-transparent px-3 py-2 text-xs sm:text-sm text-[color:var(--color-clinic-ink)] placeholder:text-[color:var(--color-clinic-muted)] focus:outline-none"
                   rows={1}
                 />
@@ -410,3 +523,5 @@ function ConsultationPage() {
     </main>
   );
 }
+
+
