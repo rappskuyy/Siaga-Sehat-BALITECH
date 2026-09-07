@@ -4,18 +4,35 @@ import {
   MousePointerClick,
   CheckSquare2,
   Sparkles,
-  Stethoscope,
   ShieldCheck,
   ArrowRight,
   Activity,
   Layers,
   BookOpen,
+  Brain,
+  Eye,
+  Stethoscope,
+  Heart,
+  Flame,
+  Bone,
+  Footprints,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AnatomyGuideCardProps {
   onSelectRegion: (region: AnatomyRegion) => void;
   onGoToModel?: () => void;
+}
+
+function getRegionIcon(regionId: string) {
+  if (regionId.includes("kepala")) return <Brain className="h-3.5 w-3.5 shrink-0" />;
+  if (regionId.includes("mata")) return <Eye className="h-3.5 w-3.5 shrink-0" />;
+  if (regionId.includes("leher")) return <Stethoscope className="h-3.5 w-3.5 shrink-0" />;
+  if (regionId.includes("dada")) return <Heart className="h-3.5 w-3.5 shrink-0" />;
+  if (regionId.includes("perut")) return <Flame className="h-3.5 w-3.5 shrink-0" />;
+  if (regionId.includes("punggung") || regionId.includes("pinggul")) return <Bone className="h-3.5 w-3.5 shrink-0" />;
+  if (regionId.includes("kaki") || regionId.includes("lutut") || regionId.includes("lengan")) return <Footprints className="h-3.5 w-3.5 shrink-0" />;
+  return <Activity className="h-3.5 w-3.5 shrink-0" />;
 }
 
 export function AnatomyGuideCard({ onSelectRegion, onGoToModel }: AnatomyGuideCardProps) {
@@ -69,7 +86,7 @@ export function AnatomyGuideCard({ onSelectRegion, onGoToModel }: AnatomyGuideCa
     ].includes(r.id),
   );
 
-   return (
+  return (
     <div className="flex flex-col h-full rounded-[20px] sm:rounded-[28px] bg-white p-3.5 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 animate-fade-up justify-between w-full max-w-full overflow-hidden min-w-0 box-border">
       {/* Header Section */}
       <div className="flex items-start justify-between gap-2 border-b border-black/5 pb-3 shrink-0 w-full min-w-0 overflow-hidden">
@@ -131,7 +148,7 @@ export function AnatomyGuideCard({ onSelectRegion, onGoToModel }: AnatomyGuideCa
         <div className="mt-3 pt-3 border-t border-black/5 shrink-0 lg:hidden">
           <Button
             onClick={onGoToModel}
-            className="w-full gap-2 rounded-full bg-[color:var(--color-clinic-blue)] py-3.5 text-xs sm:text-sm font-bold text-white hover:bg-[color:var(--color-clinic-blue-dark)] shadow-md shadow-[color:var(--color-clinic-blue)]/20 transition-all cursor-pointer"
+            className="w-full gap-2 rounded-full bg-[color:var(--color-clinic-blue)] py-3 text-xs sm:text-sm font-bold text-white hover:bg-[color:var(--color-clinic-blue-dark)] shadow-md shadow-[color:var(--color-clinic-blue)]/20 transition-all cursor-pointer"
           >
             <Layers className="h-4 w-4" />
             <span>Mulai & Pilih Model Anatomi &rarr;</span>
@@ -140,29 +157,39 @@ export function AnatomyGuideCard({ onSelectRegion, onGoToModel }: AnatomyGuideCa
       )}
 
       {/* Quick Select Popular Regions Section */}
-      <div className="mt-3 pt-3 border-t border-black/5 space-y-2 w-full min-w-0 overflow-hidden shrink-0">
-        <div className="flex items-center gap-1.5 text-xs font-bold text-[color:var(--color-clinic-ink)]">
-          <Activity className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)] shrink-0" />
-          <span className="truncate">Atau Pilih Langsung Bagian Tubuh:</span>
+      <div className="mt-3.5 pt-3 border-t border-black/5 space-y-2.5 w-full min-w-0 overflow-hidden shrink-0">
+        <div className="flex items-center justify-between gap-2 text-xs font-bold text-[color:var(--color-clinic-ink)]">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <Activity className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)] shrink-0" />
+            <span className="truncate">Atau Pilih Langsung Bagian Tubuh:</span>
+          </div>
+          <span className="text-[10px] font-semibold text-[color:var(--color-clinic-muted)] bg-slate-100 px-2 py-0.5 rounded-full shrink-0">
+            Pilihan Populer
+          </span>
         </div>
 
-        <div className="flex flex-wrap gap-1.5 w-full max-w-full overflow-hidden">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-1.5 w-full max-w-full overflow-hidden">
           {popularRegions.map((region) => (
             <button
               key={region.id}
               type="button"
               onClick={() => onSelectRegion(region)}
-              className="inline-flex items-center gap-1 rounded-full bg-[#f1f5f9] px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold text-[color:var(--color-clinic-ink)] hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition shadow-2xs border border-black/5 group cursor-pointer max-w-full min-w-0 shrink"
+              className="flex items-center gap-2 rounded-xl bg-[#f8fafc] p-2 sm:px-3 sm:py-2 text-left border border-slate-200/80 hover:bg-[color:var(--color-clinic-blue)] hover:border-[color:var(--color-clinic-blue)] hover:text-white transition-all shadow-2xs group cursor-pointer min-w-0 max-w-full shrink sm:max-w-none"
             >
-              <span className="truncate max-w-[130px] sm:max-w-none">{region.nameIndonesian}</span>
-              <ArrowRight className="h-3 w-3 opacity-50 group-hover:translate-x-0.5 group-hover:opacity-100 transition-all shrink-0" />
+              <div className="grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-white group-hover:bg-white/20 text-[color:var(--color-clinic-blue)] group-hover:text-white transition-colors shadow-2xs">
+                {getRegionIcon(region.id)}
+              </div>
+              <span className="flex-1 min-w-0 text-[11px] sm:text-xs font-semibold text-[color:var(--color-clinic-ink)] group-hover:text-white transition-colors line-clamp-2 leading-tight">
+                {region.nameIndonesian}
+              </span>
+              <ArrowRight className="h-3 w-3 opacity-40 group-hover:translate-x-0.5 group-hover:opacity-100 transition-all shrink-0 text-slate-400 group-hover:text-white" />
             </button>
           ))}
         </div>
       </div>
 
       {/* Footer Banner */}
-      <div className="mt-3 pt-3 border-t border-black/5 flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-[11px] text-[color:var(--color-clinic-muted)] shrink-0 w-full min-w-0 overflow-hidden">
+      <div className="mt-3.5 pt-3 border-t border-black/5 flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-[11px] text-[color:var(--color-clinic-muted)] shrink-0 w-full min-w-0 overflow-hidden">
         <div className="flex items-center gap-1.5 font-medium text-slate-600 min-w-0 flex-1">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
           <span className="truncate">Analisis didukung AI medis & referensi klinis terpercaya</span>
@@ -174,3 +201,4 @@ export function AnatomyGuideCard({ onSelectRegion, onGoToModel }: AnatomyGuideCa
     </div>
   );
 }
+
