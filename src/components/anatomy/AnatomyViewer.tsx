@@ -107,6 +107,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
           <button
             type="button"
             onClick={() => setView("front")}
+            aria-label="Tampilan Depan Anatomi"
             className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer min-h-[30px] sm:min-h-[36px] flex items-center ${
               view === "front"
                 ? "bg-white text-[color:var(--color-clinic-ink)] shadow-xs border border-black/5 font-bold"
@@ -118,6 +119,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
           <button
             type="button"
             onClick={() => setView("back")}
+            aria-label="Tampilan Belakang Anatomi"
             className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer min-h-[30px] sm:min-h-[36px] flex items-center ${
               view === "back"
                 ? "bg-white text-[color:var(--color-clinic-ink)] shadow-xs border border-black/5 font-bold"
@@ -145,6 +147,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             key={cat.id}
             type="button"
             onClick={() => setCategoryFilter(cat.id as CategoryFilter)}
+            aria-label={`Filter kategori ${cat.label}`}
             className={`rounded-full px-2.5 py-0.5 text-[10px] sm:text-[11px] font-semibold whitespace-nowrap transition-all cursor-pointer ${
               categoryFilter === cat.id
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-xs"
@@ -158,13 +161,16 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
 
       {/* Guide hint & Mobile Quick Select Dropdown */}
       <div className="mt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-1.5 text-xs text-slate-600 bg-slate-50/80 px-2.5 py-1.5 rounded-xl border border-slate-200/60 shrink-0 max-w-full overflow-hidden min-w-0">
-        <div className="flex items-center gap-1.5 font-medium text-slate-700 min-w-0">
+        <label htmlFor="organ-selector-dropdown" className="flex items-center gap-1.5 font-medium text-slate-700 min-w-0 cursor-pointer">
           <MousePointerClick className="h-3.5 w-3.5 text-sky-600 shrink-0" />
           <span className="text-[10px] sm:text-[11px] truncate">Klik organ atau pilih dari daftar:</span>
-        </div>
+        </label>
 
         {/* Quick Organ Selector Dropdown */}
         <select
+          id="organ-selector-dropdown"
+          name="organ-selector"
+          aria-label="Pilih Organ Tubuh"
           value={selectedRegion?.id || ""}
           onChange={(e) => {
             const found = ANATOMY_REGIONS.find((r) => r.id === e.target.value);
@@ -197,6 +203,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             type="button"
             onClick={handleZoomIn}
             disabled={zoomLevel >= 2.25}
+            aria-label="Perbesar model anatomi"
             title="Perbesar Canvas (Zoom In)"
             className="grid h-8 w-8 place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition disabled:opacity-30 cursor-pointer"
           >
@@ -207,6 +214,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             type="button"
             onClick={handleZoomOut}
             disabled={zoomLevel <= 0.75}
+            aria-label="Perkecil model anatomi"
             title="Perkecil Canvas (Zoom Out)"
             className="grid h-8 w-8 place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition disabled:opacity-30 cursor-pointer"
           >
@@ -216,6 +224,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
           <button
             type="button"
             onClick={handleResetZoom}
+            aria-label="Reset ukuran model anatomi"
             title="Reset Skala Zoom (100%)"
             className="grid h-8 w-8 place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition cursor-pointer text-[10px] font-bold"
           >
@@ -227,6 +236,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
           <button
             type="button"
             onClick={toggleView}
+            aria-label="Putar tampilan model anatomi"
             title="Putar Model (Depan / Belakang)"
             className="grid h-8 w-8 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition cursor-pointer"
           >
