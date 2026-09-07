@@ -90,12 +90,12 @@ export function Hero() {
             </div>
 
             {/* Center column: doctor photo pulled up close to the header, with floating AI feature cards */}
-            <div className="relative order-first flex flex-col items-center lg:order-none -mt-6 sm:-mt-10 md:-mt-14 lg:-mt-18">
-              <div className="relative inline-flex h-[360px] max-w-full items-end sm:h-[460px] md:h-[520px] lg:h-[600px]">
+            <div className="relative order-first flex flex-col items-center lg:order-none mt-1 sm:-mt-10 md:-mt-14 lg:-mt-18">
+              <div className="relative inline-flex h-[320px] max-w-full items-end sm:h-[460px] md:h-[520px] lg:h-[600px]">
                 <img
                   src={fotodokter2}
                   alt="Dokter dengan stetoskop"
-                  className="h-full max-h-[900px] w-auto object-contain object-bottom scale-120 sm:scale-125 lg:scale-130 -translate-y-3 sm:-translate-y-5 lg:-translate-y-7 origin-bottom transition-transform duration-300"
+                  className="h-full max-h-[900px] w-auto object-contain object-bottom scale-100 sm:scale-125 lg:scale-130 translate-y-0 sm:-translate-y-5 lg:-translate-y-7 origin-bottom transition-transform duration-300"
                 />
 
                 {/* Floating overlay cards */}
