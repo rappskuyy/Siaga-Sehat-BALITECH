@@ -242,8 +242,6 @@ export function MobileMapView() {
       sheet.style.transform = "translate3d(0, 100%, 0)";
       setTimeout(() => {
         setShowDetailsPanel(false);
-        setSelectedPharmacy(null);
-        setRouteInfo(null);
       }, 300);
     } else {
       sheet.style.transform = "translate3d(0, 0, 0)";
@@ -295,8 +293,6 @@ export function MobileMapView() {
     }
     setTimeout(() => {
       setShowDetailsPanel(false);
-      setSelectedPharmacy(null);
-      setRouteInfo(null);
     }, 300);
   }, []);
 
@@ -488,8 +484,8 @@ export function MobileMapView() {
         </div>
 
         {/* Active Route Floating Card Banner */}
-        {selectedPharmacy && routeInfo && (
-          <div className="absolute top-28 left-3 right-3 z-40">
+        {selectedPharmacy && routeInfo && !showDetailsPanel && (
+          <div className="absolute top-28 left-3 right-3 z-40 animate-fade-in">
             <div className="bg-[#4a6fa5] text-white px-3.5 py-2.5 rounded-2xl shadow-xl flex items-center justify-between gap-2 border border-white/20 backdrop-blur-md">
               <div className="flex items-center gap-2.5 overflow-hidden">
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
@@ -502,12 +498,26 @@ export function MobileMapView() {
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setShowDetailsPanel(true)}
-                className="px-3 py-1.5 rounded-xl bg-white text-[#4a6fa5] text-[11px] font-extrabold hover:bg-slate-100 transition shrink-0 shadow-sm"
-              >
-                Detail
-              </button>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setShowDetailsPanel(true)}
+                  className="px-3 py-1.5 rounded-xl bg-white text-[#4a6fa5] text-[11px] font-extrabold hover:bg-slate-100 transition shrink-0 shadow-sm cursor-pointer"
+                >
+                  Detail
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedPharmacy(null);
+                    setRouteInfo(null);
+                  }}
+                  className="p-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white transition cursor-pointer"
+                  title="Hapus Rute"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
           </div>
         )}

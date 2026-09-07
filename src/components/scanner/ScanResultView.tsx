@@ -1,5 +1,10 @@
+import { useState } from "react";
 import {
+  Activity,
   AlertTriangle,
+  ChevronDown,
+  Leaf,
+  Pill,
   RotateCcw,
   ShieldAlert,
   ShieldCheck,
@@ -58,23 +63,66 @@ const DANGER_STYLES: Record<
 
 const ResultCard = ({
   title,
+  icon: Icon,
   className,
+  isExpanded,
+  onToggle,
   children,
 }: {
   title: string;
+  icon?: any;
   className?: string;
+  isExpanded: boolean;
+  onToggle: () => void;
   children: React.ReactNode;
 }) => {
   return (
     <div
       className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border shadow-sm transition-shadow duration-200 hover:shadow-md ${className}`}
     >
-      <div className="shrink-0 px-5 pb-0 pt-6 text-center sm:px-6 md:px-7 md:pt-7">
+      {/* Mobile Only: Clickable accordion header with ONLY Arrow Chevron */}
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full text-left px-4 py-3.5 flex items-center justify-between gap-3 md:hidden cursor-pointer select-none focus:outline-none"
+        aria-expanded={isExpanded}
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          {Icon && (
+            <div className="w-7 h-7 rounded-lg bg-[color:var(--color-clinic-blue)]/10 text-[color:var(--color-clinic-blue)] flex items-center justify-center shrink-0">
+              <Icon className="h-3.5 w-3.5" />
+            </div>
+          )}
+          <h3 className="font-display text-base font-bold leading-tight text-[color:var(--color-clinic-ink)] truncate">
+            {title}
+          </h3>
+        </div>
+
+        {/* Only Arrow Chevron on Mobile */}
+        <div
+          className={`p-1 rounded-full transition-transform duration-200 text-[color:var(--color-clinic-blue)] ${
+            isExpanded ? "rotate-180" : "rotate-0"
+          }`}
+        >
+          <ChevronDown className="h-4 w-4" />
+        </div>
+      </button>
+
+      {/* Desktop Only: Original static header (unchanged) */}
+      <div className="hidden shrink-0 px-5 pb-0 pt-6 text-center sm:px-6 md:block md:px-7 md:pt-7">
         <h3 className="font-display text-xl font-bold leading-tight text-[color:var(--color-clinic-ink)] md:text-2xl">
           {title}
         </h3>
       </div>
-      <div className="flex-1 px-5 pb-6 pt-5 sm:px-6 md:px-7 md:pb-7 md:pt-6">{children}</div>
+
+      {/* Card Content: Collapsible on Mobile, always fully shown on Desktop */}
+      <div
+        className={`${
+          isExpanded ? "block" : "hidden md:block"
+        } flex-1 px-4 pb-4 pt-2 border-t border-slate-200/70 md:border-t-0 md:px-7 md:pb-7 md:pt-6`}
+      >
+        {children}
+      </div>
     </div>
   );
 };
@@ -88,6 +136,17 @@ export function ScanResultView({
   previewUrl: string;
   onReset: () => void;
 }) {
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({
+    penyebab: false,
+    pencegahan: false,
+    obat: false,
+    herbal: false,
+  });
+
+  const toggleCard = (key: string) => {
+    setExpandedCards((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
   if (!result.gambar_dapat_dianalisis) {
     return (
       <div className="animate-fade-up rounded-[24px] bg-white p-8 text-center shadow-[var(--shadow-clinic)]">
@@ -179,6 +238,9 @@ export function ScanResultView({
         {/* Card 1: Kemungkinan Penyebab */}
         <ResultCard
           title="Kemungkinan Penyebab"
+          icon={Activity}
+          isExpanded={expandedCards.penyebab}
+          onToggle={() => toggleCard("penyebab")}
           className="col-span-12 border-slate-200 bg-slate-50 md:col-span-4"
         >
           <div className="flex flex-col items-start text-[color:var(--color-clinic-blue)]">
@@ -200,6 +262,9 @@ export function ScanResultView({
         {/* Card 2: Pencegahan Mandiri */}
         <ResultCard
           title="Pencegahan Mandiri"
+          icon={ShieldCheck}
+          isExpanded={expandedCards.pencegahan}
+          onToggle={() => toggleCard("pencegahan")}
           className="col-span-12 border-slate-200 bg-slate-50 md:col-span-8"
         >
           <div className="flex flex-col items-start text-[color:var(--color-clinic-blue)]">
@@ -222,6 +287,9 @@ export function ScanResultView({
         {/* Card 3: Rekomendasi Obat */}
         <ResultCard
           title="Rekomendasi Obat & Medis"
+          icon={Pill}
+          isExpanded={expandedCards.obat}
+          onToggle={() => toggleCard("obat")}
           className="col-span-12 border-slate-200 bg-slate-50 md:col-span-8"
         >
           <div className="flex flex-col items-start text-[color:var(--color-clinic-blue)]">
@@ -250,6 +318,9 @@ export function ScanResultView({
         {/* Card 4: Obat Herbal Alami */}
         <ResultCard
           title="Obat Herbal Alami"
+          icon={Leaf}
+          isExpanded={expandedCards.herbal}
+          onToggle={() => toggleCard("herbal")}
           className="col-span-12 border-slate-200 bg-slate-50 md:col-span-4"
         >
           <div className="flex flex-col items-start text-[color:var(--color-clinic-blue)]">
