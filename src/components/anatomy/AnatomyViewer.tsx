@@ -41,8 +41,8 @@ function getRegionIcon(regionId: string) {
   return <Activity className="h-4 w-4" />;
 }
 
-const FRONT_IMAGE_URL = "/anatomy/human-anatomy-front.png";
-const BACK_IMAGE_URL = "/anatomy/human-anatomy-back.png";
+const FRONT_IMAGE_URL = "/anatomy/human-anatomy-front.svg";
+const BACK_IMAGE_URL = "/anatomy/human-anatomy-back.svg";
 
 type CategoryFilter = "all" | "head" | "torso" | "spine" | "limbs";
 
