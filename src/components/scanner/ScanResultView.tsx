@@ -37,9 +37,9 @@ const DANGER_STYLES: Record<
     icon: ShieldCheck,
     ring: "from-emerald-400 to-emerald-500",
     card: "border-slate-200 bg-slate-50",
-    panel: "from-[color:var(--color-clinic-blue)] to-[color:var(--color-clinic-blue-dark)]",
+    panel: "from-white to-slate-50",
     title: "text-slate-800",
-    accent: "text-[color:var(--color-clinic-blue-soft)]",
+    accent: "text-[color:var(--color-clinic-blue)]",
   },
   sedang: {
     label: "Perlu Diperhatikan",
@@ -47,9 +47,9 @@ const DANGER_STYLES: Record<
     icon: ShieldQuestion,
     ring: "from-amber-400 to-amber-500",
     card: "border-slate-200 bg-slate-50",
-    panel: "from-[color:var(--color-clinic-blue)] to-[color:var(--color-clinic-blue-dark)]",
+    panel: "from-white to-slate-50",
     title: "text-slate-800",
-    accent: "text-[color:var(--color-clinic-blue-soft)]",
+    accent: "text-[color:var(--color-clinic-blue)]",
   },
   tinggi: {
     label: "Bahaya Tinggi",
@@ -57,9 +57,9 @@ const DANGER_STYLES: Record<
     icon: ShieldAlert,
     ring: "from-red-400 to-red-500",
     card: "border-slate-200 bg-slate-50",
-    panel: "from-[color:var(--color-clinic-blue)] to-[color:var(--color-clinic-blue-dark)]",
+    panel: "from-white to-slate-50",
     title: "text-slate-800",
-    accent: "text-[color:var(--color-clinic-blue-soft)]",
+    accent: "text-[color:var(--color-clinic-blue)]",
   },
 };
 
@@ -90,7 +90,7 @@ const ResultCard = ({
         <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-800/5 text-slate-700">
           <Icon className="h-4 w-4" />
         </span>
-        <h3 className="flex-1 font-display text-base font-bold text-slate-800">
+        <h3 className="flex-1 font-display text-base font-bold text-[color:var(--color-clinic-blue)]">
           {title}
         </h3>
         <ChevronDown
@@ -101,7 +101,7 @@ const ResultCard = ({
 
       {/* Desktop header - always visible */}
       <div className="hidden shrink-0 items-center justify-center px-7 pt-7 pb-0 md:flex">
-        <h3 className="font-display text-2xl font-bold text-slate-800 text-center">
+        <h3 className="font-display text-2xl font-bold text-[color:var(--color-clinic-blue)] text-center">
           {title}
         </h3>
       </div>
@@ -233,21 +233,19 @@ export function ScanResultView({
           icon={Stethoscope}
           className="col-span-12 border-slate-200 bg-slate-50 md:col-span-4"
         >
-          <div
-            className={`flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-white shadow-md ${danger.panel}`}
-          >
+          <div className="flex flex-col items-start gap-2 p-1 text-[color:var(--color-clinic-blue)]">
             <Stethoscope className={`hidden h-7 w-7 shrink-0 md:block ${danger.accent}`} />
             {result.penyebab && result.penyebab.length > 0 ? (
-              <ul className="space-y-1.5 text-xs sm:text-sm font-medium text-white leading-relaxed w-full">
+              <ul className="space-y-1.5 text-xs sm:text-sm font-medium text-slate-900 leading-relaxed w-full">
                 {result.penyebab.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 bg-white/15 rounded-xl p-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--color-clinic-blue-soft)]" />
-                    <span className="text-xs sm:text-sm font-semibold">{item}</span>
+                  <li key={i} className="flex items-start gap-2 p-1">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--color-clinic-blue)]" />
+                    <span className="text-xs sm:text-sm font-semibold text-[color:var(--color-clinic-blue)]">{item}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <span className="text-xs sm:text-sm font-semibold text-white/80">
+              <span className="text-xs sm:text-sm font-semibold text-[color:var(--color-clinic-blue)]">
                 Tidak ada data penyebab yang tersedia.
               </span>
             )}
@@ -260,16 +258,14 @@ export function ScanResultView({
           icon={CheckCircle2}
           className="col-span-12 border-slate-200 bg-slate-50 md:col-span-8"
         >
-          <div
-            className={`flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
-          >
-            <CheckCircle2 className="hidden h-7 w-7 shrink-0 text-white md:block" />
+          <div className="flex flex-col items-start gap-2 p-1 text-[color:var(--color-clinic-blue)]">
+            <CheckCircle2 className="hidden h-7 w-7 shrink-0 text-[color:var(--color-clinic-blue)] md:block" />
             {result.pencegahan_mandiri && result.pencegahan_mandiri.length > 0 ? (
               <div className="grid gap-2 text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed sm:grid-cols-2 w-full">
                 {result.pencegahan_mandiri.map((item, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-2 bg-white/40 rounded-xl p-2 border border-white/30"
+                    className="flex items-start gap-2 p-2"
                   >
                     <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
                     <span className="text-xs sm:text-sm text-[color:var(--color-clinic-ink)]">
@@ -279,7 +275,7 @@ export function ScanResultView({
                 ))}
               </div>
             ) : (
-              <span className="text-xs sm:text-sm font-semibold text-white/80">
+              <span className="text-xs sm:text-sm font-semibold text-[color:var(--color-clinic-blue)]">
                 Tidak ada data pencegahan yang tersedia.
               </span>
             )}
@@ -294,12 +290,10 @@ export function ScanResultView({
           icon={Pill}
           className="col-span-12 border-slate-200 bg-slate-50 md:col-span-8"
         >
-          <div
-            className={`flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
-          >
-            <Pill className="hidden h-7 w-7 shrink-0 text-white md:block" />
+          <div className="flex flex-col items-start gap-2 p-1 text-[color:var(--color-clinic-blue)]">
+            <Pill className="hidden h-7 w-7 shrink-0 text-[color:var(--color-clinic-blue)] md:block" />
             {!result.obat_rekomendasi || result.obat_rekomendasi.length === 0 ? (
-              <span className="text-xs sm:text-sm font-semibold text-white/80">
+              <span className="text-xs sm:text-sm font-semibold text-[color:var(--color-clinic-blue)]">
                 Tidak ada saran obat bebas untuk kondisi ini, konsultasikan ke dokter/apoteker.
               </span>
             ) : (
@@ -307,17 +301,17 @@ export function ScanResultView({
                 {result.obat_rekomendasi.map((med, i) => (
                   <div
                     key={i}
-                    className="flex flex-col gap-1 bg-white/50 rounded-xl p-2.5 border border-white/40 shadow-2xs"
+                    className="flex flex-col gap-1 p-2.5"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-1.5">
-                      <span className="text-xs font-bold text-[color:var(--color-clinic-ink)] sm:text-sm">
+                      <span className="text-xs font-bold text-[color:var(--color-clinic-blue)] sm:text-sm">
                         {med.nama}
                       </span>
-                      <span className="rounded-full bg-[color:var(--color-clinic-blue-dark)] px-2 py-0.5 text-[11px] font-bold text-white">
+                      <span className="rounded-full bg-[color:var(--color-clinic-blue-soft)] px-2 py-0.5 text-[11px] font-bold text-[color:var(--color-clinic-blue)]">
                         {med.dosis}
                       </span>
                     </div>
-                    <span className="text-xs text-[color:var(--color-clinic-ink)]">
+                    <span className="text-xs text-[color:var(--color-clinic-blue)]">
                       {med.catatan}
                     </span>
                   </div>
@@ -333,12 +327,10 @@ export function ScanResultView({
           icon={Leaf}
           className="col-span-12 border-slate-200 bg-slate-50 md:col-span-4"
         >
-          <div
-            className={`flex flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-4 text-slate-900 shadow-md ${danger.panel}`}
-          >
-            <Leaf className="hidden h-7 w-7 shrink-0 text-white md:block" />
+          <div className="flex flex-col items-start gap-2 p-1 text-[color:var(--color-clinic-blue)]">
+            <Leaf className="hidden h-7 w-7 shrink-0 text-[color:var(--color-clinic-blue)] md:block" />
             {!result.obat_herbal || result.obat_herbal.length === 0 ? (
-              <span className="text-xs sm:text-sm font-semibold text-white/80">
+              <span className="text-xs sm:text-sm font-semibold text-[color:var(--color-clinic-blue)]">
                 Tidak ada saran obat herbal spesifik.
               </span>
             ) : (
@@ -346,14 +338,14 @@ export function ScanResultView({
                 {result.obat_herbal.map((herb, i) => (
                   <div
                     key={i}
-                    className="flex flex-col gap-1 bg-white/50 rounded-xl p-2.5 border border-white/40 shadow-2xs"
+                    className="flex flex-col gap-1 p-2.5"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-1.5">
-                      <span className="text-xs font-bold text-[color:var(--color-clinic-ink)] sm:text-sm">
+                      <span className="text-xs font-bold text-[color:var(--color-clinic-blue)] sm:text-sm">
                         {herb.nama}
                       </span>
                     </div>
-                    <span className="text-xs text-[color:var(--color-clinic-ink)]">
+                    <span className="text-xs text-[color:var(--color-clinic-blue)]">
                       {herb.cara_pakai}
                     </span>
                   </div>

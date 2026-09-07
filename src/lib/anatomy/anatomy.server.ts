@@ -245,10 +245,37 @@ Tolong lakukan AI Health Assessment dan kembalikan JSON.`;
   }
 
   const payload = await res.json();
-  const text = payload.choices?.[0]?.message?.content;
+  const text = getCompletionText(payload);
   if (!text) throw new Error("OpenAI/KoboiLLM tidak mengembalikan respon valid.");
 
   return parseResultJson(text);
+}
+
+function getCompletionText(payload: unknown): string | null {
+  const message = (payload as { choices?: Array<{ message?: { content?: unknown } }> })
+    .choices?.[0]?.message;
+  const content = message?.content;
+
+  if (typeof content === "string" && content.trim()) return content;
+
+  if (Array.isArray(content)) {
+    const text = content
+      .map((part) => {
+        if (typeof part === "string") return part;
+        if (part && typeof part === "object" && "text" in part) {
+          const value = (part as { text?: unknown }).text;
+          return typeof value === "string" ? value : "";
+        }
+        return "";
+      })
+      .join("")
+      .trim();
+
+    if (text) return text;
+  }
+
+  const outputText = (payload as { output_text?: unknown }).output_text;
+  return typeof outputText === "string" && outputText.trim() ? outputText : null;
 }
 
 function parseResultJson(jsonString: string): AIAssessmentResult {
