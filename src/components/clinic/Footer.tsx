@@ -10,7 +10,6 @@ const SERVICE_LINKS = [
   { label: "Scan Penyakit", path: "/scanner" },
   { label: "Visual Penyakit", path: "/anatomy" },
   { label: "Peta Faskes", path: "/maps" },
-  { label: "Pengingat Obat", path: "/reminders" },
 ];
 
 const ACCOUNT_LINKS = [
@@ -154,9 +153,9 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Giant watermark wordmark (Desktop only for compact mobile height) */}
-        <div className="pointer-events-none hidden sm:block -mb-6 -mt-2 select-none overflow-hidden text-center leading-none">
-          <span className="font-display text-[clamp(2.5rem,12vw,140px)] font-extrabold tracking-tight text-[color:var(--color-clinic-ink)]/[0.06]">
+        {/* Giant watermark wordmark */}
+        <div className="pointer-events-none -mb-3 sm:-mb-6 mt-1 sm:-mt-2 select-none overflow-hidden text-center leading-none">
+          <span className="font-display text-[clamp(1.75rem,10.5vw,140px)] font-extrabold tracking-tight text-[color:var(--color-clinic-ink)]/[0.06] block">
             {BRAND_NAME}
           </span>
         </div>
