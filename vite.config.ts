@@ -12,4 +12,24 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    build: {
+      target: "es2022",
+      minify: "esbuild",
+      cssCodeSplit: true,
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("node_modules")) {
+              if (id.includes("recharts") || id.includes("d3")) return "vendor-charts";
+              if (id.includes("leaflet") || id.includes("react-leaflet") || id.includes("@vis.gl")) return "vendor-maps";
+              if (id.includes("framer-motion")) return "vendor-motion";
+              if (id.includes("@supabase")) return "vendor-supabase";
+            }
+          },
+        },
+      },
+    },
+  },
 });

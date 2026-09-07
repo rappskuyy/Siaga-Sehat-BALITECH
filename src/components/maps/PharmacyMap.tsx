@@ -161,21 +161,6 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
   const SAVED_LOCATION_KEY = "siaga_user_chosen_location";
 
   useEffect(() => {
-    try {
-      const saved = sessionStorage.getItem(SAVED_LOCATION_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed.coords) && parsed.coords.length === 2) {
-          setUserLocation(parsed.coords);
-          setLocationSource(parsed.source || "Titik Pilihan Anda");
-          if (parsed.address) setSearchQuery(parsed.address);
-          loadPharmacies(parsed.coords[0], parsed.coords[1], parsed.address);
-          return;
-        }
-      }
-    } catch {
-      // ignore
-    }
     getUserGeolocation();
   }, []);
 
