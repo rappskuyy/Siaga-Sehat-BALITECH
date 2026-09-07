@@ -1,55 +1,28 @@
 import { useEffect, useState } from "react";
-import { Activity, Award, Clock, Target, type LucideIcon } from "lucide-react";
+import {
+  Activity,
+  ArrowRight,
+  Bone,
+  CheckCircle2,
+  Clock,
+  Globe2,
+  ScanLine,
+  ShieldCheck,
+  Zap,
+} from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Reveal } from "./Reveal";
 import { useInView } from "@/hooks/use-in-view";
 
-interface StatItem {
-  n: string;
-  t: string;
-  d: string;
-  icon: LucideIcon;
-  accent: string;
-  accentSoft: string;
-}
-
-// Unified to the site's two signature accents (Scan cyan / Konsultasi blue) plus the
-// primary clinic blue in two shades — no off-brand hues.
-const STATS: StatItem[] = [
-  {
-    n: "10+",
-    t: "Tahun pengalaman",
-    d: "Beroperasi sejak 2012, meningkatkan kualitas layanan setiap hari.",
-    icon: Clock,
-    accent: "var(--color-clinic-blue-dark)",
-    accentSoft: "var(--color-clinic-blue-soft)",
-  },
-  {
-    n: "15+",
-    t: "Bidang spesialisasi",
-    d: "Ruang lingkup klinis luas ditambah laboratorium lengkap dalam satu gedung.",
-    icon: Award,
-    accent: "var(--color-siaga-consult-dim)",
-    accentSoft: "color-mix(in srgb, var(--color-siaga-consult) 14%, white)",
-  },
-  {
-    n: "98%",
-    t: "Akurasi diagnostik",
-    d: "Skor akurasi triase awal Scan AI, dievaluasi berkala oleh tim medis.",
-    icon: Target,
-    accent: "var(--color-siaga-scan-dim)",
-    accentSoft: "color-mix(in srgb, var(--color-siaga-scan) 14%, white)",
-  },
-  {
-    n: "95%",
-    t: "Pasien puas",
-    d: "Berdasarkan survei internal terhadap pengguna aktif tahun lalu.",
-    icon: Activity,
-    accent: "var(--color-clinic-blue)",
-    accentSoft: "var(--color-clinic-blue-soft)",
-  },
-];
-
-function StatNumber({ value, color, start }: { value: string; color: string; start: boolean }) {
+function StatNumber({
+  value,
+  start,
+  className = "",
+}: {
+  value: string;
+  start: boolean;
+  className?: string;
+}) {
   const match = value.match(/^(\d+)(.*)$/);
   const target = match ? Number.parseInt(match[1], 10) : 0;
   const suffix = match ? match[2] : "";
@@ -58,7 +31,7 @@ function StatNumber({ value, color, start }: { value: string; color: string; sta
   useEffect(() => {
     if (!start) return;
     setCount(0);
-    const duration = 900;
+    const duration = 1000;
     const startTime = performance.now();
     let raf = 0;
     const tick = (now: number) => {
@@ -72,7 +45,7 @@ function StatNumber({ value, color, start }: { value: string; color: string; sta
   }, [target, start]);
 
   return (
-    <span className="font-display text-3xl font-extrabold tabular-nums" style={{ color }}>
+    <span className={`font-display font-extrabold tabular-nums ${className}`}>
       {count}
       {suffix}
     </span>
@@ -86,43 +59,211 @@ export function WhyChooseUs() {
     <section
       id="doctors"
       ref={ref}
-      className="relative w-full overflow-hidden bg-white px-4 py-10 sm:px-6 md:px-8 md:py-20 lg:px-10"
+      className="relative w-full overflow-hidden bg-white px-4 py-12 sm:px-6 md:px-8 md:py-20 lg:px-10"
     >
+      {/* Lightweight GPU-accelerated ambient background glows */}
+      <span className="pointer-events-none absolute -left-28 top-10 h-80 w-80 rounded-full bg-[color:var(--color-clinic-blue)]/5 blur-3xl animate-pulse" style={{ animationDuration: "6s" }} />
+      <span className="pointer-events-none absolute -right-28 bottom-10 h-80 w-80 rounded-full bg-[color:var(--color-clinic-blue)]/5 blur-3xl animate-pulse" style={{ animationDuration: "8s" }} />
+
       <div className="relative mx-auto max-w-6xl">
+        {/* Header */}
         <Reveal className="mx-auto max-w-2xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--color-clinic-blue)]">
-            Keunggulan Kami
+          <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3.5 py-1 text-xs uppercase tracking-[0.25em] text-[color:var(--color-clinic-blue)] shadow-2xs">
+            [ Keunggulan Platform ]
           </span>
-          <h2 className="mt-4 font-display text-3xl font-extrabold leading-tight tracking-tight text-[color:var(--color-clinic-ink)] md:text-4xl">
-            Mengapa memilih kami
+          <h2 className="mt-4 font-display text-3xl font-extrabold leading-tight tracking-tight text-[color:var(--color-clinic-ink)] md:text-4xl lg:text-5xl">
+            Mengapa memilih Siaga Sehat
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-[color:var(--color-clinic-muted)]">
-            Beberapa angka yang menjadi alasan orang mempercayakan kesehatannya pada kami.
+          <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-[color:var(--color-clinic-muted)] md:text-base">
+            Teknologi kesehatan pintar berbasis AI yang dirancang untuk membantu deteksi dini dan rekomendasi perawatan kesehatan Anda secara real-time.
           </p>
         </Reveal>
 
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 md:mt-12">
-          {STATS.map((s, i) => (
-            <Reveal key={s.t} delay={`${i * 0.06}s`}>
-              <div className="group h-full rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-clinic)]">
-                <span
-                  className="grid h-11 w-11 place-items-center rounded-xl"
-                  style={{ backgroundColor: s.accentSoft }}
-                >
-                  <s.icon className="h-5 w-5" style={{ color: s.accent }} />
-                </span>
-                <div className="mt-4">
-                  <StatNumber value={s.n} color={s.accent} start={inView} />
+        {/* Clean Bento Showcase Grid */}
+        <div className="mt-10 grid grid-cols-1 gap-5 md:mt-14 md:grid-cols-3">
+          {/* Card 1: 500+ Pola Gejala AI (Hero Bento Card - 2 Columns) */}
+          <Reveal className="md:col-span-2">
+            <div className="group relative h-full overflow-hidden rounded-[28px] border border-[color:var(--color-clinic-blue)]/20 bg-gradient-to-br from-[color:var(--color-clinic-blue-soft)]/90 via-white to-sky-50/40 p-6 md:p-8 shadow-xs transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-[color:var(--color-clinic-blue)]/12 hover:border-[color:var(--color-clinic-blue)]/35 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-clinic-blue)] px-3 py-1 text-xs font-semibold text-white shadow-xs">
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+                    </span>
+                    <ScanLine className="h-3.5 w-3.5" />
+                    Scan AI & Analisis Gejala
+                  </span>
+                  <span className="text-xs font-medium text-[color:var(--color-clinic-muted)]">
+                    Deteksi Dini Real-time
+                  </span>
                 </div>
-                <p className="mt-1.5 text-sm font-bold text-[color:var(--color-clinic-ink)]">
-                  {s.t}
-                </p>
-                <p className="mt-1.5 text-xs leading-relaxed text-[color:var(--color-clinic-muted)]">
-                  {s.d}
-                </p>
+
+                <div className="mt-6 flex flex-col sm:flex-row sm:items-baseline sm:gap-5">
+                  <StatNumber
+                    value="500+"
+                    start={inView}
+                    className="text-5xl text-[color:var(--color-clinic-blue-dark)] sm:text-6xl group-hover:scale-105 transition-transform duration-300 origin-left"
+                  />
+                  <div>
+                    <h3 className="font-display text-xl font-bold text-[color:var(--color-clinic-ink)] sm:text-2xl">
+                      Pola Gejala Teridentifikasi
+                    </h3>
+                    <p className="mt-1 max-w-md text-xs leading-relaxed text-[color:var(--color-clinic-muted)] sm:text-sm">
+                      Sistem membandingkan foto dan keluhan medis Anda dengan ratusan pola indikasi gejala untuk rekomendasi awal secara praktis.
+                    </p>
+                  </div>
+                </div>
               </div>
-            </Reveal>
-          ))}
+
+              <div className="mt-8 pt-5 border-t border-[color:var(--color-clinic-blue)]/15 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <span className="flex items-center gap-1.5 font-medium text-[color:var(--color-clinic-ink)]">
+                  <ShieldCheck className="h-4 w-4 text-[color:var(--color-clinic-blue)] group-hover:scale-110 transition-transform duration-300" />
+                  Kalkulasi Tingkat Risiko (Rendah / Sedang / Tinggi)
+                </span>
+                <Link
+                  to="/scanner"
+                  className="group/link inline-flex items-center gap-1 font-bold text-[color:var(--color-clinic-blue-dark)] hover:underline"
+                >
+                  Coba Scan AI <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover/link:translate-x-1" />
+                </Link>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* Card 2: 3 Modalitas Input Gejala */}
+          <Reveal delay="0.08s">
+            <div className="group relative h-full overflow-hidden rounded-[24px] border border-black/[0.07] bg-white p-6 shadow-xs transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-lg hover:border-[color:var(--color-clinic-blue)]/35 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] transition-transform duration-300 ease-out group-hover:scale-110 group-hover:rotate-6">
+                    <Bone className="h-5.5 w-5.5" />
+                  </span>
+                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-[color:var(--color-clinic-muted)]">
+                    Multimodal
+                  </span>
+                </div>
+
+                <div className="mt-5">
+                  <StatNumber
+                    value="3"
+                    start={inView}
+                    className="text-4xl text-[color:var(--color-clinic-ink)] group-hover:text-[color:var(--color-clinic-blue-dark)] transition-colors duration-300"
+                  />
+                  <span className="ml-1.5 font-display text-base font-bold text-[color:var(--color-clinic-ink)]">
+                    Cara Input Gejala
+                  </span>
+                  <p className="mt-2 text-xs leading-relaxed text-[color:var(--color-clinic-muted)]">
+                    Pilihan interaksi fleksibel: foto keluhan pada Scan AI, chat interaktif Konsultasi AI, atau titik Anatomi Tubuh 3D.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap gap-1.5">
+                <span className="rounded-md bg-[color:var(--color-clinic-blue-soft)] px-2 py-0.5 text-[10px] font-semibold text-[color:var(--color-clinic-blue-dark)] transition-all duration-200 hover:bg-[color:var(--color-clinic-blue)] hover:text-white hover:scale-105 cursor-default">
+                  Scan Foto
+                </span>
+                <span className="rounded-md bg-[color:var(--color-clinic-blue-soft)] px-2 py-0.5 text-[10px] font-semibold text-[color:var(--color-clinic-blue-dark)] transition-all duration-200 hover:bg-[color:var(--color-clinic-blue)] hover:text-white hover:scale-105 cursor-default">
+                  Chat Konsultasi
+                </span>
+                <span className="rounded-md bg-[color:var(--color-clinic-blue-soft)] px-2 py-0.5 text-[10px] font-semibold text-[color:var(--color-clinic-blue-dark)] transition-all duration-200 hover:bg-[color:var(--color-clinic-blue)] hover:text-white hover:scale-105 cursor-default">
+                  Anatomi 3D
+                </span>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* Card 3: 98% Estimasi Akurasi Triase */}
+          <Reveal delay="0.12s">
+            <div className="group relative h-full overflow-hidden rounded-[24px] border border-black/[0.07] bg-white p-6 shadow-xs transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-lg hover:border-[color:var(--color-clinic-blue)]/35 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] transition-transform duration-300 ease-out group-hover:scale-110 group-hover:rotate-6">
+                    <Activity className="h-5.5 w-5.5" />
+                  </span>
+                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-[color:var(--color-clinic-muted)]">
+                    Skrining AI
+                  </span>
+                </div>
+
+                <div className="mt-5">
+                  <StatNumber
+                    value="98%"
+                    start={inView}
+                    className="text-4xl text-[color:var(--color-clinic-ink)] group-hover:text-[color:var(--color-clinic-blue-dark)] transition-colors duration-300"
+                  />
+                  <p className="mt-1 font-display text-base font-bold text-[color:var(--color-clinic-ink)]">
+                    Estimasi Akurasi Triase
+                  </p>
+                  <p className="mt-2 text-xs leading-relaxed text-[color:var(--color-clinic-muted)]">
+                    Tingkat pencocokan algoritma dalam memberikan gambaran risiko awal serta saran perawatan mandiri.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-[color:var(--color-clinic-blue)]">
+                <span className="group-hover:translate-x-0.5 transition-transform duration-200">Rekomendasi Cepat</span>
+                <span>Tingkat Lanjut</span>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* Card 4: 24/7 Akses Digital Real-Time (Spans 2 Columns) */}
+          <Reveal delay="0.16s" className="md:col-span-2">
+            <div className="group relative h-full overflow-hidden rounded-[28px] border border-black/[0.07] bg-white p-6 md:p-7 shadow-xs transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-lg hover:border-[color:var(--color-clinic-blue)]/35 flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div className="flex-1">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] transition-transform duration-300 ease-out group-hover:scale-110 group-hover:rotate-6">
+                    <Clock className="h-5.5 w-5.5" />
+                  </span>
+                  <div>
+                    <span className="inline-block rounded-full bg-[color:var(--color-clinic-blue-soft)] px-2.5 py-0.5 text-[11px] font-semibold text-[color:var(--color-clinic-blue-dark)]">
+                      Akses Web Real-Time
+                    </span>
+                    <p className="text-xs font-bold text-[color:var(--color-clinic-ink)]">
+                      Layanan Mandiri 24 Jam
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-5 flex items-baseline gap-3">
+                  <span className="font-display text-4xl font-extrabold text-[color:var(--color-clinic-blue)] sm:text-5xl group-hover:scale-105 transition-transform duration-300 origin-left">
+                    24/7
+                  </span>
+                  <div>
+                    <h3 className="font-display text-lg font-bold text-[color:var(--color-clinic-ink)]">
+                      Akses Mandiri Kapan Saja
+                    </h3>
+                    <p className="mt-0.5 text-xs text-[color:var(--color-clinic-muted)]">
+                      Dapat diakses 24 jam sehari langsung di browser tanpa perlu antre dan tanpa perlu instalasi aplikasi tambahan.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Access highlight info box */}
+              <div className="w-full sm:w-auto shrink-0 rounded-2xl bg-[color:var(--color-clinic-blue-soft)]/60 p-4 border border-[color:var(--color-clinic-blue)]/10 transition-all duration-300 group-hover:border-[color:var(--color-clinic-blue)]/25 group-hover:bg-[color:var(--color-clinic-blue-soft)]/90">
+                <p className="text-xs font-bold text-[color:var(--color-clinic-ink)] flex items-center gap-1.5">
+                  <Globe2 className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)] group-hover:rotate-12 transition-transform duration-300" />
+                  Keunggulan Akses Web:
+                </p>
+                <div className="mt-2.5 flex flex-col gap-1.5 text-xs text-[color:var(--color-clinic-muted)]">
+                  <span className="flex items-center gap-1.5 transition-transform duration-200 hover:translate-x-1">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)]" />
+                    Tanpa Perlu Instal Aplikasi
+                  </span>
+                  <span className="flex items-center gap-1.5 transition-transform duration-200 hover:translate-x-1">
+                    <Zap className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)]" />
+                    Respon Analisis Hitungan Detik
+                  </span>
+                  <span className="flex items-center gap-1.5 transition-transform duration-200 hover:translate-x-1">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)]" />
+                    Gratis Digunakan Langsung
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>
