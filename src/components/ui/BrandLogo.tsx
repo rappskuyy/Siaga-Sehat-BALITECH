@@ -17,10 +17,12 @@ export function BrandLogo({
         ? "h-16 sm:h-20 md:h-24"
         : "h-12 sm:h-14 md:h-16";
 
+  const imageSrc = logoSvg || "/siaga-sehat-logo.svg";
+
   return (
     <Link to="/" className={`inline-flex items-center gap-2 shrink-0 ${className}`}>
       <img
-        src={logoSvg}
+        src={imageSrc}
         alt="Siaga Sehat Logo"
         className={`${logoHeightClass} max-w-[380px] sm:max-w-[480px] w-auto object-contain drop-shadow-sm ${inverted ? "brightness-0 invert" : ""}`}
       />

@@ -1,6 +1,6 @@
 import { ArrowUpRight, MessageCircleHeart, ScanLine, ShieldCheck, Users, Code2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import fotodokter2 from "@/assets/fotodokter(2).png?url";
+import fotodokter2 from "@/assets/fotodokter.webp?url";
 import { FloatingCard } from "./FloatingCard";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
@@ -90,12 +90,12 @@ export function Hero() {
             </div>
 
             {/* Center column: doctor photo pulled up close to the header, with floating AI feature cards */}
-            <div className="relative order-first flex flex-col items-center lg:order-none lg:-mt-6">
-              <div className="relative inline-flex h-[280px] max-w-full items-end sm:h-[400px] md:h-[460px] lg:h-[540px]">
+            <div className="relative order-first flex flex-col items-center lg:order-none -mt-6 sm:-mt-10 md:-mt-14 lg:-mt-18">
+              <div className="relative inline-flex h-[360px] max-w-full items-end sm:h-[460px] md:h-[520px] lg:h-[600px]">
                 <img
                   src={fotodokter2}
                   alt="Dokter dengan stetoskop"
-                  className="h-full max-h-[860px] w-auto object-contain object-bottom"
+                  className="h-full max-h-[900px] w-auto object-contain object-bottom scale-120 sm:scale-125 lg:scale-130 -translate-y-3 sm:-translate-y-5 lg:-translate-y-7 origin-bottom transition-transform duration-300"
                 />
 
                 {/* Floating overlay cards */}

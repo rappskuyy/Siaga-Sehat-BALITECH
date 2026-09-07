@@ -21,10 +21,9 @@ const ACCOUNT_LINKS = [
 ];
 
 const SOCIALS = [
-  { icon: MessageCircle, label: "Discord", href: "#" },
-  { icon: Twitter, label: "X", href: "#" },
-  { icon: Linkedin, label: "LinkedIn", href: "#" },
-  { icon: Github, label: "GitHub", href: "https://github.com" },
+  { icon: MessageCircle, label: "Whatsapp", href: "https://wa.me/6285770485228" },
+  { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/school/smkwikramabogor" },
+  { icon: Github, label: "GitHub", href: "https://github.com/rappskuyy" },
 ];
 
 const BRAND_NAME = "Siaga Sehat";
