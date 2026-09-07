@@ -179,35 +179,35 @@ function ChatBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
 
   return (
-    <div className={`mb-4 flex items-end gap-2.5 ${isUser ? "justify-end" : "justify-start"}`}>
+    <div className={`mb-3 sm:mb-4 flex items-end gap-2 ${isUser ? "justify-end" : "justify-start"}`}>
       {!isUser && (
-        <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white shadow-xs">
-          <Bot className="h-4 w-4" />
+        <div className="grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white shadow-xs mb-0.5">
+          <Bot className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
         </div>
       )}
 
-      <div className={`flex flex-col ${isUser ? "items-end" : "items-start"} max-w-[85%] sm:max-w-[75%]`}>
+      <div className={`flex flex-col ${isUser ? "items-end" : "items-start"} max-w-[88%] sm:max-w-[78%]`}>
         <div
-          className={`rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed shadow-xs ${
+          className={`rounded-2xl px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm leading-relaxed shadow-xs ${
             isUser
               ? "rounded-br-xs bg-[color:var(--color-clinic-blue)] text-white font-normal"
               : "rounded-bl-xs bg-white text-[color:var(--color-clinic-ink)] border border-black/5"
           }`}
         >
-          <div className="whitespace-pre-wrap">{message.text}</div>
+          <div className="whitespace-pre-wrap break-words">{message.text}</div>
           {message.actionCard && <ActionCard card={message.actionCard} />}
         </div>
 
         {message.time && (
-          <span className="mt-1 px-1 text-[10px] text-[color:var(--color-clinic-muted)]">
+          <span className="mt-1 px-1 text-[9px] sm:text-[10px] text-[color:var(--color-clinic-muted)]">
             {message.time}
           </span>
         )}
       </div>
 
       {isUser && (
-        <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-slate-200 text-slate-700 shadow-2xs">
-          <UserIcon className="h-4 w-4" />
+        <div className="grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-xl bg-slate-200 text-slate-700 shadow-2xs mb-0.5">
+          <UserIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
         </div>
       )}
     </div>
@@ -354,45 +354,45 @@ function ConsultationPage() {
         <SiteHeader />
 
         {/* Main Content Area */}
-        <div className="w-full max-w-4xl mx-auto px-4 py-4 sm:py-6">
+        <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 py-2 sm:py-6">
           {/* Chat Container Card */}
-          <div className="flex flex-col h-[calc(100vh-140px)] min-h-[420px] md:h-[76vh] md:min-h-[560px] md:max-h-[780px] rounded-[28px] bg-white shadow-[var(--shadow-clinic-lg)] border border-black/5 overflow-hidden">
+          <div className="flex flex-col h-[calc(100dvh-80px)] sm:h-[calc(100vh-140px)] min-h-[480px] md:h-[76vh] md:min-h-[560px] md:max-h-[780px] rounded-[20px] sm:rounded-[28px] bg-white shadow-[var(--shadow-clinic-lg)] border border-black/5 overflow-hidden">
             {/* Consultation Card Header */}
-            <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-black/5 bg-[#fafbfd] shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-[color:var(--color-clinic-blue)] text-white shadow-sm">
-                    <Stethoscope className="h-5 w-5" />
+            <div className="flex items-center justify-between gap-2.5 px-3.5 sm:px-5 py-3 sm:py-4 border-b border-black/5 bg-[#fafbfd] shrink-0">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="relative shrink-0">
+                  <div className="grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-2xl bg-[color:var(--color-clinic-blue)] text-white shadow-sm">
+                    <Stethoscope className="h-4 w-4 sm:h-5 sm:w-5" />
                   </div>
-                  <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-white" />
+                  <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-emerald-500 ring-2 ring-white" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h1 className="font-display text-sm sm:text-base font-bold text-[color:var(--color-clinic-ink)]">
-                      Konsultasi
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <h1 className="font-display text-xs sm:text-base font-bold text-[color:var(--color-clinic-ink)] truncate">
+                      Konsultasi AI
                     </h1>
-                    <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200/60">
+                    <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-emerald-700 border border-emerald-200/60 shrink-0">
                       Aktif 24 Jam
                     </span>
                   </div>
-                  <p className="text-[11px] text-[color:var(--color-clinic-muted)]">
+                  <p className="text-[10px] sm:text-[11px] text-[color:var(--color-clinic-muted)] truncate">
                     Analisis gejala interaktif & panduan kesehatan terpercaya
                   </p>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 shrink-0">
                 {messages.length > 0 && (
                   <Button
                     onClick={handleResetChat}
                     variant="outline"
                     size="sm"
-                    className="h-8 gap-1.5 rounded-full border-black/10 text-xs font-semibold text-[color:var(--color-clinic-muted)] hover:bg-[#f1f5f9] px-3 cursor-pointer"
+                    className="h-8 gap-1.5 rounded-full border-black/10 text-xs font-semibold text-[color:var(--color-clinic-muted)] hover:bg-[#f1f5f9] px-2.5 sm:px-3 cursor-pointer"
                     title="Mulai sesi percakapan baru"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Mulai Ulang</span>
+                    <span className="hidden xs:inline sm:inline">Mulai Ulang</span>
                   </Button>
                 )}
               </div>
@@ -400,10 +400,10 @@ function ConsultationPage() {
 
             {/* Context Notice from Anatomy (if any) */}
             {parsedAnatomyContext && (
-              <div className="px-5 py-2 bg-[color:var(--color-clinic-blue-soft)]/50 border-b border-[color:var(--color-clinic-blue)]/20 flex items-center justify-between gap-2 text-xs text-[color:var(--color-clinic-blue-dark)]">
-                <div className="flex items-center gap-2 font-medium">
+              <div className="px-3.5 sm:px-5 py-2 bg-[color:var(--color-clinic-blue-soft)]/50 border-b border-[color:var(--color-clinic-blue)]/20 flex items-center justify-between gap-2 text-xs text-[color:var(--color-clinic-blue-dark)] shrink-0">
+                <div className="flex items-center gap-2 font-medium min-w-0">
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-[color:var(--color-clinic-blue)]" />
-                  <span>
+                  <span className="truncate">
                     Terhubung dari Anatomi: <strong>{parsedAnatomyContext.regionName}</strong> ({parsedAnatomyContext.symptomsCount} gejala terpilih)
                   </span>
                 </div>
@@ -414,26 +414,26 @@ function ConsultationPage() {
             <div
               ref={scrollRef}
               data-lenis-prevent
-              className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-4 sm:p-6 bg-[#fcfdfd] scrollbar-thin scrollbar-thumb-slate-300 hover:scrollbar-thumb-slate-400"
+              className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-3 sm:p-6 bg-[#fcfdfd] scrollbar-thin scrollbar-thumb-slate-300 hover:scrollbar-thumb-slate-400 min-w-0"
             >
               {messages.length === 0 ? (
-                <div className="flex h-full flex-col items-center justify-center text-center max-w-md mx-auto py-6">
-                  <div className="grid h-14 w-14 place-items-center rounded-3xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] mb-3.5 shadow-xs">
-                    <Sparkles className="h-7 w-7" />
+                <div className="flex h-full flex-col items-center justify-center text-center max-w-lg mx-auto py-3 sm:py-6 my-auto">
+                  <div className="grid h-11 w-11 sm:h-14 sm:w-14 place-items-center rounded-2xl sm:rounded-3xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] mb-2.5 sm:mb-3.5 shadow-xs shrink-0">
+                    <Sparkles className="h-5 w-5 sm:h-7 sm:w-7" />
                   </div>
-                  <h3 className="font-display text-base sm:text-lg font-bold text-[color:var(--color-clinic-ink)]">
+                  <h2 className="font-display text-sm sm:text-lg font-bold text-[color:var(--color-clinic-ink)] px-2">
                     Bagaimana kondisi kesehatan Anda hari ini?
-                  </h3>
-                  <p className="mt-1.5 text-xs text-[color:var(--color-clinic-muted)] leading-relaxed">
-                    Ceritakan keluhan, rasa nyeri, atau pertanyaan kesehatan yang sedang Anda rasakan untuk mendapatkan analisis awal.
+                  </h2>
+                  <p className="mt-1 text-[11px] sm:text-xs text-[color:var(--color-clinic-muted)] leading-relaxed px-3 max-w-sm">
+                    Ceritakan keluhan, rasa nyeri, atau pertanyaan kesehatan yang Anda rasakan untuk analisis awal.
                   </p>
 
                   {/* Quick Prompts */}
-                  <div className="mt-6 w-full space-y-2">
-                    <p className="text-[11px] font-semibold text-[color:var(--color-clinic-muted)] uppercase tracking-wider text-left">
+                  <div className="mt-4 sm:mt-6 w-full space-y-2 px-1">
+                    <p className="text-[10px] sm:text-[11px] font-semibold text-[color:var(--color-clinic-muted)] uppercase tracking-wider text-left">
                       Pilih Contoh Keluhan / Pertanyaan:
                     </p>
-                    <div className="grid gap-2.5 sm:grid-cols-2">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-2">
                       {QUICK_PROMPTS.map((item, idx) => {
                         const Icon = item.icon;
                         return (
@@ -441,16 +441,16 @@ function ConsultationPage() {
                             key={idx}
                             type="button"
                             onClick={() => sendMessage(item.desc)}
-                            className="group flex items-start gap-2.5 rounded-2xl border border-black/5 bg-white p-3 text-left hover:border-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue-soft)]/30 hover:shadow-xs transition cursor-pointer"
+                            className="group flex items-start gap-2 rounded-xl sm:rounded-2xl border border-black/5 bg-white p-2 sm:p-3 text-left hover:border-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue-soft)]/30 hover:shadow-xs transition cursor-pointer min-w-0"
                           >
-                            <div className="grid h-7 w-7 shrink-0 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] group-hover:bg-[color:var(--color-clinic-blue)] group-hover:text-white transition">
-                              <Icon className="h-3.5 w-3.5" />
+                            <div className="grid h-6 w-6 sm:h-7 sm:w-7 shrink-0 place-items-center rounded-lg sm:rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] group-hover:bg-[color:var(--color-clinic-blue)] group-hover:text-white transition mt-0.5">
+                              <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-[color:var(--color-clinic-ink)] group-hover:text-[color:var(--color-clinic-blue-dark)] transition">
+                              <p className="text-[11px] sm:text-xs font-bold text-[color:var(--color-clinic-ink)] group-hover:text-[color:var(--color-clinic-blue-dark)] transition line-clamp-1">
                                 {item.title}
                               </p>
-                              <p className="text-[11px] text-[color:var(--color-clinic-muted)] leading-snug line-clamp-2 mt-0.5">
+                              <p className="text-[10px] sm:text-[11px] text-[color:var(--color-clinic-muted)] leading-snug line-clamp-1 sm:line-clamp-2 mt-0.5">
                                 {item.desc}
                               </p>
                             </div>
@@ -467,10 +467,10 @@ function ConsultationPage() {
                   ))}
                   {loading && (
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white shadow-xs">
-                        <Bot className="h-4 w-4" />
+                      <div className="grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white shadow-xs">
+                        <Bot className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       </div>
-                      <div className="flex items-center gap-2 rounded-2xl rounded-bl-xs bg-white border border-black/5 px-4 py-2.5 text-xs text-[color:var(--color-clinic-muted)] shadow-xs">
+                      <div className="flex items-center gap-2 rounded-2xl rounded-bl-xs bg-white border border-black/5 px-3.5 py-2 sm:px-4 sm:py-2.5 text-xs text-[color:var(--color-clinic-muted)] shadow-xs">
                         <Loader2 className="h-3.5 w-3.5 animate-spin text-[color:var(--color-clinic-blue)]" />
                         <span>Sedang menganalisis respons...</span>
                       </div>
@@ -481,8 +481,8 @@ function ConsultationPage() {
             </div>
 
             {/* Input Footer Area */}
-            <div className="p-3 sm:p-4 border-t border-black/5 bg-white shrink-0">
-              <div className="flex items-center gap-2 bg-[#f8fafc] border border-black/10 rounded-2xl p-1.5 focus-within:border-[color:var(--color-clinic-blue)] focus-within:ring-2 focus-within:ring-[color:var(--color-clinic-blue)]/15 transition">
+            <div className="p-2.5 sm:p-4 border-t border-black/5 bg-white shrink-0">
+              <div className="flex items-center gap-2 bg-[#f8fafc] border border-black/10 rounded-2xl p-1 sm:p-1.5 focus-within:border-[color:var(--color-clinic-blue)] focus-within:ring-2 focus-within:ring-[color:var(--color-clinic-blue)]/15 transition">
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -492,8 +492,8 @@ function ConsultationPage() {
                       handleSend();
                     }
                   }}
-                  placeholder="Ketik keluhan, 'cari apotek', 'nge scan', atau 'pilih tubuh'... (Enter untuk kirim)"
-                  className="flex-1 max-h-24 min-h-[42px] resize-none bg-transparent px-3 py-2 text-xs sm:text-sm text-[color:var(--color-clinic-ink)] placeholder:text-[color:var(--color-clinic-muted)] focus:outline-none"
+                  placeholder="Ketik keluhan atau pertanyaan kesehatan..."
+                  className="flex-1 max-h-24 min-h-[40px] sm:min-h-[42px] resize-none bg-transparent px-2.5 sm:px-3 py-2 text-xs sm:text-sm text-[color:var(--color-clinic-ink)] placeholder:text-[color:var(--color-clinic-muted)] focus:outline-none"
                   rows={1}
                 />
                 <Button
@@ -507,12 +507,12 @@ function ConsultationPage() {
               </div>
 
               {/* Minimal Safe Disclaimer */}
-              <div className="mt-2.5 flex items-center justify-between text-[10px] text-[color:var(--color-clinic-muted)] px-1">
-                <span className="flex items-center gap-1">
+              <div className="mt-2 flex items-center justify-between text-[9px] sm:text-[10px] text-[color:var(--color-clinic-muted)] px-1">
+                <span className="flex items-center gap-1 min-w-0 truncate">
                   <ShieldAlert className="h-3 w-3 text-amber-600 shrink-0" />
-                  Asisten bersifat edukatif awal. Jika darurat, segera hubungi IGD terdekat.
+                  <span className="truncate">Asisten bersifat edukatif awal. Jika darurat, segera hubungi IGD terdekat.</span>
                 </span>
-                <span className="hidden sm:inline text-slate-400">
+                <span className="hidden sm:inline text-slate-400 shrink-0 ml-2">
                   Tekan <strong>Enter</strong> untuk mengirim
                 </span>
               </div>
