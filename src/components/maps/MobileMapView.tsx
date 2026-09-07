@@ -163,20 +163,33 @@ export function MobileMapView() {
       return;
     }
 
+    const tryLowAccuracy = () => {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+          await updateLocationAndFacilities(coords, "GPS Presisi");
+        },
+        async () => {
+          const ipCoords = await fetchIPLocation();
+          if (ipCoords) {
+            await updateLocationAndFacilities(ipCoords, "Lokasi IP");
+          } else {
+            await updateLocationAndFacilities(DEFAULT_CENTER, "Lokasi Default");
+          }
+        },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
+      );
+    };
+
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
         await updateLocationAndFacilities(coords, "GPS Presisi");
       },
-      async () => {
-        const ipCoords = await fetchIPLocation();
-        if (ipCoords) {
-          await updateLocationAndFacilities(ipCoords, "Lokasi IP");
-        } else {
-          await updateLocationAndFacilities(DEFAULT_CENTER, "Lokasi Default");
-        }
+      () => {
+        tryLowAccuracy();
       },
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 },
     );
   }, []);
 

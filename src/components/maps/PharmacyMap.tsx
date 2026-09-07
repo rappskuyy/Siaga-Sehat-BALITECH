@@ -205,25 +205,38 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
       return;
     }
 
+    const tryLowAccuracy = () => {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+          await updateLocation(coords, "GPS Presisi (Lokasi Anda)");
+        },
+        async (err) => {
+          console.warn("Geolocation API error, trying IP fallback:", err);
+          const ipCoords = await fetchIPLocation();
+          if (ipCoords) {
+            await updateLocation(ipCoords, "Lokasi Jaringan (IP)");
+            setLocationError("GPS browser belum merespons. Menggunakan perkiraan lokasi IP.");
+          } else {
+            await updateLocation(DEFAULT_CENTER, "Lokasi Default");
+            setLocationError(
+              "Izin lokasi tidak diberikan. Cari alamat atau klik tombol GPS untuk menentukan posisi.",
+            );
+          }
+        },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
+      );
+    };
+
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
         await updateLocation(coords, "GPS Presisi (Lokasi Anda)");
       },
-      async (err) => {
-        console.warn("Geolocation API error, trying IP fallback:", err);
-        const ipCoords = await fetchIPLocation();
-        if (ipCoords) {
-          await updateLocation(ipCoords, "Lokasi Jaringan (IP)");
-          setLocationError("GPS browser belum merespons. Menggunakan perkiraan lokasi IP.");
-        } else {
-          await updateLocation(DEFAULT_CENTER, "Lokasi Default");
-          setLocationError(
-            "Izin lokasi tidak diberikan. Cari alamat atau klik tombol GPS untuk menentukan posisi.",
-          );
-        }
+      () => {
+        tryLowAccuracy();
       },
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 },
     );
   };
 
