@@ -29,7 +29,6 @@ import {
   DEFAULT_CENTER,
   fetchNearbyPharmacies,
   fetchOSRMRoute,
-  fetchIPLocation,
   searchLocationByAddress,
   reverseGeocode,
   type PharmacyNode,
@@ -133,7 +132,7 @@ export function MobileMapView() {
   const [routeInfo, setRouteInfo] = useState<ExtendedRouteInfo | null>(null);
   const [showDetailsPanel, setShowDetailsPanel] = useState(false);
 
-  // High-precision GPS Geolocation
+  // High-precision GPS Geolocation via Browser Geolocation API
   const getUserGeolocation = useCallback(async (isManualClick = false) => {
     setLoadingLocation(true);
 
@@ -154,42 +153,30 @@ export function MobileMapView() {
     };
 
     if (!navigator.geolocation) {
-      const ipCoords = await fetchIPLocation();
-      if (ipCoords) {
-        await updateLocationAndFacilities(ipCoords, "Lokasi IP");
-      } else {
-        await updateLocationAndFacilities(DEFAULT_CENTER, "Lokasi Default");
-      }
+      await updateLocationAndFacilities(DEFAULT_CENTER, "Lokasi Default");
       return;
     }
-
-    const tryLowAccuracy = () => {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
-          await updateLocationAndFacilities(coords, "GPS Presisi");
-        },
-        async () => {
-          const ipCoords = await fetchIPLocation();
-          if (ipCoords) {
-            await updateLocationAndFacilities(ipCoords, "Lokasi IP");
-          } else {
-            await updateLocationAndFacilities(DEFAULT_CENTER, "Lokasi Default");
-          }
-        },
-        { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
-      );
-    };
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
-        await updateLocationAndFacilities(coords, "GPS Presisi");
+        await updateLocationAndFacilities(coords, "GPS Browser (Geolocation API)");
       },
-      () => {
-        tryLowAccuracy();
+      (err) => {
+        console.warn("GPS High Accuracy error, fallback ke standard GPS:", err);
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+            await updateLocationAndFacilities(coords, "GPS Browser (Geolocation API)");
+          },
+          (lowErr) => {
+            console.warn("Geolocation API error:", lowErr);
+            updateLocationAndFacilities(DEFAULT_CENTER, "Lokasi Default (Jakarta)");
+          },
+          { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 },
+        );
       },
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
     );
   }, []);
 

@@ -19,7 +19,6 @@ import {
   DEFAULT_CENTER,
   fetchNearbyPharmacies,
   fetchOSRMRoute,
-  fetchIPLocation,
   searchLocationByAddress,
   reverseGeocode,
   type GeocodeResult,
@@ -196,47 +195,41 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
     };
 
     if (!navigator.geolocation) {
-      const ipCoords = await fetchIPLocation();
-      if (ipCoords) {
-        await updateLocation(ipCoords, "Lokasi Jaringan (IP)");
-      } else {
-        await updateLocation(DEFAULT_CENTER, "Lokasi Default (Jakarta)");
-      }
+      setLocationError("Browser Anda tidak mendukung Browser Geolocation API.");
+      await updateLocation(DEFAULT_CENTER, "Lokasi Default (Jakarta)");
       return;
     }
 
-    const tryLowAccuracy = () => {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
-          await updateLocation(coords, "GPS Presisi (Lokasi Anda)");
-        },
-        async (err) => {
-          console.warn("Geolocation API error, trying IP fallback:", err);
-          const ipCoords = await fetchIPLocation();
-          if (ipCoords) {
-            await updateLocation(ipCoords, "Lokasi Jaringan (IP)");
-            setLocationError("GPS browser belum merespons. Menggunakan perkiraan lokasi IP.");
-          } else {
-            await updateLocation(DEFAULT_CENTER, "Lokasi Default");
-            setLocationError(
-              "Izin lokasi tidak diberikan. Cari alamat atau klik tombol GPS untuk menentukan posisi.",
-            );
-          }
-        },
-        { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
-      );
-    };
-
+    // Menggunakan Browser Geolocation API bawaan MDN (navigator.geolocation)
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
-        await updateLocation(coords, "GPS Presisi (Lokasi Anda)");
+        await updateLocation(coords, "GPS Browser (Geolocation API)");
       },
-      () => {
-        tryLowAccuracy();
+      (err) => {
+        console.warn("Geolocation API High-Accuracy error, mencoba mode standar:", err);
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+            await updateLocation(coords, "GPS Browser (Geolocation API)");
+          },
+          (lowErr) => {
+            console.warn("Geolocation API error:", lowErr);
+            let msg = "Gagal mendeteksi lokasi GPS.";
+            if (lowErr.code === lowErr.PERMISSION_DENIED) {
+              msg = "Izin lokasi GPS ditolak oleh browser. Silakan izinkan akses lokasi pada browser Anda.";
+            } else if (lowErr.code === lowErr.POSITION_UNAVAILABLE) {
+              msg = "Informasi lokasi GPS perangkat tidak tersedia.";
+            } else if (lowErr.code === lowErr.TIMEOUT) {
+              msg = "Waktu permintaan GPS habis (timeout).";
+            }
+            setLocationError(msg);
+            updateLocation(DEFAULT_CENTER, "Lokasi Default (Jakarta)");
+          },
+          { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 },
+        );
       },
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
     );
   };
 
