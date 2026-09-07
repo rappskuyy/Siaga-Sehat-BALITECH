@@ -28,6 +28,7 @@ import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { Footer } from "@/components/clinic/Footer";
 
 export const Route = createFileRoute("/consultation")({
   validateSearch: (search: Record<string, unknown>): { anatomy?: string } => ({
@@ -520,6 +521,7 @@ function ConsultationPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </main>
   );
 }
