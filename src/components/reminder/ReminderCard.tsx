@@ -62,6 +62,12 @@ export function ReminderCard({ reminder, logs, onMarkTaken, onSkip, onDeactivate
           </span>
         </div>
 
+          {reminder.catatan?.startsWith("Untuk kondisi:") && (
+            <p className="mt-3 rounded-xl bg-[color:var(--color-clinic-blue-soft)] px-3 py-2 text-xs text-[color:var(--color-clinic-blue-dark)]">
+              {reminder.catatan.split(". ")[0]}
+            </p>
+          )}
+
         {/* Tablet progress */}
         <div className="mt-3.5">
           <div className="flex items-center justify-between text-xs text-[color:var(--color-clinic-muted)] mb-1.5">

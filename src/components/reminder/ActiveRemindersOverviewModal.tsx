@@ -101,6 +101,12 @@ export function ActiveRemindersOverviewModal({
                       </span>
                     </div>
 
+                    {reminder.catatan?.startsWith("Untuk kondisi:") && (
+                      <p className="rounded-lg bg-[color:var(--color-clinic-blue-soft)] px-2.5 py-1.5 text-[11px] text-[color:var(--color-clinic-blue-dark)]">
+                        {reminder.catatan.split(". ")[0]}
+                      </p>
+                    )}
+
                     <div className="flex flex-col gap-1.5 border-t border-slate-100 pt-2 text-[11px]">
                       <div className="flex items-center justify-between text-slate-600">
                         <span className="flex items-center gap-1">

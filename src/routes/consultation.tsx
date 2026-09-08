@@ -31,8 +31,9 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { Footer } from "@/components/clinic/Footer";
 
 export const Route = createFileRoute("/consultation")({
-  validateSearch: (search: Record<string, unknown>): { anatomy?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { anatomy?: string; scan?: string } => ({
     anatomy: typeof search.anatomy === "string" ? search.anatomy : undefined,
+    scan: typeof search.scan === "string" ? search.scan : undefined,
   }),
   head: () => ({
     meta: [
@@ -218,7 +219,7 @@ function ChatBubble({ message }: { message: ChatMessage }) {
 function ConsultationPage() {
   const chat = useServerFn(chatWithAI);
   const { user } = useAuth();
-  const { anatomy } = useSearch({ from: "/consultation" });
+  const { anatomy, scan } = useSearch({ from: "/consultation" });
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -230,6 +231,7 @@ function ConsultationPage() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const initialContextSent = useRef(false);
+  const initialScanContextSent = useRef(false);
 
   const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
     if (scrollRef.current) {
@@ -363,6 +365,44 @@ function ConsultationPage() {
       `Saya baru selesai memilih keluhan pada organ ${context.regionName || ""} di halaman Anatomi. Berikut rangkuman data saya:\n${details}\n\nTolong bantu periksa keluhan ini, tanyakan hal yang perlu diketahui, dan berikan rekomendasi medis awal yang aman.`,
     );
   }, [anatomy, sendMessage]);
+
+  useEffect(() => {
+    if (!scan || initialScanContextSent.current) return;
+
+    let context: {
+      namaPenyakit?: string;
+      ringkasan?: string;
+      tingkatBahaya?: string;
+      tingkatKeyakinan?: string;
+      penyebab?: string[];
+      pencegahan?: string[];
+      alasanKeDokter?: string;
+      catatan?: string;
+    };
+    try {
+      context = JSON.parse(scan);
+    } catch {
+      return;
+    }
+
+    initialScanContextSent.current = true;
+    const details = [
+      `Nama kondisi yang terdeteksi: ${context.namaPenyakit || "tidak disebutkan"}`,
+      `Ringkasan: ${context.ringkasan || "tidak tersedia"}`,
+      `Tingkat risiko: ${context.tingkatBahaya || "tidak tersedia"}`,
+      `Tingkat keyakinan: ${context.tingkatKeyakinan || "tidak tersedia"}`,
+      context.penyebab?.length ? `Kemungkinan penyebab:\n- ${context.penyebab.join("\n- ")}` : "",
+      context.pencegahan?.length ? `Pencegahan mandiri:\n- ${context.pencegahan.join("\n- ")}` : "",
+      context.alasanKeDokter ? `Alasan perlu ke dokter: ${context.alasanKeDokter}` : "",
+      context.catatan ? `Catatan tambahan: ${context.catatan}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    void sendMessage(
+      `Saya baru selesai melakukan scan AI. Berikut hasil skriningnya:\n${details}\n\nTolong jelaskan hasil ini dengan bahasa yang mudah dipahami, validasi hal yang perlu saya waspadai, dan berikan pertanyaan lanjutan atau langkah aman yang sebaiknya saya lakukan.`,
+    );
+  }, [scan, sendMessage]);
 
   useEffect(() => {
     if (!user || messages.length < 2) return;

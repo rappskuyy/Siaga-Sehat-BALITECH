@@ -11,10 +11,10 @@ import {
   ShieldQuestion,
   Sparkles,
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import type { DangerLevel, ScanResult } from "@/lib/scanner/types";
 import { Button } from "@/components/ui/button";
 import { PharmacyMap } from "@/components/maps/PharmacyMap";
-import { AiConsultation } from "./AiConsultation";
 
 const DANGER_STYLES: Record<
   DangerLevel,
@@ -172,6 +172,16 @@ export function ScanResultView({
 
   const danger = DANGER_STYLES[result.tingkat_bahaya];
   const DangerIcon = danger.icon;
+  const scanContext = JSON.stringify({
+    namaPenyakit: result.nama_penyakit,
+    ringkasan: result.ringkasan,
+    tingkatBahaya: result.tingkat_bahaya,
+    tingkatKeyakinan: result.tingkat_keyakinan,
+    penyebab: result.penyebab,
+    pencegahan: result.pencegahan_mandiri,
+    alasanKeDokter: result.harus_ke_dokter ? result.alasan_ke_dokter : "",
+    catatan: result.catatan_tambahan,
+  });
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -247,9 +257,9 @@ export function ScanResultView({
             {result.penyebab && result.penyebab.length > 0 ? (
               <ul className="w-full space-y-3 text-sm font-medium leading-relaxed">
                 {result.penyebab.map((item, i) => (
-                  <li key={i} className="relative pl-4 font-semibold">
-                    <span className="absolute left-0 top-[0.65em] h-1.5 w-1.5 rounded-full bg-[color:var(--color-clinic-blue)]" />
-                    {item}
+                  <li key={i} className="flex items-start gap-2 font-semibold">
+                    <span className="mt-[0.55em] h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--color-clinic-blue)]" />
+                    <span>{item}</span>
                   </li>
                 ))}
               </ul>
@@ -271,7 +281,10 @@ export function ScanResultView({
             {result.pencegahan_mandiri && result.pencegahan_mandiri.length > 0 ? (
               <div className="grid w-full gap-x-8 gap-y-4 text-sm font-semibold leading-relaxed sm:grid-cols-2">
                 {result.pencegahan_mandiri.map((item, i) => (
-                  <div key={i}>{item}</div>
+                  <div key={i} className="flex items-start gap-2">
+                    <span className="mt-[0.55em] h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--color-clinic-blue)]" />
+                    <span>{item}</span>
+                  </div>
                 ))}
               </div>
             ) : (
@@ -300,7 +313,7 @@ export function ScanResultView({
             ) : (
               <div className="grid w-full gap-x-8 gap-y-5 text-sm font-semibold leading-relaxed sm:grid-cols-2">
                 {result.obat_rekomendasi.map((med, i) => (
-                  <div key={i} className="flex flex-col gap-1">
+                  <div key={i} className="relative flex flex-col gap-1 border-l-2 border-[color:var(--color-clinic-blue)]/30 pl-3">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                       <span className="font-bold">{med.nama}</span>
                       <span className="text-xs font-bold text-[color:var(--color-clinic-blue-dark)]">
@@ -329,7 +342,7 @@ export function ScanResultView({
             ) : (
               <div className="grid w-full gap-x-8 gap-y-5 text-sm font-semibold leading-relaxed sm:grid-cols-2">
                 {result.obat_herbal.map((herb, i) => (
-                  <div key={i} className="flex flex-col gap-1">
+                  <div key={i} className="relative flex flex-col gap-1 border-l-2 border-[color:var(--color-clinic-blue)]/30 pl-3">
                     <span className="font-bold">{herb.nama}</span>
                     <span className="text-sm">{herb.cara_pakai}</span>
                   </div>
@@ -354,9 +367,13 @@ export function ScanResultView({
 
       <div className="flex justify-center pt-2">
         <div className="flex w-full max-w-xs flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row">
-          <AiConsultation
-            initialContext={`Nama kondisi: ${result.nama_penyakit}\nRingkasan: ${result.ringkasan}\nTingkat keyakinan: ${result.tingkat_keyakinan}`}
-          />
+          <Link
+            to="/consultation"
+            search={{ scan: scanContext }}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[color:var(--color-clinic-blue)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[color:var(--color-clinic-blue-dark)]"
+          >
+            Konsultasi AI
+          </Link>
           <Button
             onClick={onReset}
             variant="outline"

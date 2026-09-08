@@ -248,10 +248,7 @@ function ProfilePage() {
                   aria-label="Keluar dari akun"
                   className="group relative grid h-14 w-14 sm:h-16 sm:w-16 shrink-0 place-items-center overflow-hidden rounded-full bg-white/15 text-white shadow-sm ring-2 ring-white/25 backdrop-blur transition active:scale-95 cursor-pointer"
                 >
-                  <UserIcon className="h-6 w-6 sm:h-7 sm:w-7 transition group-hover:opacity-0" />
-                  <span className="absolute inset-0 grid place-items-center bg-red-500/90 text-white opacity-0 transition group-hover:opacity-100">
-                    <LogOut className="h-5 w-5 sm:h-6 sm:w-6" />
-                  </span>
+                  <LogOut className="h-6 w-6 sm:h-7 sm:w-7" />
                   <span className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full border-2 border-[color:var(--color-clinic-blue)] bg-red-500 text-white shadow-sm">
                     <LogOut className="h-2.5 w-2.5" />
                   </span>

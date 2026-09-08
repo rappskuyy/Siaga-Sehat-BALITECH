@@ -6,6 +6,7 @@ export interface RecommendedMed {
   nama: string;
   dosis: string;
   catatan: string;
+  penyakit: string;
   sourceType: "scan" | "consultation";
   sourceId: string;
 }
@@ -19,20 +20,27 @@ export function useLastConsultationMeds() {
     if (!user) { setMeds([]); return; }
     setLoading(true);
 
-    // Fetch from last scan_history (structured obat_rekomendasi)
+    // Fetch several recent scan histories so the user can choose the condition.
     const { data: scanData } = await supabase
       .from("scan_history")
-      .select("id, obat_rekomendasi")
+      .select("id, nama_penyakit, obat_rekomendasi, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .limit(1);
+      .limit(10);
 
     const scanMeds: RecommendedMed[] = [];
     if (scanData) {
       for (const row of scanData) {
         const obats = (row.obat_rekomendasi as Array<{ nama: string; dosis: string; catatan: string }>) ?? [];
         for (const o of obats) {
-          scanMeds.push({ nama: o.nama, dosis: o.dosis, catatan: o.catatan, sourceType: "scan", sourceId: row.id });
+          scanMeds.push({
+            nama: o.nama,
+            dosis: o.dosis,
+            catatan: o.catatan,
+            penyakit: row.nama_penyakit,
+            sourceType: "scan",
+            sourceId: row.id,
+          });
         }
       }
     }
@@ -40,7 +48,7 @@ export function useLastConsultationMeds() {
     // Deduplicate by name (case-insensitive)
     const seen = new Set<string>();
     const unique = scanMeds.filter((m) => {
-      const key = m.nama.toLowerCase();
+      const key = `${m.penyakit.toLowerCase()}::${m.nama.toLowerCase()}`;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;

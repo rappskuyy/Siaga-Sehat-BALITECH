@@ -79,6 +79,7 @@ export function MedicineReminderModal({ open, onClose }: Props) {
   const [step, setStep] = useState<Step>("location");
   const [location, setLocation] = useState<PurchaseLocation | null>(null);
   const [selectedMeds, setSelectedMeds] = useState<Set<string>>(new Set());
+  const [selectedDisease, setSelectedDisease] = useState<string | null>(null);
   const [configs, setConfigs] = useState<MedConfig[]>([]);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -87,6 +88,7 @@ export function MedicineReminderModal({ open, onClose }: Props) {
     setStep("location");
     setLocation(null);
     setSelectedMeds(new Set());
+    setSelectedDisease(null);
     setConfigs([]);
     setErrorMsg(null);
   }, []);
@@ -109,6 +111,9 @@ export function MedicineReminderModal({ open, onClose }: Props) {
       return next;
     });
   };
+
+  const diseases = Array.from(new Set(meds.map((med) => med.penyakit)));
+  const diseaseMeds = selectedDisease ? meds.filter((med) => med.penyakit === selectedDisease) : [];
 
   const handleProceedToConfig = () => {
     const chosen = meds.filter((m) => selectedMeds.has(m.nama));
@@ -153,7 +158,9 @@ export function MedicineReminderModal({ open, onClose }: Props) {
           waktu_berakhir,
           is_active: true,
           tablet_tersisa: cfg.jumlah_tablet,
-          catatan: cfg.med.catatan || null,
+          catatan: [`Untuk kondisi: ${cfg.med.penyakit}`, cfg.med.catatan]
+            .filter(Boolean)
+            .join(". ") || null,
         };
         await createReminder(payload);
       }
@@ -299,7 +306,7 @@ export function MedicineReminderModal({ open, onClose }: Props) {
                 Obat apa yang dibeli?
               </p>
               <p className="text-xs text-[color:var(--color-clinic-muted)] mb-4">
-                Centang obat dari hasil konsultasi/scan terakhirmu.
+                Pilih penyakit dari riwayat scan, lalu centang obat yang ingin diingatkan.
               </p>
 
               {medsLoading ? (
@@ -317,8 +324,41 @@ export function MedicineReminderModal({ open, onClose }: Props) {
                   </p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-2">
-                  {meds.map((med) => {
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--color-clinic-muted)]">
+                      Penyakit dari riwayat terbaru
+                    </p>
+                    {diseases.map((disease) => (
+                      <button
+                        key={disease}
+                        type="button"
+                        onClick={() => {
+                          setSelectedDisease(disease);
+                          setSelectedMeds(new Set());
+                        }}
+                        className={`flex items-center justify-between rounded-xl border-2 p-3 text-left transition ${
+                          selectedDisease === disease
+                            ? "border-[color:var(--color-clinic-blue)] bg-[color:var(--color-clinic-blue-soft)]"
+                            : "border-slate-100 bg-white hover:border-slate-200"
+                        }`}
+                      >
+                        <span className="min-w-0 pr-2 text-sm font-semibold text-[color:var(--color-clinic-ink)]">
+                          {disease}
+                        </span>
+                        <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-500">
+                          {meds.filter((med) => med.penyakit === disease).length} obat
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {selectedDisease && (
+                    <div className="flex flex-col gap-2">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--color-clinic-muted)]">
+                        Obat untuk {selectedDisease}
+                      </p>
+                      {diseaseMeds.map((med) => {
                     const checked = selectedMeds.has(med.nama);
                     return (
                       <button
@@ -360,7 +400,9 @@ export function MedicineReminderModal({ open, onClose }: Props) {
                         </span>
                       </button>
                     );
-                  })}
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -549,7 +591,7 @@ export function MedicineReminderModal({ open, onClose }: Props) {
         </div>
 
         {/* Footer action */}
-        {step === "select_meds" && meds.length > 0 && (
+        {step === "select_meds" && selectedDisease && diseaseMeds.length > 0 && (
           <div className="border-t border-slate-100 px-6 py-4">
             <button
               id="reminder-next-to-config"
