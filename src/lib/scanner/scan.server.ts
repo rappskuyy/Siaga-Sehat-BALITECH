@@ -82,13 +82,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function splitTextList(value: string): string[] {
-  // A plain regex split on "," "." ";" etc. doesn't know about parentheses,
-  // so a single sentence like "Hindari meminjamkan barang pribadi bersama
-  // (handuk, pakaian)" gets cut at the comma *inside* the parentheses,
-  // producing two broken fragments: "...(handuk" and "pakaian)". Walk the
-  // string manually and only treat these characters as separators while
-  // we're not inside a "(...)"/"[...]" group. While at it, don't split a
-  // "." that's part of a decimal number like "2.5%".
+  // Split on newlines, pipes, semicolons, and list markers (e.g. 1. 2. - •)
+  // Avoid splitting on commas mid-sentence so advice like
+  // "Gunakan pakaian longgar, lembut, dan menyerap keringat" is preserved as one sentence.
   const tokens: string[] = [];
   let current = "";
   let depth = 0;
@@ -108,20 +104,16 @@ function splitTextList(value: string): string[] {
     }
 
     if (depth === 0) {
-      if (ch === ";" || ch === "\n" || ch === "|" || ch === ",") {
+      if (ch === ";" || ch === "\n" || ch === "|") {
         tokens.push(current);
         current = "";
         continue;
       }
-      if (ch === ".") {
-        const prev = value[i - 1];
-        const next = value[i + 1];
-        const isDecimalNumber = prev !== undefined && next !== undefined && /\d/.test(prev) && /\d/.test(next);
-        if (!isDecimalNumber) {
-          tokens.push(current);
-          current = "";
-          continue;
-        }
+      // Split on numbered/bullet prefixes like "1. ", "2. ", "- ", "• "
+      if (ch === "\n" || (current.trim().length > 0 && /\n\s*[-*•\d]/.test(value.slice(i, i + 4)))) {
+        tokens.push(current);
+        current = "";
+        continue;
       }
     }
 
@@ -129,10 +121,12 @@ function splitTextList(value: string): string[] {
   }
   tokens.push(current);
 
-  return tokens
-    .map((token) => token.trim())
+  const cleaned = tokens
+    .map((token) => token.replace(/^\s*[-*•\d.)]+\s*/, "").trim())
     .filter(Boolean)
     .filter((token) => token.length > 1);
+
+  return cleaned.length > 0 ? cleaned : [value.trim()].filter(Boolean);
 }
 
 function toStringArray(value: unknown): string[] {
@@ -142,8 +136,8 @@ function toStringArray(value: unknown): string[] {
 
   if (!Array.isArray(value)) return [];
   return value
-    .flatMap((item) => {
-      if (typeof item === "string") return splitTextList(item);
+    .map((item) => {
+      if (typeof item === "string") return item.trim();
       if (item && typeof item === "object") {
         const candidate = item as Record<string, unknown>;
         const text =
@@ -154,11 +148,11 @@ function toStringArray(value: unknown): string[] {
               : typeof candidate.name === "string"
                 ? candidate.name
                 : "";
-        return text ? splitTextList(text) : [];
+        return text.trim();
       }
-      return [];
+      return "";
     })
-    .filter(Boolean);
+    .filter((s) => s.length > 0);
 }
 
 function normalizeMedicineList(value: unknown): ScanResult["obat_rekomendasi"] {
