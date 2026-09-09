@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useMedicineReminders } from "@/hooks/useMedicineReminders";
+import { useLastConsultationMeds } from "@/hooks/useLastConsultationMeds";
 import { ReminderCard } from "@/components/reminder/ReminderCard";
 import { MedicineReminderModal } from "@/components/reminder/MedicineReminderModal";
 import { ReminderNotificationManager } from "@/components/reminder/ReminderNotificationManager";
@@ -48,6 +49,7 @@ function RemindersPage() {
   const navigate = useNavigate();
   const { activeReminders, inactiveReminders, loading, markTaken, deactivateReminder, logs } =
     useMedicineReminders();
+  const { meds: recommendedMeds, loading: recommendedMedsLoading } = useLastConsultationMeds();
   const [modalOpen, setModalOpen] = useState(false);
   const [tab, setTab] = useState<"active" | "history">("active");
 
@@ -71,6 +73,22 @@ function RemindersPage() {
   const lowStockCount = activeReminders.filter(
     (r) => r.tablet_tersisa != null && r.tablet_tersisa <= 3 && r.tablet_tersisa > 0,
   ).length;
+
+  const normalizeDisease = (value: string) => value.trim().toLocaleLowerCase("id-ID");
+  const usedDiseases = new Set(
+    activeReminders
+      .concat(inactiveReminders)
+      .map((reminder) => reminder.catatan?.match(/^Untuk kondisi:\s*(.+?)(?:\.\s|$)/i)?.[1])
+      .filter((disease): disease is string => Boolean(disease))
+      .map(normalizeDisease),
+  );
+  const pendingDiseases = Array.from(
+    new Map(
+      recommendedMeds
+        .filter((med) => !usedDiseases.has(normalizeDisease(med.penyakit)))
+        .map((med) => [normalizeDisease(med.penyakit), med.penyakit]),
+    ).values(),
+  );
 
   if (!user) {
     return (
@@ -171,6 +189,38 @@ function RemindersPage() {
               jadwal minum obat tidak terputus.
             </span>
           </div>
+        )}
+
+        {!recommendedMedsLoading && pendingDiseases.length > 0 && (
+          <section className="mb-5 rounded-2xl border border-[color:var(--color-clinic-blue)]/15 bg-white p-4 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[color:var(--color-clinic-blue)]">
+                  Rekomendasi belum dijadwalkan
+                </p>
+                <h2 className="mt-1 font-display text-base font-bold text-[color:var(--color-clinic-ink)]">
+                  Tambahkan pengingat penyakit
+                </h2>
+                <p className="mt-1 text-xs leading-relaxed text-[color:var(--color-clinic-muted)]">
+                  Ada {pendingDiseases.length} hasil pemeriksaan yang belum memiliki pengingat obat.
+                </p>
+              </div>
+              <Pill className="mt-1 h-5 w-5 shrink-0 text-[color:var(--color-clinic-blue)]" />
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {pendingDiseases.map((disease) => (
+                <button
+                  key={disease}
+                  type="button"
+                  onClick={() => setModalOpen(true)}
+                  className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[color:var(--color-clinic-blue)]/20 bg-[color:var(--color-clinic-blue-soft)] px-3 py-1.5 text-left text-xs font-semibold text-[color:var(--color-clinic-blue-dark)] transition hover:border-[color:var(--color-clinic-blue)]/50 hover:bg-[color:var(--color-clinic-blue)]/10"
+                >
+                  <Plus className="h-3 w-3 shrink-0" />
+                  <span className="truncate">{disease}</span>
+                </button>
+              ))}
+            </div>
+          </section>
         )}
 
         {/* Add reminder CTA */}

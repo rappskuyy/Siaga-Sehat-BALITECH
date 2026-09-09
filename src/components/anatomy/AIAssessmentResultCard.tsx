@@ -315,7 +315,7 @@ export function AIAssessmentResultCard({
             }`}
           >
             <Stethoscope className="h-3.5 w-3.5" />
-            Konsultasi Dokter &rarr;
+            Konsultasi AI &rarr;
           </Link>
 
           <Link

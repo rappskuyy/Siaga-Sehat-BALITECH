@@ -95,9 +95,59 @@ const QUICK_PROMPTS = [
   },
 ];
 
+const FOLLOW_UP_PROMPTS = [
+  "Berikan solusi yang bisa saya lakukan sekarang",
+  "Apa ya penyebabnya?",
+  "Pantangannya apa ya?",
+  "Rekomendasi obat atau perawatan yang aman apa?",
+  "Kapan saya harus ke dokter?",
+];
+
+const FOLLOW_UP_TOPICS = [
+  { prompt: FOLLOW_UP_PROMPTS[0], keywords: ["solusi", "yang bisa dilakukan", "perawatan"] },
+  { prompt: FOLLOW_UP_PROMPTS[1], keywords: ["penyebab", "kemungkinan penyebab"] },
+  { prompt: FOLLOW_UP_PROMPTS[2], keywords: ["pantangan", "dihindari"] },
+  { prompt: FOLLOW_UP_PROMPTS[3], keywords: ["rekomendasi", "obat", "perawatan yang aman"] },
+  { prompt: FOLLOW_UP_PROMPTS[4], keywords: ["kapan", "dokter", "igd", "tanda bahaya"] },
+];
+
 function formatTime() {
   const now = new Date();
   return now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+}
+
+function getAvailableFollowUps(messages: ChatMessage[]) {
+  const conversation = messages.map((message) => message.text.toLocaleLowerCase("id-ID")).join("\n");
+
+  return FOLLOW_UP_TOPICS.filter(({ prompt, keywords }) => {
+    const promptWasSent = conversation.includes(prompt.toLocaleLowerCase("id-ID"));
+    const topicWasAnswered = keywords.some((keyword) => {
+      const answerHeadings = [
+        `**${keyword}`,
+        keyword === "solusi" ? "yang bisa dilakukan:" : "",
+        keyword === "penyebab" ? "kemungkinan penyebab:" : "",
+        keyword === "pantangan" ? "pantangan:" : "",
+        keyword === "rekomendasi" ? "obat/rekomendasi:" : "",
+        keyword === "dokter" ? "kapan ke dokter:" : "",
+      ].filter(Boolean);
+      return answerHeadings.some((heading) => conversation.includes(heading));
+    });
+
+    return !promptWasSent && !topicWasAnswered;
+  }).map(({ prompt }) => prompt);
+}
+
+function AssistantText({ text }: { text: string }) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+
+  return (
+    <div className="whitespace-pre-wrap break-words">
+      {parts.map((part, index) => {
+        const isBold = part.startsWith("**") && part.endsWith("**");
+        return isBold ? <strong key={index}>{part.slice(2, -2)}</strong> : <span key={index}>{part}</span>;
+      })}
+    </div>
+  );
 }
 
 function detectIntentAction(text: string): ActionCardType | undefined {
@@ -195,7 +245,7 @@ function ChatBubble({ message }: { message: ChatMessage }) {
               : "rounded-bl-xs bg-white text-[color:var(--color-clinic-ink)] border border-black/5"
           }`}
         >
-          <div className="whitespace-pre-wrap break-words">{message.text}</div>
+          {isUser ? <div className="whitespace-pre-wrap break-words">{message.text}</div> : <AssistantText text={message.text} />}
           {message.actionCard && <ActionCard card={message.actionCard} />}
         </div>
 
@@ -289,7 +339,7 @@ function ConsultationPage() {
       try {
         const prompt = `Kamu adalah Asisten Kesehatan SiagaSehat yang ramah, empati, dan profesional dalam Bahasa Indonesia. Berikut riwayat percakapan sejauh ini:\n${buildContext(
           next,
-        )}\n\nLanjutkan percakapan secara natural. Jika pengguna menanyakan apotek/lokasi, jelaskan bahwa mereka bisa membuka Peta Lokasi. Jika pengguna menanyakan scan obat/kulit, sebutkan fitur Scanner. Jika pengguna ingin memilih area tubuh yang sakit, rekomendasikan fitur Anatomi. Jika informasi gejala belum lengkap, tanyakan secara sopan. Jika sudah cukup, berikan Analisis Awal, Tingkat Risiko, dan Rekomendasi Tindakan yang aman.`;
+        )}\n\nBalas pesan TERAKHIR pengguna secara langsung. Ikuti tahap konsultasi dan aturan keselamatan pada instruksi sistem. Jika umur atau keluhan penyerta belum diketahui, tanyakan SATU informasi yang paling penting dan jangan memberi solusi dulu (kecuali tanda bahaya). Setelah data minimum cukup, baru berikan jawaban terstruktur. Jika pengguna menanyakan apotek/lokasi, jelaskan bahwa mereka bisa membuka Peta Lokasi. Jika pengguna menanyakan scan obat/kulit, sebutkan fitur Scanner. Jika pengguna ingin memilih area tubuh yang sakit, rekomendasikan fitur Anatomi.`;
         const res = await chat({ data: { prompt } });
         const reply = res?.reply?.trim() || "Maaf, saya tidak mendapatkan respons. Silakan coba lagi.";
         const assistantMsg: ChatMessage = {
@@ -547,6 +597,26 @@ function ConsultationPage() {
                       <div className="flex items-center gap-2 rounded-2xl rounded-bl-xs bg-white border border-black/5 px-3.5 py-2 sm:px-4 sm:py-2.5 text-xs text-[color:var(--color-clinic-muted)] shadow-xs">
                         <Loader2 className="h-3.5 w-3.5 animate-spin text-[color:var(--color-clinic-blue)]" />
                         <span>Sedang menganalisis respons...</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {!loading && getAvailableFollowUps(messages).length > 0 && (
+                    <div className="mt-4 border-t border-black/5 pt-3">
+                      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--color-clinic-muted)]">
+                        Pertanyaan lanjutan
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {getAvailableFollowUps(messages).map((prompt) => (
+                          <button
+                            key={prompt}
+                            type="button"
+                            onClick={() => void sendMessage(prompt)}
+                            className="rounded-full border border-[color:var(--color-clinic-blue)]/20 bg-[color:var(--color-clinic-blue-soft)]/55 px-3 py-1.5 text-left text-[11px] font-semibold text-[color:var(--color-clinic-blue-dark)] transition hover:border-[color:var(--color-clinic-blue)]/50 hover:bg-[color:var(--color-clinic-blue-soft)] active:scale-[0.98]"
+                          >
+                            {prompt}
+                          </button>
+                        ))}
                       </div>
                     </div>
                   )}

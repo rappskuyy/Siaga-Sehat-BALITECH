@@ -85,7 +85,7 @@ export function Services() {
             <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3 py-1 text-xs uppercase tracking-[0.25em] text-[color:var(--color-clinic-blue)]">
               [ Layanan ]
             </span>
-            <h2 className="mt-4 font-display text-4xl font-extrabold leading-tight tracking-tight text-[color:var(--color-clinic-ink)] md:text-5xl">
+            <h2 className="mt-4 max-w-[16ch] font-display text-[clamp(2rem,9vw,3rem)] font-extrabold leading-[1.05] tracking-tight text-[color:var(--color-clinic-ink)] md:max-w-none md:text-5xl">
               Semua yang Anda
               <br />
               butuhkan, dalam satu tempat
@@ -105,7 +105,7 @@ export function Services() {
 
         <Reveal
           delay="0.1s"
-          className="relative mt-12 grid gap-4 lg:grid-cols-[0.85fr_1.15fr] lg:gap-6"
+          className="relative mt-8 grid gap-4 sm:mt-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-6"
         >
           {/* Interactive list */}
           <div className="flex flex-col overflow-hidden rounded-[24px] border border-black/5">
@@ -116,7 +116,7 @@ export function Services() {
                   key={s.number}
                   type="button"
                   onClick={() => select(i)}
-                  className={`group relative flex items-center gap-4 overflow-hidden border-b border-black/5 px-5 py-4 text-left transition last:border-b-0 md:px-6 md:py-5 ${
+                  className={`group relative flex items-center gap-3 overflow-hidden border-b border-black/5 px-4 py-3.5 text-left transition last:border-b-0 sm:gap-4 sm:px-5 sm:py-4 md:px-6 md:py-5 ${
                     isActive
                       ? "bg-[color:var(--color-clinic-blue-soft)]/60"
                       : "hover:bg-black/[0.02]"
@@ -168,7 +168,7 @@ export function Services() {
           </div>
 
           {/* Preview panel */}
-          <div className="relative min-h-[320px] overflow-hidden rounded-[28px] bg-gradient-to-br from-[color:var(--color-clinic-blue-soft)] to-white p-8 md:min-h-[380px] md:p-10">
+          <div className="relative min-h-[280px] overflow-hidden rounded-[24px] bg-gradient-to-br from-[color:var(--color-clinic-blue-soft)] to-white p-5 sm:min-h-[320px] sm:p-7 md:min-h-[380px] md:rounded-[28px] md:p-10">
             <span
               key={`num-${active}`}
               className="animate-fade-up pointer-events-none absolute -bottom-6 -right-2 select-none font-display text-[160px] font-extrabold leading-none text-[color:var(--color-clinic-blue)]/[0.06] md:text-[220px]"
@@ -177,18 +177,18 @@ export function Services() {
             </span>
 
             <div key={active} className="animate-fade-up relative flex h-full flex-col">
-              <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[color:var(--color-clinic-blue)] text-white shadow-lg shadow-[color:var(--color-clinic-blue)]/30 md:h-20 md:w-20">
+              <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[color:var(--color-clinic-blue)] text-white shadow-lg shadow-[color:var(--color-clinic-blue)]/30 sm:h-16 sm:w-16 md:h-20 md:w-20">
                 <Icon className="h-7 w-7 md:h-9 md:w-9" />
               </div>
 
-              <h3 className="mt-6 font-display text-2xl font-extrabold text-[color:var(--color-clinic-ink)] md:text-3xl">
+              <h3 className="mt-5 font-display text-xl font-extrabold text-[color:var(--color-clinic-ink)] sm:text-2xl md:mt-6 md:text-3xl">
                 {current.title}
               </h3>
               <p className="mt-3 max-w-md text-sm leading-relaxed text-[color:var(--color-clinic-muted)] md:text-base">
                 {current.description}
               </p>
 
-              <div className="mt-auto flex items-center gap-3 pt-8">
+              <div className="mt-auto flex flex-wrap items-center gap-2.5 pt-6 sm:gap-3 sm:pt-8">
                 <a
                   href={active === 0 ? "/scanner" : "#services"}
                   className="group inline-flex items-center gap-2 rounded-full bg-[color:var(--color-clinic-ink)] py-2 pl-5 pr-2 text-sm font-medium text-white transition hover:bg-black/80"

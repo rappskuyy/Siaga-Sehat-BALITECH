@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, CheckCircle2, Bell, Clock, Calendar, Plus, ExternalLink } from "lucide-react";
 import type { MedicineReminder, ReminderLog } from "@/lib/supabase/types";
@@ -25,6 +26,15 @@ export function ActiveRemindersOverviewModal({
   onMarkTaken,
   onOpenSetup,
 }: Props) {
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
+
   if (typeof document === "undefined") return null;
   if (!open) return null;
 
@@ -39,7 +49,7 @@ export function ActiveRemindersOverviewModal({
       <div className="absolute inset-0 bg-black/45 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal Card */}
-      <div className="relative z-10 w-full max-w-md overflow-hidden rounded-t-3xl sm:rounded-2xl bg-white shadow-2xl flex flex-col max-h-[85vh]">
+      <div className="relative z-10 flex min-h-0 w-full max-w-md flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:max-h-[85vh] sm:rounded-2xl max-h-[88dvh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2">
@@ -65,7 +75,7 @@ export function ActiveRemindersOverviewModal({
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto flex-1 p-6 flex flex-col gap-4">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-6 flex flex-col gap-4 touch-pan-y">
           {activeReminders.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-6 text-center">
               <Bell className="h-10 w-10 text-slate-300" />

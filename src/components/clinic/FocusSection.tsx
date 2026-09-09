@@ -187,7 +187,7 @@ function ScanScreen() {
         </div>
         <div>
           <p className="text-xs font-bold text-[color:var(--color-clinic-ink)]">
-            Dermatitis Kontak Ringan
+            Tinea Corporis (Kurap)
           </p>
           <span className="mt-1 inline-block rounded-full bg-[color:var(--color-clinic-blue-soft)] px-2 py-0.5 text-[10px] font-semibold text-[color:var(--color-clinic-blue-dark)]">
             Risiko Rendah
@@ -199,19 +199,19 @@ function ScanScreen() {
         style={{ animationDuration: "0.4s", animationDelay: "0.2s" }}
       >
         <p className="font-semibold text-[color:var(--color-clinic-ink)]">Kemungkinan penyakit:</p>
-        <p>Dermatitis kontak akibat iritasi kulit</p>
+        <p>Infeksi jamur kulit yang memengaruhi lapisan luar kulit</p>
         <p className="font-semibold text-[color:var(--color-clinic-ink)]">Saran awal:</p>
-        <p>• Reaksi alergi ringan pada kulit</p>
-        <p>• Gesekan atau iritasi bahan tekstil</p>
+        <p>• Kelembapan berlebih dan area kulit yang kurang kering</p>
+        <p>• Kontak atau berbagi handuk/pakaian dengan orang lain</p>
       </div>
       <div className="grid grid-cols-2 gap-1.5 text-[10px]">
         <div className="rounded-xl bg-[color:var(--color-clinic-blue-soft)] p-2 text-[color:var(--color-clinic-ink)]">
           <p className="font-bold text-[color:var(--color-clinic-blue-dark)]">Obat umum</p>
-          <p className="mt-0.5">Krim hidrokortison 1%</p>
+          <p className="mt-0.5">Krim mikonazol 2%</p>
         </div>
         <div className="rounded-xl bg-[color:var(--color-clinic-blue-soft)] p-2 text-[color:var(--color-clinic-ink)]">
           <p className="font-bold text-[color:var(--color-clinic-blue-dark)]">Herbal</p>
-          <p className="mt-0.5">Gel lidah buaya</p>
+          <p className="mt-0.5">Minyak kelapa murni</p>
         </div>
       </div>
       <div

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import {
   X,
@@ -83,6 +83,15 @@ export function MedicineReminderModal({ open, onClose }: Props) {
   const [configs, setConfigs] = useState<MedConfig[]>([]);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
 
   const reset = useCallback(() => {
     setStep("location");
@@ -209,7 +218,7 @@ export function MedicineReminderModal({ open, onClose }: Props) {
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={handleClose} />
 
       {/* Panel */}
-      <div className="relative z-10 w-full max-w-lg overflow-hidden rounded-t-3xl bg-[#f8fafc] shadow-2xl sm:rounded-[28px] flex flex-col max-h-[90vh]">
+      <div className="relative z-10 flex min-h-0 w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-[#f8fafc] shadow-2xl sm:max-h-[90vh] sm:rounded-[28px] max-h-[92dvh]">
         {/* Header */}
         {step === "success" ? (
           <div className="relative overflow-hidden bg-[#17324d] px-6 pb-6 pt-6 sm:px-8">
@@ -275,7 +284,7 @@ export function MedicineReminderModal({ open, onClose }: Props) {
         {step !== "success" && <StepIndicator current={step} />}
 
         {/* Content */}
-        <div className="overflow-y-auto flex-1">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y">
           {/* ─── STEP 1: PILIH LOKASI ─── */}
           {step === "location" && (
             <div className="px-6 py-6">

@@ -93,7 +93,7 @@ export function Statement() {
     >
       <p
         ref={ref}
-        className="mx-auto max-w-4xl font-display text-2xl font-medium leading-snug text-[color:var(--color-clinic-ink)] md:text-3xl lg:text-[32px]"
+        className="mx-auto max-w-4xl font-display text-[clamp(1.35rem,5.8vw,2rem)] font-medium leading-snug text-[color:var(--color-clinic-ink)] md:text-3xl lg:text-[32px]"
       >
         {SEGMENTS.map((seg, i) => {
           if (i > segIndex) return null;

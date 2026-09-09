@@ -17,13 +17,13 @@ export function Hero() {
   return (
     <>
       <SiteHeader />
-      <section className="relative w-full overflow-hidden bg-white px-4 pt-4 pb-8 sm:px-6 md:px-8 md:pt-6 md:pb-12 lg:px-10 lg:pt-8 lg:pb-16 xl:pt-10 xl:pb-20">
+      <section className="relative w-full overflow-hidden bg-white px-3.5 pt-3 pb-8 sm:px-6 sm:pt-4 md:px-8 md:pt-6 md:pb-12 lg:px-10 lg:pt-8 lg:pb-16 xl:pt-10 xl:pb-20">
         {/* Body */}
         <div className="relative mx-auto max-w-6xl xl:max-w-7xl w-full">
-          <div className="relative mt-4 sm:mt-6 grid gap-8 sm:gap-10 lg:grid-cols-[1.05fr_1.1fr_0.85fr] lg:items-start lg:gap-8">
+          <div className="relative mt-4 grid gap-7 sm:mt-6 sm:gap-10 lg:grid-cols-[1.05fr_1.1fr_0.85fr] lg:items-start lg:gap-8">
             {/* Left column: headline + CTA + Tim Pengembang card */}
             <div className="relative z-10 flex flex-col justify-start">
-              <h1 className="font-display text-4xl font-extrabold leading-[0.9] tracking-tight text-[color:var(--color-clinic-ink)] sm:text-5xl md:text-6xl lg:text-[72px] xl:text-[80px]">
+              <h1 className="font-display text-[clamp(2.75rem,13vw,4rem)] font-extrabold leading-[0.9] tracking-tight text-[color:var(--color-clinic-ink)] sm:text-5xl md:text-6xl lg:text-[72px] xl:text-[80px]">
                 Siaga
                 <br />
                 Sehat
@@ -58,13 +58,13 @@ export function Hero() {
               </div>
 
               {/* Tim Pengembang Direct Link Card */}
-              <div className="mt-6 sm:mt-8 md:mt-10 max-w-sm sm:max-w-md md:max-w-lg">
+              <div className="mt-6 w-full max-w-sm sm:mt-8 sm:max-w-md md:mt-10 md:max-w-lg">
                 <Link
                   to="/dev"
-                  className="group relative flex items-center justify-between gap-3 sm:gap-4 rounded-2xl border border-black/10 bg-white p-3 sm:p-4 shadow-[var(--shadow-clinic)] transition-all duration-300 hover:scale-[1.02] hover:border-[color:var(--color-clinic-blue)]/40 hover:shadow-md cursor-pointer"
+                  className="group relative flex min-w-0 w-full items-center justify-between gap-2.5 rounded-2xl border border-black/10 bg-white p-3 sm:gap-4 sm:p-4 shadow-[var(--shadow-clinic)] transition-all duration-300 hover:scale-[1.02] hover:border-[color:var(--color-clinic-blue)]/40 hover:shadow-md cursor-pointer"
                   title="Lihat Profil Tim Pengembang BALITECH"
                 >
-                  <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3">
                     <div className="flex -space-x-2 sm:-space-x-2.5">
                       {AVATARS.map((a, idx) => (
                         <img
@@ -75,17 +75,17 @@ export function Hero() {
                         />
                       ))}
                     </div>
-                    <div>
-                      <span className="block text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[color:var(--color-clinic-blue)]">
+                    <div className="min-w-0 flex-1">
+                      <span className="block max-w-full text-[9px] font-bold uppercase leading-tight tracking-[0.08em] text-[color:var(--color-clinic-blue)] sm:text-[10px] sm:tracking-wider">
                         Karya Siswa SMK Wikrama Bogor
                       </span>
-                      <span className="block text-[11px] sm:text-xs font-extrabold text-[color:var(--color-clinic-ink)]">
+                      <span className="mt-0.5 block text-[11px] font-extrabold leading-tight text-[color:var(--color-clinic-ink)] sm:text-xs">
                         Lihat Profil Pengembang &rarr;
                       </span>
                     </div>
                   </div>
 
-                  <span className="grid h-7 w-7 sm:h-8 sm:w-8 place-items-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] transition-transform duration-300 group-hover:rotate-45 group-hover:bg-[color:var(--color-clinic-blue)] group-hover:text-white shrink-0">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] transition-transform duration-300 group-hover:rotate-45 group-hover:bg-[color:var(--color-clinic-blue)] group-hover:text-white sm:h-9 sm:w-9">
                     <ArrowUpRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </span>
                 </Link>
@@ -93,12 +93,12 @@ export function Hero() {
             </div>
 
             {/* Center column: doctor photo with floating AI feature cards */}
-            <div className="relative order-first lg:order-none flex flex-col items-center pt-2 sm:pt-4 lg:pt-0 lg:-mt-4 xl:-mt-6">
+            <div className="relative order-first lg:order-none flex flex-col items-center pt-2 sm:pt-4 lg:pt-0 lg:-mt-10 xl:-mt-14">
               <div className="relative inline-flex items-end justify-center">
                 <img
                   src={fotodokter2}
                   alt="Dokter dengan stetoskop"
-                  className="h-[250px] sm:h-[330px] md:h-[390px] lg:h-[450px] xl:h-[490px] w-auto max-w-none object-contain pointer-events-none select-none"
+                  className="h-[270px] w-auto max-w-full object-contain pointer-events-none select-none sm:h-[360px] md:h-[430px] lg:h-[540px] xl:h-[600px]"
                 />
 
                 {/* Floating overlay cards - Desktop only */}
@@ -166,7 +166,7 @@ export function Hero() {
               </div>
 
               {/* Mobile & iPad stacked feature cards */}
-              <div className="mt-4 sm:mt-6 flex w-full max-w-xs sm:max-w-md md:max-w-lg flex-col gap-2.5 sm:gap-3 lg:hidden">
+              <div className="mt-4 flex w-full max-w-[min(100%,28rem)] flex-col gap-2.5 sm:mt-6 sm:max-w-md sm:gap-3 lg:hidden">
                 <div className="rounded-2xl border border-black/5 bg-white p-3.5 sm:p-4 shadow-[var(--shadow-clinic)]">
                   <div className="flex items-center justify-between">
                     <span className="text-xs sm:text-sm font-medium text-[color:var(--color-clinic-muted)]">
