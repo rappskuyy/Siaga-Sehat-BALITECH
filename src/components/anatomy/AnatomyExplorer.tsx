@@ -187,82 +187,72 @@ export function AnatomyExplorer() {
       {/* Scroll Anchor Target (Positioned above Step Wizard) */}
       <div ref={topAnchorRef} className="scroll-mt-24" />
 
-      {/* Step Wizard Progress Bar - Responsive, No Overflow */}
-      <div className="mb-5 mx-auto max-w-3xl px-2 w-full min-w-0">
-        <div className="rounded-2xl bg-white p-1.5 px-2.5 sm:p-2.5 sm:px-4 shadow-sm border border-black/5 text-xs w-full min-w-0 overflow-hidden">
-          <div className="flex items-center justify-between w-full min-w-0 gap-0.5 sm:gap-1.5">
-            {/* Step 1: Panduan */}
-            <button
-              type="button"
-              onClick={handleReset}
-              className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1 sm:px-2 rounded-xl transition cursor-pointer ${
-                stepNumber === 1
-                  ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
-                  : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
+      {/* Step Wizard Progress Bar - Professional Icons, No Emojis */}
+      <div className="mb-5 mx-auto max-w-3xl px-2">
+        <div className="flex items-center justify-between rounded-2xl bg-white p-2 sm:p-3 shadow-sm border border-black/5 text-xs">
+          {/* Step 1: Panduan */}
+          <button
+            type="button"
+            onClick={handleReset}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl transition cursor-pointer ${stepNumber === 1
+                ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
+                : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
               }`}
-            >
-              <BookOpen className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
-              <span className="truncate text-[10px] sm:text-xs">1. Panduan</span>
-            </button>
+          >
+            <BookOpen className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
+            <span className="truncate text-[11px] sm:text-xs">1. Panduan</span>
+          </button>
 
-            <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+          <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
 
-            {/* Step 2: Model Anatomi */}
-            <button
-              type="button"
-              onClick={handleGoToModel}
-              className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1 sm:px-2 rounded-xl transition cursor-pointer ${
-                stepNumber === 2
-                  ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
-                  : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
+          {/* Step 2: Model Anatomi */}
+          <button
+            type="button"
+            onClick={handleGoToModel}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl transition cursor-pointer ${stepNumber === 2
+                ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
+                : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
               }`}
-            >
-              <Layers className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
-              <span className="truncate text-[10px] sm:text-xs">
-                <span className="hidden xs:inline sm:inline">2. </span>Model
-              </span>
-            </button>
+          >
+            <Layers className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
+            <span className="truncate text-[11px] sm:text-xs">2. Model Anatomi</span>
+          </button>
 
-            <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+          <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
 
-            {/* Step 3: Tandai Gejala */}
-            <button
-              type="button"
-              onClick={() => {
-                if (selectedRegion) {
-                  setActiveStep("symptoms");
-                  scrollToTopStep();
-                } else {
-                  toast.info("Silakan pilih organ pada model anatomi terlebih dahulu.");
-                }
-              }}
-              className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1 sm:px-2 rounded-xl transition cursor-pointer ${
-                stepNumber === 3
-                  ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
-                  : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
+          {/* Step 3: Tandai Gejala */}
+          <button
+            type="button"
+            onClick={() => {
+              if (selectedRegion) {
+                setActiveStep("symptoms");
+                scrollToTopStep();
+              } else {
+                toast.info("Silakan pilih organ pada model anatomi terlebih dahulu.");
+              }
+            }}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl transition cursor-pointer ${stepNumber === 3
+                ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
+                : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
               }`}
-            >
-              <Stethoscope className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
-              <span className="truncate text-[10px] sm:text-xs">
-                3. Gejala {selectedSymptoms.length > 0 && `(${selectedSymptoms.length})`}
-              </span>
-            </button>
+          >
+            <Stethoscope className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
+            <span className="truncate text-[11px] sm:text-xs">
+              3. Gejala {selectedSymptoms.length > 0 && `(${selectedSymptoms.length})`}
+            </span>
+          </button>
 
-            <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+          <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
 
-            {/* Step 4: Hasil AI */}
-            <div
-              className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1 sm:px-2 rounded-xl transition ${
-                stepNumber === 4
-                  ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
-                  : "text-[color:var(--color-clinic-muted)]"
+          {/* Step 4: Hasil AI */}
+          <div
+            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl transition ${stepNumber === 4
+                ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
+                : "text-[color:var(--color-clinic-muted)]"
               }`}
-            >
-              <Sparkles className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
-              <span className="truncate text-[10px] sm:text-xs">
-                4. Hasil<span className="hidden md:inline"> AI</span>
-              </span>
-            </div>
+          >
+            <Sparkles className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
+            <span className="truncate text-[11px] sm:text-xs">4. Hasil AI</span>
           </div>
         </div>
       </div>
@@ -272,9 +262,8 @@ export function AnatomyExplorer() {
         {/* Left Column: Step 1 (Guide) OR Step 3 (Symptom Selector) OR Step 4 (AI Assessment Result) */}
         <div
           ref={selectorRef}
-          className={`lg:col-span-6 w-full flex flex-col min-w-0 overflow-hidden ${
-            activeStep === "model" ? "hidden lg:flex" : "flex"
-          }`}
+          className={`lg:col-span-6 w-full flex flex-col min-w-0 overflow-hidden ${activeStep === "model" ? "hidden lg:flex" : "flex"
+            }`}
         >
           {errorMessage && (
             <div className="mb-4 flex items-start gap-2.5 rounded-2xl bg-red-50 p-3.5 text-xs font-medium text-red-700 border border-red-200 shadow-2xs animate-fade-up shrink-0 min-w-0">
@@ -316,9 +305,8 @@ export function AnatomyExplorer() {
         {/* Right Column: Step 2 Interactive Anatomy Viewer (Col Span 6) */}
         <div
           ref={modelRef}
-          className={`lg:col-span-6 w-full flex flex-col min-w-0 overflow-hidden ${
-            activeStep === "model" ? "flex" : "hidden lg:flex"
-          }`}
+          className={`lg:col-span-6 w-full flex flex-col min-w-0 overflow-hidden ${activeStep === "model" ? "flex" : "hidden lg:flex"
+            }`}
         >
           <AnatomyViewer
             selectedRegion={selectedRegion}
