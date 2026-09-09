@@ -1,15 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 
 const SYSTEM_PROMPT =
-  'Kamu adalah asisten kesehatan virtual bernama "SiagaSehat AI". Kamu melakukan konsultasi kesehatan interaktif dalam Bahasa Indonesia yang jelas, hangat, empatik, dan mudah dipahami.\n\n' +
+  'Kamu adalah asisten kesehatan virtual bernama "SiagaSehat AI". Kamu melakukan konsultasi kesehatan interaktif dalam Bahasa Indonesia yang jelas, singkat, dan mudah dipahami.\n\n' +
   "ATURAN PERCAKAPAN:\n" +
-  "- Jika pengguna baru menyebutkan gejala atau bagian tubuh yang sakit, gali informasi penting SATU per SATU (jangan tanya semua sekaligus): usia, sudah berapa lama gejala dirasakan, seberapa parah, gejala penyerta, riwayat alergi/obat yang sedang dikonsumsi.\n" +
-  "- Jika pengguna mengirimkan hasil Scan AI atau pilihan Anatomi, jelaskan kondisi tersebut dengan bahasa sederhana yang menenangkan, sebutkan tanda bahaya yang perlu diwaspadai, dan berikan langkah perawatan mandiri yang aman.\n" +
-  '- Setelah informasi cukup atau setelah pengguna membagikan hasil skrining, berikan ringkasan terstruktur dengan judul: "Preliminary Analysis", "Risk Assessment", dan "Health Recommendation".\n' +
-  "- Pada Health Recommendation, sertakan saran obat bebas/OTC umum dan alternatif herbal yang aman bila relevan, serta kapan harus segera ke dokter/IGD.\n" +
+  "- Jika pengguna baru menyebutkan gejala atau bagian tubuh yang sakit, gali informasi penting SATU per SATU (jangan tanya semua sekaligus): usia, sudah berapa lama gejala dirasakan, seberapa parah, gejala penyerta, riwayat penyakit/alergi/obat yang sedang dikonsumsi.\n" +
+  '- Setelah informasi cukup (idealnya setelah 2-4 pertanyaan), berikan ringkasan terstruktur dengan judul: "Preliminary Analysis", "Risk Assessment", dan "Health Recommendation".\n' +
+  "- Pada Health Recommendation, sertakan saran obat umum/OTC dan alternatif herbal yang aman bila relevan, serta kapan harus segera ke dokter/IGD.\n" +
   '- Jangan pernah membuat diagnosis pasti 100%, gunakan bahasa "kemungkinan", "bisa jadi", "perlu dipastikan oleh dokter".\n' +
-  "- Jika ada tanda bahaya (nyeri dada hebat, sesak napas berat, pendarahan hebat, penurunan kesadaran, ruam melepuh luas), segera sarankan ke IGD tanpa menunggu info lain.\n" +
-  "- Jawaban ringkas, ramah, dan solutif.";
+  "- Jika ada tanda bahaya (nyeri dada hebat, sesak napas berat, pendarahan hebat, penurunan kesadaran, dll), segera sarankan ke IGD tanpa menunggu info lain.\n" +
+  "- Jawaban singkat, ramah, dan empatik.";
 
 /**
  * Helper: resolve OpenAI-compatible base URL.
@@ -18,6 +17,7 @@ const SYSTEM_PROMPT =
 function getOpenAIBaseUrl(): string {
   const customBase = process.env.OPENAI_BASE_URL?.trim();
   if (customBase) {
+    // Normalize: ensure it ends with /v1
     if (customBase.endsWith("/v1")) return customBase;
     if (customBase.endsWith("/")) return `${customBase}v1`;
     return customBase;
@@ -25,66 +25,11 @@ function getOpenAIBaseUrl(): string {
   return "https://api.openai.com/v1";
 }
 
-/**
- * Fallback response generator if external AI endpoints are unreachable/rate-limited
- */
-function generateFallbackChatReply(prompt: string): string {
-  const lower = prompt.toLowerCase();
-
-  // If this is a scan result consultation handover
-  if (lower.includes("scan ai") || lower.includes("hasil skrining") || lower.includes("kondisi yang terdeteksi")) {
-    return (
-      "Halo! Saya telah menerima dan membaca rangkuman hasil Scan AI Anda.\n\n" +
-      "📌 **Penjelasan Awal:**\n" +
-      "Hasil pemindaian ini merupakan skrining awal edukatif untuk membantu Anda memahami kondisi fisik/kulit yang terlihat. Perubahan pada kulit atau gejala fisik umumnya dapat dipicu oleh faktor iritasi, alergi, infeksi ringan, maupun kelembapan berlebih.\n\n" +
-      "⚠️ **Hal yang Perlu Diwaspadai (Tanda Bahaya):**\n" +
-      "- Rasa nyeri atau perih yang bertambah parah dengan cepat.\n" +
-      "- Ruam menyebar luas disertai demam atau keluar nanah/cairan berlebih.\n" +
-      "- Tidak ada perbaikan setelah 3–5 hari perawatan mandiri.\n\n" +
-      "💡 **Langkah Aman & Rekomendasi Awal:**\n" +
-      "1. Jaga area yang bermasalah tetap bersih, kering, dan hindari menggaruk atau memencetnya.\n" +
-      "2. Gunakan pelembap lembut tanpa pewangi atau kompres sejuk bila terasa gatal/perih.\n" +
-      "3. Jika keluhan berlanjut, konsultasikan langsung ke dokter spesialis atau faskes terdekat untuk penanganan definitif.\n\n" +
-      "Boleh saya tahu sudah berapa lama keluhan ini Anda rasakan, dan apakah ada rasa gatal atau nyeri yang mengganggu?"
-    );
-  }
-
-  // If this is an anatomy result handover
-  if (lower.includes("organ") || lower.includes("anatomi") || lower.includes("bagian tubuh")) {
-    return (
-      "Halo! Saya telah menerima data keluhan yang Anda tandai pada model Anatomi.\n\n" +
-      "📌 **Analisis Awal:**\n" +
-      "Keluhan pada bagian tubuh tersebut dapat berkaitan dengan ketegangan otot, peradangan ringan, atau faktor aktivitas harian. Evaluasi menyeluruh diperlukan untuk memastikan pemicu utamanya.\n\n" +
-      "💡 **Langkah Awal yang Disarankan:**\n" +
-      "- Istirahatkan bagian tubuh yang sakit dan hindari aktivitas berat sementara waktu.\n" +
-      "- Perhatikan asupan cairan dan istirahat yang cukup.\n" +
-      "- Bila nyeri mengganggu, kompres hangat/dingin dapat membantu meredakan ketidaknyamanan.\n\n" +
-      "Boleh ceritakan lebih detail, sudah sejak kapan gejala ini muncul dan apakah terasa terus-menerus atau hilang timbul?"
-    );
-  }
-
-  // General health guidance fallback
-  return (
-    "Halo! Saya asisten kesehatan SiagaSehat AI siap membantu Anda.\n\n" +
-    "Untuk memberikan panduan dan analisis yang paling tepat, boleh ceritakan lebih detail:\n" +
-    "1. Gejala utama apa yang sedang Anda rasakan?\n" +
-    "2. Sudah berapa hari keluhan ini berlangsung?\n" +
-    "3. Apakah ada gejala penyerta lain seperti demam, mual, atau nyeri di bagian tubuh tertentu?"
-  );
-}
-
 async function chatWithGemini(prompt: string): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) throw new Error("GEMINI_API_KEY belum dikonfigurasi di server.");
 
-  // Working & verified Google Gemini models in order of preference
-  const models = [
-    "gemini-2.5-flash",
-    "gemini-2.0-flash",
-    "gemini-1.5-flash",
-    "gemini-1.5-pro",
-    "gemini-2.5-pro",
-  ];
+  const models = ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-2.5-pro"];
   let lastErrText = "";
 
   for (const model of models) {
@@ -97,13 +42,13 @@ async function chatWithGemini(prompt: string): Promise<string> {
             "Content-Type": "application/json",
             "x-goog-api-key": apiKey,
           },
-          signal: AbortSignal.timeout(25000),
+          signal: AbortSignal.timeout(12000),
           body: JSON.stringify({
             systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
             contents: [{ role: "user", parts: [{ text: prompt }] }],
             generationConfig: {
               maxOutputTokens: 1500,
-              temperature: 0.7,
+              thinkingConfig: { thinkingBudget: 0 },
             },
           }),
         },
@@ -120,7 +65,7 @@ async function chatWithGemini(prompt: string): Promise<string> {
         payload.candidates?.[0]?.content?.parts
           ?.map((p: { text?: string }) => p.text ?? "")
           .join("") || "";
-      if (text && text.trim().length > 0) return text.trim();
+      if (text) return text;
     } catch (err) {
       lastErrText = err instanceof Error ? err.message : String(err);
     }
@@ -129,12 +74,15 @@ async function chatWithGemini(prompt: string): Promise<string> {
   throw new Error(`Gemini API tidak dapat dihubungi (${lastErrText || "semua model sibuk/error"})`);
 }
 
-async function chatWithOpenAI(prompt: string): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
+async function chatWithOpenAI(
+  prompt: string,
+  config: { apiKey?: string; baseUrl?: string; model?: string } = {},
+): Promise<string> {
+  const apiKey = (config.apiKey || process.env.OPENAI_API_KEY)?.trim();
   if (!apiKey) throw new Error("OPENAI_API_KEY belum dikonfigurasi di server.");
 
-  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
-  const baseUrl = getOpenAIBaseUrl();
+  const model = config.model || process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const baseUrl = config.baseUrl || getOpenAIBaseUrl();
 
   const res = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
@@ -142,28 +90,26 @@ async function chatWithOpenAI(prompt: string): Promise<string> {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     },
-    signal: AbortSignal.timeout(25000),
     body: JSON.stringify({
       model,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: prompt },
       ],
-      max_tokens: 1000,
-      temperature: 0.7,
+      max_tokens: 800,
     }),
   });
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    throw new Error(`OpenAI error ${res.status}: ${txt.slice(0, 200)}`);
+    throw new Error(`OpenAI/KoboiLLM error ${res.status}: ${txt.slice(0, 200)}`);
   }
 
   const payload = await res.json();
   const text = payload.choices?.[0]?.message?.content;
-  if (!text || text.trim().length === 0) throw new Error("OpenAI tidak mengembalikan respon valid.");
+  if (!text) throw new Error("OpenAI/KoboiLLM tidak mengembalikan respon valid.");
 
-  return text.trim();
+  return text;
 }
 
 export const chatWithAI = createServerFn({ method: "POST" })
@@ -176,14 +122,21 @@ export const chatWithAI = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ reply: string }> => {
     const { prompt } = data as { prompt: string };
     const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase().trim();
+    let lastError: Error | null = null;
 
-    if (provider === "openai") {
-      if (process.env.OPENAI_API_KEY?.trim()) {
+    if (provider === "openai" || provider === "koboillm") {
+      const isKoboi = provider === "koboillm";
+      const apiKey = isKoboi ? process.env.KOBOILLM_API_KEY : process.env.OPENAI_API_KEY;
+      const baseUrl = isKoboi ? process.env.KOBOILLM_BASE_URL : undefined;
+      const model = isKoboi ? process.env.KOBOILLM_MODEL : undefined;
+
+      if (apiKey?.trim()) {
         try {
-          const reply = await chatWithOpenAI(prompt);
+          const reply = await chatWithOpenAI(prompt, { apiKey, baseUrl, model });
           return { reply };
         } catch (err) {
-          console.warn("OpenAI chat failed, trying Gemini as fallback:", err);
+          console.warn(`${isKoboi ? "KoboiLLM" : "OpenAI"} chat failed, trying Gemini as fallback:`, err);
+          lastError = err instanceof Error ? err : new Error(String(err));
         }
       }
       if (process.env.GEMINI_API_KEY?.trim()) {
@@ -192,6 +145,7 @@ export const chatWithAI = createServerFn({ method: "POST" })
           return { reply };
         } catch (err) {
           console.error("Gemini chat fallback failed:", err);
+          lastError = err instanceof Error ? err : new Error(String(err));
         }
       }
     } else {
@@ -202,6 +156,7 @@ export const chatWithAI = createServerFn({ method: "POST" })
           return { reply };
         } catch (err) {
           console.warn("Gemini chat failed, trying OpenAI as fallback:", err);
+          lastError = err instanceof Error ? err : new Error(String(err));
         }
       }
       if (process.env.OPENAI_API_KEY?.trim()) {
@@ -210,13 +165,15 @@ export const chatWithAI = createServerFn({ method: "POST" })
           return { reply };
         } catch (err) {
           console.error("OpenAI chat fallback failed:", err);
+          lastError = err instanceof Error ? err : new Error(String(err));
         }
       }
     }
 
-    // High-resilience fallback: provide structured clinical guidance rather than throwing UI errors
-    console.info("Using intelligent medical fallback response for consultation chat.");
-    return {
-      reply: generateFallbackChatReply(prompt),
-    };
+    throw (
+      lastError ||
+      new Error(
+        "API AI belum dikonfigurasi di server. Tambahkan OPENAI_API_KEY atau GEMINI_API_KEY ke file .env lalu restart server.",
+      )
+    );
   });

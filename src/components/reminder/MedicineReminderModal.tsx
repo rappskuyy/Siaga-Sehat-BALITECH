@@ -74,7 +74,7 @@ function StepIndicator({ current }: { current: Step }) {
 
 export function MedicineReminderModal({ open, onClose }: Props) {
   const { meds, loading: medsLoading } = useLastConsultationMeds();
-  const { createReminder } = useMedicineReminders();
+  const { reminders, createReminder } = useMedicineReminders();
 
   const [step, setStep] = useState<Step>("location");
   const [location, setLocation] = useState<PurchaseLocation | null>(null);
@@ -112,7 +112,24 @@ export function MedicineReminderModal({ open, onClose }: Props) {
     });
   };
 
-  const diseases = Array.from(new Set(meds.map((med) => med.penyakit)));
+  const normalizeDisease = (value: string) => value.trim().toLocaleLowerCase("id-ID");
+  const usedDiseases = new Set(
+    reminders
+      .map((reminder) => {
+        const match = reminder.catatan?.match(/^Untuk kondisi:\s*(.+?)(?:\.\s|$)/i);
+        return match?.[1] ? normalizeDisease(match[1]) : null;
+      })
+      .filter((disease): disease is string => Boolean(disease)),
+  );
+  const usedSourceIds = new Set(
+    reminders.map((reminder) => reminder.source_id).filter((sourceId): sourceId is string => Boolean(sourceId)),
+  );
+  const hasUsedDisease = (disease: string) =>
+    usedDiseases.has(normalizeDisease(disease)) ||
+    meds.some((med) => med.penyakit === disease && usedSourceIds.has(med.sourceId));
+  const diseases = Array.from(
+    new Set(meds.map((med) => med.penyakit)),
+  ).filter((disease) => !hasUsedDisease(disease));
   const diseaseMeds = selectedDisease ? meds.filter((med) => med.penyakit === selectedDisease) : [];
 
   const handleProceedToConfig = () => {
@@ -138,6 +155,11 @@ export function MedicineReminderModal({ open, onClose }: Props) {
 
   const handleSave = async () => {
     if (!location) return;
+    if (selectedDisease && hasUsedDisease(selectedDisease)) {
+      setErrorMsg("Penyakit ini sudah memiliki reminder. Pilih penyakit lain.");
+      setStep("select_meds");
+      return;
+    }
     setSaving(true);
     setErrorMsg(null);
     try {
@@ -187,28 +209,31 @@ export function MedicineReminderModal({ open, onClose }: Props) {
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={handleClose} />
 
       {/* Panel */}
-      <div className="relative z-10 w-full max-w-md overflow-hidden rounded-t-3xl sm:rounded-2xl bg-white shadow-2xl flex flex-col max-h-[90vh]">
+      <div className="relative z-10 w-full max-w-lg overflow-hidden rounded-t-3xl bg-[#f8fafc] shadow-2xl sm:rounded-[28px] flex flex-col max-h-[90vh]">
         {/* Header */}
         {step === "success" ? (
-          <div className="relative overflow-hidden bg-[color:var(--color-clinic-blue)] px-6 pb-5 pt-5">
-            <div
-              className="pointer-events-none absolute inset-0 opacity-25"
-              style={{ background: "radial-gradient(65% 100% at 85% 0%, #2ee6c4, transparent)" }}
-            />
+          <div className="relative overflow-hidden bg-[#17324d] px-6 pb-6 pt-6 sm:px-8">
             <button
               onClick={handleClose}
-              className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-white/15 text-white transition hover:bg-white/25"
+              className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-xl border border-white/15 bg-white/10 text-white transition hover:bg-white/20"
               aria-label="Tutup"
             >
               <X className="h-4 w-4" />
             </button>
-            <div className="relative z-10 flex items-center gap-2">
-              <div className="grid h-8 w-8 place-items-center rounded-full bg-white/15 text-white backdrop-blur">
-                <Bell className="h-4 w-4" />
+            <div className="relative z-10 flex max-w-[calc(100%-3rem)] items-start gap-3">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[#35d399] text-[#123049] shadow-[0_8px_20px_rgba(53,211,153,0.22)]">
+                <CheckCircle2 className="h-6 w-6" />
               </div>
               <div>
-                <p className="font-semibold text-sm text-white">Pengingat Obat</p>
-                <p className="text-[10px] text-white/70">Berhasil dijadwalkan</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8ee6c5]">
+                  Jadwal tersimpan
+                </p>
+                <p className="mt-1 font-display text-xl font-extrabold tracking-tight text-white">
+                  Pengingat obat aktif
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-white/65">
+                  Pengingat akan berjalan selama halaman browser tetap terbuka.
+                </p>
               </div>
             </div>
           </div>
@@ -321,6 +346,16 @@ export function MedicineReminderModal({ open, onClose }: Props) {
                   <p className="text-xs text-amber-600">
                     Lakukan konsultasi atau scan AI terlebih dahulu untuk mendapatkan rekomendasi
                     obat.
+                  </p>
+                </div>
+              ) : diseases.length === 0 ? (
+                <div className="flex flex-col items-center gap-2 rounded-2xl bg-emerald-50 p-5 text-center">
+                  <CheckCircle2 className="h-8 w-8 text-emerald-500" />
+                  <p className="text-sm font-semibold text-emerald-700">
+                    Semua penyakit sudah memiliki reminder
+                  </p>
+                  <p className="text-xs text-emerald-600">
+                    Satu penyakit hanya dapat dibuatkan satu reminder.
                   </p>
                 </div>
               ) : (
@@ -527,63 +562,88 @@ export function MedicineReminderModal({ open, onClose }: Props) {
 
           {/* ─── SUCCESS ─── */}
           {step === "success" && (
-            <div className="flex flex-col items-center px-6 pb-7 pt-8 text-center">
-              <div className="relative grid h-20 w-20 place-items-center">
-                <span className="absolute inset-0 animate-ping rounded-full bg-emerald-200/60" />
-                <div className="relative grid h-20 w-20 place-items-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 text-white shadow-lg shadow-emerald-500/30">
-                  <CheckCircle2 className="h-10 w-10" />
+            <div className="flex flex-col px-5 pb-6 pt-6 sm:px-8">
+              <div className="grid grid-cols-3 gap-2">
+                <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3">
+                  <p className="font-display text-xl font-extrabold text-[color:var(--color-clinic-ink)]">
+                    {configs.length}
+                  </p>
+                  <p className="mt-0.5 text-[10px] font-medium text-[color:var(--color-clinic-muted)]">
+                    Obat aktif
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3">
+                  <p className="font-display text-xl font-extrabold text-[color:var(--color-clinic-ink)]">
+                    {configs[0]?.dosis_per_hari ?? 0}x
+                  </p>
+                  <p className="mt-0.5 text-[10px] font-medium text-[color:var(--color-clinic-muted)]">
+                    Per hari
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3">
+                  <p className="font-display text-xl font-extrabold text-[#099268]">Aktif</p>
+                  <p className="mt-0.5 text-[10px] font-medium text-[color:var(--color-clinic-muted)]">
+                    Status jadwal
+                  </p>
                 </div>
               </div>
 
-              <p className="mt-4 font-display text-xl font-extrabold text-[color:var(--color-clinic-ink)] flex items-center justify-center gap-2">
-                Pengingat Aktif!
-              </p>
-              <p className="mt-1 max-w-xs text-sm text-[color:var(--color-clinic-muted)]">
-                {configs.length} obat berhasil dijadwalkan. Browser akan mengingatkanmu sesuai
-                jadwal.
-              </p>
+              <div className="mt-6 flex items-end justify-between gap-3">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[color:var(--color-clinic-blue)]">
+                    Rencana terapi
+                  </p>
+                  <h2 className="mt-1 font-display text-2xl font-extrabold tracking-tight text-[color:var(--color-clinic-ink)]">
+                    Yang perlu kamu minum
+                  </h2>
+                </div>
+                <Pill className="mb-1 h-5 w-5 text-[color:var(--color-clinic-blue)]" />
+              </div>
 
               {/* Scheduled meds summary */}
               {configs.length > 0 && (
-                <div className="mt-5 flex w-full flex-col gap-2 rounded-2xl bg-slate-50 p-3 text-left">
+                <div className="mt-4 flex w-full flex-col gap-2 text-left">
                   {configs.map((cfg, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-3 rounded-xl bg-white p-2.5 shadow-xs"
+                      className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-[0_4px_14px_rgba(23,50,77,0.04)]"
                     >
-                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)]">
-                        <Pill className="h-4 w-4" />
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#e8f7f2] text-[#099268]">
+                        <Bell className="h-4 w-4" />
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-xs font-semibold text-[color:var(--color-clinic-ink)]">
+                        <p className="truncate text-sm font-bold text-[color:var(--color-clinic-ink)]">
                           {cfg.med.nama}
                         </p>
-                        <p className="text-[10px] text-[color:var(--color-clinic-muted)]">
-                          {cfg.dosis_per_minum} · {cfg.dosis_per_hari}x sehari
+                        <p className="mt-0.5 text-[11px] text-[color:var(--color-clinic-muted)]">
+                          {cfg.dosis_per_minum} · setiap {intervalForDosis(cfg.dosis_per_hari)} jam
+                        </p>
+                        <p className="mt-1 truncate text-[10px] font-medium text-[color:var(--color-clinic-blue)]">
+                          Untuk kondisi: {cfg.med.penyakit}
                         </p>
                       </div>
-                      <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-1 text-[9px] font-bold text-emerald-600">
-                        Terjadwal
+                      <span className="shrink-0 rounded-full bg-[#e8f7f2] px-2 py-1 text-[9px] font-bold text-[#087f5b]">
+                        Aktif
                       </span>
                     </div>
                   ))}
                 </div>
               )}
 
-              <div className="mt-5 flex w-full flex-col gap-2">
+              <div className="mt-6 flex w-full flex-col gap-2.5">
                 <a
                   href="/reminders"
                   id="reminder-go-to-page"
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[color:var(--color-clinic-blue)] py-3 text-sm font-semibold text-white shadow-md shadow-[color:var(--color-clinic-blue)]/20 transition hover:bg-[color:var(--color-clinic-blue-dark)] active:scale-[0.98]"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[color:var(--color-clinic-blue)] py-3.5 text-sm font-bold text-white shadow-[0_8px_18px_rgba(57,105,166,0.22)] transition hover:bg-[color:var(--color-clinic-blue-dark)] active:scale-[0.98]"
                 >
                   <Bell className="h-4 w-4" />
-                  Lihat Semua Notifikasi
+                  Buka jadwal pengingat
                 </a>
                 <button
                   onClick={handleClose}
-                  className="w-full rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-500 transition hover:bg-slate-50"
+                  className="w-full rounded-2xl border border-slate-200 bg-white py-3 text-sm font-semibold text-[color:var(--color-clinic-muted)] transition hover:border-slate-300 hover:text-[color:var(--color-clinic-ink)]"
                 >
-                  Tutup
+                  Selesai
                 </button>
               </div>
             </div>

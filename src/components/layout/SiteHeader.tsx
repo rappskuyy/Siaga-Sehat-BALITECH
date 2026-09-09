@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { Bell, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -162,9 +162,11 @@ export function SiteHeader() {
             <>
               <Link
                 to="/reminders"
-                className="hidden items-center justify-center rounded-full border border-[color:var(--color-clinic-blue)]/15 bg-[color:var(--color-clinic-blue-soft)] px-3.5 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)] hover:text-white sm:inline-flex"
+                aria-label="Notifikasi dan pengingat obat"
+                title="Notifikasi dan pengingat obat"
+                className="hidden h-9 w-9 items-center justify-center rounded-full border border-[color:var(--color-clinic-blue)]/15 bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)] hover:text-white sm:inline-flex"
               >
-                Notifikasi
+                <Bell className="h-4 w-4" />
               </Link>
               <Link
                 to="/profile"
@@ -231,11 +233,10 @@ export function SiteHeader() {
                   to={tab.path}
                   search={tab.search as any}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`rounded-xl px-3.5 py-2.5 text-sm transition ${
-                    isActive
+                  className={`rounded-xl px-3.5 py-2.5 text-sm transition ${isActive
                       ? "font-semibold text-[color:var(--color-clinic-blue)] bg-white"
                       : "font-medium text-[color:var(--color-clinic-ink)] hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   {tab.label}
                 </Link>
@@ -245,11 +246,10 @@ export function SiteHeader() {
               <Link
                 to="/reminders"
                 onClick={() => setIsMenuOpen(false)}
-                className={`rounded-xl px-3.5 py-2.5 text-sm transition ${
-                  currentPath.startsWith("/reminders")
+                className={`rounded-xl px-3.5 py-2.5 text-sm transition ${currentPath.startsWith("/reminders")
                     ? "font-semibold text-[color:var(--color-clinic-blue)] bg-white"
                     : "font-medium text-[color:var(--color-clinic-ink)] hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 Notifikasi
               </Link>

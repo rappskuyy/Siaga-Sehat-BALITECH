@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import {
   Activity,
   AlertTriangle,
+  CheckCircle2,
+  ChevronDown,
   Droplets,
   ExternalLink,
   Flower2,
@@ -18,6 +20,7 @@ import {
   Wheat,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { toast } from "sonner";
 import type { DangerLevel, ScanResult } from "@/lib/scanner/types";
 import { Button } from "@/components/ui/button";
 import { PharmacyMap } from "@/components/maps/PharmacyMap";
@@ -103,6 +106,47 @@ const getHerbIcon = (herbName: string): React.FC<{ className?: string }> => {
   return Leaf;
 };
 
+const ResultCard = ({
+  title,
+  icon: Icon,
+  className,
+  isExpanded,
+  onToggle,
+  children,
+}: {
+  title: string;
+  icon?: any;
+  className?: string;
+  isExpanded: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) => {
+  return (
+    <div
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border shadow-sm transition-shadow duration-200 hover:shadow-md ${className}`}
+    >
+      {/* Card Header */}
+      <div className="shrink-0 px-4 pb-0 pt-4 text-left sm:px-6 sm:pt-5 block">
+        <div className="flex items-center gap-2.5">
+          {Icon && (
+            <div className="w-7 h-7 rounded-lg bg-[color:var(--color-clinic-blue)]/10 text-[color:var(--color-clinic-blue)] flex items-center justify-center shrink-0">
+              <Icon className="h-4 w-4" />
+            </div>
+          )}
+          <h3 className="font-display text-base sm:text-lg font-bold leading-tight text-[color:var(--color-clinic-ink)]">
+            {title}
+          </h3>
+        </div>
+      </div>
+
+      {/* Card Content */}
+      <div className="flex-1 px-4 pb-4 pt-3 sm:px-6 sm:pb-6 sm:pt-4">
+        {children}
+      </div>
+    </div>
+  );
+};
+
 export function ScanResultView({
   result,
   previewUrl,
@@ -113,7 +157,8 @@ export function ScanResultView({
   onReset: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<"penyebab" | "pencegahan">("penyebab");
-  const [hoveredTab, setHoveredTab] = useState<"penyebab" | "pencegahan" | null>(null);
+  const [isMedicineOpenMobile, setIsMedicineOpenMobile] = useState<boolean>(true);
+  const [isHerbalOpenMobile, setIsHerbalOpenMobile] = useState<boolean>(true);
 
   if (!result.gambar_dapat_dianalisis) {
     return (
@@ -151,46 +196,59 @@ export function ScanResultView({
     catatan: result.catatan_tambahan,
   });
 
+  const formattedDate = new Date().toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+<<<<<<< Updated upstream
+  const medicineList = (result.obat_rekomendasi ?? []).map((item) => ({
+    nama: item.nama,
+    dosis: item.dosis,
+    note: (item.catatan || "").replace(/sangat penting untuk/gi, "Disarankan untuk").replace(/sangat penting/gi, "Disarankan"),
+  }));
+=======
   const rawMedicineList =
     result.obat_rekomendasi && result.obat_rekomendasi.length > 0
       ? result.obat_rekomendasi.map((item, idx) => {
-          const isWarning =
-            item.catatan?.toLowerCase().includes("resep") ||
-            item.catatan?.toLowerCase().includes("dokter") ||
-            item.catatan?.toLowerCase().includes("hati-hati");
-          const formattedNote = (
-            item.catatan || "Disarankan sesuai indikasi klinis hasil analisis skrining."
-          )
-            .replace(/sangat penting untuk/gi, "Disarankan untuk")
-            .replace(/sangat penting/gi, "Disarankan");
+        const isWarning =
+          item.catatan?.toLowerCase().includes("resep") ||
+          item.catatan?.toLowerCase().includes("dokter") ||
+          item.catatan?.toLowerCase().includes("hati-hati");
+        const formattedNote = (
+          item.catatan || "Disarankan sesuai indikasi klinis hasil analisis skrining."
+        )
+          .replace(/sangat penting untuk/gi, "Disarankan untuk")
+          .replace(/sangat penting/gi, "Disarankan");
 
-          return {
-            nama: item.nama,
-            dosis: item.dosis,
-            note: formattedNote,
-            status: isWarning ? "Perhatian Khusus" : "Terverifikasi Aman",
-          };
-        })
+        return {
+          nama: item.nama,
+          dosis: item.dosis,
+          note: formattedNote,
+          status: isWarning ? "Perhatian Khusus" : "Terverifikasi Aman",
+        };
+      })
       : [
-          {
-            nama: "Ibuprofen",
-            dosis: "200 mg",
-            note: "Disarankan untuk meredakan peradangan lokal, mengurangi rasa nyeri atau ngilu, serta membantu mengontrol pembengkakan jaringan akibat infeksi atau iritasi.",
-            status: "Terverifikasi Aman",
-          },
-          {
-            nama: "Cetirizine",
-            dosis: "10 mg",
-            note: "Disarankan untuk meredakan gejolak reaksi alergi, mengurangi gatal kemerahan pada kulit, serta menekan pelepasan histamin tubuh secara aman.",
-            status: "Terverifikasi Aman",
-          },
-          {
-            nama: "Paracetamol",
-            dosis: "500 mg",
-            note: "Digunakan sebagai analgesik dan antipiretik pertolongan pertama untuk menstabilkan suhu tubuh dan meredakan rasa sakit ringan hingga sedang.",
-            status: "Terverifikasi Aman",
-          },
-        ];
+        {
+          nama: "Ibuprofen",
+          dosis: "200 mg",
+          note: "Disarankan untuk meredakan peradangan lokal, mengurangi rasa nyeri atau ngilu, serta membantu mengontrol pembengkakan jaringan akibat infeksi atau iritasi.",
+          status: "Terverifikasi Aman",
+        },
+        {
+          nama: "Cetirizine",
+          dosis: "10 mg",
+          note: "Disarankan untuk meredakan gejolak reaksi alergi, mengurangi gatal kemerahan pada kulit, serta menekan pelepasan histamin tubuh secara aman.",
+          status: "Terverifikasi Aman",
+        },
+        {
+          nama: "Paracetamol",
+          dosis: "500 mg",
+          note: "Digunakan sebagai analgesik dan antipiretik pertolongan pertama untuk menstabilkan suhu tubuh dan meredakan rasa sakit ringan hingga sedang.",
+          status: "Terverifikasi Aman",
+        },
+      ];
 
   const medicineList = [...rawMedicineList];
   const defaultSupplements = [
@@ -224,6 +282,7 @@ export function ScanResultView({
       medicineList.push(supp);
     }
   }
+>>>>>>> Stashed changes
 
   const cleanSentenceList = (items?: string[]): string[] => {
     if (!items || items.length === 0) return [];
@@ -283,8 +342,6 @@ export function ScanResultView({
           <img
             src={previewUrl}
             alt="Foto yang dianalisis"
-            width={340}
-            height={340}
             loading="lazy"
             decoding="async"
             className="aspect-square w-full object-cover max-h-[340px] md:max-h-none"
@@ -337,19 +394,49 @@ export function ScanResultView({
         <div className="lg:col-span-5 flex flex-col h-full">
           <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border-2 border-white/20 bg-[color:var(--color-clinic-blue)] p-4 sm:p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:border-white/40 h-full text-white">
             <div className="flex flex-col">
-              {/* Card Header */}
-              <div className="flex items-center gap-2.5 mb-3.5">
-                <div className="w-7 h-7 rounded-lg bg-white text-[color:var(--color-clinic-blue)] flex items-center justify-center shrink-0 shadow-2xs">
-                  <Pill className="h-4 w-4" />
+              {/* Card Header / Mobile Dropdown Trigger */}
+              <button
+                type="button"
+                onClick={() => setIsMedicineOpenMobile((prev) => !prev)}
+                className="flex w-full items-center justify-between text-left cursor-pointer lg:cursor-default select-none group/header"
+                aria-expanded={isMedicineOpenMobile}
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-white text-[color:var(--color-clinic-blue)] flex items-center justify-center shrink-0 shadow-2xs">
+                    <Pill className="h-4 w-4" />
+                  </div>
+                  <h3 className="font-display text-lg font-bold leading-tight text-white">
+                    Rekomendasi Obat
+                  </h3>
                 </div>
-                <h3 className="font-display text-lg font-bold leading-tight text-white">
-                  Rekomendasi Obat
-                </h3>
-              </div>
 
+<<<<<<< Updated upstream
               {/* Medicine List */}
               <div className="flex flex-col gap-3.5">
+                {medicineList.length === 0 ? (
+                  <p className="rounded-xl border border-white/15 bg-white/10 p-3 text-xs leading-relaxed text-blue-100">
+                    AI tidak memberikan rekomendasi obat untuk kondisi ini. Konsultasikan dengan dokter atau apoteker bila diperlukan.
+                  </p>
+                ) : medicineList.map((item, i) => {
+=======
+                <div className="flex items-center gap-1.5 lg:hidden text-blue-100 group-hover/header:text-white transition-colors">
+                  <span className="text-xs font-semibold">
+                    {isMedicineOpenMobile ? "Sembunyikan" : "Tampilkan"}
+                  </span>
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform duration-200 ${isMedicineOpenMobile ? "rotate-180" : ""
+                      }`}
+                  />
+                </div>
+              </button>
+
+              {/* Medicine List - Collapsible on Mobile, Always Open on Desktop */}
+              <div
+                className={`flex-col gap-3.5 mt-3.5 ${isMedicineOpenMobile ? "flex" : "hidden"
+                  } lg:flex`}
+              >
                 {medicineList.map((item, i) => {
+>>>>>>> Stashed changes
                   const shoppingQuery = encodeURIComponent(
                     `beli obat ${item.nama}${item.dosis ? ` ${item.dosis}` : ""}`
                   );
@@ -410,38 +497,25 @@ export function ScanResultView({
               </h3>
             </div>
 
-            <div
-              onMouseLeave={() => setHoveredTab(null)}
-              className="relative mb-4 inline-flex w-full items-center justify-between rounded-full bg-black/20 p-1 sm:w-auto self-start border border-white/20 shadow-2xs"
-            >
+            <div className="relative mb-4 grid grid-cols-2 w-full max-w-[280px] sm:max-w-none sm:w-auto items-center rounded-full bg-black/20 p-1 self-center sm:self-start border border-white/20 shadow-2xs">
               {[
-                { id: "penyebab" as const, label: "Penyebab" },
-                { id: "pencegahan" as const, label: "Pencegahan" },
+                { id: "penyebab" as const, mobileLabel: "Penyebab", desktopLabel: "Penyebab" },
+                { id: "pencegahan" as const, mobileLabel: "Pencegahan", desktopLabel: "Pencegahan Mandiri" },
               ].map((tab) => {
-                const isSelected = (hoveredTab ?? activeTab) === tab.id;
+                const isSelected = activeTab === tab.id;
                 return (
                   <button
                     key={tab.id}
                     type="button"
-                    onClick={() => {
-                      setActiveTab(tab.id);
-                      setHoveredTab(null);
-                    }}
-                    onMouseEnter={() => setHoveredTab(tab.id)}
-                    className={`relative flex-1 sm:flex-initial rounded-full px-5 py-1.5 text-xs sm:text-sm font-bold transition-colors duration-200 cursor-pointer select-none ${
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center justify-center rounded-full py-1.5 px-3 sm:px-6 sm:min-w-[150px] text-xs sm:text-sm font-bold text-center transition-all duration-150 cursor-pointer select-none ${
                       isSelected
-                        ? "text-[color:var(--color-clinic-blue-dark)]"
-                        : "text-blue-100 hover:text-white"
+                        ? "bg-white text-[color:var(--color-clinic-blue-dark)] shadow-xs"
+                        : "bg-transparent text-blue-100 hover:text-white"
                     }`}
                   >
-                    {isSelected && (
-                      <motion.div
-                        layoutId="activeTabPillPenyebabPencegahan"
-                        className="absolute inset-0 z-0 rounded-full bg-white shadow-xs pointer-events-none"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                    <span className="relative z-10">{tab.label}</span>
+                    <span className="sm:hidden">{tab.mobileLabel}</span>
+                    <span className="hidden sm:inline">{tab.desktopLabel}</span>
                   </button>
                 );
               })}
@@ -480,48 +554,73 @@ export function ScanResultView({
             </div>
           </div>
 
-          {/* Card 2: Obat Herbal Alami (Photo-style list with pill badge) */}
+          {/* Card 2: Obat Herbal Alami (Dropdown on Mobile, Open on Desktop) */}
           <div className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-white/20 bg-[color:var(--color-clinic-blue)] shadow-sm transition-all duration-200 hover:shadow-md hover:border-white/40 text-white">
-            {/* Card Header */}
-            <div className="flex items-center gap-2.5 px-4 sm:px-5 pt-4 sm:pt-5 pb-3">
-              <div className="w-7 h-7 rounded-lg bg-white text-[color:var(--color-clinic-blue)] flex items-center justify-center shrink-0 shadow-2xs">
-                <Leaf className="h-4 w-4" />
+            {/* Card Header / Mobile Dropdown Trigger */}
+            <button
+              type="button"
+              onClick={() => setIsHerbalOpenMobile((prev) => !prev)}
+              className="flex w-full items-center justify-between text-left cursor-pointer lg:cursor-default select-none px-4 sm:px-5 pt-4 sm:pt-5 pb-3 group/header"
+              aria-expanded={isHerbalOpenMobile}
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-white text-[color:var(--color-clinic-blue)] flex items-center justify-center shrink-0 shadow-2xs">
+                  <Leaf className="h-4 w-4" />
+                </div>
+                <h3 className="font-display text-lg font-bold leading-tight text-white">
+                  Obat Herbal Alami
+                </h3>
               </div>
-              <h3 className="font-display text-lg font-bold leading-tight text-white">
-                Obat Herbal Alami
-              </h3>
-            </div>
 
-            {/* Herb List - Photo Style */}
-            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5 lg:hidden text-blue-100 group-hover/header:text-white transition-colors">
+                <span className="text-xs font-semibold">
+                  {isHerbalOpenMobile ? "Sembunyikan" : "Tampilkan"}
+                </span>
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform duration-200 ${isHerbalOpenMobile ? "rotate-180" : ""
+                    }`}
+                />
+              </div>
+            </button>
+
+            {/* Herb List - Collapsible on Mobile, Always Open on Desktop */}
+            <div
+              className={`flex-col ${isHerbalOpenMobile ? "flex" : "hidden"
+                } lg:flex`}
+            >
               {!result.obat_herbal || result.obat_herbal.length === 0 ? (
                 <div className="px-4 sm:px-5 pb-4 text-sm italic text-blue-200">
                   Tidak ada saran obat herbal spesifik.
                 </div>
               ) : (
                 result.obat_herbal.map((herb, i) => (
-                    <div
-                      key={i}
-                      className="flex items-stretch justify-between border-b border-white/15 last:border-0"
-                    >
-                      {/* Left: Name + Description */}
-                      <div className="flex flex-col gap-1 px-4 sm:px-5 py-3.5 flex-1 min-w-0">
-                        <h4 className="text-sm sm:text-base font-extrabold uppercase tracking-wide text-white leading-tight">
-                          {herb.nama}
-                        </h4>
-                        <p className="text-xs text-blue-100/90 leading-relaxed">
-                          {herb.cara_pakai}
-                        </p>
-                      </div>
+                  <div
+                    key={i}
+                    className="flex items-stretch justify-between border-b border-white/15 last:border-0"
+                  >
+                    {/* Left: Name + Description */}
+                    <div className="flex flex-col gap-1 px-4 sm:px-5 py-3.5 flex-1 min-w-0">
+                      <h4 className="text-sm sm:text-base font-extrabold uppercase tracking-wide text-white leading-tight">
+                        {herb.nama}
+                      </h4>
+                      <p className="text-xs text-blue-100/90 leading-relaxed">
+                        {herb.cara_pakai}
+                      </p>
+                    </div>
 
-                      {/* Right: Smart Icon Pill Badge */}
-                      <div className="flex items-center justify-center shrink-0 px-2.5">
-                        <div className="flex h-14 w-8 items-center justify-center rounded-full bg-white text-[color:var(--color-clinic-blue)] shadow-sm">
-                          {(() => { const HerbIcon = getHerbIcon(herb.nama); return <HerbIcon className="h-4 w-4 text-[color:var(--color-clinic-blue)]" />; })()}
-                        </div>
+                    {/* Right: Smart Icon Pill Badge */}
+                    <div className="flex items-center justify-center shrink-0 px-2.5">
+                      <div className="flex h-14 w-8 items-center justify-center rounded-full bg-white text-[color:var(--color-clinic-blue)] shadow-sm">
+                        {(() => {
+                          const HerbIcon = getHerbIcon(herb.nama);
+                          return (
+                            <HerbIcon className="h-4 w-4 text-[color:var(--color-clinic-blue)]" />
+                          );
+                        })()}
                       </div>
                     </div>
-                  ))
+                  </div>
+                ))
               )}
             </div>
           </div>
