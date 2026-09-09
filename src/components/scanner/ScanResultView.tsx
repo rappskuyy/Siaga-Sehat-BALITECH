@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import {
   Activity,
   AlertTriangle,
-  CheckCircle2,
   ChevronDown,
   Droplets,
   ExternalLink,
@@ -20,7 +18,6 @@ import {
   Wheat,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { toast } from "sonner";
 import type { DangerLevel, ScanResult } from "@/lib/scanner/types";
 import { Button } from "@/components/ui/button";
 import { PharmacyMap } from "@/components/maps/PharmacyMap";
@@ -73,78 +70,31 @@ const DANGER_STYLES: Record<
 // Smart herb-to-icon mapping based on herb name keywords
 const getHerbIcon = (herbName: string): React.FC<{ className?: string }> => {
   const name = herbName.toLowerCase();
-  // Coconut / palm trees
   if (
     name.includes("kelapa") || name.includes("coconut") || name.includes("pohon") ||
     name.includes("pinang") || name.includes("sagu")
   ) return TreePine;
-  // Flowers & blossoms
   if (
     name.includes("bunga") || name.includes("flower") || name.includes("lavender") ||
     name.includes("chamomile") || name.includes("mawar") || name.includes("rose") ||
     name.includes("melati") || name.includes("jasmine") || name.includes("kembang")
   ) return Flower2;
-  // Grains, seeds, cereals
   if (
     name.includes("biji") || name.includes("seed") || name.includes("gandum") ||
     name.includes("beras") || name.includes("oat") || name.includes("wheat") ||
     name.includes("jewawut") || name.includes("jagung")
   ) return Wheat;
-  // Aloe, moisture & gel plants
   if (
     name.includes("lidah buaya") || name.includes("aloe") || name.includes("gel") ||
     name.includes("bengkuang") || name.includes("timun") || name.includes("cucumber")
   ) return Droplets;
-  // Sprouts, rhizomes, roots, turmeric, ginger family
   if (
     name.includes("jahe") || name.includes("ginger") || name.includes("kunyit") ||
     name.includes("temulawak") || name.includes("kencur") || name.includes("lengkuas") ||
     name.includes("umbi") || name.includes("akar") || name.includes("root") ||
     name.includes("sprout") || name.includes("toge") || name.includes("tauge")
   ) return Sprout;
-  // Default: Leaf (general herbs, leaves, mint, basil, etc.)
   return Leaf;
-};
-
-const ResultCard = ({
-  title,
-  icon: Icon,
-  className,
-  isExpanded,
-  onToggle,
-  children,
-}: {
-  title: string;
-  icon?: any;
-  className?: string;
-  isExpanded: boolean;
-  onToggle: () => void;
-  children: React.ReactNode;
-}) => {
-  return (
-    <div
-      className={`group relative flex flex-col overflow-hidden rounded-2xl border shadow-sm transition-shadow duration-200 hover:shadow-md ${className}`}
-    >
-      {/* Card Header */}
-      <div className="shrink-0 px-4 pb-0 pt-4 text-left sm:px-6 sm:pt-5 block">
-        <div className="flex items-center gap-2.5">
-          {Icon && (
-            <div className="w-7 h-7 rounded-lg bg-[color:var(--color-clinic-blue)]/10 text-[color:var(--color-clinic-blue)] flex items-center justify-center shrink-0">
-              <Icon className="h-4 w-4" />
-            </div>
-          )}
-          <h3 className="font-display text-base sm:text-lg font-bold leading-tight text-[color:var(--color-clinic-ink)]">
-            {title}
-          </h3>
-        </div>
-      </div>
-
-      {/* Card Content */}
-      <div className="flex-1 px-4 pb-4 pt-3 sm:px-6 sm:pb-6 sm:pt-4">
-        {children}
-      </div>
-    </div>
-  );
 };
 
 export function ScanResultView({
@@ -196,59 +146,46 @@ export function ScanResultView({
     catatan: result.catatan_tambahan,
   });
 
-  const formattedDate = new Date().toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-
-<<<<<<< Updated upstream
-  const medicineList = (result.obat_rekomendasi ?? []).map((item) => ({
-    nama: item.nama,
-    dosis: item.dosis,
-    note: (item.catatan || "").replace(/sangat penting untuk/gi, "Disarankan untuk").replace(/sangat penting/gi, "Disarankan"),
-  }));
-=======
   const rawMedicineList =
     result.obat_rekomendasi && result.obat_rekomendasi.length > 0
-      ? result.obat_rekomendasi.map((item, idx) => {
-        const isWarning =
-          item.catatan?.toLowerCase().includes("resep") ||
-          item.catatan?.toLowerCase().includes("dokter") ||
-          item.catatan?.toLowerCase().includes("hati-hati");
-        const formattedNote = (
-          item.catatan || "Disarankan sesuai indikasi klinis hasil analisis skrining."
-        )
-          .replace(/sangat penting untuk/gi, "Disarankan untuk")
-          .replace(/sangat penting/gi, "Disarankan");
+      ? result.obat_rekomendasi.map((item) => {
+          const isWarning =
+            item.catatan?.toLowerCase().includes("resep") ||
+            item.catatan?.toLowerCase().includes("dokter") ||
+            item.catatan?.toLowerCase().includes("hati-hati");
+          const formattedNote = (
+            item.catatan || "Disarankan sesuai indikasi klinis hasil analisis skrining."
+          )
+            .replace(/sangat penting untuk/gi, "Disarankan untuk")
+            .replace(/sangat penting/gi, "Disarankan");
 
-        return {
-          nama: item.nama,
-          dosis: item.dosis,
-          note: formattedNote,
-          status: isWarning ? "Perhatian Khusus" : "Terverifikasi Aman",
-        };
-      })
+          return {
+            nama: item.nama,
+            dosis: item.dosis,
+            note: formattedNote,
+            status: isWarning ? "Perhatian Khusus" : "Terverifikasi Aman",
+          };
+        })
       : [
-        {
-          nama: "Ibuprofen",
-          dosis: "200 mg",
-          note: "Disarankan untuk meredakan peradangan lokal, mengurangi rasa nyeri atau ngilu, serta membantu mengontrol pembengkakan jaringan akibat infeksi atau iritasi.",
-          status: "Terverifikasi Aman",
-        },
-        {
-          nama: "Cetirizine",
-          dosis: "10 mg",
-          note: "Disarankan untuk meredakan gejolak reaksi alergi, mengurangi gatal kemerahan pada kulit, serta menekan pelepasan histamin tubuh secara aman.",
-          status: "Terverifikasi Aman",
-        },
-        {
-          nama: "Paracetamol",
-          dosis: "500 mg",
-          note: "Digunakan sebagai analgesik dan antipiretik pertolongan pertama untuk menstabilkan suhu tubuh dan meredakan rasa sakit ringan hingga sedang.",
-          status: "Terverifikasi Aman",
-        },
-      ];
+          {
+            nama: "Ibuprofen",
+            dosis: "200 mg",
+            note: "Disarankan untuk meredakan peradangan lokal, mengurangi rasa nyeri atau ngilu, serta membantu mengontrol pembengkakan jaringan akibat infeksi atau iritasi.",
+            status: "Terverifikasi Aman",
+          },
+          {
+            nama: "Cetirizine",
+            dosis: "10 mg",
+            note: "Disarankan untuk meredakan gejolak reaksi alergi, mengurangi gatal kemerahan pada kulit, serta menekan pelepasan histamin tubuh secara aman.",
+            status: "Terverifikasi Aman",
+          },
+          {
+            nama: "Paracetamol",
+            dosis: "500 mg",
+            note: "Digunakan sebagai analgesik dan antipiretik pertolongan pertama untuk menstabilkan suhu tubuh dan meredakan rasa sakit ringan hingga sedang.",
+            status: "Terverifikasi Aman",
+          },
+        ];
 
   const medicineList = [...rawMedicineList];
   const defaultSupplements = [
@@ -282,7 +219,6 @@ export function ScanResultView({
       medicineList.push(supp);
     }
   }
->>>>>>> Stashed changes
 
   const cleanSentenceList = (items?: string[]): string[] => {
     if (!items || items.length === 0) return [];
@@ -410,33 +346,25 @@ export function ScanResultView({
                   </h3>
                 </div>
 
-<<<<<<< Updated upstream
-              {/* Medicine List */}
-              <div className="flex flex-col gap-3.5">
-                {medicineList.length === 0 ? (
-                  <p className="rounded-xl border border-white/15 bg-white/10 p-3 text-xs leading-relaxed text-blue-100">
-                    AI tidak memberikan rekomendasi obat untuk kondisi ini. Konsultasikan dengan dokter atau apoteker bila diperlukan.
-                  </p>
-                ) : medicineList.map((item, i) => {
-=======
                 <div className="flex items-center gap-1.5 lg:hidden text-blue-100 group-hover/header:text-white transition-colors">
                   <span className="text-xs font-semibold">
                     {isMedicineOpenMobile ? "Sembunyikan" : "Tampilkan"}
                   </span>
                   <ChevronDown
-                    className={`h-4 w-4 transition-transform duration-200 ${isMedicineOpenMobile ? "rotate-180" : ""
-                      }`}
+                    className={`h-4 w-4 transition-transform duration-200 ${
+                      isMedicineOpenMobile ? "rotate-180" : ""
+                    }`}
                   />
                 </div>
               </button>
 
               {/* Medicine List - Collapsible on Mobile, Always Open on Desktop */}
               <div
-                className={`flex-col gap-3.5 mt-3.5 ${isMedicineOpenMobile ? "flex" : "hidden"
-                  } lg:flex`}
+                className={`flex-col gap-3.5 mt-3.5 ${
+                  isMedicineOpenMobile ? "flex" : "hidden"
+                } lg:flex`}
               >
                 {medicineList.map((item, i) => {
->>>>>>> Stashed changes
                   const shoppingQuery = encodeURIComponent(
                     `beli obat ${item.nama}${item.dosis ? ` ${item.dosis}` : ""}`
                   );
@@ -577,16 +505,18 @@ export function ScanResultView({
                   {isHerbalOpenMobile ? "Sembunyikan" : "Tampilkan"}
                 </span>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 ${isHerbalOpenMobile ? "rotate-180" : ""
-                    }`}
+                  className={`h-4 w-4 transition-transform duration-200 ${
+                    isHerbalOpenMobile ? "rotate-180" : ""
+                  }`}
                 />
               </div>
             </button>
 
             {/* Herb List - Collapsible on Mobile, Always Open on Desktop */}
             <div
-              className={`flex-col ${isHerbalOpenMobile ? "flex" : "hidden"
-                } lg:flex`}
+              className={`flex-col ${
+                isHerbalOpenMobile ? "flex" : "hidden"
+              } lg:flex`}
             >
               {!result.obat_herbal || result.obat_herbal.length === 0 ? (
                 <div className="px-4 sm:px-5 pb-4 text-sm italic text-blue-200">
@@ -667,4 +597,3 @@ export function ScanResultView({
     </div>
   );
 }
-
