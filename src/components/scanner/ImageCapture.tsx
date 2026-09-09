@@ -149,6 +149,10 @@ export function ImageCapture({ image, onChange, disabled }: ImageCaptureProps) {
         <img
           src={image.previewUrl}
           alt="Foto yang dipilih"
+          width="400"
+          height="300"
+          loading="lazy"
+          decoding="async"
           className="aspect-[4/3] w-full object-cover"
         />
         {!disabled && (

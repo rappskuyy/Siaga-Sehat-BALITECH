@@ -181,7 +181,26 @@ export function MobileMapView() {
   }, []);
 
   useEffect(() => {
-    getUserGeolocation();
+    // Only query GPS immediately if user has already granted permission, otherwise load default center
+    if (typeof navigator !== "undefined" && navigator.permissions) {
+      navigator.permissions
+        .query({ name: "geolocation" as PermissionName })
+        .then((perm) => {
+          if (perm.state === "granted") {
+            getUserGeolocation();
+          } else {
+            setUserLocation(DEFAULT_CENTER);
+            loadNearbyFacilities(DEFAULT_CENTER[0], DEFAULT_CENTER[1]);
+          }
+        })
+        .catch(() => {
+          setUserLocation(DEFAULT_CENTER);
+          loadNearbyFacilities(DEFAULT_CENTER[0], DEFAULT_CENTER[1]);
+        });
+    } else {
+      setUserLocation(DEFAULT_CENTER);
+      loadNearbyFacilities(DEFAULT_CENTER[0], DEFAULT_CENTER[1]);
+    }
   }, [getUserGeolocation]);
 
   // Load nearby facilities around user location
@@ -373,6 +392,8 @@ export function MobileMapView() {
 
   return (
     <div className="fixed inset-0 w-full h-screen bg-white overflow-hidden flex flex-col lg:hidden">
+      <h1 className="sr-only">Peta Fasilitas Kesehatan, Rumah Sakit, Klinik, dan Apotek Terdekat</h1>
+
       {/* Full Screen OpenStreetMap */}
       <div className="flex-1 relative">
         <OpenStreetMapCanvas
@@ -393,6 +414,7 @@ export function MobileMapView() {
               <input
                 type="text"
                 placeholder="Cari lokasi / rumah sakit..."
+                aria-label="Cari lokasi atau nama fasilitas kesehatan"
                 value={searchInput}
                 onChange={(e) => {
                   setSearchInput(e.target.value);
@@ -407,7 +429,7 @@ export function MobileMapView() {
                     setShowSearchResults(false);
                   }
                 }}
-                className="w-full pl-10 pr-8 py-2.5 rounded-2xl border border-[#E5E7EB] bg-white/95 backdrop-blur-md text-xs font-medium text-[#111111] shadow-lg focus:outline-none focus:border-[#4a6fa5]"
+                className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-[#E5E7EB] bg-white/95 backdrop-blur-md text-xs font-medium text-[#111111] shadow-lg focus:outline-none focus:border-[#4a6fa5]"
               />
               {searchInput && (
                 <button
@@ -416,7 +438,8 @@ export function MobileMapView() {
                     setSearchInput("");
                     setShowSearchResults(false);
                   }}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label="Hapus teks pencarian"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600 flex items-center justify-center"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -425,8 +448,9 @@ export function MobileMapView() {
             <button
               type="button"
               onClick={() => getUserGeolocation(true)}
-              className="p-2.5 rounded-2xl bg-white/95 backdrop-blur-md border border-[#E5E7EB] shadow-lg hover:bg-slate-50 transition active:scale-95 flex items-center justify-center text-[#4a6fa5]"
+              className="p-2.5 min-w-[42px] min-h-[42px] rounded-2xl bg-white/95 backdrop-blur-md border border-[#E5E7EB] shadow-lg hover:bg-slate-50 transition active:scale-95 flex items-center justify-center text-[#4a6fa5]"
               title="Perbarui GPS"
+              aria-label="Perbarui lokasi GPS saya"
             >
               <RefreshCw className={`h-4 w-4 ${loadingLocation ? "animate-spin" : ""}`} />
             </button>
@@ -439,6 +463,7 @@ export function MobileMapView() {
                 <button
                   key={idx}
                   onClick={() => handleSelectSearchResult(item)}
+                  aria-label={`Pilih lokasi ${item.displayname}`}
                   className="w-full text-left px-3.5 py-2.5 text-xs text-[#111111] hover:bg-slate-50 border-b border-gray-100 last:border-0 flex items-start gap-2"
                 >
                   <MapPin className="h-3.5 w-3.5 text-[#4a6fa5] mt-0.5 shrink-0" />
@@ -460,7 +485,8 @@ export function MobileMapView() {
             <button
               key={id}
               onClick={() => setFacilityTypeFilter(id as any)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition shadow-md backdrop-blur-md ${
+              aria-label={`Filter fasilitas ${label}`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] rounded-full text-[11px] font-bold whitespace-nowrap transition shadow-md backdrop-blur-md ${
                 facilityTypeFilter === id
                   ? "bg-[#4a6fa5] text-white"
                   : "bg-white/95 text-[#111111] border border-[#E5E7EB]"
@@ -472,7 +498,8 @@ export function MobileMapView() {
           ))}
           <button
             onClick={() => setShowLocationList(!showLocationList)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition shadow-md backdrop-blur-md shrink-0 ${
+            aria-label={showLocationList ? "Sembunyikan daftar lokasi" : `Lihat daftar ${filteredPharmacies.length} lokasi`}
+            className={`flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] rounded-full text-[11px] font-bold whitespace-nowrap transition shadow-md backdrop-blur-md shrink-0 ${
               showLocationList
                 ? "bg-amber-500 text-white"
                 : "bg-white/95 text-[#4a6fa5] border border-[#4a6fa5]/40"
@@ -502,6 +529,7 @@ export function MobileMapView() {
                 <button
                   type="button"
                   onClick={() => setShowDetailsPanel(true)}
+                  aria-label="Buka rincian fasilitas terpilih"
                   className="px-3 py-1.5 rounded-xl bg-white text-[#4a6fa5] text-[11px] font-extrabold hover:bg-slate-100 transition shrink-0 shadow-sm cursor-pointer"
                 >
                   Detail
@@ -512,6 +540,7 @@ export function MobileMapView() {
                     setSelectedPharmacy(null);
                     setRouteInfo(null);
                   }}
+                  aria-label="Hapus rute navigasi aktif"
                   className="p-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white transition cursor-pointer"
                   title="Hapus Rute"
                 >
@@ -544,16 +573,19 @@ export function MobileMapView() {
               }}
               className="w-full py-2.5 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing active:bg-slate-100/80 rounded-t-2xl shrink-0 select-none border-b border-gray-100 mb-2 touch-none"
               title="Geser ke Bawah untuk Menutup"
+              role="button"
+              tabIndex={0}
+              aria-label="Tutup daftar lokasi fasilitas"
             >
               <div className="w-14 h-1.5 bg-slate-300 hover:bg-[#4a6fa5] rounded-full transition-colors" />
               <span className="text-[10px] font-semibold text-gray-400 mt-0.5">Geser ke bawah untuk menutup</span>
             </div>
 
             <div className="flex items-center justify-between mb-2 shrink-0 px-1">
-              <h3 className="text-xs font-extrabold text-[#111111] flex items-center gap-1.5">
+              <h2 className="text-xs font-extrabold text-[#111111] flex items-center gap-1.5">
                 <List className="h-4 w-4 text-[#4a6fa5]" />
                 Daftar Lokasi Terdekat ({filteredPharmacies.length})
-              </h3>
+              </h2>
             </div>
             <div className="overflow-y-auto space-y-2 pr-1 max-h-[160px]">
               {filteredPharmacies.map((facility) => {
@@ -564,6 +596,7 @@ export function MobileMapView() {
                   <button
                     key={facility.id}
                     onClick={() => handleSelectFacility(facility)}
+                    aria-label={`Pilih ${facility.name}, jarak ${facility.distanceKm.toFixed(1)} km`}
                     className={`w-full text-left p-2.5 rounded-xl border transition flex items-center justify-between gap-2.5 ${
                       isSelected
                         ? "bg-[#4a6fa5]/10 border-[#4a6fa5] ring-1 ring-[#4a6fa5]"
@@ -571,7 +604,7 @@ export function MobileMapView() {
                     }`}
                   >
                     <div className="flex items-center gap-2.5 overflow-hidden">
-                      {/* Facility Category Icon Badge (No broken/useless images) */}
+                      {/* Facility Category Icon Badge */}
                       <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
                         isHosp ? "bg-red-50 text-red-600 border-red-200" : isClinic ? "bg-amber-50 text-amber-600 border-amber-200" : "bg-blue-50 text-blue-600 border-blue-200"
                       }`}>
@@ -583,7 +616,7 @@ export function MobileMapView() {
                         }`}>
                           {isHosp ? "RUMAH SAKIT" : isClinic ? "KLINIK" : "APOTEK"}
                         </span>
-                        <h4 className="text-xs font-bold text-[#111111] truncate">{facility.name}</h4>
+                        <h3 className="text-xs font-bold text-[#111111] truncate">{facility.name}</h3>
                         <p className="text-[10px] text-gray-500 truncate">{facility.address || "Alamat Terdaftar"}</p>
                       </div>
                     </div>
@@ -608,7 +641,8 @@ export function MobileMapView() {
           <div className="absolute bottom-[112px] left-3 z-40">
             <button
               onClick={() => setShowLocationList(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-white/95 backdrop-blur-md border border-[#E5E7EB] shadow-xl text-xs font-bold text-[#4a6fa5] hover:bg-slate-50 active:scale-95 transition"
+              aria-label={`Buka daftar ${filteredPharmacies.length} lokasi terdekat`}
+              className="flex items-center gap-1.5 px-3.5 py-2.5 min-h-[44px] rounded-2xl bg-white/95 backdrop-blur-md border border-[#E5E7EB] shadow-xl text-xs font-bold text-[#4a6fa5] hover:bg-slate-50 active:scale-95 transition"
             >
               <List className="h-4 w-4" />
               Daftar Lokasi ({filteredPharmacies.length})
@@ -621,8 +655,9 @@ export function MobileMapView() {
           <div className="absolute bottom-[112px] right-3 z-40">
             <button
               onClick={() => getUserGeolocation(true)}
-              className="p-3 rounded-full bg-[#4a6fa5] text-white border-2 border-white shadow-xl hover:bg-[#35517d] transition active:scale-90 flex items-center justify-center"
+              className="p-3 min-w-[44px] min-h-[44px] rounded-full bg-[#4a6fa5] text-white border-2 border-white shadow-xl hover:bg-[#35517d] transition active:scale-90 flex items-center justify-center"
               title="Lokasi Presisi Saya"
+              aria-label="Pusatkan ke lokasi saya saat ini"
             >
               <Crosshair className={`h-5 w-5 ${loadingLocation ? "animate-spin" : ""}`} />
             </button>
@@ -646,6 +681,9 @@ export function MobileMapView() {
             }}
             className="w-full py-3.5 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing active:bg-slate-100 rounded-t-3xl shrink-0 select-none border-b border-gray-100 touch-none"
             title="Geser ke Bawah untuk Menutup"
+            role="button"
+            tabIndex={0}
+            aria-label="Tutup panel rincian fasilitas"
           >
             <div className="w-14 h-1.5 bg-slate-300 hover:bg-[#4a6fa5] rounded-full transition-colors" />
             <span className="text-[10px] font-semibold text-gray-400 mt-1">Geser ke bawah untuk menutup</span>
@@ -653,7 +691,7 @@ export function MobileMapView() {
 
           {/* Content */}
           <div className="overflow-y-auto px-4 pb-24 pt-3 max-h-[calc(75vh-55px)]">
-            {/* Header (No X button) */}
+            {/* Header */}
             <div className="flex items-start justify-between gap-3 mb-4">
               <div>
                 <span className="text-xs font-bold uppercase text-[#4a6fa5] flex items-center gap-1.5 mb-1">
@@ -674,6 +712,10 @@ export function MobileMapView() {
               <img
                 src={finalPhotoUrl || getWikimediaFallbackPhoto(selectedPharmacy.facilityType, selectedPharmacy.name.charCodeAt(0) || 0)}
                 alt={selectedPharmacy.name}
+                width="360"
+                height="176"
+                loading="lazy"
+                decoding="async"
                 referrerPolicy="no-referrer"
                 onError={(e) => {
                   e.currentTarget.style.display = "none";
@@ -738,7 +780,8 @@ export function MobileMapView() {
             <div className="mb-4 flex gap-2">
               <button
                 onClick={() => handleTransportModeChange("driving")}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-semibold text-xs transition ${
+                aria-label="Pilih rute berkendara mobil"
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 min-h-[44px] rounded-xl font-semibold text-xs transition ${
                   transportMode === "driving"
                     ? "bg-[#4a6fa5] text-white"
                     : "bg-slate-100 text-[#111111] border border-[#E5E7EB]"
@@ -748,7 +791,8 @@ export function MobileMapView() {
               </button>
               <button
                 onClick={() => handleTransportModeChange("motorcycle")}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-semibold text-xs transition ${
+                aria-label="Pilih rute berkendara motor"
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 min-h-[44px] rounded-xl font-semibold text-xs transition ${
                   transportMode === "motorcycle"
                     ? "bg-[#4a6fa5] text-white"
                     : "bg-slate-100 text-[#111111] border border-[#E5E7EB]"
@@ -771,7 +815,8 @@ export function MobileMapView() {
               href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPharmacy.lat},${selectedPharmacy.lon}`}
               target="_blank"
               rel="noreferrer"
-              className="w-full py-3 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition"
+              aria-label="Buka petunjuk arah di aplikasi Google Maps"
+              className="w-full py-3 min-h-[48px] rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition"
             >
               <Navigation className="h-4 w-4" />
               Navigasi Google Maps
@@ -782,10 +827,11 @@ export function MobileMapView() {
       )}
 
       {/* Mobile Bottom Navigation Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#E5E7EB] py-2 px-4 flex lg:hidden items-center justify-around shadow-lg">
+      <nav aria-label="Navigasi Utama Mobile" className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#E5E7EB] py-1.5 px-4 flex lg:hidden items-center justify-around shadow-lg">
         <Link
           to="/"
-          className="flex flex-col items-center gap-0.5 text-[#6B7280] hover:text-[#4a6fa5] transition"
+          aria-label="Menuju halaman Beranda"
+          className="flex flex-col items-center justify-center min-h-[44px] min-w-[48px] gap-0.5 text-[#6B7280] hover:text-[#4a6fa5] transition"
         >
           <Home className="h-5 w-5" />
           <span className="text-[10px] font-semibold">Beranda</span>
@@ -793,7 +839,8 @@ export function MobileMapView() {
 
         <Link
           to="/maps"
-          className="flex flex-col items-center gap-0.5 text-[#4a6fa5] font-bold transition"
+          aria-label="Halaman Peta Fasilitas Aktif"
+          className="flex flex-col items-center justify-center min-h-[44px] min-w-[48px] gap-0.5 text-[#4a6fa5] font-bold transition"
         >
           <Compass className="h-5 w-5" />
           <span className="text-[10px] font-extrabold">Peta</span>
@@ -801,7 +848,8 @@ export function MobileMapView() {
 
         <Link
           to="/scanner"
-          className="flex flex-col items-center gap-0.5 text-[#6B7280] hover:text-[#4a6fa5] transition"
+          aria-label="Menuju halaman Scanner AI"
+          className="flex flex-col items-center justify-center min-h-[44px] min-w-[48px] gap-0.5 text-[#6B7280] hover:text-[#4a6fa5] transition"
         >
           <ScanLine className="h-5 w-5" />
           <span className="text-[10px] font-semibold">Scan</span>
@@ -809,7 +857,8 @@ export function MobileMapView() {
 
         <Link
           to="/anatomy"
-          className="flex flex-col items-center gap-0.5 text-[#6B7280] hover:text-[#4a6fa5] transition"
+          aria-label="Menuju halaman Anatomi Interaktif"
+          className="flex flex-col items-center justify-center min-h-[44px] min-w-[48px] gap-0.5 text-[#6B7280] hover:text-[#4a6fa5] transition"
         >
           <Stethoscope className="h-5 w-5" />
           <span className="text-[10px] font-semibold">Anatomi</span>
@@ -817,12 +866,13 @@ export function MobileMapView() {
 
         <Link
           to="/profile"
-          className="flex flex-col items-center gap-0.5 text-[#6B7280] hover:text-[#4a6fa5] transition"
+          aria-label="Menuju halaman Profil Pengguna"
+          className="flex flex-col items-center justify-center min-h-[44px] min-w-[48px] gap-0.5 text-[#6B7280] hover:text-[#4a6fa5] transition"
         >
           <User className="h-5 w-5" />
           <span className="text-[10px] font-semibold">Profil</span>
         </Link>
-      </div>
+      </nav>
     </div>
   );
 }

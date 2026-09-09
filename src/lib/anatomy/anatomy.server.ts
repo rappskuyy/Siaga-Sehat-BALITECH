@@ -78,7 +78,13 @@ Catatan Tambahan Pengguna: ${input.additionalNotes || "Tidak ada"}
 
 Tolong lakukan AI Health Assessment dan kembalikan JSON sesuai skema yang ditentukan.`;
 
-  const models = ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-2.5-pro"];
+  const models = [
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
+    "gemini-2.5-pro",
+  ];
   let lastErr = "";
 
   for (const model of models) {
@@ -91,14 +97,13 @@ Tolong lakukan AI Health Assessment dan kembalikan JSON sesuai skema yang ditent
             "Content-Type": "application/json",
             "x-goog-api-key": apiKey,
           },
-          signal: AbortSignal.timeout(12000),
+          signal: AbortSignal.timeout(25000),
           body: JSON.stringify({
             systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
             contents: [{ role: "user", parts: [{ text: userPrompt }] }],
             generationConfig: {
               responseMimeType: "application/json",
               maxOutputTokens: 2500,
-              thinkingConfig: { thinkingBudget: 0 },
             },
           }),
         },

@@ -67,6 +67,8 @@ export function Hero() {
                         <img
                           key={idx}
                           src={a}
+                          width={36}
+                          height={36}
                           alt={`Pengembang ${idx + 1}`}
                           className="h-9 w-9 rounded-full border-2 border-white object-cover shadow-2xs transition-transform duration-200 group-hover:scale-105"
                         />
@@ -94,7 +96,11 @@ export function Hero() {
               <div className="relative inline-flex h-[320px] max-w-full items-end sm:h-[460px] md:h-[520px] lg:h-[600px]">
                 <img
                   src={fotodokter2}
+                  width={400}
+                  height={600}
                   alt="Dokter dengan stetoskop"
+                  loading="eager"
+                  fetchPriority="high"
                   className="h-full max-h-[900px] w-auto object-contain object-bottom scale-100 sm:scale-125 lg:scale-130 translate-y-0 sm:-translate-y-5 lg:-translate-y-7 origin-bottom transition-transform duration-300"
                 />
 

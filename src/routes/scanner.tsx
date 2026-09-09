@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   Lightbulb,
+  Loader2,
   ScanLine,
   ShieldCheck,
   XCircle,
@@ -16,13 +17,17 @@ import { analyzeHealthImage } from "@/lib/scanner/scan.server";
 import type { ScanResult } from "@/lib/scanner/types";
 import { ImageCapture, type SelectedImage } from "@/components/scanner/ImageCapture";
 import { ScanningOverlay, SCAN_STEPS } from "@/components/scanner/ScanningOverlay";
-import { ScanResultView } from "@/components/scanner/ScanResultView";
 import { Button } from "@/components/ui/button";
-import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useAuth } from "@/lib/auth/auth-context";
-import { supabase } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { Footer } from "@/components/clinic/Footer";
+
+// Lazy-load ScanResultView (and its heavy map/Leaflet dependencies) so initial mobile load is lightweight
+const ScanResultView = lazy(() =>
+  import("@/components/scanner/ScanResultView").then((mod) => ({
+    default: mod.ScanResultView,
+  }))
+);
 
 const PHOTO_DO = [
   "Gunakan cahaya alami atau lampu terang yang merata",
@@ -104,6 +109,7 @@ function ScannerPage() {
       setStage("result");
 
       if (user) {
+        const { supabase } = await import("@/lib/supabase/client");
         supabase
           .from("scan_history")
           .insert({
@@ -239,7 +245,18 @@ function ScannerPage() {
 
         {stage === "result" && result && image && (
           <div className="mx-auto w-full max-w-6xl">
-            <ScanResultView result={result} previewUrl={image.previewUrl} onReset={handleReset} />
+            <Suspense
+              fallback={
+                <div className="flex flex-col items-center justify-center p-12 text-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-[color:var(--color-clinic-blue)]" />
+                  <p className="mt-3 text-sm text-[color:var(--color-clinic-muted)]">
+                    Memuat hasil skrining...
+                  </p>
+                </div>
+              }
+            >
+              <ScanResultView result={result} previewUrl={image.previewUrl} onReset={handleReset} />
+            </Suspense>
           </div>
         )}
       </div>

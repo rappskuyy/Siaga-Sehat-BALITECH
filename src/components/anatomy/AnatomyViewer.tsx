@@ -205,7 +205,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             disabled={zoomLevel >= 2.25}
             aria-label="Perbesar model anatomi"
             title="Perbesar Canvas (Zoom In)"
-            className="grid h-8 w-8 place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition disabled:opacity-30 cursor-pointer"
+            className="grid h-8 w-8 min-h-[32px] min-w-[32px] place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition disabled:opacity-30 cursor-pointer"
           >
             <ZoomIn className="h-4 w-4" />
           </button>
@@ -216,7 +216,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             disabled={zoomLevel <= 0.75}
             aria-label="Perkecil model anatomi"
             title="Perkecil Canvas (Zoom Out)"
-            className="grid h-8 w-8 place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition disabled:opacity-30 cursor-pointer"
+            className="grid h-8 w-8 min-h-[32px] min-w-[32px] place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition disabled:opacity-30 cursor-pointer"
           >
             <ZoomOut className="h-4 w-4" />
           </button>
@@ -226,7 +226,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             onClick={handleResetZoom}
             aria-label="Reset ukuran model anatomi"
             title="Reset Skala Zoom (100%)"
-            className="grid h-8 w-8 place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition cursor-pointer text-[10px] font-bold"
+            className="grid h-8 w-8 min-h-[32px] min-w-[32px] place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition cursor-pointer text-[10px] font-bold"
           >
             {Math.round(zoomLevel * 100)}%
           </button>
@@ -238,7 +238,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             onClick={toggleView}
             aria-label="Putar tampilan model anatomi"
             title="Putar Model (Depan / Belakang)"
-            className="grid h-8 w-8 place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition cursor-pointer"
+            className="grid h-8 w-8 min-h-[32px] min-w-[32px] place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition cursor-pointer"
           >
             <RotateCw className="h-4 w-4" />
           </button>
@@ -249,13 +249,17 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
           className="relative inline-flex justify-center items-center transition-transform duration-300 ease-out max-w-full"
           style={{ transform: `scale(${zoomLevel})` }}
         >
-          {/* Base Layer Anatomy PNG Image with fluid height */}
+          {/* Base Layer Anatomy SVG Image with fluid height and explicit dimensions */}
           <img
             key={view}
             src={activeImageUrl}
+            width={300}
+            height={600}
             alt={view === "front" ? "Anatomi Tubuh Tampak Depan" : "Anatomi Tubuh Tampak Belakang"}
             className="h-[320px] sm:h-[480px] md:h-[540px] lg:h-[600px] w-auto max-w-full object-contain select-none drop-shadow-[0_12px_24px_rgba(15,23,42,0.12)] pointer-events-none transition-all duration-300"
-            loading="eager"
+            loading={view === "front" ? "eager" : "lazy"}
+            fetchPriority={view === "front" ? "high" : "auto"}
+            decoding="async"
             draggable={false}
           />
 

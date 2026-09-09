@@ -174,7 +174,8 @@ export function AnatomyGuideCard({ onSelectRegion, onGoToModel }: AnatomyGuideCa
               key={region.id}
               type="button"
               onClick={() => onSelectRegion(region)}
-              className="flex items-center gap-2 rounded-xl bg-[#f8fafc] p-2 sm:px-3 sm:py-2 text-left border border-slate-200/80 hover:bg-[color:var(--color-clinic-blue)] hover:border-[color:var(--color-clinic-blue)] hover:text-white transition-all shadow-2xs group cursor-pointer min-w-0 max-w-full shrink sm:max-w-none"
+              aria-label={`Pilih organ ${region.nameIndonesian}`}
+              className="flex items-center gap-2 rounded-xl bg-[#f8fafc] p-2 sm:px-3 sm:py-2 text-left border border-slate-200/80 hover:bg-[color:var(--color-clinic-blue)] hover:border-[color:var(--color-clinic-blue)] hover:text-white transition-all shadow-2xs group cursor-pointer min-w-0 max-w-full shrink sm:max-w-none min-h-[38px]"
             >
               <div className="grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-white group-hover:bg-white/20 text-[color:var(--color-clinic-blue)] group-hover:text-white transition-colors shadow-2xs">
                 {getRegionIcon(region.id)}

@@ -38,8 +38,20 @@ function MapsPage() {
 
   if (!mounted) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-slate-50">
-        <div className="w-10 h-10 border-4 border-[#4a6fa5] border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-full min-h-screen bg-[#F7F9FB] flex flex-col">
+        <div className="max-w-[1700px] mx-auto w-full p-4 sm:p-6 flex-1 flex flex-col gap-4">
+          <div className="rounded-3xl bg-white p-4 border border-[#E5E7EB] shadow-sm">
+            <h1 className="font-display text-base sm:text-lg font-bold text-[#111111]">
+              Peta Fasilitas Kesehatan & Apotek Terdekat
+            </h1>
+            <p className="text-xs text-[#6B7280] mt-0.5">
+              Menghubungkan ke jaringan rumah sakit, klinik, dan apotek terdekat...
+            </p>
+          </div>
+          <div className="flex-1 w-full min-h-[400px] bg-slate-100 rounded-3xl animate-pulse flex items-center justify-center">
+            <div className="w-8 h-8 border-3 border-[#4a6fa5] border-t-transparent rounded-full animate-spin" />
+          </div>
+        </div>
       </div>
     );
   }

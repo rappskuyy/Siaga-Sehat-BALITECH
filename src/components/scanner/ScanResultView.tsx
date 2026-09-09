@@ -3,8 +3,6 @@ import { motion } from "framer-motion";
 import {
   Activity,
   AlertTriangle,
-  CheckCircle2,
-  ChevronDown,
   Droplets,
   ExternalLink,
   Flower2,
@@ -20,7 +18,6 @@ import {
   Wheat,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { toast } from "sonner";
 import type { DangerLevel, ScanResult } from "@/lib/scanner/types";
 import { Button } from "@/components/ui/button";
 import { PharmacyMap } from "@/components/maps/PharmacyMap";
@@ -106,47 +103,6 @@ const getHerbIcon = (herbName: string): React.FC<{ className?: string }> => {
   return Leaf;
 };
 
-const ResultCard = ({
-  title,
-  icon: Icon,
-  className,
-  isExpanded,
-  onToggle,
-  children,
-}: {
-  title: string;
-  icon?: any;
-  className?: string;
-  isExpanded: boolean;
-  onToggle: () => void;
-  children: React.ReactNode;
-}) => {
-  return (
-    <div
-      className={`group relative flex flex-col overflow-hidden rounded-2xl border shadow-sm transition-shadow duration-200 hover:shadow-md ${className}`}
-    >
-      {/* Card Header */}
-      <div className="shrink-0 px-4 pb-0 pt-4 text-left sm:px-6 sm:pt-5 block">
-        <div className="flex items-center gap-2.5">
-          {Icon && (
-            <div className="w-7 h-7 rounded-lg bg-[color:var(--color-clinic-blue)]/10 text-[color:var(--color-clinic-blue)] flex items-center justify-center shrink-0">
-              <Icon className="h-4 w-4" />
-            </div>
-          )}
-          <h3 className="font-display text-base sm:text-lg font-bold leading-tight text-[color:var(--color-clinic-ink)]">
-            {title}
-          </h3>
-        </div>
-      </div>
-
-      {/* Card Content */}
-      <div className="flex-1 px-4 pb-4 pt-3 sm:px-6 sm:pb-6 sm:pt-4">
-        {children}
-      </div>
-    </div>
-  );
-};
-
 export function ScanResultView({
   result,
   previewUrl,
@@ -193,12 +149,6 @@ export function ScanResultView({
     pencegahan: result.pencegahan_mandiri,
     alasanKeDokter: result.harus_ke_dokter ? result.alasan_ke_dokter : "",
     catatan: result.catatan_tambahan,
-  });
-
-  const formattedDate = new Date().toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
   });
 
   const rawMedicineList =
@@ -333,6 +283,8 @@ export function ScanResultView({
           <img
             src={previewUrl}
             alt="Foto yang dianalisis"
+            width={340}
+            height={340}
             loading="lazy"
             decoding="async"
             className="aspect-square w-full object-cover max-h-[340px] md:max-h-none"
@@ -464,7 +416,7 @@ export function ScanResultView({
             >
               {[
                 { id: "penyebab" as const, label: "Penyebab" },
-                { id: "pencegahan" as const, label: "Pencegahan Mandiri" },
+                { id: "pencegahan" as const, label: "Pencegahan" },
               ].map((tab) => {
                 const isSelected = (hoveredTab ?? activeTab) === tab.id;
                 return (

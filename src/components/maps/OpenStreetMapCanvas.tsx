@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { PharmacyNode, RouteInfo } from "./maps.service";
+import "leaflet/dist/leaflet.css";
 
 const DEFAULT_CENTER: [number, number] = [-6.2088, 106.8456];
 

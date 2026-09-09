@@ -10,7 +10,14 @@ const SCAN_STEPS = [
 export function ScanningOverlay({ previewUrl, step }: { previewUrl: string; step: number }) {
   return (
     <div className="relative overflow-hidden rounded-[24px] shadow-[var(--shadow-clinic-lg)]">
-      <img src={previewUrl} alt="Menganalisis foto" className="aspect-[4/3] w-full object-cover" />
+      <img
+        src={previewUrl}
+        alt="Menganalisis foto"
+        width="400"
+        height="300"
+        decoding="async"
+        className="aspect-[4/3] w-full object-cover"
+      />
 
       {/* dark scan tint */}
       <div className="absolute inset-0 bg-gradient-to-b from-[color:var(--color-clinic-blue)]/25 via-transparent to-[color:var(--color-clinic-blue)]/35" />

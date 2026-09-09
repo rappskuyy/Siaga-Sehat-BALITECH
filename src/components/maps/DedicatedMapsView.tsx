@@ -133,7 +133,25 @@ export function DedicatedMapsView() {
   const SAVED_LOCATION_KEY = "siaga_user_chosen_location";
 
   useEffect(() => {
-    getUserGeolocation();
+    if (typeof navigator !== "undefined" && navigator.permissions) {
+      navigator.permissions
+        .query({ name: "geolocation" as PermissionName })
+        .then((perm) => {
+          if (perm.state === "granted") {
+            getUserGeolocation();
+          } else {
+            setUserLocation(DEFAULT_CENTER);
+            loadPharmacies(DEFAULT_CENTER[0], DEFAULT_CENTER[1], "Jakarta Pusat (Pusat Default)");
+          }
+        })
+        .catch(() => {
+          setUserLocation(DEFAULT_CENTER);
+          loadPharmacies(DEFAULT_CENTER[0], DEFAULT_CENTER[1], "Jakarta Pusat (Pusat Default)");
+        });
+    } else {
+      setUserLocation(DEFAULT_CENTER);
+      loadPharmacies(DEFAULT_CENTER[0], DEFAULT_CENTER[1], "Jakarta Pusat (Pusat Default)");
+    }
   }, []);
 
   const getUserGeolocation = async (isManualClick = false) => {

@@ -25,7 +25,6 @@ import {
 
 import { chatWithAI } from "@/lib/ai/chat.server";
 import { useAuth } from "@/lib/auth/auth-context";
-import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { Footer } from "@/components/clinic/Footer";
@@ -406,7 +405,8 @@ function ConsultationPage() {
 
   useEffect(() => {
     if (!user || messages.length < 2) return;
-    const timeout = setTimeout(() => {
+    const timeout = setTimeout(async () => {
+      const { supabase } = await import("@/lib/supabase/client");
       supabase
         .from("consultation_history")
         .insert({

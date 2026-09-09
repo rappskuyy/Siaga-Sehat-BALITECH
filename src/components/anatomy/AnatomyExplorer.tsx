@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, lazy, Suspense } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import type { AIAssessmentResult, AnatomyRegion } from "@/lib/anatomy/types";
@@ -6,9 +6,12 @@ import { assessHealthAnatomy } from "@/lib/anatomy/anatomy.server";
 import { AnatomyViewer } from "./AnatomyViewer";
 import { AnatomyGuideCard } from "./AnatomyGuideCard";
 import { SymptomSelectorCard } from "./SymptomSelectorCard";
-import { AIAssessmentResultCard } from "./AIAssessmentResultCard";
-import { AlertCircle, Activity, ChevronRight, Sparkles, Stethoscope, Layers, BookOpen } from "lucide-react";
+import { AlertCircle, Activity, ChevronRight, Sparkles, Stethoscope, Layers, BookOpen, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
+
+const AIAssessmentResultCard = lazy(() =>
+  import("./AIAssessmentResultCard").then((mod) => ({ default: mod.AIAssessmentResultCard }))
+);
 
 type ExplorerStep = "guide" | "model" | "symptoms" | "result";
 
@@ -278,14 +281,25 @@ export function AnatomyExplorer() {
           )}
 
           {activeStep === "result" && assessmentResult && selectedRegion ? (
-            <AIAssessmentResultCard
-              result={assessmentResult}
-              regionName={selectedRegion.nameIndonesian}
-              selectedSymptoms={selectedSymptoms}
-              selectedConditions={selectedConditions}
-              additionalNotes={additionalNotes}
-              onReset={handleReset}
-            />
+            <Suspense
+              fallback={
+                <div className="flex flex-col items-center justify-center p-8 rounded-[24px] sm:rounded-[28px] bg-white border border-black/5 shadow-[var(--shadow-clinic-lg)] min-h-[300px]">
+                  <Loader2 className="h-8 w-8 text-[color:var(--color-clinic-blue)] animate-spin mb-3" />
+                  <p className="text-xs font-semibold text-[color:var(--color-clinic-muted)]">
+                    Memuat hasil analisis AI...
+                  </p>
+                </div>
+              }
+            >
+              <AIAssessmentResultCard
+                result={assessmentResult}
+                regionName={selectedRegion.nameIndonesian}
+                selectedSymptoms={selectedSymptoms}
+                selectedConditions={selectedConditions}
+                additionalNotes={additionalNotes}
+                onReset={handleReset}
+              />
+            </Suspense>
           ) : activeStep === "symptoms" && selectedRegion ? (
             <SymptomSelectorCard
               region={selectedRegion}

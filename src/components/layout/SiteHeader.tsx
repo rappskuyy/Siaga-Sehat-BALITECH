@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
@@ -23,7 +23,6 @@ function SlideTabs() {
     opacity: 0,
   });
 
-  const [isReady, setIsReady] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const tabsRef = useRef<(HTMLAnchorElement | null)[]>([]);
 
@@ -37,33 +36,31 @@ function SlideTabs() {
 
   const updatePosition = (index: number) => {
     const activeTab = tabsRef.current[index];
-    if (activeTab && activeTab.offsetWidth > 0) {
+    if (activeTab) {
       setPosition({
         left: activeTab.offsetLeft,
         width: activeTab.offsetWidth,
         opacity: 1,
       });
-      return true;
     } else {
       setPosition((prev) => ({ ...prev, opacity: 0 }));
-      return false;
     }
   };
 
-  // Synchronous placement before paint to eliminate 50ms delay and slide jumps on initial load/refresh
-  useLayoutEffect(() => {
+  // Keep sliding pill aligned with active route on resize or pathname change
+  useEffect(() => {
     const targetIdx = hoveredIndex !== null ? hoveredIndex : activeIndex;
     if (targetIdx !== -1) {
-      const success = updatePosition(targetIdx);
-      if (success && !isReady) {
-        setIsReady(true);
-      }
+      const timer = setTimeout(() => {
+        updatePosition(targetIdx);
+      }, 50);
+      return () => clearTimeout(timer);
     } else {
-      setPosition({ left: 0, width: 0, opacity: 0 });
+      setPosition((prev) => ({ ...prev, opacity: 0 }));
     }
   }, [activeIndex, currentPath, hoveredIndex]);
 
-  // Adjust on window resize or font render completion
+  // Adjust on window resize
   useEffect(() => {
     const handleResize = () => {
       const targetIdx = hoveredIndex !== null ? hoveredIndex : activeIndex;
@@ -71,15 +68,9 @@ function SlideTabs() {
         updatePosition(targetIdx);
       }
     };
-
-    if (!isReady && activeIndex !== -1) {
-      const success = updatePosition(activeIndex);
-      if (success) setIsReady(true);
-    }
-
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [activeIndex, hoveredIndex, isReady]);
+  }, [activeIndex, hoveredIndex]);
 
   const handleMouseLeave = () => {
     setHoveredIndex(null);
@@ -95,11 +86,10 @@ function SlideTabs() {
   return (
     <nav
       onMouseLeave={handleMouseLeave}
-      className="absolute left-1/2 hidden -translate-x-1/2 items-center whitespace-nowrap rounded-full bg-[color:var(--color-clinic-blue-soft)]/70 px-1.5 py-1 text-sm text-[color:var(--color-clinic-ink)] shadow-xs lg:flex"
+      className="absolute left-1/2 hidden -translate-x-1/2 items-center whitespace-nowrap rounded-full bg-[color:var(--color-clinic-blue-soft)]/60 px-1.5 py-1 text-sm text-[color:var(--color-clinic-ink)] shadow-xs lg:flex"
     >
       {TABS.map((tab, i) => {
-        // Text is white ONLY when position measurement is initialized and pill is visible
-        const isUnderPill = isReady && position.opacity > 0 && currentPillIndex === i;
+        const isUnderPill = currentPillIndex === i;
 
         return (
           <Link
@@ -125,32 +115,21 @@ function SlideTabs() {
         );
       })}
 
-      <Cursor position={position} animateInitial={isReady} />
+      <Cursor position={position} />
     </nav>
   );
 }
 
-const Cursor = ({
-  position,
-  animateInitial,
-}: {
-  position: { left: number; width: number; opacity: number };
-  animateInitial: boolean;
-}) => {
+const Cursor = ({ position }: { position: { left: number; width: number; opacity: number } }) => {
   return (
     <motion.div
-      initial={false}
       animate={{
         left: position.left,
         width: position.width,
         opacity: position.opacity,
       }}
-      transition={
-        animateInitial
-          ? { type: "spring", stiffness: 380, damping: 30 }
-          : { duration: 0 }
-      }
-      className="absolute z-0 h-[28px] rounded-full bg-[color:var(--color-clinic-blue)] shadow-xs"
+      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+      className="absolute z-0 h-[28px] rounded-full bg-[color:var(--color-clinic-blue)] shadow-md"
     />
   );
 };
