@@ -32,6 +32,9 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { Footer } from "@/components/clinic/Footer";
+import raffasyaAvatar from "@/assets/Raffasya Javas Niscala Widjaja.avif?url";
+import ahmadAvatar from "@/assets/Ahmad Rhezki Prasetya.avif?url";
+import muhamadAvatar from "@/assets/Muhamad Fedliansyah Ilham.avif?url";
 
 export const Route = createFileRoute("/dev")({
   head: () => ({
@@ -55,9 +58,9 @@ const TEAM_MEMBERS = [
     skills: ["React 19", "Vite", "TypeScript", "AI Integration", "TanStack Router", "Fullstack System"],
     bio: "Merancang arsitektur utama platform SiagaSehat, mengintegrasikan inferensi AI (Gemini Vision & LLM Medis), membangun pertukaran data real-time, serta mengarahkan standar teknis rekayasa perangkat lunak.",
     icon: Terminal,
-    avatar: "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Raffasya%20Javas%20Niscala%20Widjaja.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvUmFmZmFzeWEgSmF2YXMgTmlzY2FsYSBXaWRqYWphLmF2aWYiLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4MjI3NzAyLCJleHAiOjE4MTk3NjM3MDJ9.HIn4-zAuQTHyk4wTnhzjkyE54v1QpsW72CDghC1GaYg",
+    avatar: raffasyaAvatar,
     linkedin: "https://www.linkedin.com/in/rappskuyy/",
-    github: "https://github.com/rappskuyy/Siaga-Sehat-BALITECH",
+    github: "https://github.com/rappskuyy",
     gradient: "from-blue-600 to-indigo-700",
     accent: "#4a6fa5",
   },
@@ -68,7 +71,7 @@ const TEAM_MEMBERS = [
     skills: ["React 19", "Tailwind CSS", "UI/UX Design", "Framer Motion", "Component System", "Responsive Layouts"],
     bio: "Merancang antarmuka pengguna (UI/UX) berstandar tinggi, mengimplementasikan sistem komponen interaktif, transisi mikro dinamis, serta mengoptimalkan performa tata letak yang responsif di seluruh perangkat.",
     icon: Palette,
-    avatar: "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Ahmad%20Rhezki%20Prasetya.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvQWhtYWQgUmhlemtpIFByYXNldHlhLmF2aWYiLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4MjI3NzgxLCJleHAiOjE4MTk3NjM3ODF9.uR1PPi7HtQUaEIJ9fvWg7xhQOh8XttTFQEn6cYOaKV8",
+    avatar: ahmadAvatar,
     linkedin: "https://www.linkedin.com/in/ahmad-rhezki-prasetya-153079388/",
     github: "https://github.com/ahmadrhezkiprasetya",
     gradient: "from-emerald-500 to-teal-600",
@@ -81,7 +84,7 @@ const TEAM_MEMBERS = [
     skills: ["Supabase", "PostgreSQL", "API Security", "Database Architecture", "Auth Systems", "Data Pipeline"],
     bio: "Mengarsitekturi infrastruktur database PostgreSQL & Supabase, membangun sistem autentikasi aman, mengelola alur data triase medis, serta menjamin keandalan dan keamanan data pasien secara komprehensif.",
     icon: Database,
-    avatar: "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Muhamad%20Fedliansyah%20Ilham.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvTXVoYW1hZCBGZWRsaWFuc3lhaCBJbGhhbS5hdmlmIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODIyNzc2NiwiZXhwIjoxODE5NzYzNzY2fQ.6TKpgDEEZ5tktyEv_ZB-WkIcPda0jjbc3rYtlDEPPv4",
+    avatar: muhamadAvatar,
     linkedin: "https://www.linkedin.com/in/muhammad-fedliansyah-ilham-b7b27a388/",
     github: "https://github.com/muhamadfedliansyah-boop",
     gradient: "from-violet-600 to-purple-700",

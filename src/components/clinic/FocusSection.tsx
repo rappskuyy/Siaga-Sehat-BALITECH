@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Reveal } from "./Reveal";
+import scanPreview from "@/assets/hasilpenyakit.webp?url";
 
 const STEPS = [
   {
@@ -140,8 +141,12 @@ function ScanScreen() {
         <ScanLine className="h-3 w-3" /> Analisis Selesai
       </span>
       <div className="relative h-24 overflow-hidden rounded-2xl bg-[#d4a58f] shadow-inner">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_48%_48%,#d88983_0%,#bf6e71_25%,#d4a58f_48%,#b8796a_70%,#e0b8a3_100%)]" />
-        <div className="absolute left-[28%] top-[17%] h-16 w-24 rounded-[48%] border-2 border-[#a64f5b]/70 bg-[#c9787e]/55 shadow-[inset_0_0_12px_rgba(114,45,53,0.25)]" />
+        <img
+          src={scanPreview}
+          alt="Contoh foto kondisi kulit untuk Scan AI"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-white/10" />
         <span className="absolute bottom-1.5 left-2 rounded-full bg-white/85 px-2 py-0.5 text-[9px] font-semibold text-[color:var(--color-clinic-blue-dark)]">
           Foto keluhan kulit
         </span>

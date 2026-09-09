@@ -201,79 +201,11 @@ export function ScanResultView({
     year: "numeric",
   });
 
-  const rawMedicineList =
-    result.obat_rekomendasi && result.obat_rekomendasi.length > 0
-      ? result.obat_rekomendasi.map((item, idx) => {
-          const isWarning =
-            item.catatan?.toLowerCase().includes("resep") ||
-            item.catatan?.toLowerCase().includes("dokter") ||
-            item.catatan?.toLowerCase().includes("hati-hati");
-          const formattedNote = (
-            item.catatan || "Disarankan sesuai indikasi klinis hasil analisis skrining."
-          )
-            .replace(/sangat penting untuk/gi, "Disarankan untuk")
-            .replace(/sangat penting/gi, "Disarankan");
-
-          return {
-            nama: item.nama,
-            dosis: item.dosis,
-            note: formattedNote,
-            status: isWarning ? "Perhatian Khusus" : "Terverifikasi Aman",
-          };
-        })
-      : [
-          {
-            nama: "Ibuprofen",
-            dosis: "200 mg",
-            note: "Disarankan untuk meredakan peradangan lokal, mengurangi rasa nyeri atau ngilu, serta membantu mengontrol pembengkakan jaringan akibat infeksi atau iritasi.",
-            status: "Terverifikasi Aman",
-          },
-          {
-            nama: "Cetirizine",
-            dosis: "10 mg",
-            note: "Disarankan untuk meredakan gejolak reaksi alergi, mengurangi gatal kemerahan pada kulit, serta menekan pelepasan histamin tubuh secara aman.",
-            status: "Terverifikasi Aman",
-          },
-          {
-            nama: "Paracetamol",
-            dosis: "500 mg",
-            note: "Digunakan sebagai analgesik dan antipiretik pertolongan pertama untuk menstabilkan suhu tubuh dan meredakan rasa sakit ringan hingga sedang.",
-            status: "Terverifikasi Aman",
-          },
-        ];
-
-  const medicineList = [...rawMedicineList];
-  const defaultSupplements = [
-    {
-      nama: "Pelembap Skin Barrier (Moisturizer)",
-      dosis: "Oleskan 2-3x sehari",
-      note: "Disarankan untuk merawat dan memperbaiki lapisan pelindung kulit (skin barrier), menjaga kelembapan jaringan, serta mencegah iritasi susulan.",
-      status: "Terverifikasi Aman",
-    },
-    {
-      nama: "Pembersih Wajah Lembut (Gentle Cleanser)",
-      dosis: "2x sehari saat cuci muka",
-      note: "Gunakan pembersih pH seimbang tanpa kandungan alkohol atau pewangi buatan agar kulit tetap bersih tanpa merasa kering terarik.",
-      status: "Terverifikasi Aman",
-    },
-    {
-      nama: "Suplemen Antioksidan (Vit C & Zinc)",
-      dosis: "1 tablet per hari sesudah makan",
-      note: "Disarankan untuk mendukung percepatan pemulihan sel jaringan dari dalam serta memperkuat benteng kekebalan imun kulit.",
-      status: "Terverifikasi Aman",
-    },
-  ];
-
-  for (const supp of defaultSupplements) {
-    if (medicineList.length >= 4) break;
-    if (
-      !medicineList.some(
-        (m) => m.nama.toLowerCase().includes(supp.nama.split(" ")[0].toLowerCase())
-      )
-    ) {
-      medicineList.push(supp);
-    }
-  }
+  const medicineList = (result.obat_rekomendasi ?? []).map((item) => ({
+    nama: item.nama,
+    dosis: item.dosis,
+    note: (item.catatan || "").replace(/sangat penting untuk/gi, "Disarankan untuk").replace(/sangat penting/gi, "Disarankan"),
+  }));
 
   const cleanSentenceList = (items?: string[]): string[] => {
     if (!items || items.length === 0) return [];
@@ -397,7 +329,11 @@ export function ScanResultView({
 
               {/* Medicine List */}
               <div className="flex flex-col gap-3.5">
-                {medicineList.map((item, i) => {
+                {medicineList.length === 0 ? (
+                  <p className="rounded-xl border border-white/15 bg-white/10 p-3 text-xs leading-relaxed text-blue-100">
+                    AI tidak memberikan rekomendasi obat untuk kondisi ini. Konsultasikan dengan dokter atau apoteker bila diperlukan.
+                  </p>
+                ) : medicineList.map((item, i) => {
                   const shoppingQuery = encodeURIComponent(
                     `beli obat ${item.nama}${item.dosis ? ` ${item.dosis}` : ""}`
                   );

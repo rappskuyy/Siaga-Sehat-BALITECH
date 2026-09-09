@@ -1,6 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { Bell, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -183,9 +183,11 @@ export function SiteHeader() {
             <>
               <Link
                 to="/reminders"
-                className="hidden items-center justify-center rounded-full border border-[color:var(--color-clinic-blue)]/15 bg-[color:var(--color-clinic-blue-soft)] px-3.5 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)] hover:text-white sm:inline-flex"
+                aria-label="Notifikasi dan pengingat obat"
+                title="Notifikasi dan pengingat obat"
+                className="hidden h-9 w-9 items-center justify-center rounded-full border border-[color:var(--color-clinic-blue)]/15 bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)] hover:text-white sm:inline-flex"
               >
-                Notifikasi
+                <Bell className="h-4 w-4" />
               </Link>
               <Link
                 to="/profile"

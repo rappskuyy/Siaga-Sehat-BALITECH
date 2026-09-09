@@ -74,12 +74,15 @@ async function chatWithGemini(prompt: string): Promise<string> {
   throw new Error(`Gemini API tidak dapat dihubungi (${lastErrText || "semua model sibuk/error"})`);
 }
 
-async function chatWithOpenAI(prompt: string): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
+async function chatWithOpenAI(
+  prompt: string,
+  config: { apiKey?: string; baseUrl?: string; model?: string } = {},
+): Promise<string> {
+  const apiKey = (config.apiKey || process.env.OPENAI_API_KEY)?.trim();
   if (!apiKey) throw new Error("OPENAI_API_KEY belum dikonfigurasi di server.");
 
-  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
-  const baseUrl = getOpenAIBaseUrl();
+  const model = config.model || process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const baseUrl = config.baseUrl || getOpenAIBaseUrl();
 
   const res = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
@@ -121,13 +124,18 @@ export const chatWithAI = createServerFn({ method: "POST" })
     const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase().trim();
     let lastError: Error | null = null;
 
-    if (provider === "openai") {
-      if (process.env.OPENAI_API_KEY?.trim()) {
+    if (provider === "openai" || provider === "koboillm") {
+      const isKoboi = provider === "koboillm";
+      const apiKey = isKoboi ? process.env.KOBOILLM_API_KEY : process.env.OPENAI_API_KEY;
+      const baseUrl = isKoboi ? process.env.KOBOILLM_BASE_URL : undefined;
+      const model = isKoboi ? process.env.KOBOILLM_MODEL : undefined;
+
+      if (apiKey?.trim()) {
         try {
-          const reply = await chatWithOpenAI(prompt);
+          const reply = await chatWithOpenAI(prompt, { apiKey, baseUrl, model });
           return { reply };
         } catch (err) {
-          console.warn("OpenAI/KoboiLLM chat failed, trying Gemini as fallback:", err);
+          console.warn(`${isKoboi ? "KoboiLLM" : "OpenAI"} chat failed, trying Gemini as fallback:`, err);
           lastError = err instanceof Error ? err : new Error(String(err));
         }
       }

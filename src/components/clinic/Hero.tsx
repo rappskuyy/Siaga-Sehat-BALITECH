@@ -1,13 +1,16 @@
 import { ArrowUpRight, MessageCircleHeart, ScanLine, ShieldCheck, Users, Code2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import fotodokter2 from "@/assets/fotodokter.webp?url";
+import raffasyaAvatar from "@/assets/Raffasya Javas Niscala Widjaja.avif?url";
+import ahmadAvatar from "@/assets/Ahmad Rhezki Prasetya.avif?url";
+import muhamadAvatar from "@/assets/Muhamad Fedliansyah Ilham.avif?url";
 import { FloatingCard } from "./FloatingCard";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
 const AVATARS = [
-  "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Raffasya%20Javas%20Niscala%20Widjaja.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvUmFmZmFzeWEgSmF2YXMgTmlzY2FsYSBXaWRqYWphLmF2aWYiLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4MjI5MjE2LCJleHAiOjE4MTk3NjUyMTZ9.iRr6ud84LJqYwUzAOFXM4MjhjgI0h5hPPhfo_cH5aoQ",
-  "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Muhamad%20Fedliansyah%20Ilham.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvTXVoYW1hZCBGZWRsaWFuc3lhaCBJbGhhbS5hdmlmIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODIyOTI0MiwiZXhwIjoxODE5NzY1MjQyfQ.dLqKIowxqRfX6f3cO03UQg4xDyp7JIKc8WXyWQrpoHI",
-  "https://dvtakououwyiejsudzey.supabase.co/storage/v1/object/sign/img/Ahmad%20Rhezki%20Prasetya.avif?token=eyJraWQiOiIzMmU4MWVjMy0wZWQzLTQ1N2EtYmQ3Yi04ZmE4YTU4YzUwM2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWcvQWhtYWQgUmhlemtpIFByYXNldHlhLmF2aWYiLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4MjI5MjU0LCJleHAiOjE4MTk3NjUyNTR9.NPKlNAKqDpmnKsYdqMXk3AG9p5lyc7tv1dNPfMSaAHo",
+  raffasyaAvatar,
+  muhamadAvatar,
+  ahmadAvatar,
 ];
 
 export function Hero() {

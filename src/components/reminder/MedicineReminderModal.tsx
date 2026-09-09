@@ -74,7 +74,7 @@ function StepIndicator({ current }: { current: Step }) {
 
 export function MedicineReminderModal({ open, onClose }: Props) {
   const { meds, loading: medsLoading } = useLastConsultationMeds();
-  const { createReminder } = useMedicineReminders();
+  const { reminders, createReminder } = useMedicineReminders();
 
   const [step, setStep] = useState<Step>("location");
   const [location, setLocation] = useState<PurchaseLocation | null>(null);
@@ -112,7 +112,24 @@ export function MedicineReminderModal({ open, onClose }: Props) {
     });
   };
 
-  const diseases = Array.from(new Set(meds.map((med) => med.penyakit)));
+  const normalizeDisease = (value: string) => value.trim().toLocaleLowerCase("id-ID");
+  const usedDiseases = new Set(
+    reminders
+      .map((reminder) => {
+        const match = reminder.catatan?.match(/^Untuk kondisi:\s*(.+?)(?:\.\s|$)/i);
+        return match?.[1] ? normalizeDisease(match[1]) : null;
+      })
+      .filter((disease): disease is string => Boolean(disease)),
+  );
+  const usedSourceIds = new Set(
+    reminders.map((reminder) => reminder.source_id).filter((sourceId): sourceId is string => Boolean(sourceId)),
+  );
+  const hasUsedDisease = (disease: string) =>
+    usedDiseases.has(normalizeDisease(disease)) ||
+    meds.some((med) => med.penyakit === disease && usedSourceIds.has(med.sourceId));
+  const diseases = Array.from(
+    new Set(meds.map((med) => med.penyakit)),
+  ).filter((disease) => !hasUsedDisease(disease));
   const diseaseMeds = selectedDisease ? meds.filter((med) => med.penyakit === selectedDisease) : [];
 
   const handleProceedToConfig = () => {
@@ -138,6 +155,11 @@ export function MedicineReminderModal({ open, onClose }: Props) {
 
   const handleSave = async () => {
     if (!location) return;
+    if (selectedDisease && hasUsedDisease(selectedDisease)) {
+      setErrorMsg("Penyakit ini sudah memiliki reminder. Pilih penyakit lain.");
+      setStep("select_meds");
+      return;
+    }
     setSaving(true);
     setErrorMsg(null);
     try {
@@ -324,6 +346,16 @@ export function MedicineReminderModal({ open, onClose }: Props) {
                   <p className="text-xs text-amber-600">
                     Lakukan konsultasi atau scan AI terlebih dahulu untuk mendapatkan rekomendasi
                     obat.
+                  </p>
+                </div>
+              ) : diseases.length === 0 ? (
+                <div className="flex flex-col items-center gap-2 rounded-2xl bg-emerald-50 p-5 text-center">
+                  <CheckCircle2 className="h-8 w-8 text-emerald-500" />
+                  <p className="text-sm font-semibold text-emerald-700">
+                    Semua penyakit sudah memiliki reminder
+                  </p>
+                  <p className="text-xs text-emerald-600">
+                    Satu penyakit hanya dapat dibuatkan satu reminder.
                   </p>
                 </div>
               ) : (
