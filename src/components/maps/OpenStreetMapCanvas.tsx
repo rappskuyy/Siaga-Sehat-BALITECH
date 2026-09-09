@@ -79,7 +79,13 @@ export function OpenStreetMapCanvas({
         // ResizeObserver to handle aspect ratio / mobile layout changes
         if (typeof ResizeObserver !== "undefined" && mapContainerRef.current) {
           resizeObserver = new ResizeObserver(() => {
-            map.invalidateSize();
+            if (isMountedRef.current && leafletMapRef.current && mapContainerRef.current) {
+              try {
+                leafletMapRef.current.invalidateSize();
+              } catch {
+                // Silently ignore if map container is temporarily detached
+              }
+            }
           });
           resizeObserver.observe(mapContainerRef.current);
         }
@@ -90,9 +96,14 @@ export function OpenStreetMapCanvas({
       isMountedRef.current = false;
       if (resizeObserver) {
         resizeObserver.disconnect();
+        resizeObserver = null;
       }
       if (leafletMapRef.current) {
-        leafletMapRef.current.remove();
+        try {
+          leafletMapRef.current.remove();
+        } catch {
+          // ignore cleanup errors
+        }
         leafletMapRef.current = null;
         markersLayerRef.current = null;
         routeUnderlayRef.current = null;
