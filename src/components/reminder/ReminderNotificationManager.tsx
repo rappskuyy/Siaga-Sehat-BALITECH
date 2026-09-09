@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { MedicineReminder } from "@/lib/supabase/types";
+import { getNextDoseDate } from "@/lib/reminders/scheduling";
 
 interface Props {
   activeReminders: MedicineReminder[];
@@ -7,7 +8,7 @@ interface Props {
 
 function scheduleNotification(reminder: MedicineReminder) {
   const intervalMs = reminder.interval_jam * 60 * 60 * 1000;
-  const id = setInterval(() => {
+  const notify = () => {
     if (Notification.permission === "granted") {
       new Notification(" Waktunya Minum Obat!", {
         body: `${reminder.nama_obat} (${reminder.dosis_per_minum})\nTablet tersisa: ${reminder.tablet_tersisa ?? "?"}`,
@@ -16,12 +17,24 @@ function scheduleNotification(reminder: MedicineReminder) {
         requireInteraction: true,
       });
     }
-  }, intervalMs);
-  return id;
+  };
+
+  const nextDose = getNextDoseDate(reminder, []);
+  const delay = Math.max(0, nextDose.getTime() - Date.now());
+  let intervalId: ReturnType<typeof setInterval> | undefined;
+  const timeoutId = setTimeout(() => {
+    notify();
+    intervalId = setInterval(notify, intervalMs);
+  }, delay);
+
+  return () => {
+    clearTimeout(timeoutId);
+    if (intervalId) clearInterval(intervalId);
+  };
 }
 
 export function ReminderNotificationManager({ activeReminders }: Props) {
-  const intervalsRef = useRef<Map<string, ReturnType<typeof setInterval>>>(new Map());
+  const intervalsRef = useRef<Map<string, () => void>>(new Map());
 
   useEffect(() => {
     // Request notification permission if not granted
@@ -34,9 +47,9 @@ export function ReminderNotificationManager({ activeReminders }: Props) {
     if (!("Notification" in window)) return;
 
     // Clear intervals that are no longer active
-    for (const [id, intervalId] of intervalsRef.current.entries()) {
+    for (const [id, cleanup] of intervalsRef.current.entries()) {
       if (!activeReminders.find((r) => r.id === id)) {
-        clearInterval(intervalId);
+        cleanup();
         intervalsRef.current.delete(id);
       }
     }
@@ -44,15 +57,13 @@ export function ReminderNotificationManager({ activeReminders }: Props) {
     // Schedule new intervals
     for (const reminder of activeReminders) {
       if (!intervalsRef.current.has(reminder.id)) {
-        const intervalId = scheduleNotification(reminder);
-        intervalsRef.current.set(reminder.id, intervalId);
+        const cleanup = scheduleNotification(reminder);
+        intervalsRef.current.set(reminder.id, cleanup);
       }
     }
 
     return () => {
-      for (const intervalId of intervalsRef.current.values()) {
-        clearInterval(intervalId);
-      }
+      for (const cleanup of intervalsRef.current.values()) cleanup();
       intervalsRef.current.clear();
     };
   }, [activeReminders]);

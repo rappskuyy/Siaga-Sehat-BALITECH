@@ -86,10 +86,24 @@ export function MedicineReminderModal({ open, onClose }: Props) {
 
   useEffect(() => {
     if (!open) return;
+    const scrollY = window.scrollY;
     const previousOverflow = document.body.style.overflow;
+    const previousPosition = document.body.style.position;
+    const previousTop = document.body.style.top;
+    const previousWidth = document.body.style.width;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
     return () => {
       document.body.style.overflow = previousOverflow;
+      document.body.style.position = previousPosition;
+      document.body.style.top = previousTop;
+      document.body.style.width = previousWidth;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      window.scrollTo(0, scrollY);
     };
   }, [open]);
 
@@ -193,7 +207,10 @@ export function MedicineReminderModal({ open, onClose }: Props) {
             .filter(Boolean)
             .join(". ") || null,
         };
-        await createReminder(payload);
+        const created = await createReminder(payload);
+        if (!created) {
+          throw new Error("Reminder gagal disimpan");
+        }
       }
       setStep("success");
     } catch {
@@ -209,7 +226,8 @@ export function MedicineReminderModal({ open, onClose }: Props) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center"
+      data-lenis-prevent
+      className="fixed inset-0 z-[9999] flex items-end justify-center overscroll-none sm:items-center"
       role="dialog"
       aria-modal="true"
       aria-label="Medicine Reminder Modal"
@@ -218,7 +236,7 @@ export function MedicineReminderModal({ open, onClose }: Props) {
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={handleClose} />
 
       {/* Panel */}
-      <div className="relative z-10 flex min-h-0 w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-[#f8fafc] shadow-2xl sm:max-h-[90vh] sm:rounded-[28px] max-h-[92dvh]">
+      <div data-lenis-prevent className="relative z-10 flex min-h-0 w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-[#f8fafc] shadow-2xl sm:max-h-[90vh] sm:rounded-[28px] max-h-[92dvh]">
         {/* Header */}
         {step === "success" ? (
           <div className="relative overflow-hidden bg-[#17324d] px-6 pb-6 pt-6 sm:px-8">
@@ -284,7 +302,7 @@ export function MedicineReminderModal({ open, onClose }: Props) {
         {step !== "success" && <StepIndicator current={step} />}
 
         {/* Content */}
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y">
+        <div data-lenis-prevent className="min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y">
           {/* ─── STEP 1: PILIH LOKASI ─── */}
           {step === "location" && (
             <div className="px-6 py-6">

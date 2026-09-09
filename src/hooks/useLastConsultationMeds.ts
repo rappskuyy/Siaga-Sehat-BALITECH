@@ -26,17 +26,20 @@ export function useLastConsultationMeds() {
       .select("id, nama_penyakit, obat_rekomendasi, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .limit(10);
+      .limit(50);
 
     const scanMeds: RecommendedMed[] = [];
     if (scanData) {
       for (const row of scanData) {
-        const obats = (row.obat_rekomendasi as Array<{ nama: string; dosis: string; catatan: string }>) ?? [];
+        const obats = Array.isArray(row.obat_rekomendasi)
+          ? (row.obat_rekomendasi as Array<{ nama?: string; dosis?: string; catatan?: string }>)
+          : [];
         for (const o of obats) {
+          if (!o.nama?.trim() || !row.nama_penyakit?.trim()) continue;
           scanMeds.push({
             nama: o.nama,
-            dosis: o.dosis,
-            catatan: o.catatan,
+            dosis: o.dosis ?? "",
+            catatan: o.catatan ?? "",
             penyakit: row.nama_penyakit,
             sourceType: "scan",
             sourceId: row.id,

@@ -25,6 +25,25 @@ interface RemindersSearch {
   penyakit?: string;
 }
 
+function getScanFilter(value: string | undefined, fallbackDisease?: string) {
+  if (!value) return { id: undefined, disease: fallbackDisease };
+
+  try {
+    const parsed = JSON.parse(value) as { namaPenyakit?: unknown };
+    if (typeof parsed.namaPenyakit === "string" && parsed.namaPenyakit.trim()) {
+      return { id: undefined, disease: parsed.namaPenyakit };
+    }
+  } catch {
+    // Profile links use a scan history id; scanner links may contain a result payload.
+  }
+
+  return { id: value, disease: fallbackDisease };
+}
+
+function reminderDisease(reminder: { catatan: string | null }) {
+  return reminder.catatan?.match(/^Untuk kondisi:\s*(.+?)(?:\.\s|$)/i)?.[1];
+}
+
 export const Route = createFileRoute("/reminders")({
   validateSearch: (search: Record<string, unknown>): RemindersSearch => ({
     scan: typeof search.scan === "string" ? search.scan : undefined,
@@ -54,20 +73,33 @@ function RemindersPage() {
   const [tab, setTab] = useState<"active" | "history">("active");
 
   const clearFilter = () => navigate({ to: "/reminders", search: {} });
+  const scanSelection = getScanFilter(scanFilter, penyakit);
 
   const filteredActive = useMemo(
     () =>
       scanFilter
-        ? activeReminders.filter((r) => r.source_type === "scan" && r.source_id === scanFilter)
+        ? activeReminders.filter(
+            (r) =>
+              (scanSelection.id && r.source_id === scanSelection.id) ||
+              (scanSelection.disease &&
+                reminderDisease(r)?.toLocaleLowerCase("id-ID") ===
+                  scanSelection.disease.toLocaleLowerCase("id-ID")),
+          )
         : activeReminders,
-    [activeReminders, scanFilter],
+    [activeReminders, scanFilter, scanSelection.id, scanSelection.disease],
   );
   const filteredInactive = useMemo(
     () =>
       scanFilter
-        ? inactiveReminders.filter((r) => r.source_type === "scan" && r.source_id === scanFilter)
+        ? inactiveReminders.filter(
+            (r) =>
+              (scanSelection.id && r.source_id === scanSelection.id) ||
+              (scanSelection.disease &&
+                reminderDisease(r)?.toLocaleLowerCase("id-ID") ===
+                  scanSelection.disease.toLocaleLowerCase("id-ID")),
+          )
         : inactiveReminders,
-    [inactiveReminders, scanFilter],
+    [inactiveReminders, scanFilter, scanSelection.id, scanSelection.disease],
   );
 
   const lowStockCount = activeReminders.filter(
@@ -78,7 +110,7 @@ function RemindersPage() {
   const usedDiseases = new Set(
     activeReminders
       .concat(inactiveReminders)
-      .map((reminder) => reminder.catatan?.match(/^Untuk kondisi:\s*(.+?)(?:\.\s|$)/i)?.[1])
+      .map(reminderDisease)
       .filter((disease): disease is string => Boolean(disease))
       .map(normalizeDisease),
   );

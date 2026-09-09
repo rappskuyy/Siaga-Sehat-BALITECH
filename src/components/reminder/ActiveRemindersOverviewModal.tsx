@@ -28,10 +28,24 @@ export function ActiveRemindersOverviewModal({
 }: Props) {
   useEffect(() => {
     if (!open) return;
+    const scrollY = window.scrollY;
     const previousOverflow = document.body.style.overflow;
+    const previousPosition = document.body.style.position;
+    const previousTop = document.body.style.top;
+    const previousWidth = document.body.style.width;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
     return () => {
       document.body.style.overflow = previousOverflow;
+      document.body.style.position = previousPosition;
+      document.body.style.top = previousTop;
+      document.body.style.width = previousWidth;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      window.scrollTo(0, scrollY);
     };
   }, [open]);
 
@@ -40,7 +54,8 @@ export function ActiveRemindersOverviewModal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center"
+      data-lenis-prevent
+      className="fixed inset-0 z-[9999] flex items-end justify-center overscroll-none sm:items-center"
       role="dialog"
       aria-modal="true"
       aria-label="Active Reminders Overview"
@@ -49,7 +64,7 @@ export function ActiveRemindersOverviewModal({
       <div className="absolute inset-0 bg-black/45 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal Card */}
-      <div className="relative z-10 flex min-h-0 w-full max-w-md flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:max-h-[85vh] sm:rounded-2xl max-h-[88dvh]">
+      <div data-lenis-prevent className="relative z-10 flex min-h-0 w-full max-w-md flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:max-h-[85vh] sm:rounded-2xl max-h-[88dvh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2">
@@ -75,7 +90,7 @@ export function ActiveRemindersOverviewModal({
         </div>
 
         {/* Content */}
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-6 flex flex-col gap-4 touch-pan-y">
+        <div data-lenis-prevent className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-6 flex flex-col gap-4 touch-pan-y">
           {activeReminders.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-6 text-center">
               <Bell className="h-10 w-10 text-slate-300" />
