@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import logoSvg from "@/assets/siaga-sehat-logo.svg";
 
 export function BrandLogo({
   className = "",
@@ -22,7 +23,7 @@ export function BrandLogo({
   return (
     <Link to="/" className={`inline-flex items-center gap-2 shrink-0 ${className}`}>
       <img
-        src="/siaga-sehat-logo.svg"
+        src={logoSvg}
         alt="Siaga Sehat Logo"
         width={width}
         height={height}
