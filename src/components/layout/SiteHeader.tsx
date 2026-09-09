@@ -252,11 +252,10 @@ export function SiteHeader() {
                   to={tab.path}
                   search={tab.search as any}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`rounded-xl px-3.5 py-2.5 text-sm transition ${
-                    isActive
+                  className={`rounded-xl px-3.5 py-2.5 text-sm transition ${isActive
                       ? "font-semibold text-[color:var(--color-clinic-blue)] bg-white"
                       : "font-medium text-[color:var(--color-clinic-ink)] hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   {tab.label}
                 </Link>
@@ -266,11 +265,10 @@ export function SiteHeader() {
               <Link
                 to="/reminders"
                 onClick={() => setIsMenuOpen(false)}
-                className={`rounded-xl px-3.5 py-2.5 text-sm transition ${
-                  currentPath.startsWith("/reminders")
+                className={`rounded-xl px-3.5 py-2.5 text-sm transition ${currentPath.startsWith("/reminders")
                     ? "font-semibold text-[color:var(--color-clinic-blue)] bg-white"
                     : "font-medium text-[color:var(--color-clinic-ink)] hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 Notifikasi
               </Link>
