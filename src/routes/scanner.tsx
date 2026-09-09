@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
-  AlertCircle,
+  AlertTriangle,
   ArrowLeft,
   CheckCircle2,
   Lightbulb,
@@ -67,7 +67,11 @@ function ScannerPage() {
   const [image, setImage] = useState<SelectedImage | null>(null);
   const [stage, setStage] = useState<Stage>("idle");
   const [result, setResult] = useState<ScanResult | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [scanAlert, setScanAlert] = useState<{
+    title: string;
+    message: string;
+    details?: string[];
+  } | null>(null);
   const [scanStep, setScanStep] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -81,7 +85,7 @@ function ScannerPage() {
     setImage(next);
     setStage("idle");
     setResult(null);
-    setErrorMessage(null);
+    setScanAlert(null);
   };
 
   const handleScan = async () => {
@@ -94,7 +98,7 @@ function ScannerPage() {
     }
 
     setStage("scanning");
-    setErrorMessage(null);
+    setScanAlert(null);
     setScanStep(0);
     intervalRef.current = setInterval(() => {
       setScanStep((s) => (s + 1) % SCAN_STEPS.length);
@@ -105,6 +109,28 @@ function ScannerPage() {
         data: { imageBase64: image.base64, mediaType: image.mediaType },
       });
       if (intervalRef.current) clearInterval(intervalRef.current);
+
+      // If photo cannot be analyzed (unclear, blurry, dark, or not recognizable),
+      // DO NOT navigate to the results view. Stay on the SAME page and display the alert!
+      if (!data.gambar_dapat_dianalisis) {
+        setStage("idle");
+        setScanAlert({
+          title: "Foto Kurang Jelas atau Tidak Terdeteksi",
+          message:
+            data.ringkasan ||
+            "Foto yang diunggah belum memenuhi standar analisis AI. Pastikan foto fokus, pencahayaan terang, dan menyorot area keluhan secara langsung.",
+          details:
+            data.penyebab && data.penyebab.length > 0
+              ? data.penyebab
+              : [
+                  "Foto buram atau kamera tidak fokus pada area keluhan",
+                  "Pencahayaan kurang terang atau terhalang bayangan gelap",
+                  "Jarak foto terlalu jauh dari area kulit/tubuh yang bermasalah",
+                ],
+        });
+        return;
+      }
+
       setResult(data);
       setStage("result");
 
@@ -132,17 +158,26 @@ function ScannerPage() {
       }
     } catch (err) {
       if (intervalRef.current) clearInterval(intervalRef.current);
-      setErrorMessage(
-        err instanceof Error ? err.message : "Terjadi kesalahan saat menganalisis gambar.",
-      );
-      setStage("error");
+      setStage("idle");
+      setScanAlert({
+        title: "Foto Belum Berhasil Dianalisis",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Terjadi kendala saat memproses gambar. Pastikan foto jelas dan koneksi internet stabil.",
+        details: [
+          "Pastikan foto tidak buram atau goyang saat memotret",
+          "Gunakan pencahayaan ruangan yang terang merata",
+          "Fokuskan kamera pada jarak 10–15 cm menyorot area keluhan",
+        ],
+      });
     }
   };
 
   const handleReset = () => {
     setImage(null);
     setResult(null);
-    setErrorMessage(null);
+    setScanAlert(null);
     setStage("idle");
   };
 
@@ -177,14 +212,8 @@ function ScannerPage() {
                   image={image}
                   onChange={handleImageChange}
                   disabled={stage === "scanning"}
+                  alert={scanAlert}
                 />
-              )}
-
-              {stage === "error" && errorMessage && (
-                <div className="flex items-start gap-2 rounded-xl bg-red-50 p-3 text-sm text-red-700">
-                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-                  {errorMessage}
-                </div>
               )}
 
               <Button

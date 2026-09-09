@@ -61,17 +61,26 @@ DATASET INFORMASI PENYAKIT ACUAN:
    - Obat OTC: Krim Hidrokortison, Gel Aloe Vera.
    - Obat Herbal: Kompres Daun Lidah Buaya.
 
+PANDUAN KHUSUS JIKA FOTO TIDAK JELAS / BURAM / GAGAL / BUKAN KONDISI MEDIS:
+- Jika foto buram, tidak fokus, terlalu gelap, terhalang bayangan, terlalu jauh, atau bukan gambar keluhan kulit/tubuh manusia:
+  * Wajib set "gambar_dapat_dianalisis": false.
+  * Pada "nama_penyakit", isi: "Foto Belum Dapat Dianalisis".
+  * Pada "ringkasan", jelaskan secara ramah, santun, dan edukatif APA YANG KURANG ATAU SALAH pada foto tersebut (contoh: "Foto tampak buram atau tidak fokus sehingga tekstur ruam/bintil tidak terbaca", "Pencahayaan foto terlalu gelap/silau sehingga detail perubahan kulit tidak terlihat", "Foto tidak menampilkan bagian kulit/tubuh manusia yang bermasalah", atau "Area keluhan terlalu jauh dari kamera").
+  * Pada "penyebab", sebutkan 2-3 poin kendala pada foto (misal: "Foto buram atau kamera bergerak saat memotret", "Pencahayaan ruangan kurang terang", "Jarak pengambilan foto terlalu jauh dari area keluhan").
+  * Pada "pencegahan_mandiri", berikan 2-3 langkah praktis foto ulang yang baik (misal: "Gunakan pencahayaan terang alami atau lampu ruangan", "Dekatkan kamera pada jarak 10-15 cm dan sentuh layar untuk fokus", "Pegang ponsel dengan stabil agar foto tidak goyang").
+  * Set "tingkat_bahaya": "rendah", "tingkat_keyakinan": "rendah", "harus_ke_dokter": false, "alasan_ke_dokter": "".
+  * Biarkan "obat_rekomendasi" dan "obat_herbal" berupa array kosong [].
+
 ATURAN ANALISIS INFORMASI PENYAKIT:
 - Selalu jawab dalam Bahasa Indonesia yang jelas dan mudah dipahami.
-- Jika gambar tidak menunjukkan kondisi kesehatan/kulit (buram, foto benda, tangan yang tidak nuduhake kondisi kulit, dsb), set "gambar_dapat_dianalisis" ke false dan berikan petunjuk di "ringkasan".
+- Jika foto jelas dan menunjukkan kondisi kulit/tubuh, set "gambar_dapat_dianalisis" ke true.
 - Jika kondisi tidak tercakup dalam contoh di atas, tetap analisis berdasarkan ciri visual dan sebutkan "kemungkinan" atau "mungkin".
-- Jika kamu tidak yakin, gunakan istilah umum seperti "Ruam kulit tidak spesifik" atau "Iritasi kulit kemungkinan akibat..." di "nama_penyakit" dan tetap beri rekomendasi aman.
-- "penyebab": WAJIB diisi 2-4 poin kemungkinan penyebab/pemicu kondisi tersebut (mis. kontak iritan, infeksi bakteri/jamur, reaksi alergi, gesekan, kelembapan berlebih, dsb) berdasarkan ciri visual yang terlihat. Field ini TIDAK BOLEH berupa array kosong; bahkan jika gambar tidak jelas, isi dengan kemungkinan umum seperti "Belum dapat dipastikan tanpa pemeriksaan langsung; kemungkinan terkait iritasi, infeksi, atau alergi kulit".
+- Jika kamu tidak yakin dengan penyakit spesifik tapi foto jelas, gunakan istilah umum seperti "Ruam kulit tidak spesifik" atau "Iritasi kulit kemungkinan akibat..." di "nama_penyakit" dan tetap beri rekomendasi aman.
+- "penyebab": WAJIB diisi 2-4 poin kemungkinan penyebab/pemicu kondisi tersebut berdasarkan ciri visual. Field ini TIDAK BOLEH berupa array kosong.
 - Klasifikasikan "tingkat_bahaya" ("rendah", "sedang", "tinggi") secara akurat. Jika "tinggi", set "harus_ke_dokter" ke true.
-- "obat_rekomendasi": Hanya cantumkan obat bebas/OTC umum di Indonesia beserta dosis aman; kalau tidak yakin dengan penyakit spesifik, gunakan rekomendasi untuk gejala yang muncul (misalnya gatal, merah, kering).
+- "obat_rekomendasi": Hanya cantumkan obat bebas/OTC umum di Indonesia beserta dosis aman.
 - "obat_herbal": Cantumkan tanaman obat atau cara alami tradisional yang relatif aman dan sesuai gejala.
-- Jangan pernah membuat diagnosis pasti 100%, gunakan bahasa "kemungkinan", "berdasarkan gambar terlihat seperti", "mirip dengan".
-- Jika kamu tidak bisa yakin karena kualitas gambar buruk, set "gambar_dapat_dianalisis" ke false.
+- Jangan pernah membuat diagnosis pasti 100%, gunakan bahasa edukatif skrining awal.
 - Keluarkan HANYA data terstruktur sesuai skema JSON tanpa teks tambahan di luar skema.`;
 
 const USER_PROMPT =
@@ -1216,26 +1225,72 @@ async function analyzeWithGemini(data: {
   );
 }
 
+export function createUnclearImageResult(customReason?: string): ScanResult {
+  return {
+    gambar_dapat_dianalisis: false,
+    nama_penyakit: "Foto Belum Dapat Dianalisis",
+    ringkasan:
+      customReason ||
+      "Foto yang diunggah belum cukup jelas, buram, minim pencahayaan, atau tidak menampilkan kondisi kulit/tubuh dengan fokus. Mohon ikuti panduan dan coba ambil ulang foto.",
+    tingkat_bahaya: "rendah",
+    tingkat_keyakinan: "rendah",
+    penyebab: [
+      "Foto buram atau kamera tidak fokus pada area yang bermasalah",
+      "Pencahayaan kurang terang atau terhalang bayangan gelap",
+      "Foto diambil terlalu jauh atau objek keluhan terhalang benda lain",
+    ],
+    pencegahan_mandiri: [
+      "Gunakan pencahayaan yang terang merata (cahaya alami atau lampu ruangan)",
+      "Posisikan kamera fokus pada jarak 10–15 cm dari area keluhan",
+      "Pegang perangkat secara stabil agar foto tidak goyang atau buram",
+    ],
+    harus_ke_dokter: false,
+    alasan_ke_dokter: "",
+    obat_rekomendasi: [],
+    obat_herbal: [],
+    catatan_tambahan: "Pastikan foto diambil pada pencahayaan yang cukup tanpa filter.",
+  };
+}
+
 export const analyzeHealthImage = createServerFn({ method: "POST" })
   .validator((data: unknown) => scanInputSchema.parse(data))
   .handler(async ({ data }): Promise<ScanResult> => {
-    const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase().trim();
-    if (provider === "koboillm" || provider === "koboldllm") {
-      try {
-        return await analyzeWithKoboiLLM(data);
-      } catch (err) {
-        console.warn("KoboiLLM scan analysis failed, attempting Gemini fallback:", err);
-        return await analyzeWithGemini(data);
+    try {
+      const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase().trim();
+      if (provider === "koboillm" || provider === "koboldllm") {
+        try {
+          return await analyzeWithKoboiLLM(data);
+        } catch (err) {
+          console.warn("KoboiLLM scan analysis failed, attempting Gemini fallback:", err);
+          return await analyzeWithGemini(data);
+        }
       }
-    }
-    if (provider === "openai" && process.env.OPENAI_API_KEY?.trim()) {
-      try {
-        return await analyzeWithOpenAI(data);
-      } catch (err) {
-        console.warn("OpenAI scan analysis failed, attempting Gemini fallback:", err);
-        return await analyzeWithGemini(data);
+      if (provider === "openai" && process.env.OPENAI_API_KEY?.trim()) {
+        try {
+          return await analyzeWithOpenAI(data);
+        } catch (err) {
+          console.warn("OpenAI scan analysis failed, attempting Gemini fallback:", err);
+          return await analyzeWithGemini(data);
+        }
       }
+      return await analyzeWithGemini(data);
+    } catch (err) {
+      console.warn("Error during health image analysis:", err);
+      const message = err instanceof Error ? err.message : String(err);
+
+      // If the AI refused due to safety/unclear content, return an informative alert result
+      if (
+        message.includes("menolak") ||
+        message.includes("SAFETY") ||
+        message.includes("tidak jelas") ||
+        message.includes("format JSON yang tidak valid")
+      ) {
+        return createUnclearImageResult(
+          "Foto tidak dapat dianalisis oleh AI. Kemungkinan foto terlalu buram, minim cahaya, atau tidak memfokuskan area keluhan. Silakan ambil foto ulang dengan pencahayaan terang dan fokus tajam.",
+        );
+      }
+
+      throw err;
     }
-    return analyzeWithGemini(data);
   });
 

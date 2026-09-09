@@ -112,23 +112,169 @@ export function ScanResultView({
 
   if (!result.gambar_dapat_dianalisis) {
     return (
-      <div className="animate-fade-up rounded-[24px] bg-white p-8 text-center shadow-[var(--shadow-clinic)]">
-        <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-amber-100 text-amber-600">
-          <AlertTriangle className="h-8 w-8" />
+      <div className="animate-fade-up flex flex-col gap-6">
+        {/* Top Header Badge */}
+        <div className="flex items-center justify-between">
+          <p className="font-display text-lg font-bold uppercase tracking-wide text-amber-600">
+            Perhatian Skrining AI
+          </p>
         </div>
-        <h2 className="mt-4 font-display text-xl font-bold text-[color:var(--color-clinic-ink)]">
-          Foto Belum Bisa Dianalisis
-        </h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-[color:var(--color-clinic-muted)]">
-          {result.ringkasan}
-        </p>
-        <Button
-          onClick={onReset}
-          className="mt-6 gap-2 rounded-full bg-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue-dark)]"
-        >
-          <RotateCcw className="h-4 w-4" />
-          Coba Foto Lain
-        </Button>
+
+        {/* Main Alert Card */}
+        <div className="rounded-[28px] border-2 border-amber-200 bg-amber-50/70 p-6 shadow-[var(--shadow-clinic-lg)] md:p-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+            <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-amber-500 text-white shadow-md">
+              <AlertTriangle className="h-7 w-7" />
+            </div>
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-200/80 px-3 py-1 text-xs font-bold text-amber-900">
+                Foto Tidak Memenuhi Standar Analisis
+              </span>
+              <h2 className="mt-1.5 font-display text-2xl font-extrabold text-amber-950 md:text-3xl">
+                Foto Belum Dapat Dianalisis
+              </h2>
+            </div>
+          </div>
+
+          {/* AI Explanation / Alert Text */}
+          <div className="mt-5 rounded-2xl border border-amber-300/80 bg-white/90 p-4 sm:p-5 shadow-xs">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-800">
+              <Sparkles className="h-4 w-4 text-amber-600" />
+              Penjelasan Hasil Pemindaian
+            </div>
+            <p className="mt-2 text-sm sm:text-base leading-relaxed text-amber-950 font-medium">
+              {result.ringkasan}
+            </p>
+          </div>
+
+          {/* Two Columns: Photo Inspector & Improvement Guide */}
+          <div className="mt-6 grid gap-6 md:grid-cols-12">
+            {/* Left Column: Photo Preview & What is Missing / Wrong */}
+            <div className="flex flex-col gap-4 md:col-span-5">
+              <div className="relative overflow-hidden rounded-2xl border-2 border-amber-200 bg-black/5 shadow-inner">
+                <img
+                  src={previewUrl}
+                  alt="Foto yang diunggah"
+                  loading="lazy"
+                  decoding="async"
+                  className="aspect-[4/3] w-full object-cover"
+                />
+                <span className="absolute bottom-3 left-3 right-3 rounded-xl bg-black/70 px-3 py-1.5 text-center text-xs font-semibold text-white backdrop-blur">
+                  Foto Perlu Diambil Ulang
+                </span>
+              </div>
+
+              {/* Box: Kemungkinan Masalah pada Foto */}
+              <div className="rounded-2xl border border-amber-200 bg-white p-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-amber-900">
+                  Kemungkinan Masalah Foto:
+                </p>
+                <ul className="mt-2.5 space-y-2 text-xs text-amber-950/90">
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
+                    <span><strong>Kurang Fokus / Buram:</strong> Kamera goyang saat memotret atau fokus meleset dari area keluhan.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
+                    <span><strong>Pencahayaan Kurang:</strong> Ruangan redup, terlalu gelap, atau tertutup bayangan tebal.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
+                    <span><strong>Jarak Terlalu Jauh:</strong> Detail tekstur ruam, bintil, atau kulit tidak terbaca AI.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
+                    <span><strong>Bukan Area Kulit/Tubuh:</strong> Terhalang pakaian, perban, atau bukan bagian tubuh manusia.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Right Column: Steps for a Perfect Retake */}
+            <div className="flex flex-col justify-between rounded-2xl border border-emerald-200 bg-emerald-50/80 p-5 md:col-span-7">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-600 text-white shadow-xs">
+                    <ShieldCheck className="h-4 w-4" />
+                  </span>
+                  <h3 className="font-display text-base font-bold text-emerald-950">
+                    Panduan Foto yang Benar & Jelas
+                  </h3>
+                </div>
+                <p className="mt-1 text-xs text-emerald-800">
+                  Ikuti langkah-langkah berikut agar AI dapat menganalisis kondisi dengan akurat:
+                </p>
+
+                <div className="mt-4 space-y-3">
+                  <div className="flex items-start gap-3 rounded-xl bg-white p-3 shadow-2xs border border-emerald-100">
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-800">
+                      1
+                    </span>
+                    <div>
+                      <p className="text-xs font-bold text-emerald-950">Gunakan Pencahayaan Terang & Merata</p>
+                      <p className="text-[11px] text-slate-600 mt-0.5">
+                        Foto di ruangan dengan lampu terang atau dekat jendela alami. Hindari bayangan menutupi area keluhan.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 rounded-xl bg-white p-3 shadow-2xs border border-emerald-100">
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-800">
+                      2
+                    </span>
+                    <div>
+                      <p className="text-xs font-bold text-emerald-950">Dekatkan Kamera (Jarak 10–15 cm)</p>
+                      <p className="text-[11px] text-slate-600 mt-0.5">
+                        Posisikan kamera cukup dekat agar area kulit atau ruam memenuhi bagian tengah layar.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 rounded-xl bg-white p-3 shadow-2xs border border-emerald-100">
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-800">
+                      3
+                    </span>
+                    <div>
+                      <p className="text-xs font-bold text-emerald-950">Kunci Fokus & Jaga Kamera Stabil</p>
+                      <p className="text-[11px] text-slate-600 mt-0.5">
+                        Sentuh layar tepat di bagian keluhan hingga fokus mengunci tajam sebelum menekan tombol ambil foto.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 rounded-xl bg-white p-3 shadow-2xs border border-emerald-100">
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-800">
+                      4
+                    </span>
+                    <div>
+                      <p className="text-xs font-bold text-emerald-950">Tanpa Filter Kamera atau Screenshot</p>
+                      <p className="text-[11px] text-slate-600 mt-0.5">
+                        Gunakan foto asli langsung tanpa efek kecantikan, filter warna, atau crop berlebih.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-6 flex flex-col sm:flex-row gap-3 pt-3 border-t border-emerald-200">
+                <Button
+                  onClick={onReset}
+                  className="flex-1 gap-2 rounded-full bg-[color:var(--color-clinic-blue)] py-5 text-sm font-bold text-white hover:bg-[color:var(--color-clinic-blue-dark)] shadow-sm"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Ambil Ulang Foto
+                </Button>
+                <Link
+                  to="/consultation"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-[color:var(--color-clinic-ink)] hover:bg-slate-50 transition shadow-2xs"
+                >
+                  Konsultasi Gejala Langsung
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

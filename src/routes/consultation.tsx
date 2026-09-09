@@ -152,12 +152,30 @@ function AssistantText({ text }: { text: string }) {
 
 function detectIntentAction(text: string): ActionCardType | undefined {
   const lower = text.toLowerCase();
+
+  // Do not trigger action cards if text is an initial context transfer from other pages
   if (
-    lower.includes("apotek") ||
-    lower.includes("farmasi") ||
-    lower.includes("peta") ||
-    lower.includes("maps") ||
-    lower.includes("lokasi apotek")
+    lower.includes("saya baru selesai") ||
+    lower.includes("halaman anatomi") ||
+    lower.includes("melakukan scan ai") ||
+    lower.includes("berikut rangkuman data saya") ||
+    lower.includes("berikut hasil skriningnya")
+  ) {
+    return undefined;
+  }
+
+  // Maps / Pharmacy intent: user explicitly asks for map/pharmacy
+  if (
+    lower.includes("cari apotek") ||
+    lower.includes("lokasi apotek") ||
+    lower.includes("peta apotek") ||
+    lower.includes("buka peta") ||
+    lower.includes("peta faskes") ||
+    lower.includes("apotek terdekat") ||
+    lower.includes("faskes terdekat") ||
+    lower.includes("klinik terdekat") ||
+    lower.includes("lihat di peta") ||
+    lower.includes("rute apotek")
   ) {
     return {
       type: "maps",
@@ -167,12 +185,20 @@ function detectIntentAction(text: string): ActionCardType | undefined {
       href: "/maps",
     };
   }
+
+  // Scanner intent: user explicitly asks to open scanner / scan photo
   if (
-    lower.includes("scan") ||
-    lower.includes("pindai") ||
-    lower.includes("foto") ||
-    lower.includes("kamera") ||
-    lower.includes("gambar")
+    lower.includes("buka scanner") ||
+    lower.includes("buka fitur scan") ||
+    lower.includes("fitur scanner") ||
+    lower.includes("scan foto") ||
+    lower.includes("scan resep") ||
+    lower.includes("scan obat") ||
+    lower.includes("mau scan") ||
+    lower.includes("mau foto") ||
+    lower.includes("buka pemindai") ||
+    lower.includes("unggah foto") ||
+    lower.includes("fitur scan")
   ) {
     return {
       type: "scanner",
@@ -182,11 +208,18 @@ function detectIntentAction(text: string): ActionCardType | undefined {
       href: "/scanner",
     };
   }
+
+  // Anatomy intent: user explicitly asks to open anatomy / pick body part
   if (
-    lower.includes("tubuh") ||
-    lower.includes("anatomi") ||
-    lower.includes("organ") ||
-    lower.includes("bagian tubuh")
+    lower.includes("buka anatomi") ||
+    lower.includes("fitur anatomi") ||
+    lower.includes("model anatomi") ||
+    lower.includes("buka model anatomi") ||
+    lower.includes("pilih bagian tubuh") ||
+    lower.includes("pilih organ tubuh") ||
+    lower.includes("pilih organ") ||
+    lower.includes("lihat anatomi") ||
+    lower.includes("eksplorasi anatomi")
   ) {
     return {
       type: "anatomy",
@@ -196,6 +229,7 @@ function detectIntentAction(text: string): ActionCardType | undefined {
       href: "/anatomy",
     };
   }
+
   return undefined;
 }
 
@@ -326,7 +360,7 @@ function ConsultationPage() {
       .join("\n");
 
   const sendMessage = useCallback(
-    async (text: string) => {
+    async (text: string, options?: { isInitialContext?: boolean }) => {
       if (!text.trim()) return;
 
       const userMsg: ChatMessage = { role: "user", text, time: formatTime() };
@@ -334,19 +368,25 @@ function ConsultationPage() {
       setMessages(next);
       setLoading(true);
 
-      const intentCard = detectIntentAction(text);
+      // Only show action card if user explicitly requested that action in their message,
+      // and NOT during initial context transfers from scan or anatomy
+      const intentCard = options?.isInitialContext ? undefined : detectIntentAction(text);
 
       try {
         const prompt = `Kamu adalah Asisten Kesehatan SiagaSehat yang ramah, empati, dan profesional dalam Bahasa Indonesia. Berikut riwayat percakapan sejauh ini:\n${buildContext(
           next,
+<<<<<<< Updated upstream
         )}\n\nBalas pesan TERAKHIR pengguna secara langsung. Ikuti tahap konsultasi dan aturan keselamatan pada instruksi sistem. Jika umur atau keluhan penyerta belum diketahui, tanyakan SATU informasi yang paling penting dan jangan memberi solusi dulu (kecuali tanda bahaya). Setelah data minimum cukup, baru berikan jawaban terstruktur. Jika pengguna menanyakan apotek/lokasi, jelaskan bahwa mereka bisa membuka Peta Lokasi. Jika pengguna menanyakan scan obat/kulit, sebutkan fitur Scanner. Jika pengguna ingin memilih area tubuh yang sakit, rekomendasikan fitur Anatomi.`;
+=======
+        )}\n\nLanjutkan percakapan secara natural. Berikan penjelasan yang jelas, ramah, dan solutif. Jika informasi gejala belum lengkap, tanyakan secara sopan. Jika sudah cukup, berikan Analisis Awal, Tingkat Risiko, dan Rekomendasi Tindakan yang aman.`;
+>>>>>>> Stashed changes
         const res = await chat({ data: { prompt } });
         const reply = res?.reply?.trim() || "Maaf, saya tidak mendapatkan respons. Silakan coba lagi.";
         const assistantMsg: ChatMessage = {
           role: "assistant",
           text: reply,
           time: formatTime(),
-          actionCard: intentCard || detectIntentAction(reply),
+          actionCard: intentCard,
         };
         setMessages((m) => m.concat(assistantMsg));
       } catch {
@@ -412,6 +452,7 @@ function ConsultationPage() {
 
     void sendMessage(
       `Saya baru selesai memilih keluhan pada organ ${context.regionName || ""} di halaman Anatomi. Berikut rangkuman data saya:\n${details}\n\nTolong bantu periksa keluhan ini, tanyakan hal yang perlu diketahui, dan berikan rekomendasi medis awal yang aman.`,
+      { isInitialContext: true }
     );
   }, [anatomy, sendMessage]);
 
@@ -450,6 +491,7 @@ function ConsultationPage() {
 
     void sendMessage(
       `Saya baru selesai melakukan scan AI. Berikut hasil skriningnya:\n${details}\n\nTolong jelaskan hasil ini dengan bahasa yang mudah dipahami, validasi hal yang perlu saya waspadai, dan berikan pertanyaan lanjutan atau langkah aman yang sebaiknya saya lakukan.`,
+      { isInitialContext: true }
     );
   }, [scan, sendMessage]);
 
