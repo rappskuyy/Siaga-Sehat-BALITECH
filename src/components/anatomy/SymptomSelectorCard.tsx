@@ -110,33 +110,30 @@ export function SymptomSelectorCard({
           <button
             type="button"
             onClick={() => setActiveTab("all")}
-            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all cursor-pointer ${
-              activeTab === "all"
+            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all cursor-pointer ${activeTab === "all"
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-sm"
                 : "bg-[#f1f5f9] text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
-            }`}
+              }`}
           >
             Semua ({region.symptoms.length + region.conditions.length})
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("symptoms")}
-            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all cursor-pointer ${
-              activeTab === "symptoms"
+            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all cursor-pointer ${activeTab === "symptoms"
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-sm"
                 : "bg-[#f1f5f9] text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
-            }`}
+              }`}
           >
             Gejala ({region.symptoms.length})
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("conditions")}
-            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all cursor-pointer ${
-              activeTab === "conditions"
+            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all cursor-pointer ${activeTab === "conditions"
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-sm"
                 : "bg-[#f1f5f9] text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
-            }`}
+              }`}
           >
             Kondisi ({region.conditions.length})
           </button>
@@ -178,19 +175,17 @@ export function SymptomSelectorCard({
                           onToggleSymptom(symptom.name);
                         }
                       }}
-                      className={`group flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 rounded-xl border p-2.5 sm:p-3 cursor-pointer transition-all duration-150 select-none ${
-                        isChecked
+                      className={`group flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 rounded-xl border p-2.5 sm:p-3 cursor-pointer transition-all duration-150 select-none ${isChecked
                           ? "border-[color:var(--color-clinic-blue)] bg-[color:var(--color-clinic-blue-soft)]/25 text-[color:var(--color-clinic-ink)] shadow-xs ring-1 ring-[color:var(--color-clinic-blue)]/30"
                           : "border-black/5 bg-[#f8fafc] text-[color:var(--color-clinic-ink)] hover:border-[color:var(--color-clinic-blue)]/40 hover:bg-white"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div
-                          className={`grid h-5 w-5 shrink-0 place-items-center rounded-lg border transition-all ${
-                            isChecked
+                          className={`grid h-5 w-5 shrink-0 place-items-center rounded-lg border transition-all ${isChecked
                               ? "bg-[color:var(--color-clinic-blue)] border-[color:var(--color-clinic-blue)] text-white shadow-xs"
                               : "border-black/20 bg-white group-hover:border-[color:var(--color-clinic-blue)]"
-                          }`}
+                            }`}
                         >
                           {isChecked && <Check className="h-3.5 w-3.5 stroke-[3]" />}
                         </div>
@@ -244,19 +239,17 @@ export function SymptomSelectorCard({
                           onToggleCondition(condition.name);
                         }
                       }}
-                      className={`group rounded-xl border p-2.5 sm:p-3 cursor-pointer transition-all duration-150 select-none ${
-                        isChecked
+                      className={`group rounded-xl border p-2.5 sm:p-3 cursor-pointer transition-all duration-150 select-none ${isChecked
                           ? "border-[color:var(--color-clinic-blue)] bg-[color:var(--color-clinic-blue-soft)]/30 shadow-xs ring-1 ring-[color:var(--color-clinic-blue)]/30"
                           : "border-black/5 bg-[#f8fafc] hover:bg-white hover:border-[color:var(--color-clinic-blue)]/40"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-start gap-2.5">
                         <div
-                          className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-lg border transition-all ${
-                            isChecked
+                          className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-lg border transition-all ${isChecked
                               ? "bg-[color:var(--color-clinic-blue)] border-[color:var(--color-clinic-blue)] text-white shadow-xs"
                               : "border-black/20 bg-white group-hover:border-[color:var(--color-clinic-blue)]"
-                          }`}
+                            }`}
                         >
                           {isChecked && <Check className="h-3.5 w-3.5 stroke-[3]" />}
                         </div>

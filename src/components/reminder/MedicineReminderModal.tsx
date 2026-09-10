@@ -44,11 +44,11 @@ function StepIndicator({ current }: { current: Step }) {
   const steps: Step[] = ["location", "select_meds", "configure", "success"];
   const idx = steps.indexOf(current);
   return (
-    <div className="flex items-center gap-1 px-6 py-3 border-b border-slate-100">
+    <div className="flex items-center justify-between gap-1 px-4 sm:px-6 py-3 border-b border-slate-100 overflow-x-auto scrollbar-none min-w-0">
       {["Lokasi", "Pilih Obat", "Atur Dosis"].map((label, i) => (
-        <div key={label} className="flex items-center gap-1">
+        <div key={label} className="flex items-center gap-1 shrink-0 whitespace-nowrap">
           <div
-            className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold transition-all ${
+            className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold transition-all shrink-0 ${
               i < idx
                 ? "bg-emerald-500 text-white"
                 : i === idx
@@ -59,13 +59,13 @@ function StepIndicator({ current }: { current: Step }) {
             {i < idx ? <Check className="h-2.5 w-2.5" /> : i + 1}
           </div>
           <span
-            className={`text-[10px] font-medium ${
-              i === idx ? "text-[color:var(--color-clinic-blue)]" : "text-slate-400"
+            className={`text-[10px] sm:text-xs font-medium ${
+              i === idx ? "text-[color:var(--color-clinic-blue)] font-bold" : "text-slate-400"
             }`}
           >
             {label}
           </span>
-          {i < 2 && <ChevronRight className="h-3 w-3 text-slate-300 mx-0.5" />}
+          {i < 2 && <ChevronRight className="h-3 w-3 text-slate-300 mx-0.5 shrink-0" />}
         </div>
       ))}
     </div>

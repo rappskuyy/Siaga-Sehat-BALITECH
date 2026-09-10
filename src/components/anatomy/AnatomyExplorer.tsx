@@ -185,38 +185,44 @@ export function AnatomyExplorer() {
       {/* Scroll Anchor Target (Positioned above Step Wizard) */}
       <div ref={topAnchorRef} className="scroll-mt-24" />
 
-      {/* Step Wizard Progress Bar - Professional Icons, No Emojis */}
-      <div className="mb-5 mx-auto max-w-3xl px-2">
-        <div className="flex items-center justify-between rounded-2xl bg-white p-2 sm:p-3 shadow-sm border border-black/5 text-xs">
+      {/* Step Wizard Progress Bar - Professional Icons, 100% Fit Responsive & Flexible */}
+      <div className="mb-4 sm:mb-5 mx-auto max-w-3xl px-1 sm:px-2 w-full min-w-0">
+        <div className="flex items-center justify-between w-full min-w-0 rounded-2xl bg-white p-1 sm:p-2 md:p-3 shadow-xs border border-black/5 text-xs gap-0.5 sm:gap-1.5">
           {/* Step 1: Panduan */}
           <button
             type="button"
             onClick={handleReset}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl transition cursor-pointer ${stepNumber === 1
+            className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1 sm:px-2.5 rounded-xl transition cursor-pointer ${stepNumber === 1
                 ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
                 : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
               }`}
           >
-            <BookOpen className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
-            <span className="truncate text-[11px] sm:text-xs">1. Panduan</span>
+            <BookOpen className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
+            <span className="text-[10px] xs:text-[11px] sm:text-xs font-semibold truncate">
+              <span className="hidden xs:inline">1. </span>Panduan
+            </span>
           </button>
 
-          <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+          <ChevronRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-300 shrink-0 mx-0.5" />
 
           {/* Step 2: Model Anatomi */}
           <button
             type="button"
             onClick={handleGoToModel}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl transition cursor-pointer ${stepNumber === 2
+            className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1 sm:px-2.5 rounded-xl transition cursor-pointer ${stepNumber === 2
                 ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
                 : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
               }`}
           >
-            <Layers className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
-            <span className="truncate text-[11px] sm:text-xs">2. Model Anatomi</span>
+            <Layers className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
+            <span className="text-[10px] xs:text-[11px] sm:text-xs font-semibold truncate">
+              <span className="hidden xs:inline">2. </span>
+              <span className="sm:hidden">Anatomi</span>
+              <span className="hidden sm:inline">Model Anatomi</span>
+            </span>
           </button>
 
-          <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+          <ChevronRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-300 shrink-0 mx-0.5" />
 
           {/* Step 3: Tandai Gejala */}
           <button
@@ -229,28 +235,33 @@ export function AnatomyExplorer() {
                 toast.info("Silakan pilih organ pada model anatomi terlebih dahulu.");
               }
             }}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl transition cursor-pointer ${stepNumber === 3
+            className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1 sm:px-2.5 rounded-xl transition cursor-pointer ${stepNumber === 3
                 ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
                 : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
               }`}
           >
-            <Stethoscope className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
-            <span className="truncate text-[11px] sm:text-xs">
-              3. Gejala {selectedSymptoms.length > 0 && `(${selectedSymptoms.length})`}
+            <Stethoscope className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
+            <span className="text-[10px] xs:text-[11px] sm:text-xs font-semibold truncate">
+              <span className="hidden xs:inline">3. </span>
+              Gejala{selectedSymptoms.length > 0 && `(${selectedSymptoms.length})`}
             </span>
           </button>
 
-          <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+          <ChevronRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-300 shrink-0 mx-0.5" />
 
           {/* Step 4: Hasil AI */}
           <div
-            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl transition ${stepNumber === 4
+            className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1 sm:px-2.5 rounded-xl transition ${stepNumber === 4
                 ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
                 : "text-[color:var(--color-clinic-muted)]"
               }`}
           >
-            <Sparkles className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
-            <span className="truncate text-[11px] sm:text-xs">4. Hasil AI</span>
+            <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
+            <span className="text-[10px] xs:text-[11px] sm:text-xs font-semibold truncate">
+              <span className="hidden xs:inline">4. </span>
+              <span className="sm:hidden">Hasil</span>
+              <span className="hidden sm:inline">Hasil AI</span>
+            </span>
           </div>
         </div>
       </div>
