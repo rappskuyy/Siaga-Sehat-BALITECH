@@ -4,7 +4,7 @@ import { ArrowRight, CheckCircle2, Github, Linkedin, Loader2, MessageCircle, Twi
 import { Reveal } from "./Reveal";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import { toast } from "sonner";
-import { subscribeNewsletterClient } from "@/lib/newsletter/newsletter.client";
+import { subscribeNewsletterClient } from "@/lib/newsletter/newsletter.service";
 
 const SERVICE_LINKS = [
   { label: "Beranda", path: "/" },
