@@ -612,9 +612,7 @@ export function RouteOverlayCard({
             href={mapsUrl}
             target="_blank"
             rel="noreferrer"
-            className={`flex items-center justify-center gap-1.5 w-full rounded-xl py-2.5 text-xs font-bold text-[#FFFFFF] shadow-xs hover:opacity-95 active:scale-[0.99] transition cursor-pointer ${
-              isHospital ? "bg-[#EF4444]" : isClinic ? "bg-[#F59E0B]" : "bg-gradient-blue-primary"
-            }`}
+            className="flex items-center justify-center gap-1.5 w-full rounded-xl py-2.5 text-xs font-bold text-[#FFFFFF] shadow-xs bg-[#4a6fa5] hover:bg-[#35517d] active:scale-[0.99] transition cursor-pointer"
           >
             <Navigation className="h-3.5 w-3.5" />
             Buka Navigasi Rute Cepat

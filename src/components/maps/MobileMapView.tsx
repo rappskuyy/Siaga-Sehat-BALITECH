@@ -806,7 +806,7 @@ export function MobileMapView() {
               target="_blank"
               rel="noreferrer"
               aria-label="Buka petunjuk arah di aplikasi Google Maps"
-              className="w-full py-3 min-h-[48px] rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition"
+              className="w-full py-3 min-h-[48px] rounded-2xl bg-[#4a6fa5] hover:bg-[#35517d] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition"
             >
               <Navigation className="h-4 w-4" />
               Navigasi Google Maps

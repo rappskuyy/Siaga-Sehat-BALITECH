@@ -819,7 +819,7 @@ export function DedicatedMapsView() {
                     href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPharmacy.lat},${selectedPharmacy.lon}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full h-11 bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white font-extrabold text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer mt-auto shrink-0"
+                    className="w-full h-11 bg-[#4a6fa5] hover:bg-[#35517d] text-white font-extrabold text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer mt-auto shrink-0"
                   >
                     <Navigation className="h-4 w-4" />
                     <span>Buka Navigasi Google Maps</span>

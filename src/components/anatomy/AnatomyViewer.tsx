@@ -85,7 +85,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
   };
 
   return (
-    <div className="flex flex-col h-full rounded-[20px] sm:rounded-[28px] bg-white p-3 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 justify-between select-none max-w-full overflow-hidden min-w-0">
+    <div className="flex flex-col w-full h-[520px] sm:h-[620px] lg:h-[680px] rounded-[20px] sm:rounded-[28px] bg-white p-3 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 select-none overflow-hidden min-w-0">
       {/* Top Header Bar */}
       <div className="flex items-center justify-between gap-2 border-b border-black/5 pb-3 shrink-0 max-w-full min-w-0 overflow-hidden">
         <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -190,12 +190,12 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
       </div>
 
       {/* Interactive Anatomy Viewport Container */}
-      <div className="relative mt-3 flex-1 w-full min-h-[340px] sm:min-h-[480px] md:min-h-[540px] lg:min-h-[600px] rounded-2xl bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0]/60 p-2 sm:p-4 border border-slate-200/60 shadow-inner flex flex-col justify-center items-center overflow-hidden select-none max-w-full min-w-0">
+      <div className="relative mt-2.5 flex-1 w-full rounded-2xl bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0]/60 p-2 sm:p-3 border border-slate-200/60 shadow-inner flex flex-col justify-center items-center overflow-hidden select-none max-w-full min-w-0">
         {/* Subtle Blueprint Dot Grid */}
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[radial-gradient(#0f172a_1px,transparent_1px)] [background-size:20px_20px]" />
 
         {/* Soft Medical Vignette Spotlight */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-[500px] rounded-full bg-radial from-sky-200/30 via-sky-100/10 to-transparent blur-2xl pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-[450px] rounded-full bg-radial from-sky-200/30 via-sky-100/10 to-transparent blur-2xl pointer-events-none" />
 
         {/* Interactive Floating Canvas Action Controls (Zoom & Rotate) */}
         <div className="absolute top-3 right-3 z-30 flex flex-col gap-1.5 bg-white/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200/80 shadow-md">
@@ -256,7 +256,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             width={300}
             height={600}
             alt={view === "front" ? "Anatomi Tubuh Tampak Depan" : "Anatomi Tubuh Tampak Belakang"}
-            className="h-[320px] sm:h-[480px] md:h-[540px] lg:h-[600px] w-auto max-w-full object-contain select-none drop-shadow-[0_12px_24px_rgba(15,23,42,0.12)] pointer-events-none transition-all duration-300"
+            className="h-[340px] sm:h-[460px] lg:h-[500px] w-auto max-w-full object-contain select-none drop-shadow-[0_12px_24px_rgba(15,23,42,0.12)] pointer-events-none transition-all duration-300"
             loading={view === "front" ? "eager" : "lazy"}
             fetchPriority={view === "front" ? "high" : "auto"}
             decoding="async"

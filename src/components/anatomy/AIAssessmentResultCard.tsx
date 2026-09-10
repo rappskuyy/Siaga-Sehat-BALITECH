@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { AIAssessmentResult } from "@/lib/anatomy/types";
 import { Link } from "@tanstack/react-router";
 import {
@@ -5,6 +6,7 @@ import {
   ArrowRight,
   Building2,
   CheckCircle2,
+  ChevronDown,
   MapPin,
   Navigation,
   RefreshCw,
@@ -42,6 +44,13 @@ export function AIAssessmentResultCard({
     emergencyMessage,
     disclaimer,
   } = result;
+
+  const [showMainCondition, setShowMainCondition] = useState(true);
+  const [showDifferential, setShowDifferential] = useState(false);
+  const [showSymptoms, setShowSymptoms] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [showRecommendations, setShowRecommendations] = useState(false);
+  const [showEmergencyReferral, setShowEmergencyReferral] = useState(false);
 
   const consultationContext = JSON.stringify({
     regionName,
@@ -98,8 +107,12 @@ export function AIAssessmentResultCard({
         )}
 
         {/* Main Condition Likelihood Card */}
-        <div className="rounded-2xl bg-[color:var(--color-clinic-blue-soft)]/30 p-3.5 sm:p-4 border border-[color:var(--color-clinic-blue)]/20">
-          <div className="flex items-center justify-between gap-3">
+        <div className="rounded-2xl bg-[color:var(--color-clinic-blue-soft)]/30 p-3.5 sm:p-4 border border-[color:var(--color-clinic-blue)]/20 transition-all">
+          <button
+            type="button"
+            onClick={() => setShowMainCondition((prev) => !prev)}
+            className="w-full flex items-center justify-between gap-3 text-left cursor-pointer group"
+          >
             <div>
               <span className="text-[10px] font-bold text-[color:var(--color-clinic-blue-dark)] uppercase tracking-wider">
                 Kemungkinan Kondisi Utama
@@ -108,110 +121,197 @@ export function AIAssessmentResultCard({
                 {primaryCondition.name}
               </h3>
             </div>
-            <div className="text-right shrink-0">
-              <span className="text-lg sm:text-xl font-extrabold text-[color:var(--color-clinic-blue-dark)]">
-                {primaryCondition.likelihood}%
-              </span>
-              <span className="block text-[9px] sm:text-[10px] font-medium text-[color:var(--color-clinic-muted)]">
-                Tingkat Kecocokan
-              </span>
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="text-right">
+                <span className="text-lg sm:text-xl font-extrabold text-[color:var(--color-clinic-blue-dark)]">
+                  {primaryCondition.likelihood}%
+                </span>
+                <span className="block text-[9px] sm:text-[10px] font-medium text-[color:var(--color-clinic-muted)]">
+                  Kecocokan
+                </span>
+              </div>
+              <ChevronDown
+                className={`h-4 w-4 text-[color:var(--color-clinic-blue-dark)] transition-transform duration-200 group-hover:scale-110 ${
+                  showMainCondition ? "rotate-180" : ""
+                }`}
+              />
             </div>
-          </div>
+          </button>
 
-          {/* Likelihood Progress Bar */}
-          <div className="mt-2.5 h-2 w-full rounded-full bg-white overflow-hidden p-0.5 shadow-inner">
-            <div
-              className="h-full rounded-full bg-[color:var(--color-clinic-blue)] transition-all duration-1000 ease-out"
-              style={{ width: `${primaryCondition.likelihood}%` }}
-            />
-          </div>
+          {showMainCondition && (
+            <div className="mt-2.5 pt-2 border-t border-[color:var(--color-clinic-blue)]/10 animate-in fade-in-50 duration-200">
+              {/* Likelihood Progress Bar */}
+              <div className="h-2 w-full rounded-full bg-white overflow-hidden p-0.5 shadow-inner">
+                <div
+                  className="h-full rounded-full bg-[color:var(--color-clinic-blue)] transition-all duration-1000 ease-out"
+                  style={{ width: `${primaryCondition.likelihood}%` }}
+                />
+              </div>
 
-          <p className="mt-2.5 text-xs leading-relaxed text-[color:var(--color-clinic-ink)]">
-            {primaryCondition.reason}
-          </p>
+              <p className="mt-2.5 text-xs leading-relaxed text-[color:var(--color-clinic-ink)]">
+                {primaryCondition.reason}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Differential / Alternative Conditions */}
         {differentialConditions.length > 0 && (
-          <div>
-            <h4 className="text-[11px] font-bold text-[color:var(--color-clinic-muted)] uppercase tracking-wider mb-1.5">
-              Kemungkinan Kondisi Lainnya:
-            </h4>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {differentialConditions.map((cond, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between rounded-xl bg-[#f8fafc] p-2.5 border border-black/5"
-                >
-                  <div className="flex-1 pr-2 min-w-0">
-                    <span className="text-xs font-semibold text-[color:var(--color-clinic-ink)] block truncate">
-                      {cond.name}
+          <div className="rounded-2xl bg-white p-3 sm:p-3.5 border border-black/5 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setShowDifferential((prev) => !prev)}
+              className="w-full flex items-center justify-between text-left cursor-pointer group"
+            >
+              <h4 className="text-[11px] font-bold text-[color:var(--color-clinic-muted)] uppercase tracking-wider flex items-center gap-1.5">
+                Kemungkinan Kondisi Lainnya ({differentialConditions.length}):
+              </h4>
+              <div className="flex items-center gap-1 text-[11px] text-[color:var(--color-clinic-blue)] font-medium">
+                <span className="text-[10px] sm:hidden">{showDifferential ? "Sembunyikan" : "Tampilkan"}</span>
+                <ChevronDown
+                  className={`h-3.5 w-3.5 text-[color:var(--color-clinic-muted)] group-hover:text-[color:var(--color-clinic-blue)] transition-transform duration-200 ${
+                    showDifferential ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+            </button>
+
+            {showDifferential && (
+              <div className="grid gap-2 sm:grid-cols-2 items-start mt-2.5 animate-in fade-in-50 duration-200">
+                {differentialConditions.map((cond, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between rounded-xl bg-[#f8fafc] p-2.5 sm:p-3 border border-black/5 gap-2 self-start"
+                  >
+                    <div className="flex-1 min-w-0 pr-1">
+                      {/* Mobile: Full title without truncation and clean wrap; Laptop: Truncate nicely */}
+                      <span className="text-xs font-semibold text-[color:var(--color-clinic-ink)] block leading-snug break-words sm:truncate">
+                        {cond.name}
+                      </span>
+                      {/* Penjelasan: hidden on mobile, visible on laptop (sm/desktop) */}
+                      {cond.reason && (
+                        <p className="hidden sm:block text-[10px] text-[color:var(--color-clinic-muted)] line-clamp-1 mt-0.5">
+                          {cond.reason}
+                        </p>
+                      )}
+                    </div>
+                    <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-bold text-[color:var(--color-clinic-blue)] shadow-xs shrink-0">
+                      {cond.likelihood}%
                     </span>
-                    {cond.reason && (
-                      <p className="text-[10px] text-[color:var(--color-clinic-muted)] line-clamp-1">
-                        {cond.reason}
-                      </p>
-                    )}
                   </div>
-                  <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-bold text-[color:var(--color-clinic-blue)] shadow-xs shrink-0">
-                    {cond.likelihood}%
-                  </span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
         {/* Matched Symptoms Breakdown */}
         {matchedSymptoms.length > 0 && (
-          <div>
-            <h4 className="text-[11px] font-bold text-[color:var(--color-clinic-muted)] uppercase tracking-wider mb-1.5">
-              Gejala yang Sesuai:
-            </h4>
-            <div className="flex flex-wrap gap-1.5">
-              {matchedSymptoms.map((symptom, i) => (
-                <span
-                  key={i}
-                  className="inline-flex items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/50 px-2.5 py-0.5 text-[11px] font-medium text-[color:var(--color-clinic-blue-dark)]"
-                >
-                  <CheckCircle2 className="h-3 w-3" />
-                  {symptom}
-                </span>
-              ))}
-            </div>
+          <div className="rounded-2xl bg-white p-3 sm:p-3.5 border border-black/5 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setShowSymptoms((prev) => !prev)}
+              className="w-full flex items-center justify-between text-left cursor-pointer group"
+            >
+              <h4 className="text-[11px] font-bold text-[color:var(--color-clinic-muted)] uppercase tracking-wider">
+                Gejala yang Sesuai ({matchedSymptoms.length}):
+              </h4>
+              <div className="flex items-center gap-1 text-[11px] text-[color:var(--color-clinic-blue)] font-medium">
+                <span className="text-[10px] sm:hidden">{showSymptoms ? "Sembunyikan" : "Tampilkan"}</span>
+                <ChevronDown
+                  className={`h-3.5 w-3.5 text-[color:var(--color-clinic-muted)] group-hover:text-[color:var(--color-clinic-blue)] transition-transform duration-200 ${
+                    showSymptoms ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+            </button>
+
+            {showSymptoms && (
+              <div className="flex flex-wrap gap-1.5 mt-2.5 animate-in fade-in-50 duration-200">
+                {matchedSymptoms.map((symptom, i) => (
+                  <span
+                    key={i}
+                    className="inline-flex items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)]/50 px-2.5 py-0.5 text-[11px] font-medium text-[color:var(--color-clinic-blue-dark)]"
+                  >
+                    <CheckCircle2 className="h-3 w-3" />
+                    {symptom}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
         {/* Summary & Actionable Recommendations */}
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl bg-[#f8fafc] p-3 sm:p-3.5 border border-black/5">
-            <h4 className="text-xs font-bold text-[color:var(--color-clinic-ink)] mb-1">
-              Ringkasan Penilaian
-            </h4>
-            <p className="text-[11px] text-[color:var(--color-clinic-muted)] leading-relaxed">
-              {summary}
-            </p>
+        <div className="grid gap-3 sm:grid-cols-2 items-start">
+          {/* Ringkasan Penilaian Card with Arrow Toggle */}
+          <div className="rounded-2xl bg-[#f8fafc] p-3 sm:p-3.5 border border-black/5 self-start transition-all">
+            <button
+              type="button"
+              onClick={() => setShowSummary((prev) => !prev)}
+              className="w-full flex items-center justify-between text-left cursor-pointer group"
+            >
+              <h4 className="text-xs font-bold text-[color:var(--color-clinic-ink)]">
+                Ringkasan Penilaian
+              </h4>
+              <div className="flex items-center gap-1 text-[11px] text-[color:var(--color-clinic-blue)] font-medium">
+                <span className="text-[10px] sm:hidden">{showSummary ? "Sembunyikan" : "Tampilkan"}</span>
+                <ChevronDown
+                  className={`h-3.5 w-3.5 text-[color:var(--color-clinic-muted)] group-hover:text-[color:var(--color-clinic-blue)] transition-transform duration-200 ${
+                    showSummary ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+            </button>
+
+            {showSummary && (
+              <p className="text-[11px] text-[color:var(--color-clinic-muted)] leading-relaxed mt-2 animate-in fade-in-50 duration-200">
+                {summary}
+              </p>
+            )}
           </div>
 
-          <div className="rounded-2xl bg-[#f8fafc] p-3 sm:p-3.5 border border-black/5">
-            <h4 className="text-xs font-bold text-[color:var(--color-clinic-ink)] mb-1">
-              Rekomendasi Langkah Selanjutnya
-            </h4>
-            <ul className="space-y-1 text-[11px] text-[color:var(--color-clinic-muted)]">
-              {recommendations.map((rec, i) => (
-                <li key={i} className="flex items-start gap-1.5">
-                  <span className="text-[color:var(--color-clinic-blue)] font-bold">•</span>
-                  <span>{rec}</span>
-                </li>
-              ))}
-            </ul>
+          {/* Rekomendasi Langkah Selanjutnya Card with Arrow Toggle */}
+          <div className="rounded-2xl bg-[#f8fafc] p-3 sm:p-3.5 border border-black/5 self-start transition-all">
+            <button
+              type="button"
+              onClick={() => setShowRecommendations((prev) => !prev)}
+              className="w-full flex items-center justify-between text-left cursor-pointer group"
+            >
+              <h4 className="text-xs font-bold text-[color:var(--color-clinic-ink)]">
+                Rekomendasi Langkah Selanjutnya
+              </h4>
+              <div className="flex items-center gap-1 text-[11px] text-[color:var(--color-clinic-blue)] font-medium">
+                <span className="text-[10px] sm:hidden">{showRecommendations ? "Sembunyikan" : "Tampilkan"}</span>
+                <ChevronDown
+                  className={`h-3.5 w-3.5 text-[color:var(--color-clinic-muted)] group-hover:text-[color:var(--color-clinic-blue)] transition-transform duration-200 ${
+                    showRecommendations ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+            </button>
+
+            {showRecommendations && (
+              <ul className="space-y-1 text-[11px] text-[color:var(--color-clinic-muted)] mt-2 animate-in fade-in-50 duration-200">
+                {recommendations.map((rec, i) => (
+                  <li key={i} className="flex items-start gap-1.5">
+                    <span className="text-[color:var(--color-clinic-blue)] font-bold">•</span>
+                    <span>{rec}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 
         {/* Rekomendasi Rujukan IGD & Banner Gambar Peta */}
         {isEmergency && (
           <div className="rounded-2xl border border-red-200/80 bg-gradient-to-b from-red-50/40 to-white p-3.5 sm:p-4 space-y-3 shadow-xs">
-            <div className="flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={() => setShowEmergencyReferral((prev) => !prev)}
+              className="w-full flex items-center justify-between gap-2 text-left cursor-pointer group"
+            >
               <div className="flex items-center gap-2">
                 <div className="grid h-7 w-7 place-items-center rounded-xl bg-red-600 text-white shadow-xs shrink-0">
                   <Building2 className="h-3.5 w-3.5" />
@@ -225,61 +325,72 @@ export function AIAssessmentResultCard({
                   </p>
                 </div>
               </div>
-              <span className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-bold text-red-700 border border-red-200 shrink-0">
-                Siaga 24 Jam
-              </span>
-            </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-bold text-red-700 border border-red-200">
+                  Siaga 24 Jam
+                </span>
+                <ChevronDown
+                  className={`h-4 w-4 text-red-600 transition-transform duration-200 ${
+                    showEmergencyReferral ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+            </button>
 
-            {/* Visual Gambar Peta Interaktif Banner */}
-            <Link
-              to="/maps"
-              className="relative block overflow-hidden rounded-2xl border border-red-200/80 bg-slate-900 h-28 sm:h-36 group cursor-pointer shadow-sm"
-            >
-              <div
-                className="absolute inset-0 bg-cover bg-center opacity-85 group-hover:scale-105 transition-transform duration-700"
-                style={{
-                  backgroundImage: `url("https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&auto=format&fit=crop&q=80")`,
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent" />
+            {showEmergencyReferral && (
+              <div className="space-y-3 pt-1 animate-in fade-in-50 duration-200">
+                {/* Visual Gambar Peta Interaktif Banner */}
+                <Link
+                  to="/maps"
+                  className="relative block overflow-hidden rounded-2xl border border-red-200/80 bg-slate-900 h-28 sm:h-36 group cursor-pointer shadow-sm"
+                >
+                  <div
+                    className="absolute inset-0 bg-cover bg-center opacity-85 group-hover:scale-105 transition-transform duration-700"
+                    style={{
+                      backgroundImage: `url("https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&auto=format&fit=crop&q=80")`,
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent" />
 
-              {/* Pin Radar Visual */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                <div className="relative flex items-center justify-center">
-                  <span className="animate-ping absolute inline-flex h-9 w-9 rounded-full bg-red-500 opacity-75"></span>
-                  <div className="relative grid h-8 w-8 place-items-center rounded-full bg-red-600 text-white shadow-xl border-2 border-white group-hover:scale-110 transition-transform">
-                    <MapPin className="h-3.5 w-3.5" />
+                  {/* Pin Radar Visual */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                    <div className="relative flex items-center justify-center">
+                      <span className="animate-ping absolute inline-flex h-9 w-9 rounded-full bg-red-500 opacity-75"></span>
+                      <div className="relative grid h-8 w-8 place-items-center rounded-full bg-red-600 text-white shadow-xl border-2 border-white group-hover:scale-110 transition-transform">
+                        <MapPin className="h-3.5 w-3.5" />
+                      </div>
+                    </div>
+                    <span className="mt-1 rounded-full bg-slate-900/90 backdrop-blur-xs px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-white shadow-md border border-white/10">
+                      Cari RS & IGD Terdekat
+                    </span>
                   </div>
-                </div>
-                <span className="mt-1 rounded-full bg-slate-900/90 backdrop-blur-xs px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-white shadow-md border border-white/10">
-                  Cari RS & IGD Terdekat
-                </span>
+
+                  {/* Bottom Card Overlay Info */}
+                  <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-white text-xs">
+                    <span className="flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-white/90 truncate">
+                      <Navigation className="h-3 w-3 text-red-400 shrink-0" />
+                      Cek Faskes & Rute GPS
+                    </span>
+                    <span className="inline-flex items-center gap-1 font-bold text-amber-300 group-hover:text-amber-200 text-[10px] sm:text-xs bg-black/40 px-2 py-0.5 rounded-lg backdrop-blur-xs shrink-0">
+                      Buka Peta &rarr;
+                    </span>
+                  </div>
+                </Link>
+
+                <p className="text-[11px] text-[color:var(--color-clinic-muted)] text-center leading-relaxed">
+                  Berdasarkan gejala yang dipilih, Anda disarankan segera mengunjungi Instalasi Gawat Darurat (IGD). Buka fitur <strong>Peta Lokasi</strong> untuk melihat daftar lengkap rumah sakit terdekat.
+                </p>
+
+                <Link
+                  to="/maps"
+                  className="flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold py-2.5 px-4 text-xs shadow-md transition group cursor-pointer"
+                >
+                  <MapPin className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                  <span>Lihat Rekomendasi RS Terdekat di Peta Lokasi</span>
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
               </div>
-
-              {/* Bottom Card Overlay Info */}
-              <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-white text-xs">
-                <span className="flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-white/90 truncate">
-                  <Navigation className="h-3 w-3 text-red-400 shrink-0" />
-                  Cek Faskes & Rute GPS
-                </span>
-                <span className="inline-flex items-center gap-1 font-bold text-amber-300 group-hover:text-amber-200 text-[10px] sm:text-xs bg-black/40 px-2 py-0.5 rounded-lg backdrop-blur-xs shrink-0">
-                  Buka Peta &rarr;
-                </span>
-              </div>
-            </Link>
-
-            <p className="text-[11px] text-[color:var(--color-clinic-muted)] text-center leading-relaxed">
-              Berdasarkan gejala yang dipilih, Anda disarankan segera mengunjungi Instalasi Gawat Darurat (IGD). Buka fitur <strong>Peta Lokasi</strong> untuk melihat daftar lengkap rumah sakit terdekat.
-            </p>
-
-            <Link
-              to="/maps"
-              className="flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold py-2.5 px-4 text-xs shadow-md transition group cursor-pointer"
-            >
-              <MapPin className="h-4 w-4 group-hover:scale-110 transition-transform" />
-              <span>Lihat Rekomendasi RS Terdekat di Peta Lokasi</span>
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
+            )}
           </div>
         )}
 
