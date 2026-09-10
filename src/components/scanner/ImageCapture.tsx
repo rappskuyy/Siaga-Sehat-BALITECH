@@ -16,14 +16,9 @@ export interface SelectedImage {
 }
 
 export interface ScanAlertInfo {
-<<<<<<< Updated upstream
   title?: string;
   message: string;
-=======
-  title: string;
-  message: string;
   details?: string[];
->>>>>>> Stashed changes
 }
 
 interface ImageCaptureProps {
@@ -133,8 +128,12 @@ export function ImageCapture({
         window.alert("Format gambar tidak didukung. Gunakan JPG, PNG, atau WebP.");
         return;
       }
-      const selected = await fileToSelectedImage(file);
-      onChange(selected);
+      try {
+        const selected = await fileToSelectedImage(file);
+        onChange(selected);
+      } catch (err) {
+        console.error(err);
+      }
     },
     [onChange],
   );
@@ -143,8 +142,8 @@ export function ImageCapture({
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -152,20 +151,33 @@ export function ImageCapture({
       ctx.translate(canvas.width, 0);
       ctx.scale(-1, 1);
     }
-
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
-    const [, base64] = dataUrl.split(",");
+
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+    const base64 = dataUrl.split(",")[1];
     onChange({ base64, mediaType: "image/jpeg", previewUrl: dataUrl });
     setCameraOpen(false);
   }, [facingMode, onChange]);
 
+  const handleFile = async (file: File) => {
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      alert?.message;
+      return;
+    }
+    try {
+      const selected = await fileToSelectedImage(file);
+      onChange(selected);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   if (image) {
     return (
-      <div className="relative overflow-hidden rounded-[20px] sm:rounded-[24px] bg-black/5 shadow-[var(--shadow-clinic)]">
+      <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-slate-900">
         <img
           src={image.previewUrl}
-          alt="Foto yang dipilih"
+          alt="Preview area keluhan yang akan dianalisis"
           width="400"
           height="300"
           loading="lazy"
@@ -185,36 +197,6 @@ export function ImageCapture({
           </button>
         )}
 
-<<<<<<< Updated upstream
-        {/* Sleek & Highly Responsive Floating Notification Alert */}
-        {alert && (
-          <div className="absolute inset-x-2 bottom-2 sm:inset-x-3 sm:bottom-3 z-20 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div className="flex items-center justify-between gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border border-amber-200/90 bg-white/95 p-2.5 sm:px-3.5 sm:py-3 shadow-lg shadow-black/10 backdrop-blur-md">
-              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
-                <div className="grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-lg sm:rounded-xl bg-amber-100 text-amber-700 shadow-xs">
-                  <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  {alert.title && (
-                    <p className="text-[11px] sm:text-xs font-bold text-amber-950 truncate leading-tight">
-                      {alert.title}
-                    </p>
-                  )}
-                  <p className="text-[10.5px] sm:text-xs leading-snug text-slate-700 line-clamp-2 mt-0.5 font-medium">
-                    {alert.message}
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => onChange(null)}
-                className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue)] px-2.5 py-1 text-[11px] sm:px-3 sm:py-1.5 sm:text-xs font-semibold text-white shadow-xs transition hover:bg-[color:var(--color-clinic-blue-dark)] active:scale-95"
-              >
-                <RotateCcw className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                <span>Ganti</span>
-              </button>
-=======
         {/* Centered Alert Overlay directly in the middle of the frame */}
         {alert && (
           <div className="absolute inset-0 z-20 flex items-center justify-center p-3.5 sm:p-5 bg-black/40 backdrop-blur-[2px] animate-fade-in">
@@ -228,7 +210,7 @@ export function ImageCapture({
                     Perhatian Foto
                   </span>
                   <h3 className="mt-0.5 text-sm sm:text-base font-bold text-amber-950 leading-snug">
-                    {alert.title}
+                    {alert.title || "Foto Kurang Jelas"}
                   </h3>
                 </div>
               </div>
@@ -265,7 +247,6 @@ export function ImageCapture({
                   Ganti / Foto Ulang
                 </Button>
               </div>
->>>>>>> Stashed changes
             </div>
           </div>
         )}

@@ -88,11 +88,7 @@ function ScannerPage() {
   const [stage, setStage] = useState<Stage>("idle");
   const [result, setResult] = useState<ScanResult | null>(null);
   const [scanAlert, setScanAlert] = useState<{
-<<<<<<< Updated upstream
     title?: string;
-=======
-    title: string;
->>>>>>> Stashed changes
     message: string;
     details?: string[];
   } | null>(null);
@@ -138,21 +134,14 @@ function ScannerPage() {
       // DO NOT navigate to the results view. Stay on the SAME page and display the alert!
       if (!data.gambar_dapat_dianalisis) {
         setStage("idle");
-<<<<<<< Updated upstream
         const shortMessage =
           data.ringkasan?.trim() ||
           (data.penyebab && data.penyebab.length > 0
             ? data.penyebab[0]
             : "Foto buram atau tidak fokus pada area keluhan.");
         setScanAlert({
-          title: "Foto Tidak Terdeteksi",
-          message: shortMessage,
-=======
-        setScanAlert({
           title: "Foto Kurang Jelas atau Tidak Terdeteksi",
-          message:
-            data.ringkasan ||
-            "Foto yang diunggah belum memenuhi standar analisis AI. Pastikan foto fokus, pencahayaan terang, dan menyorot area keluhan secara langsung.",
+          message: shortMessage,
           details:
             data.penyebab && data.penyebab.length > 0
               ? data.penyebab
@@ -161,7 +150,6 @@ function ScannerPage() {
                   "Pencahayaan kurang terang atau terhalang bayangan gelap",
                   "Jarak foto terlalu jauh dari area kulit/tubuh yang bermasalah",
                 ],
->>>>>>> Stashed changes
         });
         return;
       }
