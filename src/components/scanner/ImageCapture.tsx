@@ -16,8 +16,14 @@ export interface SelectedImage {
 }
 
 export interface ScanAlertInfo {
+<<<<<<< Updated upstream
   title?: string;
   message: string;
+=======
+  title: string;
+  message: string;
+  details?: string[];
+>>>>>>> Stashed changes
 }
 
 interface ImageCaptureProps {
@@ -164,7 +170,9 @@ export function ImageCapture({
           height="300"
           loading="lazy"
           decoding="async"
-          className="aspect-[4/3] w-full object-cover"
+          className={`aspect-[4/3] w-full object-cover transition duration-300 ${
+            alert ? "brightness-50 filter blur-[1.5px]" : ""
+          }`}
         />
         {!disabled && !alert && (
           <button
@@ -177,6 +185,7 @@ export function ImageCapture({
           </button>
         )}
 
+<<<<<<< Updated upstream
         {/* Sleek & Highly Responsive Floating Notification Alert */}
         {alert && (
           <div className="absolute inset-x-2 bottom-2 sm:inset-x-3 sm:bottom-3 z-20 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -205,6 +214,58 @@ export function ImageCapture({
                 <RotateCcw className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                 <span>Ganti</span>
               </button>
+=======
+        {/* Centered Alert Overlay directly in the middle of the frame */}
+        {alert && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center p-3.5 sm:p-5 bg-black/40 backdrop-blur-[2px] animate-fade-in">
+            <div className="relative w-full max-w-sm sm:max-w-md max-h-[94%] overflow-y-auto rounded-2xl border-2 border-amber-300 bg-white/98 p-4 sm:p-5 shadow-2xl">
+              <div className="flex items-start gap-3">
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-500 text-white shadow-xs">
+                  <AlertTriangle className="h-5 w-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="inline-block rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold text-amber-900 uppercase tracking-wide">
+                    Perhatian Foto
+                  </span>
+                  <h3 className="mt-0.5 text-sm sm:text-base font-bold text-amber-950 leading-snug">
+                    {alert.title}
+                  </h3>
+                </div>
+              </div>
+
+              <div className="mt-3 rounded-xl bg-amber-50/90 p-2.5 sm:p-3 border border-amber-200">
+                <p className="text-xs sm:text-[13px] leading-relaxed text-amber-950 font-medium">
+                  {alert.message}
+                </p>
+              </div>
+
+              {alert.details && alert.details.length > 0 && (
+                <div className="mt-2.5 rounded-xl bg-slate-50 p-2.5 sm:p-3 border border-slate-200/80">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-800">
+                    Hal yang Perlu Diperbaiki:
+                  </p>
+                  <ul className="mt-1.5 space-y-1 text-[11px] text-slate-700">
+                    {alert.details.map((detail, idx) => (
+                      <li key={idx} className="flex items-start gap-1.5">
+                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
+                        <span>{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="mt-3.5 pt-2 border-t border-slate-100">
+                <Button
+                  type="button"
+                  onClick={() => onChange(null)}
+                  className="w-full gap-2 rounded-full bg-[color:var(--color-clinic-blue)] py-2.5 text-xs sm:text-sm font-bold text-white hover:bg-[color:var(--color-clinic-blue-dark)] shadow-xs"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Ganti / Foto Ulang
+                </Button>
+              </div>
+>>>>>>> Stashed changes
             </div>
           </div>
         )}

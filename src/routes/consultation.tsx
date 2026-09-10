@@ -200,11 +200,39 @@ function AssistantText({ text }: { text: string }) {
 
 function detectIntentAction(text: string): ActionCardType | undefined {
   const lower = text.toLowerCase();
+<<<<<<< Updated upstream
   const asksForMaps =
     /\b(cari|carikan|tampilkan|buka|lihat|tunjukkan)\b.{0,40}\b(apotek|farmasi|faskes|peta|maps)\b/i.test(lower) ||
     /\b(apotek|faskes)\s+(terdekat|sekitar sini|di dekat saya)\b/i.test(lower) ||
     /\b(mau|ingin)\b.{0,20}\b(cari|ke)\b.{0,20}\b(apotek|faskes)\b/i.test(lower);
   if (asksForMaps) {
+=======
+
+  // Do not trigger action cards if text is an initial context transfer from other pages
+  if (
+    lower.includes("saya baru selesai") ||
+    lower.includes("halaman anatomi") ||
+    lower.includes("melakukan scan ai") ||
+    lower.includes("berikut rangkuman data saya") ||
+    lower.includes("berikut hasil skriningnya")
+  ) {
+    return undefined;
+  }
+
+  // Maps / Pharmacy intent: user explicitly asks for map/pharmacy
+  if (
+    lower.includes("cari apotek") ||
+    lower.includes("lokasi apotek") ||
+    lower.includes("peta apotek") ||
+    lower.includes("buka peta") ||
+    lower.includes("peta faskes") ||
+    lower.includes("apotek terdekat") ||
+    lower.includes("faskes terdekat") ||
+    lower.includes("klinik terdekat") ||
+    lower.includes("lihat di peta") ||
+    lower.includes("rute apotek")
+  ) {
+>>>>>>> Stashed changes
     return {
       type: "maps",
       title: "Peta Apotek Terdekat",
@@ -213,10 +241,28 @@ function detectIntentAction(text: string): ActionCardType | undefined {
       href: "/maps",
     };
   }
+<<<<<<< Updated upstream
   const asksForScanner =
     /\b(mau|ingin|tolong|buka|gunakan|akses|lakukan)\b.{0,30}\b(scan|pindai)\b/i.test(lower) ||
     /\b(scan|pindai)\b.{0,30}\b(foto|obat|resep|kulit|penyakit|gambar)\b/i.test(lower);
   if (asksForScanner) {
+=======
+
+  // Scanner intent: user explicitly asks to open scanner / scan photo
+  if (
+    lower.includes("buka scanner") ||
+    lower.includes("buka fitur scan") ||
+    lower.includes("fitur scanner") ||
+    lower.includes("scan foto") ||
+    lower.includes("scan resep") ||
+    lower.includes("scan obat") ||
+    lower.includes("mau scan") ||
+    lower.includes("mau foto") ||
+    lower.includes("buka pemindai") ||
+    lower.includes("unggah foto") ||
+    lower.includes("fitur scan")
+  ) {
+>>>>>>> Stashed changes
     return {
       type: "scanner",
       title: "Pemindai AI (Scanner)",
@@ -225,10 +271,26 @@ function detectIntentAction(text: string): ActionCardType | undefined {
       href: "/scanner",
     };
   }
+<<<<<<< Updated upstream
   const asksForAnatomy =
     /\b(mau|ingin|tolong|buka|gunakan|akses|lihat|pilih)\b.{0,35}\b(anatomi|anatomy|organ|bagian tubuh|model tubuh)\b/i.test(lower) ||
     /\b(anatomi|anatomy|model anatomi|bagian tubuh)\b.{0,20}\b(interaktif|buka|lihat|pilih)\b/i.test(lower);
   if (asksForAnatomy) {
+=======
+
+  // Anatomy intent: user explicitly asks to open anatomy / pick body part
+  if (
+    lower.includes("buka anatomi") ||
+    lower.includes("fitur anatomi") ||
+    lower.includes("model anatomi") ||
+    lower.includes("buka model anatomi") ||
+    lower.includes("pilih bagian tubuh") ||
+    lower.includes("pilih organ tubuh") ||
+    lower.includes("pilih organ") ||
+    lower.includes("lihat anatomi") ||
+    lower.includes("eksplorasi anatomi")
+  ) {
+>>>>>>> Stashed changes
     return {
       type: "anatomy",
       title: "Eksplorasi Anatomi Interaktif",
@@ -237,6 +299,7 @@ function detectIntentAction(text: string): ActionCardType | undefined {
       href: "/anatomy",
     };
   }
+
   return undefined;
 }
 
@@ -367,7 +430,11 @@ function ConsultationPage() {
       .join("\n");
 
   const sendMessage = useCallback(
+<<<<<<< Updated upstream
     async (text: string, options: { showActionCard?: boolean } = {}) => {
+=======
+    async (text: string, options?: { isInitialContext?: boolean }) => {
+>>>>>>> Stashed changes
       if (!text.trim()) return;
 
       const userMsg: ChatMessage = { role: "user", text, time: formatTime() };
@@ -375,6 +442,7 @@ function ConsultationPage() {
       setMessages(next);
       setLoading(true);
 
+<<<<<<< Updated upstream
       const intentCard = options.showActionCard === false ? undefined : detectIntentAction(text);
 
       try {
@@ -383,6 +451,16 @@ function ConsultationPage() {
           ? "DATA MINIMUM TERPENUHI. Berikan solusi konkret sekarang sebelum bertanya lagi."
           : "DATA MINIMUM BELUM TERPENUHI. Tanyakan hanya satu informasi terpenting.";
         const prompt = `Kamu adalah Asisten Kesehatan SiagaSehat yang ramah, empati, dan profesional dalam Bahasa Indonesia. Berikut riwayat percakapan sejauh ini:\n${conversation}\n\nSTATUS DATA: ${dataStatus}\nBalas pesan TERAKHIR pengguna secara langsung. Ikuti tahap konsultasi dan aturan keselamatan pada instruksi sistem. Jika data minimum sudah terpenuhi, WAJIB tampilkan bagian YANG BISA DILAKUKAN dengan langkah yang aman dan mudah dipahami. Jika pengguna menanyakan apotek/lokasi, jelaskan bahwa mereka bisa membuka Peta Lokasi. Jika pengguna menanyakan scan obat/kulit, sebutkan fitur Scanner. Jika pengguna ingin memilih area tubuh yang sakit, rekomendasikan fitur Anatomi.`;
+=======
+      // Only show action card if user explicitly requested that action in their message,
+      // and NOT during initial context transfers from scan or anatomy
+      const intentCard = options?.isInitialContext ? undefined : detectIntentAction(text);
+
+      try {
+        const prompt = `Kamu adalah Asisten Kesehatan SiagaSehat yang ramah, empati, dan profesional dalam Bahasa Indonesia. Berikut riwayat percakapan sejauh ini:\n${buildContext(
+          next,
+        )}\n\nLanjutkan percakapan secara natural. Berikan penjelasan yang jelas, ramah, dan solutif. Jika informasi gejala belum lengkap, tanyakan secara sopan. Jika sudah cukup, berikan Analisis Awal, Tingkat Risiko, dan Rekomendasi Tindakan yang aman.`;
+>>>>>>> Stashed changes
         const res = await chat({ data: { prompt } });
         const reply = res?.reply?.trim() || "Maaf, saya tidak mendapatkan respons. Silakan coba lagi.";
         const assistantMsg: ChatMessage = {
@@ -455,7 +533,11 @@ function ConsultationPage() {
 
     void sendMessage(
       `Saya baru selesai memilih keluhan pada organ ${context.regionName || ""} di halaman Anatomi. Berikut rangkuman data saya:\n${details}\n\nTolong bantu periksa keluhan ini, tanyakan hal yang perlu diketahui, dan berikan rekomendasi medis awal yang aman.`,
+<<<<<<< Updated upstream
       { showActionCard: false },
+=======
+      { isInitialContext: true }
+>>>>>>> Stashed changes
     );
   }, [anatomy, sendMessage]);
 
@@ -494,7 +576,11 @@ function ConsultationPage() {
 
     void sendMessage(
       `Saya baru selesai melakukan scan AI. Berikut hasil skriningnya:\n${details}\n\nTolong jelaskan hasil ini dengan bahasa yang mudah dipahami, validasi hal yang perlu saya waspadai, dan berikan pertanyaan lanjutan atau langkah aman yang sebaiknya saya lakukan.`,
+<<<<<<< Updated upstream
       { showActionCard: false },
+=======
+      { isInitialContext: true }
+>>>>>>> Stashed changes
     );
   }, [scan, sendMessage]);
 
