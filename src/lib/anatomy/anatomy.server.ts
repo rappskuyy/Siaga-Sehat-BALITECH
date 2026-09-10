@@ -176,7 +176,6 @@ Tolong lakukan AI Health Assessment dan kembalikan JSON.`;
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt },
       ],
-      response_format: { type: "json_object" },
       max_tokens: 1000,
     }),
   });
@@ -187,7 +186,7 @@ Tolong lakukan AI Health Assessment dan kembalikan JSON.`;
   }
 
   const payload = await res.json();
-  const text = payload.choices?.[0]?.message?.content;
+  const text = getCompletionText(payload);
   if (!text) throw new Error("KoboiLLM tidak mengembalikan respon valid.");
 
   return parseResultJson(text);
@@ -283,8 +282,15 @@ function getCompletionText(payload: unknown): string | null {
   return typeof outputText === "string" && outputText.trim() ? outputText : null;
 }
 
+function extractJsonObject(text: string): string {
+  const cleaned = text.replace(/^```(?:json)?\s*/i, "").replace(/```$/i, "").trim();
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  return start >= 0 && end > start ? cleaned.slice(start, end + 1) : cleaned;
+}
+
 function parseResultJson(jsonString: string): AIAssessmentResult {
-  const cleaned = jsonString.replace(/^```json\s*/i, "").replace(/```$/i, "").trim();
+  const cleaned = extractJsonObject(jsonString);
   const raw = JSON.parse(cleaned);
 
   return {

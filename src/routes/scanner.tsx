@@ -41,6 +41,26 @@ const PHOTO_DONT = [
   "Hindari bayangan yang menutupi area keluhan",
 ];
 
+const PHOTO_GUIDE_IMAGES = {
+  good: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=700&auto=format&fit=crop&q=80",
+  bad: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=700&auto=format&fit=crop&q=80",
+};
+
+function getFriendlyScanError(error: unknown) {
+  const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+
+  if (message.includes("timeout") || message.includes("network") || message.includes("fetch")) {
+    return "AI sedang sulit dihubungi. Periksa koneksi lalu coba lagi.";
+  }
+  if (message.includes("json") || message.includes("format") || message.includes("valid")) {
+    return "AI belum bisa membaca foto ini. Coba gunakan foto yang lebih jelas.";
+  }
+  if (message.includes("api") || message.includes("401") || message.includes("403") || message.includes("500")) {
+    return "Layanan AI sedang tidak tersedia. Coba lagi nanti.";
+  }
+  return "AI sedang tidak bisa memproses foto. Coba lagi nanti.";
+}
+
 export const Route = createFileRoute("/scanner")({
   head: () => ({
     meta: [
@@ -161,10 +181,7 @@ function ScannerPage() {
       setStage("idle");
       setScanAlert({
         title: "Foto Belum Berhasil Dianalisis",
-        message:
-          err instanceof Error
-            ? err.message
-            : "Terjadi kendala saat memproses gambar. Pastikan foto jelas dan koneksi internet stabil.",
+        message: getFriendlyScanError(err),
         details: [
           "Pastikan foto tidak buram atau goyang saat memotret",
           "Gunakan pencahayaan ruangan yang terang merata",
@@ -243,10 +260,13 @@ function ScannerPage() {
               </div>
 
               <div className="mt-4 flex flex-col gap-2">
-                {PHOTO_DO.map((text) => (
-                  <div key={text} className="flex items-start gap-2.5 rounded-xl bg-white p-3">
+                {PHOTO_DO.map((text, index) => (
+                  <div
+                    key={text}
+                    className={`flex items-start gap-2.5 rounded-xl bg-white p-2.5 sm:p-3 ${index > 1 ? "hidden sm:flex" : ""}`}
+                  >
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                    <span className="text-xs leading-relaxed text-[color:var(--color-clinic-ink)]">
+                    <span className="text-[11px] leading-relaxed text-[color:var(--color-clinic-ink)] sm:text-xs">
                       {text}
                     </span>
                   </div>
@@ -254,14 +274,55 @@ function ScannerPage() {
               </div>
 
               <div className="mt-2 flex flex-col gap-2">
-                {PHOTO_DONT.map((text) => (
-                  <div key={text} className="flex items-start gap-2.5 rounded-xl bg-white/70 p-3">
+                {PHOTO_DONT.map((text, index) => (
+                  <div
+                    key={text}
+                    className={`flex items-start gap-2.5 rounded-xl bg-white/70 p-2.5 sm:p-3 ${index > 1 ? "hidden sm:flex" : ""}`}
+                  >
                     <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
-                    <span className="text-xs leading-relaxed text-[color:var(--color-clinic-muted)]">
+                    <span className="text-[11px] leading-relaxed text-[color:var(--color-clinic-muted)] sm:text-xs">
                       {text}
                     </span>
                   </div>
                 ))}
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-2.5 sm:gap-3">
+                <div className="overflow-hidden rounded-2xl border border-emerald-200 bg-white shadow-sm">
+                  <div className="relative aspect-[4/3]">
+                    <img
+                      src={PHOTO_GUIDE_IMAGES.good}
+                      alt="Contoh foto area keluhan yang terang dan fokus"
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-1 text-[10px] font-bold text-white shadow-sm">
+                      <CheckCircle2 className="h-3 w-3" />
+                      Benar
+                    </span>
+                  </div>
+                  <p className="p-2 text-[10px] font-semibold leading-snug text-emerald-900 sm:p-2.5 sm:text-[11px]">
+                    Terang, fokus, dan area keluhan terlihat jelas
+                  </p>
+                </div>
+
+                <div className="overflow-hidden rounded-2xl border border-red-200 bg-white shadow-sm">
+                  <div className="relative aspect-[4/3]">
+                    <img
+                      src={PHOTO_GUIDE_IMAGES.bad}
+                      alt="Contoh foto yang kurang sesuai karena tidak fokus"
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-red-600 px-2 py-1 text-[10px] font-bold text-white shadow-sm">
+                      <XCircle className="h-3 w-3" />
+                      Hindari
+                    </span>
+                  </div>
+                  <p className="p-2 text-[10px] font-semibold leading-snug text-red-900 sm:p-2.5 sm:text-[11px]">
+                    Gelap, buram, atau area keluhan tidak terlihat
+                  </p>
+                </div>
               </div>
 
               <div className="mt-auto pt-4 flex items-start gap-2 border-t border-black/[0.06] text-[11px] leading-relaxed text-[color:var(--color-clinic-muted)]">

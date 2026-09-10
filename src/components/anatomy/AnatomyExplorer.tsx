@@ -146,23 +146,18 @@ export function AnatomyExplorer() {
     } catch (err: unknown) {
       console.error("Gagal melakukan AI Health Assessment:", err);
 
-      let message = "Terjadi kesalahan saat memproses analisis. Silakan coba lagi beberapa saat lagi.";
+      let message = "AI sedang tidak bisa memproses analisis. Coba lagi nanti.";
       const rawText = err instanceof Error ? err.message : String(err || "");
 
       try {
         const parsed = JSON.parse(rawText);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          message = parsed.map((item: { message?: string }) => item.message || "").filter(Boolean).join(", ");
-        } else if (parsed && typeof parsed === "object" && parsed.message) {
-          message = parsed.message;
-        }
+        if (Array.isArray(parsed) && parsed.length > 0) message = "Data yang dipilih belum bisa diproses. Coba lagi.";
+        else if (parsed && typeof parsed === "object" && parsed.message) message = "AI sedang mengalami kendala. Coba lagi nanti.";
       } catch {
-        if (rawText && !rawText.startsWith("{") && !rawText.startsWith("[")) {
-          message = rawText;
-        }
+        if (/pilih minimal|wajib diisi|tidak valid/i.test(rawText)) message = "Lengkapi pilihan gejala atau kondisi terlebih dahulu.";
       }
 
-      setErrorMessage(message || "Terjadi kesalahan saat memproses analisis.");
+      setErrorMessage(message);
     } finally {
       setIsLoading(false);
     }
