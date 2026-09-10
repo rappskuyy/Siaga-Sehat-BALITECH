@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./src/assets/siaga-sehat-logo.svg" alt="SiagaSehat" width="360" />
+<img src="./src/assets/Siaga Sehat.svg" alt="SiagaSehat" width="360" />
 
 ### Kesehatanmu, dipantau dengan lebih siaga.
 

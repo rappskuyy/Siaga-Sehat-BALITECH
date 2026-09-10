@@ -149,7 +149,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white/95 px-3 py-2.5 shadow-xs backdrop-blur-md sm:px-6 md:px-8 lg:px-10">
       <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-2 sm:gap-3">
-        <div className="mt-1">
+        <div className="flex items-center shrink-0">
           <BrandLogo size="sm" />
         </div>
 

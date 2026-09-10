@@ -23,7 +23,7 @@ export function Hero() {
       localStorage.removeItem("siaga_sehat_hero_mobile_coords_v2");
       localStorage.removeItem("siaga_sehat_hero_mobile_coords_v3");
       localStorage.removeItem("siaga_hero_coords");
-    } catch {}
+    } catch { }
   }, []);
 
   return (
@@ -125,7 +125,7 @@ export function Hero() {
                   style={{
                     top: "24px",
                     left: "-28px",
-                    width: "155px",
+                    width: "150px",
                   }}
                   delay="0s"
                 >
@@ -151,9 +151,9 @@ export function Hero() {
                 <FloatingCard
                   className="hidden min-[900px]:block p-2.5 shadow-xl"
                   style={{
-                    top: "95px",
-                    left: "295px",
-                    width: "175px",
+                    top: "215px",
+                    left: "345px",
+                    width: "170px",
                   }}
                   delay="0.5s"
                 >
@@ -179,9 +179,9 @@ export function Hero() {
                 <FloatingCard
                   className="hidden min-[900px]:block p-2.5 shadow-xl"
                   style={{
-                    top: "245px",
-                    left: "305px",
-                    width: "175px",
+                    top: "415px",
+                    left: "415px",
+                    width: "170px",
                   }}
                   delay="1s"
                 >
