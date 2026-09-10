@@ -125,7 +125,7 @@ export function Hero() {
                   style={{
                     top: "24px",
                     left: "-28px",
-                    width: "150px",
+                    width: "155px",
                   }}
                   delay="0s"
                 >
@@ -151,9 +151,9 @@ export function Hero() {
                 <FloatingCard
                   className="hidden min-[900px]:block p-2.5 shadow-xl"
                   style={{
-                    top: "215px",
-                    left: "345px",
-                    width: "170px",
+                    top: "95px",
+                    left: "295px",
+                    width: "175px",
                   }}
                   delay="0.5s"
                 >
@@ -179,9 +179,9 @@ export function Hero() {
                 <FloatingCard
                   className="hidden min-[900px]:block p-2.5 shadow-xl"
                   style={{
-                    top: "415px",
-                    left: "415px",
-                    width: "170px",
+                    top: "245px",
+                    left: "305px",
+                    width: "175px",
                   }}
                   delay="1s"
                 >
@@ -197,15 +197,14 @@ export function Hero() {
                   </p>
                 </FloatingCard>
 
-                {/* Floating overlay cards - Mobile & Tablet (<900px) - EXACT USER MOBILE COORDINATES */}
+                {/* Floating overlay cards - Mobile & Tablet (<900px) - FULLY RESPONSIVE & BALANCED */}
                 <div className="pointer-events-none absolute inset-0 min-[900px]:hidden overflow-visible">
                   <FloatingCard
                     className="p-2 sm:p-2.5 shadow-lg border border-slate-200"
                     style={{
-                      top: "12px",
-                      left: "-83px",
-                      width: "130px",
-                      maxWidth: "none",
+                      top: "4px",
+                      left: "-6px",
+                      width: "128px",
                     }}
                     delay="0s"
                   >
@@ -231,10 +230,9 @@ export function Hero() {
                   <FloatingCard
                     className="p-2 sm:p-2.5 shadow-lg border border-slate-200"
                     style={{
-                      top: "75px",
-                      left: "265px",
+                      top: "50px",
+                      right: "-6px",
                       width: "130px",
-                      maxWidth: "none",
                     }}
                     delay="0.5s"
                   >
@@ -252,10 +250,9 @@ export function Hero() {
                   <FloatingCard
                     className="p-2 sm:p-2.5 shadow-lg border border-slate-200"
                     style={{
-                      top: "265px",
-                      left: "300px",
+                      bottom: "-24px",
+                      right: "-6px",
                       width: "130px",
-                      maxWidth: "none",
                     }}
                     delay="1s"
                   >
