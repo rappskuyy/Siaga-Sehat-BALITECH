@@ -188,7 +188,12 @@ export function OpenStreetMapCanvas({
           zIndexOffset: isSelected ? 900 : 100,
         }).addTo(markersGroup);
 
-        m.on("click", () => onSelectPharmacy(facility));
+        m.on("click", (e: any) => {
+          if (L.DomEvent) {
+            L.DomEvent.stopPropagation(e);
+          }
+          onSelectPharmacy(facility);
+        });
       });
 
       // Always render selected destination pin if not already rendered
@@ -216,7 +221,12 @@ export function OpenStreetMapCanvas({
           icon: facilityIcon,
           zIndexOffset: 1200,
         }).addTo(markersGroup);
-        m.on("click", () => onSelectPharmacy(selectedPharmacy));
+        m.on("click", (e: any) => {
+          if (L.DomEvent) {
+            L.DomEvent.stopPropagation(e);
+          }
+          onSelectPharmacy(selectedPharmacy);
+        });
       }
 
       // Clear previous polylines

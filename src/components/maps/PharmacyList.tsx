@@ -288,11 +288,11 @@ export function PharmacyList({
                 key={pharm.id}
                 role="button"
                 tabIndex={0}
-                onClick={() => onSelectPharmacy(isSelected ? null : pharm)}
+                onClick={() => onSelectPharmacy(pharm)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    onSelectPharmacy(isSelected ? null : pharm);
+                    onSelectPharmacy(pharm);
                   }
                 }}
                 className={`group w-full rounded-2xl p-3 text-left transition border cursor-pointer ${
@@ -586,48 +586,12 @@ export function RouteOverlayCard({
         <MapPin className="h-3 w-3 text-[#4a6fa5] shrink-0" /> {selectedPlace.address}
       </p>
 
-      {/* Mode Selector */}
-      <div className="flex items-center gap-1 rounded-xl bg-[#FFFFFF] p-1 border border-[#E5E7EB]">
-        <button
-          type="button"
-          onClick={() => onTransportModeChange("driving")}
-          className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1 text-[11px] font-semibold transition cursor-pointer ${
-            transportMode === "driving"
-              ? "bg-[#eef2f8] text-[#4a6fa5] border border-[#d1def0] font-bold"
-              : "text-[#6B7280] hover:text-[#111111]"
-          }`}
-        >
-          <Car className="h-3 w-3" />
-          Mobil
-        </button>
-        <button
-          type="button"
-          onClick={() => onTransportModeChange("motorcycle")}
-          className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1 text-[11px] font-semibold transition cursor-pointer ${
-            transportMode === "motorcycle"
-              ? "bg-[#eef2f8] text-[#4a6fa5] border border-[#d1def0] font-bold"
-              : "text-[#6B7280] hover:text-[#111111]"
-          }`}
-        >
-          <Bike className="h-3 w-3" />
-          Motor
-        </button>
-      </div>
-
-      {/* Distance & ETA */}
-      <div className="grid grid-cols-2 gap-2 rounded-xl bg-[#FFFFFF] p-2 text-xs border border-[#E5E7EB]">
-        <div>
-          <span className="block text-[9px] text-[#6B7280] font-medium">Jarak Estimasi</span>
-          <span className="font-bold text-[#4a6fa5] text-xs">
-            {routeInfo ? `${routeInfo.distanceKm} km` : `~${selectedPlace.distanceKm} km`}
-          </span>
-        </div>
-        <div>
-          <span className="block text-[9px] text-[#6B7280] font-medium">Waktu Tempuh (ETA)</span>
-          <span className="font-bold text-[#4a6fa5] text-xs">
-            {loadingRoute ? "Menghitung..." : routeInfo ? `~${routeInfo.durationMin} menit` : "Siap rute"}
-          </span>
-        </div>
+      {/* Distance */}
+      <div className="rounded-xl bg-[#FFFFFF] p-2 text-xs border border-[#E5E7EB] flex items-center justify-between">
+        <span className="text-[11px] text-[#6B7280] font-medium">Jarak Tempuh:</span>
+        <span className="font-bold text-[#4a6fa5] text-xs">
+          {routeInfo ? `${routeInfo.distanceKm} km` : `~${selectedPlace.distanceKm} km`}
+        </span>
       </div>
 
       {/* Primary CTA Button */}

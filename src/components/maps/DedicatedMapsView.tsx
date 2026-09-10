@@ -100,6 +100,7 @@ export function DedicatedMapsView() {
   const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(false);
   const [selectedPharmacy, setSelectedPharmacy] = useState<PharmacyNode | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<PlaceNode | null>(null);
+  const [showDetailPanel, setShowDetailPanel] = useState<boolean>(true);
 
   const [transportMode, setTransportMode] = useState<TransportMode>("driving");
   const [routeInfo, setRouteInfo] = useState<ExtendedRouteInfo | null>(null);
@@ -250,6 +251,7 @@ export function DedicatedMapsView() {
         };
         setSelectedPlace(place);
         setSelectedPharmacy(bestMatch);
+        setShowDetailPanel(true);
         selectPharmacyAndRoute(bestMatch, transportMode, [lat, lon]);
       }
     } catch (err) {
@@ -290,6 +292,7 @@ export function DedicatedMapsView() {
     setSelectedPharmacy(null);
     setSelectedPlace(null);
     setRouteInfo(null);
+    setShowDetailPanel(false);
 
     try {
       sessionStorage.setItem(
@@ -311,6 +314,7 @@ export function DedicatedMapsView() {
         setSelectedPlace(null);
         setSelectedPharmacy(null);
         setRouteInfo(null);
+        setShowDetailPanel(false);
         return;
       }
 
@@ -333,7 +337,7 @@ export function DedicatedMapsView() {
 
       setSelectedPlace(place);
       setSelectedPharmacy(pharmacy);
-      setRouteInfo(null);
+      setShowDetailPanel(true);
 
       selectPharmacyAndRoute(pharmacy, transportMode, userLocation || undefined);
     },
@@ -515,7 +519,7 @@ export function DedicatedMapsView() {
                 <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#4a6fa5]" />
                 <Input
                   type="text"
-                  placeholder="Ketik kota/alamat (misal: Bogor, Jakarta, Surabaya)..."
+                  placeholder="Cari alamat"
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -600,16 +604,12 @@ export function DedicatedMapsView() {
           </div>
 
           {/* Mobile View Toggle Bar (Responsive Segment Switcher) */}
-          <div
-            className={`grid lg:hidden p-1 bg-[#eef2f8] rounded-2xl border border-[#d1def0] shadow-2xs gap-1.5 ${
-              selectedPharmacy ? "grid-cols-3" : "grid-cols-2"
-            }`}
-          >
+          <div className="grid grid-cols-2 lg:hidden p-1 bg-[#eef2f8] rounded-2xl border border-[#d1def0] shadow-2xs gap-1.5">
             <button
               type="button"
               onClick={() => setMobileTab("map")}
               className={`flex items-center justify-center gap-1.5 h-9 px-2 text-xs font-bold rounded-xl transition-all cursor-pointer border select-none ${
-                mobileTab === "map"
+                mobileTab === "map" || mobileTab === "detail"
                   ? "bg-[#4a6fa5] text-white border-[#4a6fa5] shadow-xs font-extrabold"
                   : "bg-white/80 text-[#4a6fa5] border-[#d1def0]/60 hover:bg-white hover:border-[#d1def0]"
               }`}
@@ -629,24 +629,10 @@ export function DedicatedMapsView() {
               <Building2 className="h-4 w-4 shrink-0" />
               <span className="truncate">Daftar Fasilitas ({pharmacies.length})</span>
             </button>
-            {selectedPharmacy && (
-              <button
-                type="button"
-                onClick={() => setMobileTab("detail")}
-                className={`flex items-center justify-center gap-1.5 h-9 px-2 text-xs font-bold rounded-xl transition-all cursor-pointer border select-none ${
-                  mobileTab === "detail"
-                    ? "bg-[#F59E0B] text-white border-[#F59E0B] shadow-xs font-extrabold"
-                    : "bg-white/80 text-[#D97706] border-amber-200/80 hover:bg-white hover:border-amber-300"
-                }`}
-              >
-                <Info className="h-4 w-4 shrink-0" />
-                <span className="truncate">Detail</span>
-              </button>
-            )}
           </div>
         </div>
 
-        {/* Main 3-Column Desktop Layout & Mobile View */}
+        {/* Main 2-Column Desktop Layout (List on Left + Map on Right with in-frame Overlay Card) */}
         <div className="flex flex-col lg:flex-row gap-4 min-h-[450px] lg:h-[560px] xl:h-[580px] items-stretch">
           {/* Column 1 (Left): PharmacyList */}
           <div
@@ -667,17 +653,15 @@ export function DedicatedMapsView() {
               onSelectPharmacy={handleSelectPharmacy}
               onTransportModeChange={handleTransportModeChange}
               onCloseCard={() => {
-                setSelectedPharmacy(null);
-                setSelectedPlace(null);
-                setRouteInfo(null);
+                setShowDetailPanel(false);
               }}
             />
           </div>
 
-          {/* Column 2 (Center): Clean Unobstructed Map Canvas */}
+          {/* Column 2 (Right): Full Map Frame with Floating Overlay Card inside */}
           <div
             className={`relative flex-1 min-w-0 h-full rounded-3xl overflow-hidden border border-[#E5E7EB] bg-[#FFFFFF] shadow-md flex flex-col ${
-              mobileTab === "map" ? "block" : "hidden lg:block"
+              mobileTab === "map" || mobileTab === "detail" ? "block" : "hidden lg:block"
             }`}
           >
             <div className="relative flex-1 w-full h-full">
@@ -689,168 +673,162 @@ export function DedicatedMapsView() {
                 onSelectPharmacy={handleSelectPharmacy}
                 className="w-full h-full"
               />
+
+              {/* Floating Active Route Banner when Detail Panel is Closed */}
+              {selectedPharmacy && !showDetailPanel && (
+                <div className="absolute top-3 left-3 right-3 z-30 flex items-center justify-between gap-2.5 rounded-2xl bg-white/95 p-3 shadow-xl border border-[#E5E7EB] backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                    <div className="grid h-8 w-8 place-items-center rounded-xl bg-[#4a6fa5] text-white shrink-0 shadow-xs">
+                      <Navigation className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-bold text-[#111111] truncate">{selectedPharmacy.name}</p>
+                      <p className="text-[11px] text-[#4a6fa5] font-semibold">
+                        {routeInfo ? `Rute navigasi aktif (${routeInfo.distanceKm} km)` : "Rute navigasi aktif"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setShowDetailPanel(true)}
+                      className="rounded-xl bg-[#4a6fa5] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#35517d] transition shadow-xs cursor-pointer"
+                    >
+                      Buka Detail
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedPharmacy(null);
+                        setSelectedPlace(null);
+                        setRouteInfo(null);
+                        setShowDetailPanel(false);
+                      }}
+                      className="rounded-xl p-1.5 text-[#6B7280] hover:bg-slate-100 hover:text-red-600 transition cursor-pointer"
+                      title="Hapus Rute"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* In-Frame Floating Detail Card (Overlaid directly on the map canvas) */}
+              {selectedPharmacy && showDetailPanel && (
+                <div className="absolute top-3 right-3 bottom-3 z-30 w-[calc(100%-24px)] sm:w-[380px] xl:w-[410px] max-h-[calc(100%-24px)] bg-white/98 border border-[#E5E7EB] rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col overflow-y-auto animate-in fade-in slide-in-from-right-4 duration-300 backdrop-blur-md scrollbar-thin scrollbar-thumb-[#4a6fa5]/20">
+                  {/* Category Badge & Rating Header */}
+                  <div className="flex items-center justify-between gap-2 mb-3 shrink-0">
+                    <span
+                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide border shadow-xs ${
+                        selectedPharmacy.facilityType === "hospital"
+                          ? "bg-red-500 text-white border-red-600"
+                          : selectedPharmacy.facilityType === "clinic"
+                            ? "bg-[#F59E0B] text-white border-amber-600"
+                            : "bg-[#4a6fa5] text-white border-blue-600"
+                      }`}
+                    >
+                      {selectedPharmacy.facilityType === "hospital" ? (
+                        <><Building2 className="h-3 w-3 inline mr-1 shrink-0" /> RUMAH SAKIT</>
+                      ) : selectedPharmacy.facilityType === "clinic" ? (
+                        <><Stethoscope className="h-3 w-3 inline mr-1 shrink-0" /> KLINIK</>
+                      ) : (
+                        <><Pill className="h-3 w-3 inline mr-1 shrink-0" /> APOTEK</>
+                      )}
+                    </span>
+
+                    <div className="flex items-center gap-2">
+                      <div className="bg-amber-50 text-amber-900 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-2xs">
+                        <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                        <span>
+                          {selectedPharmacy.rating ? Number(selectedPharmacy.rating).toFixed(1) : "4.8"}
+                        </span>
+                        <span className="text-[10px] text-amber-700 font-normal">
+                          ({selectedPharmacy.userRatingsTotal || "128"})
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setShowDetailPanel(false)}
+                        className="text-[#6B7280] hover:text-[#111111] p-1.5 rounded-full hover:bg-slate-100 shrink-0 transition cursor-pointer"
+                        title="Tutup Panel Detail (Rute Tetap Aktif)"
+                      >
+                        <X className="h-4.5 w-4.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Clean Full Photo Header */}
+                  <div className="relative h-36 sm:h-40 w-full rounded-2xl overflow-hidden mb-3 border border-[#E5E7EB] bg-slate-100 shrink-0 shadow-xs">
+                    <img
+                      src={finalPhotoUrl || getWikimediaFallbackPhoto(selectedPharmacy.facilityType, selectedPharmacy.name.charCodeAt(0) || 0)}
+                      alt={selectedPharmacy.name}
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = getWikimediaFallbackPhoto(selectedPharmacy.facilityType, 0);
+                      }}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+
+                  {/* Title & Address */}
+                  <div className="mb-3">
+                    <h3 className="text-base sm:text-lg font-bold text-[#111111] leading-snug">
+                      {selectedPharmacy.name}
+                    </h3>
+                    <p className="text-xs text-[#6B7280] mt-1.5 leading-relaxed flex items-start gap-1">
+                      <MapPin className="h-3.5 w-3.5 text-[#4a6fa5] shrink-0 mt-0.5" />
+                      <span>
+                        {selectedPharmacy.address ||
+                          `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
+                      </span>
+                    </p>
+                  </div>
+
+                  {/* Operational Hours & Phone Contact */}
+                  <div className="mt-1 pt-3 border-t border-[#E5E7EB] flex flex-col gap-1.5 text-xs mb-3">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1.5 text-[#4a6fa5] font-semibold">
+                        <Clock className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                        {selectedPharmacy.openingHoursText || "Buka 24 Jam (IGD Siaga)"}
+                      </span>
+                      <span className="font-extrabold text-[#111111]">
+                        {selectedPharmacy.distanceKm < 1
+                          ? `${(selectedPharmacy.distanceKm * 1000).toFixed(0)} m`
+                          : `${selectedPharmacy.distanceKm.toFixed(2)} km`}
+                      </span>
+                    </div>
+
+                    {selectedPharmacy.phone && (
+                      <div className="text-[11px] text-[#6B7280] font-medium flex items-center gap-1">
+                        <Phone className="h-3 w-3 text-[#4a6fa5] shrink-0" />
+                        <span>Telepon: <strong className="text-[#111111]">{selectedPharmacy.phone}</strong></span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Review Comment Snippet */}
+                  <div className="mb-4 p-3 bg-blue-50/60 border border-blue-200/80 rounded-2xl text-xs text-[#35517d] flex items-start gap-2">
+                    <MessageSquare className="h-4 w-4 text-[#4a6fa5] shrink-0 mt-0.5" />
+                    <p className="italic leading-relaxed">&quot;{finalReviewText}&quot;</p>
+                  </div>
+
+                  {/* Direct Google Maps Navigation Primary CTA Button */}
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPharmacy.lat},${selectedPharmacy.lon}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full h-11 bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white font-extrabold text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer mt-auto shrink-0"
+                  >
+                    <Navigation className="h-4 w-4" />
+                    <span>Buka Navigasi Google Maps</span>
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </div>
+              )}
             </div>
           </div>
-
-          {/* Column 3 (Right Side Dedicated Detail Panel - Outside the Map!) */}
-          {selectedPharmacy && (
-            <div
-              className={`w-full lg:w-[380px] xl:w-[420px] shrink-0 h-full bg-[#FFFFFF] border border-[#E5E7EB] rounded-3xl p-4 sm:p-5 shadow-lg flex-col overflow-y-auto animate-fade-in scrollbar-thin scrollbar-thumb-[#4a6fa5]/20 ${
-                mobileTab === "detail" ? "flex" : "hidden lg:flex"
-              }`}
-            >
-              {/* Category Badge & Rating Header */}
-              <div className="flex items-center justify-between gap-2 mb-3 shrink-0">
-                <span
-                  className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide border shadow-xs ${
-                    selectedPharmacy.facilityType === "hospital"
-                      ? "bg-red-500 text-white border-red-600"
-                      : selectedPharmacy.facilityType === "clinic"
-                        ? "bg-[#F59E0B] text-white border-amber-600"
-                        : "bg-[#4a6fa5] text-white border-blue-600"
-                  }`}
-                >
-                  {selectedPharmacy.facilityType === "hospital" ? (
-                    <><Building2 className="h-3 w-3 inline mr-1 shrink-0" /> RUMAH SAKIT</>
-                  ) : selectedPharmacy.facilityType === "clinic" ? (
-                    <><Stethoscope className="h-3 w-3 inline mr-1 shrink-0" /> KLINIK</>
-                  ) : (
-                    <><Pill className="h-3 w-3 inline mr-1 shrink-0" /> APOTEK</>
-                  )}
-                </span>
-
-                <div className="flex items-center gap-2">
-                  <div className="bg-amber-50 text-amber-900 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-2xs">
-                    <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                    <span>
-                      {selectedPharmacy.rating ? Number(selectedPharmacy.rating).toFixed(1) : "4.8"}
-                    </span>
-                    <span className="text-[10px] text-amber-700 font-normal">
-                      ({selectedPharmacy.userRatingsTotal || "128"})
-                    </span>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedPharmacy(null);
-                      setSelectedPlace(null);
-                      setRouteInfo(null);
-                    }}
-                    className="text-[#6B7280] hover:text-[#111111] p-1.5 rounded-full hover:bg-slate-100 shrink-0 transition cursor-pointer"
-                    title="Tutup Panel Detail"
-                  >
-                    <X className="h-4.5 w-4.5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Clean Full Photo Header */}
-              <div className="relative h-36 sm:h-40 w-full rounded-2xl overflow-hidden mb-3 border border-[#E5E7EB] bg-slate-100 shrink-0 shadow-xs">
-                <img
-                  src={finalPhotoUrl || getWikimediaFallbackPhoto(selectedPharmacy.facilityType, selectedPharmacy.name.charCodeAt(0) || 0)}
-                  alt={selectedPharmacy.name}
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = getWikimediaFallbackPhoto(selectedPharmacy.facilityType, 0);
-                  }}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-
-              {/* Title & Address */}
-              <div className="mb-3">
-                <h3 className="text-lg font-bold text-[#111111] leading-snug">
-                  {selectedPharmacy.name}
-                </h3>
-                <p className="text-xs text-[#6B7280] mt-1.5 leading-relaxed flex items-start gap-1">
-                  <MapPin className="h-3.5 w-3.5 text-[#4a6fa5] shrink-0 mt-0.5" />
-                  <span>
-                    {selectedPharmacy.address ||
-                      `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
-                  </span>
-                </p>
-              </div>
-
-              {/* Operational Hours & Phone Contact */}
-              <div className="mt-1 pt-3 border-t border-[#E5E7EB] flex flex-col gap-1.5 text-xs mb-3">
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-[#4a6fa5] font-semibold">
-                    <Clock className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                    {selectedPharmacy.openingHoursText || "Buka 24 Jam (IGD Siaga)"}
-                  </span>
-                  <span className="font-extrabold text-[#111111]">
-                    {selectedPharmacy.distanceKm < 1
-                      ? `${(selectedPharmacy.distanceKm * 1000).toFixed(0)} m`
-                      : `${selectedPharmacy.distanceKm.toFixed(2)} km`}
-                  </span>
-                </div>
-
-                {selectedPharmacy.phone && (
-                  <div className="text-[11px] text-[#6B7280] font-medium flex items-center gap-1">
-                    <Phone className="h-3 w-3 text-[#4a6fa5] shrink-0" />
-                    <span>Telepon: <strong className="text-[#111111]">{selectedPharmacy.phone}</strong></span>
-                  </div>
-                )}
-              </div>
-
-              {/* Review Comment Snippet */}
-              <div className="mb-3.5 p-3 bg-blue-50/60 border border-blue-200/80 rounded-2xl text-xs text-[#35517d] flex items-start gap-2">
-                <MessageSquare className="h-4 w-4 text-[#4a6fa5] shrink-0 mt-0.5" />
-                <p className="italic leading-relaxed">&quot;{finalReviewText}&quot;</p>
-              </div>
-
-              {/* Mode Transport Switcher & Duration ETA */}
-              <div className="p-2.5 bg-[#F7F9FB] rounded-2xl border border-[#E5E7EB] mb-4 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => handleTransportModeChange("driving")}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${
-                      transportMode === "driving"
-                        ? "bg-[#4a6fa5] text-white shadow-xs"
-                        : "bg-white text-[#6B7280] border border-[#E5E7EB]"
-                    }`}
-                  >
-                    <Car className="h-3.5 w-3.5" /> Mobil
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleTransportModeChange("motorcycle")}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${
-                      transportMode === "motorcycle"
-                        ? "bg-[#4a6fa5] text-white shadow-xs"
-                        : "bg-white text-[#6B7280] border border-[#E5E7EB]"
-                    }`}
-                  >
-                    <Bike className="h-3.5 w-3.5" /> Motor
-                  </button>
-                </div>
-
-                <div className="text-right">
-                  <div className="font-extrabold text-[#4a6fa5] text-sm sm:text-base">
-                    {routeInfo
-                      ? `${routeInfo.durationMin} Menit`
-                      : `${Math.ceil(selectedPharmacy.distanceKm * 4)} Menit`}
-                  </div>
-                  <div className="text-[10px] text-[#6B7280]">Estimasi Waktu</div>
-                </div>
-              </div>
-
-              {/* Direct Google Maps Navigation Primary CTA Button */}
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPharmacy.lat},${selectedPharmacy.lon}`}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full h-11 bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white font-extrabold text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer mt-auto"
-              >
-                <Navigation className="h-4 w-4" />
-                <span>Buka Navigasi Google Maps</span>
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            </div>
-          )}
         </div>
         <Footer />
       </main>

@@ -68,9 +68,8 @@ function ScannerPage() {
   const [stage, setStage] = useState<Stage>("idle");
   const [result, setResult] = useState<ScanResult | null>(null);
   const [scanAlert, setScanAlert] = useState<{
-    title: string;
+    title?: string;
     message: string;
-    details?: string[];
   } | null>(null);
   const [scanStep, setScanStep] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -114,19 +113,14 @@ function ScannerPage() {
       // DO NOT navigate to the results view. Stay on the SAME page and display the alert!
       if (!data.gambar_dapat_dianalisis) {
         setStage("idle");
+        const shortMessage =
+          data.ringkasan?.trim() ||
+          (data.penyebab && data.penyebab.length > 0
+            ? data.penyebab[0]
+            : "Foto buram atau tidak fokus pada area keluhan.");
         setScanAlert({
-          title: "Foto Kurang Jelas atau Tidak Terdeteksi",
-          message:
-            data.ringkasan ||
-            "Foto yang diunggah belum memenuhi standar analisis AI. Pastikan foto fokus, pencahayaan terang, dan menyorot area keluhan secara langsung.",
-          details:
-            data.penyebab && data.penyebab.length > 0
-              ? data.penyebab
-              : [
-                  "Foto buram atau kamera tidak fokus pada area keluhan",
-                  "Pencahayaan kurang terang atau terhalang bayangan gelap",
-                  "Jarak foto terlalu jauh dari area kulit/tubuh yang bermasalah",
-                ],
+          title: "Foto Tidak Terdeteksi",
+          message: shortMessage,
         });
         return;
       }
@@ -160,16 +154,11 @@ function ScannerPage() {
       if (intervalRef.current) clearInterval(intervalRef.current);
       setStage("idle");
       setScanAlert({
-        title: "Foto Belum Berhasil Dianalisis",
+        title: "Gagal Menganalisis",
         message:
           err instanceof Error
             ? err.message
-            : "Terjadi kendala saat memproses gambar. Pastikan foto jelas dan koneksi internet stabil.",
-        details: [
-          "Pastikan foto tidak buram atau goyang saat memotret",
-          "Gunakan pencahayaan ruangan yang terang merata",
-          "Fokuskan kamera pada jarak 10–15 cm menyorot area keluhan",
-        ],
+            : "Koneksi terputus atau foto tidak dapat diproses.",
       });
     }
   };

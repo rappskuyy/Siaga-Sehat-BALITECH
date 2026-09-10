@@ -307,18 +307,26 @@ export function MobileMapView() {
 
   const handleCloseDetails = useCallback(() => {
     if (detailSheetRef.current) {
-      detailSheetRef.current.style.transition = "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)";
+      detailSheetRef.current.style.transition = "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)";
       detailSheetRef.current.style.transform = "translate3d(0, 100%, 0)";
     }
     setTimeout(() => {
       setShowDetailsPanel(false);
-    }, 300);
+      if (detailSheetRef.current) {
+        detailSheetRef.current.style.transform = "translate3d(0, 0, 0)";
+      }
+    }, 280);
   }, []);
 
   const handleSelectFacility = async (facility: PharmacyNode) => {
     setSelectedPharmacy(facility);
     setShowDetailsPanel(true);
     setShowLocationList(false); // Otomatis hide daftar lokasi saat fasilitas dipilih
+
+    if (detailSheetRef.current) {
+      detailSheetRef.current.style.transform = "translate3d(0, 0, 0)";
+      detailSheetRef.current.style.transition = "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)";
+    }
 
     const startLoc = userLocation || DEFAULT_CENTER;
     try {
@@ -328,6 +336,13 @@ export function MobileMapView() {
       console.error("Error fetching route:", error);
     }
   };
+
+  useEffect(() => {
+    if (showDetailsPanel && detailSheetRef.current) {
+      detailSheetRef.current.style.transform = "translate3d(0, 0, 0)";
+      detailSheetRef.current.style.transition = "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)";
+    }
+  }, [showDetailsPanel, selectedPharmacy]);
 
   const handleTransportModeChange = async (mode: TransportMode) => {
     setTransportMode(mode);
@@ -521,7 +536,7 @@ export function MobileMapView() {
                 <div className="truncate">
                   <p className="text-[11px] font-bold truncate">{selectedPharmacy.name}</p>
                   <p className="text-[10px] text-white/80 font-medium">
-                    Estimasi {routeInfo.durationMin} Menit • {routeInfo.distanceKm} km
+                    Jarak: {routeInfo.distanceKm} km
                   </p>
                 </div>
               </div>
@@ -693,7 +708,7 @@ export function MobileMapView() {
           <div className="overflow-y-auto px-4 pb-24 pt-3 max-h-[calc(75vh-55px)]">
             {/* Header */}
             <div className="flex items-start justify-between gap-3 mb-4">
-              <div>
+              <div className="flex-1 min-w-0">
                 <span className="text-xs font-bold uppercase text-[#4a6fa5] flex items-center gap-1.5 mb-1">
                   {selectedPharmacy.facilityType === "hospital" ? (
                     <><Building2 className="h-3.5 w-3.5 text-red-500 shrink-0" /> RUMAH SAKIT</>
@@ -705,6 +720,15 @@ export function MobileMapView() {
                 </span>
                 <h2 className="text-lg font-bold text-[#111111]">{selectedPharmacy.name}</h2>
               </div>
+              <button
+                type="button"
+                onClick={handleCloseDetails}
+                className="p-1.5 rounded-full text-[#6B7280] hover:text-[#111111] hover:bg-slate-100 transition shrink-0"
+                aria-label="Tutup panel informasi (Rute tetap aktif)"
+                title="Tutup Panel"
+              >
+                <X className="h-5 w-5" />
+              </button>
             </div>
 
             {/* Photo */}
@@ -773,40 +797,6 @@ export function MobileMapView() {
               <div className="mb-4 p-3 bg-slate-50 rounded-xl flex items-center gap-2">
                 <Phone className="h-4 w-4 text-[#4a6fa5]" />
                 <span className="text-sm text-[#111111] font-medium">{selectedPharmacy.phone}</span>
-              </div>
-            )}
-
-            {/* Transport Mode Selector */}
-            <div className="mb-4 flex gap-2">
-              <button
-                onClick={() => handleTransportModeChange("driving")}
-                aria-label="Pilih rute berkendara mobil"
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 min-h-[44px] rounded-xl font-semibold text-xs transition ${
-                  transportMode === "driving"
-                    ? "bg-[#4a6fa5] text-white"
-                    : "bg-slate-100 text-[#111111] border border-[#E5E7EB]"
-                }`}
-              >
-                <Car className="h-4 w-4" /> Mobil
-              </button>
-              <button
-                onClick={() => handleTransportModeChange("motorcycle")}
-                aria-label="Pilih rute berkendara motor"
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 min-h-[44px] rounded-xl font-semibold text-xs transition ${
-                  transportMode === "motorcycle"
-                    ? "bg-[#4a6fa5] text-white"
-                    : "bg-slate-100 text-[#111111] border border-[#E5E7EB]"
-                }`}
-              >
-                <Bike className="h-4 w-4" /> Motor
-              </button>
-            </div>
-
-            {/* Duration */}
-            {routeInfo && (
-              <div className="mb-4 p-3 bg-[#eef2f8] rounded-xl text-center">
-                <p className="text-xs text-[#6B7280] font-medium">Estimasi Waktu</p>
-                <p className="text-lg font-bold text-[#4a6fa5]">{routeInfo.durationMin} Menit</p>
               </div>
             )}
 
