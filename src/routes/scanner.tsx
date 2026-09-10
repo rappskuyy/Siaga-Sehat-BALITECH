@@ -90,6 +90,7 @@ function ScannerPage() {
   const [scanAlert, setScanAlert] = useState<{
     title?: string;
     message: string;
+    details?: string[];
   } | null>(null);
   const [scanStep, setScanStep] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
