@@ -1,10 +1,9 @@
+import { useEffect } from "react";
 import {
   ArrowUpRight,
   MessageCircleHeart,
   ScanLine,
   ShieldCheck,
-  Users,
-  Code2,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import fotodokter2 from "@/assets/fotodokter.webp?url";
@@ -17,6 +16,16 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 const AVATARS = [raffasyaAvatar, muhamadAvatar, ahmadAvatar];
 
 export function Hero() {
+  // Clear any temporary tuner storage from previous session
+  useEffect(() => {
+    try {
+      localStorage.removeItem("siaga_sehat_hero_coords_v1");
+      localStorage.removeItem("siaga_sehat_hero_mobile_coords_v2");
+      localStorage.removeItem("siaga_sehat_hero_mobile_coords_v3");
+      localStorage.removeItem("siaga_hero_coords");
+    } catch {}
+  }, []);
+
   return (
     <>
       <SiteHeader />
@@ -97,7 +106,7 @@ export function Hero() {
 
             {/* Center column: doctor photo with floating AI feature cards */}
             <div className="relative order-first flex flex-col items-center pt-2 sm:pt-4 min-[900px]:order-none min-[900px]:pt-0 min-[900px]:-mt-6 xl:-mt-10">
-              <div className="relative inline-flex items-end justify-center">
+              <div className="relative inline-flex items-end justify-center w-full max-w-[280px] sm:max-w-[360px] min-[900px]:max-w-none">
                 {/* Soft ambient glow behind the avatar for a premium, alive feel */}
                 <span
                   aria-hidden
@@ -110,9 +119,14 @@ export function Hero() {
                   style={{ animationDuration: "0.7s" }}
                 />
 
-                {/* Floating overlay cards - Desktop only */}
+                {/* Floating overlay cards - Desktop only (≥900px) */}
                 <FloatingCard
-                  className="hidden min-[900px]:block w-[150px] p-2.5 min-[900px]:-left-7 min-[900px]:top-6 xl:w-[175px] xl:-left-12 xl:top-8"
+                  className="hidden min-[900px]:block p-2.5 shadow-xl"
+                  style={{
+                    top: "24px",
+                    left: "-28px",
+                    width: "150px",
+                  }}
                   delay="0s"
                 >
                   <div className="flex items-center justify-between">
@@ -135,7 +149,12 @@ export function Hero() {
                 </FloatingCard>
 
                 <FloatingCard
-                  className="hidden min-[900px]:block w-[170px] p-2.5 min-[900px]:top-[48%] min-[900px]:-translate-y-1/2 min-[900px]:-right-5 xl:w-[195px] xl:-right-10"
+                  className="hidden min-[900px]:block p-2.5 shadow-xl"
+                  style={{
+                    top: "215px",
+                    left: "345px",
+                    width: "170px",
+                  }}
                   delay="0.5s"
                 >
                   <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-2 py-0.5 text-[10px] font-semibold text-[color:var(--color-clinic-blue-dark)]">
@@ -158,7 +177,12 @@ export function Hero() {
                 </FloatingCard>
 
                 <FloatingCard
-                  className="hidden min-[900px]:block w-[170px] p-2.5 min-[900px]:bottom-0 min-[900px]:-right-3 xl:w-[195px] xl:-right-8"
+                  className="hidden min-[900px]:block p-2.5 shadow-xl"
+                  style={{
+                    top: "415px",
+                    left: "415px",
+                    width: "170px",
+                  }}
                   delay="1s"
                 >
                   <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-2 py-0.5 text-[10px] font-semibold text-[color:var(--color-clinic-blue-dark)]">
@@ -172,58 +196,77 @@ export function Hero() {
                     Hemat waktu ke dokter hingga 40%
                   </p>
                 </FloatingCard>
-              </div>
 
-              <div className="pointer-events-none absolute inset-0 min-[900px]:hidden">
-                <FloatingCard
-                  className="left-0 top-[6%] w-[38vw] max-w-[132px] min-w-[104px] p-2 xs:w-[142px] sm:p-2.5"
-                  delay="0s"
-                >
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="text-[10px] font-medium leading-tight text-[color:var(--color-clinic-muted)] sm:text-[11px]">
-                      Progres pemulihan
+                {/* Floating overlay cards - Mobile & Tablet (<900px) - EXACT USER MOBILE COORDINATES */}
+                <div className="pointer-events-none absolute inset-0 min-[900px]:hidden overflow-visible">
+                  <FloatingCard
+                    className="p-2 sm:p-2.5 shadow-lg border border-slate-200"
+                    style={{
+                      top: "12px",
+                      left: "-83px",
+                      width: "130px",
+                      maxWidth: "none",
+                    }}
+                    delay="0s"
+                  >
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-[10px] font-medium leading-tight text-[color:var(--color-clinic-muted)] sm:text-[11px]">
+                        Progres pemulihan
+                      </span>
+                      <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
+                    </div>
+                    <p className="mt-1 font-display text-sm font-extrabold text-[color:var(--color-clinic-ink)] sm:text-base">
+                      Risiko rendah
+                    </p>
+                    <div className="mt-1.5 flex flex-col gap-1">
+                      <div className="h-1.5 rounded-full bg-black/[0.06]">
+                        <div className="h-full w-4/5 rounded-full bg-[color:var(--color-clinic-blue)]" />
+                      </div>
+                      <div className="h-1.5 rounded-full bg-black/[0.06]">
+                        <div className="h-full w-2/5 rounded-full bg-[color:var(--color-clinic-blue-dark)]" />
+                      </div>
+                    </div>
+                  </FloatingCard>
+
+                  <FloatingCard
+                    className="p-2 sm:p-2.5 shadow-lg border border-slate-200"
+                    style={{
+                      top: "75px",
+                      left: "265px",
+                      width: "130px",
+                      maxWidth: "none",
+                    }}
+                    delay="0.5s"
+                  >
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-1.5 py-0.5 text-[9px] font-semibold text-[color:var(--color-clinic-blue-dark)] sm:text-[10px]">
+                      <ScanLine className="h-2.5 w-2.5" /> Scan AI
                     </span>
-                    <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
-                  </div>
-                  <p className="mt-1 font-display text-sm font-extrabold text-[color:var(--color-clinic-ink)] sm:text-base">
-                    Risiko rendah
-                  </p>
-                  <div className="mt-1.5 flex flex-col gap-1">
-                    <div className="h-1.5 rounded-full bg-black/[0.06]">
-                      <div className="h-full w-4/5 rounded-full bg-[color:var(--color-clinic-blue)]" />
-                    </div>
-                    <div className="h-1.5 rounded-full bg-black/[0.06]">
-                      <div className="h-full w-2/5 rounded-full bg-[color:var(--color-clinic-blue-dark)]" />
-                    </div>
-                  </div>
-                </FloatingCard>
+                    <p className="mt-1 text-[10px] font-semibold leading-snug text-[color:var(--color-clinic-ink)] sm:text-[11px]">
+                      Analisis foto dan gejala
+                    </p>
+                    <p className="mt-1 font-display text-sm font-extrabold text-[color:var(--color-clinic-blue-dark)]">
+                      92%
+                    </p>
+                  </FloatingCard>
 
-                <FloatingCard
-                  className="right-0 top-[32%] w-[38vw] max-w-[132px] min-w-[104px] p-2 xs:w-[142px] sm:p-2.5"
-                  delay="0.5s"
-                >
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-1.5 py-0.5 text-[9px] font-semibold text-[color:var(--color-clinic-blue-dark)] sm:text-[10px]">
-                    <ScanLine className="h-2.5 w-2.5" /> Scan AI
-                  </span>
-                  <p className="mt-1 text-[10px] font-semibold leading-snug text-[color:var(--color-clinic-ink)] sm:text-[11px]">
-                    Analisis foto dan gejala
-                  </p>
-                  <p className="mt-1 font-display text-sm font-extrabold text-[color:var(--color-clinic-blue-dark)]">
-                    92%
-                  </p>
-                </FloatingCard>
-
-                <FloatingCard
-                  className="bottom-[2%] right-0 w-[38vw] max-w-[132px] min-w-[104px] p-2 xs:w-[142px] sm:p-2.5"
-                  delay="1s"
-                >
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-1.5 py-0.5 text-[9px] font-semibold text-[color:var(--color-clinic-blue-dark)] sm:text-[10px]">
-                    <MessageCircleHeart className="h-2.5 w-2.5" /> Konsultasi AI
-                  </span>
-                  <p className="mt-1 text-[10px] font-semibold leading-snug text-[color:var(--color-clinic-ink)] sm:text-[11px]">
-                    Tanya gejala, bahasa sehari-hari
-                  </p>
-                </FloatingCard>
+                  <FloatingCard
+                    className="p-2 sm:p-2.5 shadow-lg border border-slate-200"
+                    style={{
+                      top: "265px",
+                      left: "300px",
+                      width: "130px",
+                      maxWidth: "none",
+                    }}
+                    delay="1s"
+                  >
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-1.5 py-0.5 text-[9px] font-semibold text-[color:var(--color-clinic-blue-dark)] sm:text-[10px]">
+                      <MessageCircleHeart className="h-2.5 w-2.5" /> Konsultasi AI
+                    </span>
+                    <p className="mt-1 text-[10px] font-semibold leading-snug text-[color:var(--color-clinic-ink)] sm:text-[11px]">
+                      Tanya gejala, bahasa sehari-hari
+                    </p>
+                  </FloatingCard>
+                </div>
               </div>
             </div>
 
