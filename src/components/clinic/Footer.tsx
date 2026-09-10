@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Github, Linkedin, MessageCircle, Twitter } from "lucide-react";
+import { ArrowRight, CheckCircle2, Github, Linkedin, Loader2, MessageCircle, Twitter } from "lucide-react";
 import { Reveal } from "./Reveal";
 import { BrandLogo } from "@/components/ui/BrandLogo";
+import { toast } from "sonner";
+import { subscribeNewsletterClient } from "@/lib/newsletter/newsletter.client";
 
 const SERVICE_LINKS = [
   { label: "Beranda", path: "/" },
@@ -29,6 +31,37 @@ const BRAND_NAME = "Siaga Sehat";
 
 export function Footer() {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !email.includes("@")) {
+      toast.error("Mohon masukkan format email yang valid.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await subscribeNewsletterClient({
+        email: email.trim(),
+      });
+
+      if (res.success) {
+        setIsSuccess(true);
+        setEmail("");
+        toast.success(res.message || "Berhasil berlangganan newsletter!");
+        setTimeout(() => setIsSuccess(false), 5000);
+      } else {
+        toast.error("Gagal berlangganan. Silakan coba beberapa saat lagi.");
+      }
+    } catch (err: any) {
+      console.error("Gagal subscribe:", err);
+      toast.error(err?.message || "Terjadi kesalahan saat memproses langganan.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <footer id="contact" className="w-full bg-[#f7f4ee] px-2.5 pb-3 pt-4 sm:px-4 md:px-8 md:pb-2 md:pt-10">
@@ -113,26 +146,39 @@ export function Footer() {
               <span className="font-normal sm:font-bold">Tetap terhubung dengan {BRAND_NAME}.</span>
             </p>
             <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setEmail("");
-              }}
+              onSubmit={handleSubscribe}
               className="mt-2.5 sm:mt-4 flex flex-row items-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-[20px] bg-white p-1 sm:p-2 shadow-sm ring-1 ring-black/5"
             >
               <input
                 type="email"
                 required
+                disabled={loading}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Masukkan email Anda"
-                className="min-w-0 flex-1 rounded-full bg-transparent px-2.5 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-sm text-[color:var(--color-clinic-ink)] outline-none placeholder:text-[color:var(--color-clinic-muted)]"
+                className="min-w-0 flex-1 rounded-full bg-transparent px-2.5 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-sm text-[color:var(--color-clinic-ink)] outline-none placeholder:text-[color:var(--color-clinic-muted)] disabled:opacity-50"
               />
               <button
                 type="submit"
-                className="group inline-flex items-center justify-center gap-1 rounded-full bg-[color:var(--color-clinic-blue)] px-3 sm:px-4 py-1.5 sm:py-2.5 text-[11px] sm:text-sm font-medium text-white transition hover:bg-[color:var(--color-clinic-blue-dark)] cursor-pointer shrink-0"
+                disabled={loading}
+                className="group inline-flex items-center justify-center gap-1 rounded-full bg-[color:var(--color-clinic-blue)] px-3 sm:px-4 py-1.5 sm:py-2.5 text-[11px] sm:text-sm font-medium text-white transition hover:bg-[color:var(--color-clinic-blue-dark)] cursor-pointer shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <span>Langganan</span>
-                <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 transition group-hover:translate-x-0.5" />
+                {loading ? (
+                  <>
+                    <Loader2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-spin" />
+                    <span>Mengirim...</span>
+                  </>
+                ) : isSuccess ? (
+                  <>
+                    <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-emerald-300" />
+                    <span>Terdaftar</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Langganan</span>
+                    <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 transition group-hover:translate-x-0.5" />
+                  </>
+                )}
               </button>
             </form>
           </div>
