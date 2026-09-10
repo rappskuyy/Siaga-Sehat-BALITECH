@@ -111,6 +111,36 @@ const FOLLOW_UP_TOPICS = [
   { prompt: FOLLOW_UP_PROMPTS[4], keywords: ["kapan", "dokter", "igd", "tanda bahaya"] },
 ];
 
+function normalizeAssistantText(text: string) {
+  return text
+    .toLocaleLowerCase("id-ID")
+    .replace(/\*{1,3}/g, "")
+    .replace(/[：]/g, ":")
+    .replace(/\s+/g, " ");
+}
+
+function isTopicAnswered(topic: string, text: string) {
+  const normalized = normalizeAssistantText(text);
+  if (topic === "solusi" || topic.includes("dilakukan") || topic === "perawatan") {
+    return /yang bisa dilakukan|solusi awal|perawatan mandiri|langkah perawatan|saran perawatan/.test(normalized);
+  }
+  if (topic === "penyebab" || topic.includes("penyebab")) {
+    return /kemungkinan penyebab|penyebab/.test(normalized);
+  }
+  if (topic === "pantangan" || topic === "dihindari") {
+    return /pantangan\s*:|yang perlu dihindari\s*:|hal yang harus dihindari\s*:/.test(normalized);
+  }
+  if (topic === "rekomendasi" || topic === "obat" || topic.includes("perawatan yang aman")) {
+    return /obat\s*\/\s*rekomendasi|obat bebas|rekomendasi obat|perawatan yang aman/.test(normalized);
+  }
+  if (topic === "kapan" || topic === "dokter" || topic === "igd" || topic === "tanda bahaya") {
+    return /kapan ke dokter\s*:|kapan harus ke dokter\s*:|tanda bahaya\s*:/.test(
+      normalized,
+    );
+  }
+  return false;
+}
+
 function formatTime() {
   const now = new Date();
   return now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
@@ -119,7 +149,7 @@ function formatTime() {
 function getAvailableFollowUps(messages: ChatMessage[]) {
   const assistantConversation = messages
     .filter((message) => message.role === "assistant")
-    .map((message) => message.text.toLocaleLowerCase("id-ID"))
+    .map((message) => message.text)
     .join("\n");
   const userConversation = messages
     .filter((message) => message.role === "user")
@@ -128,35 +158,31 @@ function getAvailableFollowUps(messages: ChatMessage[]) {
 
   return FOLLOW_UP_TOPICS.filter(({ prompt, keywords }) => {
     const promptWasSent = userConversation.includes(prompt.toLocaleLowerCase("id-ID"));
-    const topicWasAnswered = keywords.some((keyword) => {
-      const answerHeadings = [
-        `**${keyword}`,
-        keyword === "solusi" ? "yang bisa dilakukan:" : "",
-        keyword === "penyebab" ? "kemungkinan penyebab:" : "",
-        keyword === "pantangan" ? "pantangan:" : "",
-        keyword === "rekomendasi" ? "obat/rekomendasi:" : "",
-        keyword === "dokter" ? "kapan ke dokter:" : "",
-      ].filter(Boolean);
-      return answerHeadings.some((heading) => assistantConversation.includes(heading));
-    });
+    const topicWasAnswered = keywords.some((keyword) => isTopicAnswered(keyword, assistantConversation));
 
     return !promptWasSent && !topicWasAnswered;
   }).map(({ prompt }) => prompt);
 }
 
 function canShowFollowUps(messages: ChatMessage[]) {
-  const assistantConversation = messages
-    .filter((message) => message.role === "assistant")
-    .map((message) => message.text.toLocaleLowerCase("id-ID"))
-    .join("\n");
-
-  const askedAge = /\b(umur|usia|tahun)\b/.test(assistantConversation);
-  const askedSymptoms = /\b(keluhan|gejala|sakit|nyeri|dirasakan)\b/.test(assistantConversation);
-  const hasSolution = /\b(solusi|yang bisa dilakukan|perawatan mandiri|obat\/rekomendasi|rekomendasi tindakan)\b/.test(
-    assistantConversation,
+  const conversation = messages.map((message) => message.text).join("\n");
+  const assistantMessages = messages.filter((message) => message.role === "assistant");
+  const latestAssistant = assistantMessages.at(-1)?.text || "";
+  const hasAnswer = latestAssistant.length >= 80;
+  const hasHealthContext = hasMinimumHealthContext(conversation);
+  const hasStructuredResult = /analisis awal|yang bisa dilakukan|pantangan|kapan ke dokter|obat\s*\/\s*rekomendasi/i.test(
+    latestAssistant,
   );
 
-  return askedAge && askedSymptoms && hasSolution;
+  return hasAnswer && assistantMessages.length > 0 && (hasHealthContext || hasStructuredResult);
+}
+
+function hasMinimumHealthContext(conversation: string) {
+  const hasAge = /\b(umur|usia)\D{0,12}\d{1,3}\b|\b\d{1,2}\s*tahun\b/i.test(conversation);
+  const hasSymptom = /sakit|nyeri|demam|pusing|mual|batuk|sesak|lemas|berdenyut|keluhan|gejala/i.test(
+    conversation,
+  );
+  return hasAge && hasSymptom;
 }
 
 function AssistantText({ text }: { text: string }) {
@@ -175,8 +201,9 @@ function AssistantText({ text }: { text: string }) {
 function detectIntentAction(text: string): ActionCardType | undefined {
   const lower = text.toLowerCase();
   const asksForMaps =
-    /(mau|ingin|tolong|bisa|carikan|cari|buka).{0,35}(apotek|farmasi|peta|maps|faskes)/i.test(lower) ||
-    /lokasi apotek|apotek terdekat|faskes terdekat/i.test(lower);
+    /\b(cari|carikan|tampilkan|buka|lihat|tunjukkan)\b.{0,40}\b(apotek|farmasi|faskes|peta|maps)\b/i.test(lower) ||
+    /\b(apotek|faskes)\s+(terdekat|sekitar sini|di dekat saya)\b/i.test(lower) ||
+    /\b(mau|ingin)\b.{0,20}\b(cari|ke)\b.{0,20}\b(apotek|faskes)\b/i.test(lower);
   if (asksForMaps) {
     return {
       type: "maps",
@@ -187,8 +214,8 @@ function detectIntentAction(text: string): ActionCardType | undefined {
     };
   }
   const asksForScanner =
-    /(mau|ingin|tolong|bisa|buka|gunakan|melakukan).{0,35}(scan|pindai|foto|kamera|gambar)/i.test(lower) ||
-    /scan (foto|obat|resep)|pindai (foto|obat|resep)/i.test(lower);
+    /\b(mau|ingin|tolong|buka|gunakan|akses|lakukan)\b.{0,30}\b(scan|pindai)\b/i.test(lower) ||
+    /\b(scan|pindai)\b.{0,30}\b(foto|obat|resep|kulit|penyakit|gambar)\b/i.test(lower);
   if (asksForScanner) {
     return {
       type: "scanner",
@@ -199,8 +226,8 @@ function detectIntentAction(text: string): ActionCardType | undefined {
     };
   }
   const asksForAnatomy =
-    /(mau|ingin|tolong|bisa|buka|gunakan|pilih).{0,35}(anatomi|organ|bagian tubuh|model tubuh)/i.test(lower) ||
-    /pilih bagian tubuh|model anatomi/i.test(lower);
+    /\b(mau|ingin|tolong|buka|gunakan|akses|lihat|pilih)\b.{0,35}\b(anatomi|anatomy|organ|bagian tubuh|model tubuh)\b/i.test(lower) ||
+    /\b(anatomi|anatomy|model anatomi|bagian tubuh)\b.{0,20}\b(interaktif|buka|lihat|pilih)\b/i.test(lower);
   if (asksForAnatomy) {
     return {
       type: "anatomy",
@@ -351,9 +378,11 @@ function ConsultationPage() {
       const intentCard = options.showActionCard === false ? undefined : detectIntentAction(text);
 
       try {
-        const prompt = `Kamu adalah Asisten Kesehatan SiagaSehat yang ramah, empati, dan profesional dalam Bahasa Indonesia. Berikut riwayat percakapan sejauh ini:\n${buildContext(
-          next,
-        )}\n\nBalas pesan TERAKHIR pengguna secara langsung. Ikuti tahap konsultasi dan aturan keselamatan pada instruksi sistem. Jika umur atau keluhan penyerta belum diketahui, tanyakan SATU informasi yang paling penting dan jangan memberi solusi dulu (kecuali tanda bahaya). Setelah data minimum cukup, baru berikan jawaban terstruktur. Jika pengguna menanyakan apotek/lokasi, jelaskan bahwa mereka bisa membuka Peta Lokasi. Jika pengguna menanyakan scan obat/kulit, sebutkan fitur Scanner. Jika pengguna ingin memilih area tubuh yang sakit, rekomendasikan fitur Anatomi.`;
+        const conversation = buildContext(next);
+        const dataStatus = hasMinimumHealthContext(conversation)
+          ? "DATA MINIMUM TERPENUHI. Berikan solusi konkret sekarang sebelum bertanya lagi."
+          : "DATA MINIMUM BELUM TERPENUHI. Tanyakan hanya satu informasi terpenting.";
+        const prompt = `Kamu adalah Asisten Kesehatan SiagaSehat yang ramah, empati, dan profesional dalam Bahasa Indonesia. Berikut riwayat percakapan sejauh ini:\n${conversation}\n\nSTATUS DATA: ${dataStatus}\nBalas pesan TERAKHIR pengguna secara langsung. Ikuti tahap konsultasi dan aturan keselamatan pada instruksi sistem. Jika data minimum sudah terpenuhi, WAJIB tampilkan bagian YANG BISA DILAKUKAN dengan langkah yang aman dan mudah dipahami. Jika pengguna menanyakan apotek/lokasi, jelaskan bahwa mereka bisa membuka Peta Lokasi. Jika pengguna menanyakan scan obat/kulit, sebutkan fitur Scanner. Jika pengguna ingin memilih area tubuh yang sakit, rekomendasikan fitur Anatomi.`;
         const res = await chat({ data: { prompt } });
         const reply = res?.reply?.trim() || "Maaf, saya tidak mendapatkan respons. Silakan coba lagi.";
         const assistantMsg: ChatMessage = {

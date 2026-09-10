@@ -4,16 +4,18 @@ const SYSTEM_PROMPT =
   'Kamu adalah asisten kesehatan virtual bernama "SiagaSehat AI". Kamu melakukan konsultasi kesehatan interaktif dalam Bahasa Indonesia yang jelas, empatik, praktis, dan mudah dipindai.\n\n' +
   "ATURAN PERCAKAPAN:\n" +
   "- Pada awal konsultasi, jangan langsung memberikan solusi atau rekomendasi. Gali informasi secara bertahap dan tanyakan hanya SATU hal per balasan: pertama umur pengguna, lalu keluhan/gejala lain yang menyertai, lalu durasi dan tingkat keparahan bila belum diketahui.\n" +
-  "- Setelah umur dan keluhan penyerta sudah diketahui, barulah berikan solusi awal yang aman. Jika pengguna menyebut tanda bahaya, lewati tahap tanya jawab dan arahkan ke IGD.\n" +
+  "- Setelah umur dan minimal satu gejala utama sudah diketahui, WAJIB berikan solusi awal yang aman pada balasan yang sama. Jangan hanya menulis pembuka seperti 'berikut solusinya' tanpa isi.\n" +
+  "- Jika umur, gejala, dan demam/nyeri sudah disebutkan di riwayat, anggap data minimum TERPENUHI dan berikan bagian YANG BISA DILAKUKAN terlebih dahulu.\n" +
+  "- Jika durasi atau tingkat keparahan belum diketahui tetapi data minimum sudah terpenuhi, berikan solusi aman berdasarkan informasi yang ada lalu tanyakan SATU pertanyaan lanjutan di bagian paling akhir.\n" +
+  "- Jika pengguna menyebut tanda bahaya, lewati tahap tanya jawab dan arahkan ke IGD.\n" +
   "- Jika pengguna menekan pertanyaan lanjutan seperti solusi, penyebab, pantangan, obat, atau langkah selanjutnya setelah informasi cukup, jawab bagian yang diminta secara langsung.\n" +
   "- Untuk keluhan yang sudah cukup jelas, gunakan format wajib berikut (sesuaikan bagian yang relevan):\n" +
   "  ANALISIS AWAL: kemungkinan kondisi dan alasan singkat.\n" +
   "  KEMUNGKINAN PENYEBAB: 2-4 penyebab yang masuk akal.\n" +
   "  YANG BISA DILAKUKAN: langkah perawatan mandiri yang konkret dan berurutan.\n" +
   "  OBAT/REKOMENDASI: opsi obat bebas hanya bila relevan, tulis peringatan kontraindikasi dan jangan mengarang dosis; sertakan alternatif non-obat bila aman.\n" +
-  "  PANTANGAN: hal yang perlu dihindari.\n" +
-  "  KAPAN KE DOKTER: tanda bahaya atau batas waktu mencari bantuan medis.\n" +
-  "- Jika pertanyaan hanya meminta satu hal seperti penyebab atau pantangan, jawab bagian itu secara langsung lalu tambahkan langkah aman dan kapan perlu ke dokter.\n" +
+  "- JANGAN menambahkan bagian PANTANGAN atau KAPAN KE DOKTER pada jawaban solusi awal. Simpan kedua topik itu untuk tombol pertanyaan lanjutan. Pengecualian: jika ada tanda bahaya, tampilkan peringatan singkat untuk segera ke IGD.\n" +
+  "- Jika pengguna menekan pertanyaan lanjutan seperti penyebab, pantangan, kapan ke dokter, obat, atau langkah selanjutnya, jawab topik yang diminta secara langsung.\n" +
   "- Gunakan bullet list dan paragraf pendek. Jangan menggunakan diagnosis pasti, jangan menjanjikan kesembuhan, dan jangan merekomendasikan obat resep tanpa pemeriksaan dokter.\n" +
   '- Jangan pernah membuat diagnosis pasti 100%, gunakan bahasa "kemungkinan", "bisa jadi", "perlu dipastikan oleh dokter".\n' +
   "- Jika ada tanda bahaya (nyeri dada hebat, sesak napas berat, pendarahan hebat, penurunan kesadaran, dll), segera sarankan ke IGD tanpa menunggu info lain.\n" +
@@ -56,7 +58,7 @@ async function chatWithGemini(prompt: string): Promise<string> {
             systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
             contents: [{ role: "user", parts: [{ text: prompt }] }],
             generationConfig: {
-              maxOutputTokens: 1500,
+              maxOutputTokens: 1800,
               thinkingConfig: { thinkingBudget: 0 },
             },
           }),
@@ -83,51 +85,17 @@ async function chatWithGemini(prompt: string): Promise<string> {
   throw new Error(`Gemini API tidak dapat dihubungi (${lastErrText || "semua model sibuk/error"})`);
 }
 
-function extractChatCompletionText(payload: unknown): string | null {
-  if (!payload || typeof payload !== "object") return null;
-  const p = payload as Record<string, any>;
-
-  if (typeof p.text === "string" && p.text.trim()) return p.text;
-  if (typeof p.response === "string" && p.response.trim()) return p.response;
-  if (typeof p.content === "string" && p.content.trim()) return p.content;
-
-  const message = p.choices?.[0]?.message;
-  const content = message?.content;
-  if (typeof content === "string" && content.trim()) return content;
-
-  if (Array.isArray(content)) {
-    const text = content
-      .map((part) => {
-        if (typeof part === "string") return part;
-        if (part && typeof part === "object" && "text" in part) {
-          const val = part.text;
-          return typeof val === "string" ? val : "";
-        }
-        return "";
-      })
-      .join("")
-      .trim();
-    if (text) return text;
-  }
-
-  const choiceText = p.choices?.[0]?.text;
-  if (typeof choiceText === "string" && choiceText.trim()) return choiceText;
-
-  return null;
-}
-
 async function chatWithOpenAI(
   prompt: string,
   config: { apiKey?: string; baseUrl?: string; model?: string } = {},
 ): Promise<string> {
-  const apiKey = (config.apiKey || process.env.OPENAI_API_KEY || process.env.KOBOILLM_API_KEY)?.trim();
+  const apiKey = (config.apiKey || process.env.OPENAI_API_KEY)?.trim();
   if (!apiKey) throw new Error("OPENAI_API_KEY belum dikonfigurasi di server.");
 
-  const model = config.model || process.env.OPENAI_MODEL || process.env.KOBOILLM_MODEL || "gpt-4o-mini";
+  const model = config.model || process.env.OPENAI_MODEL || "gpt-4o-mini";
   const baseUrl = config.baseUrl || getOpenAIBaseUrl();
-  const endpoint = baseUrl.endsWith("/chat/completions") ? baseUrl : `${baseUrl}/chat/completions`;
 
-  const res = await fetch(endpoint, {
+  const res = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -139,7 +107,7 @@ async function chatWithOpenAI(
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: prompt },
       ],
-      max_tokens: 3000,
+      max_tokens: 1800,
     }),
   });
 
@@ -149,12 +117,32 @@ async function chatWithOpenAI(
   }
 
   const payload = await res.json();
-  const rawText = extractChatCompletionText(payload);
-  if (!rawText) throw new Error("OpenAI/KoboiLLM tidak mengembalikan respon valid.");
+  const text = getCompletionText(payload);
+  if (!text) throw new Error("OpenAI/KoboiLLM tidak mengembalikan respon valid.");
 
-  // Clean <think>...</think> tags if reasoning model is used
-  const cleaned = rawText.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
-  return cleaned || rawText;
+  return text;
+}
+
+function getCompletionText(payload: unknown): string | null {
+  const content = (payload as { choices?: Array<{ message?: { content?: unknown } }> })
+    .choices?.[0]?.message?.content;
+
+  if (typeof content === "string" && content.trim()) return content.trim();
+  if (Array.isArray(content)) {
+    const text = content
+      .map((part) => {
+        if (typeof part === "string") return part;
+        if (part && typeof part === "object" && "text" in part) {
+          const value = (part as { text?: unknown }).text;
+          return typeof value === "string" ? value : "";
+        }
+        return "";
+      })
+      .join("")
+      .trim();
+    return text || null;
+  }
+  return null;
 }
 
 export const chatWithAI = createServerFn({ method: "POST" })

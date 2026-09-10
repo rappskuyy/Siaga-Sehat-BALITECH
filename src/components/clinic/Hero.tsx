@@ -1,4 +1,11 @@
-import { ArrowUpRight, MessageCircleHeart, ScanLine, ShieldCheck, Users, Code2 } from "lucide-react";
+import {
+  ArrowUpRight,
+  MessageCircleHeart,
+  ScanLine,
+  ShieldCheck,
+  Users,
+  Code2,
+} from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import fotodokter2 from "@/assets/fotodokter.webp?url";
 import raffasyaAvatar from "@/assets/Raffasya Javas Niscala Widjaja.avif?url";
@@ -7,11 +14,7 @@ import muhamadAvatar from "@/assets/Muhamad Fedliansyah Ilham.avif?url";
 import { FloatingCard } from "./FloatingCard";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
-const AVATARS = [
-  raffasyaAvatar,
-  muhamadAvatar,
-  ahmadAvatar,
-];
+const AVATARS = [raffasyaAvatar, muhamadAvatar, ahmadAvatar];
 
 export function Hero() {
   return (
@@ -95,10 +98,16 @@ export function Hero() {
             {/* Center column: doctor photo with floating AI feature cards */}
             <div className="relative order-first flex flex-col items-center pt-2 sm:pt-4 min-[900px]:order-none min-[900px]:pt-0 min-[900px]:-mt-6 xl:-mt-10">
               <div className="relative inline-flex items-end justify-center">
+                {/* Soft ambient glow behind the avatar for a premium, alive feel */}
+                <span
+                  aria-hidden
+                  className="animate-siaga-glow pointer-events-none absolute inset-x-[10%] bottom-0 top-[10%] -z-10 rounded-full bg-[color:var(--color-clinic-blue)]/10 blur-3xl"
+                />
                 <img
                   src={fotodokter2}
                   alt="Dokter dengan stetoskop"
-                  className="h-[240px] w-auto max-w-full object-contain pointer-events-none select-none sm:h-[320px] md:h-[380px] min-[900px]:h-[460px] xl:h-[540px]"
+                  className="animate-fade-up h-[240px] w-auto max-w-full object-contain pointer-events-none select-none sm:h-[320px] md:h-[380px] min-[900px]:h-[460px] xl:h-[540px]"
+                  style={{ animationDuration: "0.7s" }}
                 />
 
                 {/* Floating overlay cards - Desktop only */}
@@ -166,7 +175,10 @@ export function Hero() {
               </div>
 
               <div className="pointer-events-none absolute inset-0 min-[900px]:hidden">
-                <FloatingCard className="left-[-24px] top-[8%] w-[126px] p-2 sm:left-[-30px] sm:w-[142px] sm:p-2.5" delay="0s">
+                <FloatingCard
+                  className="left-0 top-[6%] w-[38vw] max-w-[132px] min-w-[104px] p-2 xs:w-[142px] sm:p-2.5"
+                  delay="0s"
+                >
                   <div className="flex items-center justify-between gap-1">
                     <span className="text-[10px] font-medium leading-tight text-[color:var(--color-clinic-muted)] sm:text-[11px]">
                       Progres pemulihan
@@ -177,27 +189,39 @@ export function Hero() {
                     Risiko rendah
                   </p>
                   <div className="mt-1.5 flex flex-col gap-1">
-                    <div className="h-1.5 rounded-full bg-black/[0.06]"><div className="h-full w-4/5 rounded-full bg-[color:var(--color-clinic-blue)]" /></div>
-                    <div className="h-1.5 rounded-full bg-black/[0.06]"><div className="h-full w-2/5 rounded-full bg-[color:var(--color-clinic-blue-dark)]" /></div>
+                    <div className="h-1.5 rounded-full bg-black/[0.06]">
+                      <div className="h-full w-4/5 rounded-full bg-[color:var(--color-clinic-blue)]" />
+                    </div>
+                    <div className="h-1.5 rounded-full bg-black/[0.06]">
+                      <div className="h-full w-2/5 rounded-full bg-[color:var(--color-clinic-blue-dark)]" />
+                    </div>
                   </div>
                 </FloatingCard>
 
-                <FloatingCard className="right-[-24px] top-[34%] w-[126px] p-2 sm:right-[-30px] sm:w-[142px] sm:p-2.5" delay="0.5s">
+                <FloatingCard
+                  className="right-0 top-[32%] w-[38vw] max-w-[132px] min-w-[104px] p-2 xs:w-[142px] sm:p-2.5"
+                  delay="0.5s"
+                >
                   <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-1.5 py-0.5 text-[9px] font-semibold text-[color:var(--color-clinic-blue-dark)] sm:text-[10px]">
                     <ScanLine className="h-2.5 w-2.5" /> Scan AI
                   </span>
                   <p className="mt-1 text-[10px] font-semibold leading-snug text-[color:var(--color-clinic-ink)] sm:text-[11px]">
                     Analisis foto dan gejala
                   </p>
-                  <p className="mt-1 font-display text-sm font-extrabold text-[color:var(--color-clinic-blue-dark)]">92%</p>
+                  <p className="mt-1 font-display text-sm font-extrabold text-[color:var(--color-clinic-blue-dark)]">
+                    92%
+                  </p>
                 </FloatingCard>
 
-                <FloatingCard className="bottom-[4%] right-[-24px] w-[126px] p-2 sm:right-[-30px] sm:w-[142px] sm:p-2.5" delay="1s">
+                <FloatingCard
+                  className="bottom-[2%] right-0 w-[38vw] max-w-[132px] min-w-[104px] p-2 xs:w-[142px] sm:p-2.5"
+                  delay="1s"
+                >
                   <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-1.5 py-0.5 text-[9px] font-semibold text-[color:var(--color-clinic-blue-dark)] sm:text-[10px]">
                     <MessageCircleHeart className="h-2.5 w-2.5" /> Konsultasi AI
                   </span>
                   <p className="mt-1 text-[10px] font-semibold leading-snug text-[color:var(--color-clinic-ink)] sm:text-[11px]">
-                    Tanya gejala dengan bahasa sehari-hari
+                    Tanya gejala, bahasa sehari-hari
                   </p>
                 </FloatingCard>
               </div>
@@ -212,8 +236,8 @@ export function Hero() {
                   Buatan
                 </h3>
                 <p className="mt-2.5 sm:mt-3 text-xs sm:text-sm md:text-[15px] leading-relaxed text-[color:var(--color-clinic-muted)]">
-                  Peralatan generasi terbaru, diagnostik digital, dan kecerdasan buatan, semua bekerja
-                  untuk kesehatan Anda.
+                  Peralatan generasi terbaru, diagnostik digital, dan kecerdasan buatan, semua
+                  bekerja untuk kesehatan Anda.
                 </p>
               </div>
             </div>

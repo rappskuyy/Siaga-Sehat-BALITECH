@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { Bell, Menu, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useAuth } from "@/lib/auth/auth-context";
 
@@ -104,9 +104,10 @@ function SlideTabs() {
               updatePosition(i);
             }}
             className={`relative z-10 rounded-full px-4 py-1.5 transition-colors duration-200 cursor-pointer select-none
-              ${isUnderPill
-                ? "text-white font-semibold"
-                : "text-[color:var(--color-clinic-ink)] font-medium hover:text-[color:var(--color-clinic-blue)]"
+              ${
+                isUnderPill
+                  ? "text-white font-semibold"
+                  : "text-[color:var(--color-clinic-ink)] font-medium hover:text-[color:var(--color-clinic-blue)]"
               }
             `}
           >
@@ -176,87 +177,140 @@ export function SiteHeader() {
               </Link>
             </>
           ) : (
-            <>
-              <Link
-                to="/login"
-                className="hidden items-center justify-center rounded-full bg-[color:var(--color-clinic-blue)] px-4 py-2 text-sm font-semibold text-white shadow-md shadow-[color:var(--color-clinic-blue)]/20 transition hover:bg-[color:var(--color-clinic-blue-dark)] sm:inline-flex"
+            <div className="hidden items-center gap-2 xs:flex">
+              <motion.div
+                whileHover={{ y: -2, scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
               >
-                Masuk
-              </Link>
-              <Link
-                to="/register"
-                className="hidden items-center justify-center rounded-full border border-[color:var(--color-clinic-blue)]/15 bg-[color:var(--color-clinic-blue-soft)] px-4 py-2 text-sm font-semibold text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)] hover:text-white sm:inline-flex"
+                <Link
+                  to="/login"
+                  className="group inline-flex items-center justify-center rounded-full bg-[color:var(--color-clinic-blue)] px-4 py-2 text-sm font-semibold text-white shadow-md shadow-[color:var(--color-clinic-blue)]/25 outline-none transition-all duration-300 hover:bg-[color:var(--color-clinic-blue-dark)] hover:shadow-lg hover:shadow-[color:var(--color-clinic-blue)]/35 focus-visible:ring-2 focus-visible:ring-[color:var(--color-clinic-blue)] focus-visible:ring-offset-2"
+                >
+                  <span className="transition-transform duration-300 group-hover:scale-[1.02]">Masuk</span>
+                </Link>
+              </motion.div>
+              <motion.div
+                whileHover={{ y: -2, scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
               >
-                Daftar
-              </Link>
-            </>
+                <Link
+                  to="/register"
+                  className="group inline-flex items-center justify-center rounded-full bg-[color:var(--color-clinic-blue)] px-4 py-2 text-sm font-semibold text-white shadow-md shadow-[color:var(--color-clinic-blue)]/25 outline-none transition-all duration-300 hover:bg-[color:var(--color-clinic-blue-dark)] hover:shadow-lg hover:shadow-[color:var(--color-clinic-blue)]/35 focus-visible:ring-2 focus-visible:ring-[color:var(--color-clinic-blue)] focus-visible:ring-offset-2"
+                >
+                  <span className="transition-transform duration-300 group-hover:scale-[1.02]">Daftar</span>
+                </Link>
+              </motion.div>
+            </div>
           )}
 
-          {!loading && (
-            !user ? (
-              <Link
-                to="/login"
-                className="inline-flex items-center justify-center rounded-full bg-[color:var(--color-clinic-blue)] px-3 py-1.5 text-[11px] font-semibold text-white shadow-xs sm:hidden"
-              >
-                Masuk
-              </Link>
+          {!loading &&
+            (!user ? (
+              <motion.div whileTap={{ scale: 0.93 }} className="xs:hidden">
+                <Link
+                  to="/login"
+                  className="inline-flex items-center justify-center rounded-full bg-[color:var(--color-clinic-blue)] px-3 py-1.5 text-[11px] font-semibold text-white shadow-xs transition-transform duration-200"
+                >
+                  Masuk
+                </Link>
+              </motion.div>
             ) : (
-              <Link
-                to="/profile"
-                className="inline-flex max-w-[82px] items-center justify-center truncate rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3 py-1.5 text-[11px] font-semibold text-[color:var(--color-clinic-blue)] sm:hidden"
-              >
-                {profile?.full_name?.split(" ")[0] || "Profil"}
-              </Link>
-            )
-          )}
+              <motion.div whileTap={{ scale: 0.93 }} className="sm:hidden">
+                <Link
+                  to="/profile"
+                  className="inline-flex max-w-[82px] items-center justify-center truncate rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3 py-1.5 text-[11px] font-semibold text-[color:var(--color-clinic-blue)] transition-transform duration-200"
+                >
+                  {profile?.full_name?.split(" ")[0] || "Profil"}
+                </Link>
+              </motion.div>
+            ))}
 
-          <button
+          <motion.button
             type="button"
             onClick={() => setIsMenuOpen((open) => !open)}
-            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] transition hover:bg-[color:var(--color-clinic-blue)]/10 lg:hidden"
+            whileTap={{ scale: 0.9 }}
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue)] transition-colors duration-200 hover:bg-[color:var(--color-clinic-blue)]/10 lg:hidden"
             aria-label={isMenuOpen ? "Tutup menu" : "Buka menu"}
             aria-expanded={isMenuOpen}
           >
-            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+            <motion.span
+              key={isMenuOpen ? "close" : "open"}
+              initial={{ rotate: -90, opacity: 0 }}
+              animate={{ rotate: 0, opacity: 1 }}
+              transition={{ duration: 0.2 }}
+              className="inline-flex"
+            >
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </motion.span>
+          </motion.button>
         </div>
       </div>
 
-      {isMenuOpen && (
-        <div className="absolute left-4 right-4 top-[calc(100%+8px)] z-50 rounded-2xl border border-black/5 bg-white p-3 shadow-xl lg:hidden">
-          <nav className="flex flex-col gap-1">
-            {TABS.map((tab) => {
-              const isActive = tab.path === "/" ? currentPath === "/" : currentPath.startsWith(tab.path);
-              return (
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute left-4 right-4 top-[calc(100%+8px)] z-50 rounded-2xl border border-black/5 bg-white p-3 shadow-xl lg:hidden"
+          >
+            <nav className="flex flex-col gap-1">
+              {TABS.map((tab) => {
+                const isActive =
+                  tab.path === "/" ? currentPath === "/" : currentPath.startsWith(tab.path);
+                return (
+                  <Link
+                    key={tab.path}
+                    to={tab.path}
+                    search={tab.search as any}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`rounded-xl px-3.5 py-2.5 text-sm transition-colors duration-200 ${
+                      isActive
+                        ? "font-semibold text-[color:var(--color-clinic-blue)] bg-white"
+                        : "font-medium text-[color:var(--color-clinic-ink)] hover:bg-gray-50"
+                    }`}
+                  >
+                    {tab.label}
+                  </Link>
+                );
+              })}
+              {user && (
                 <Link
-                  key={tab.path}
-                  to={tab.path}
-                  search={tab.search as any}
+                  to="/reminders"
                   onClick={() => setIsMenuOpen(false)}
-                  className={`rounded-xl px-3.5 py-2.5 text-sm transition ${isActive
+                  className={`rounded-xl px-3.5 py-2.5 text-sm transition-colors duration-200 ${
+                    currentPath.startsWith("/reminders")
                       ? "font-semibold text-[color:var(--color-clinic-blue)] bg-white"
                       : "font-medium text-[color:var(--color-clinic-ink)] hover:bg-gray-50"
-                    }`}
-                >
-                  {tab.label}
-                </Link>
-              );
-            })}
-            {user && (
-              <Link
-                to="/reminders"
-                onClick={() => setIsMenuOpen(false)}
-                className={`rounded-xl px-3.5 py-2.5 text-sm transition ${currentPath.startsWith("/reminders")
-                    ? "font-semibold text-[color:var(--color-clinic-blue)] bg-white"
-                    : "font-medium text-[color:var(--color-clinic-ink)] hover:bg-gray-50"
                   }`}
-              >
-                Notifikasi
-              </Link>
-            )}
-          </nav>
-        </div>
-      )}
+                >
+                  Notifikasi
+                </Link>
+              )}
+              {!user && (
+                <div className="mt-1 flex flex-col gap-1.5 border-t border-black/5 pt-2.5">
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="rounded-xl bg-[color:var(--color-clinic-blue)] px-3.5 py-2.5 text-center text-sm font-semibold text-white transition-colors duration-200 hover:bg-[color:var(--color-clinic-blue-dark)]"
+                  >
+                    Masuk
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="rounded-xl bg-[color:var(--color-clinic-blue)] px-3.5 py-2.5 text-center text-sm font-semibold text-white transition-colors duration-200 hover:bg-[color:var(--color-clinic-blue-dark)]"
+                  >
+                    Daftar
+                  </Link>
+                </div>
+              )}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
