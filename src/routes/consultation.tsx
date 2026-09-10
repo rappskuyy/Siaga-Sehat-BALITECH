@@ -340,7 +340,7 @@ function ConsultationPage() {
       .join("\n");
 
   const sendMessage = useCallback(
-    async (text: string) => {
+    async (text: string, options: { showActionCard?: boolean } = {}) => {
       if (!text.trim()) return;
 
       const userMsg: ChatMessage = { role: "user", text, time: formatTime() };
@@ -348,7 +348,7 @@ function ConsultationPage() {
       setMessages(next);
       setLoading(true);
 
-      const intentCard = detectIntentAction(text);
+      const intentCard = options.showActionCard === false ? undefined : detectIntentAction(text);
 
       try {
         const prompt = `Kamu adalah Asisten Kesehatan SiagaSehat yang ramah, empati, dan profesional dalam Bahasa Indonesia. Berikut riwayat percakapan sejauh ini:\n${buildContext(
@@ -426,6 +426,7 @@ function ConsultationPage() {
 
     void sendMessage(
       `Saya baru selesai memilih keluhan pada organ ${context.regionName || ""} di halaman Anatomi. Berikut rangkuman data saya:\n${details}\n\nTolong bantu periksa keluhan ini, tanyakan hal yang perlu diketahui, dan berikan rekomendasi medis awal yang aman.`,
+      { showActionCard: false },
     );
   }, [anatomy, sendMessage]);
 
@@ -464,6 +465,7 @@ function ConsultationPage() {
 
     void sendMessage(
       `Saya baru selesai melakukan scan AI. Berikut hasil skriningnya:\n${details}\n\nTolong jelaskan hasil ini dengan bahasa yang mudah dipahami, validasi hal yang perlu saya waspadai, dan berikan pertanyaan lanjutan atau langkah aman yang sebaiknya saya lakukan.`,
+      { showActionCard: false },
     );
   }, [scan, sendMessage]);
 
