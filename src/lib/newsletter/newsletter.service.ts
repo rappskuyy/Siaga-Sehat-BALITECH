@@ -57,7 +57,7 @@ export async function subscribeNewsletterClient({ email, nama }: SubscribeParams
     }
   }
 
-  // 2. Kirim email via EmailJS langsung dari Browser (hanya jika di client)
+  // 2. Kirim email via EmailJS langsung dari Browser
   let emailSent = false;
   let emailError = "";
 
