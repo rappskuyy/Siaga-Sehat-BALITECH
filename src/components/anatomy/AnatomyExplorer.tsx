@@ -6,7 +6,7 @@ import { assessHealthAnatomy } from "@/lib/anatomy/anatomy.server";
 import { AnatomyViewer } from "./AnatomyViewer";
 import { AnatomyGuideCard } from "./AnatomyGuideCard";
 import { SymptomSelectorCard } from "./SymptomSelectorCard";
-import { AlertCircle, Activity, ChevronRight, Sparkles, Stethoscope, Layers, BookOpen, Loader2 } from "lucide-react";
+import { AlertCircle, ChevronRight, Sparkles, Stethoscope, Layers, BookOpen, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
 
 const AIAssessmentResultCard = lazy(() =>
@@ -176,10 +176,6 @@ export function AnatomyExplorer() {
     <div ref={containerRef} className="w-full max-w-[1440px] mx-auto min-w-0 overflow-hidden">
       {/* Top Banner Intro */}
       <div className="text-center mb-4 sm:mb-6 md:mb-8 px-2 min-w-0">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-clinic-blue-soft)]/80 px-3.5 py-1 text-[10px] sm:text-xs font-bold text-[color:var(--color-clinic-blue-dark)] shadow-2xs max-w-full truncate border border-[color:var(--color-clinic-blue)]/15">
-          <Activity className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-clinic-blue)]" />
-          Interactive Anatomy Explorer & AI Assessment
-        </span>
         <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-extrabold text-[color:var(--color-clinic-ink)] mt-2 tracking-tight break-words">
           Eksplorasi Anatomi Tubuh
         </h1>

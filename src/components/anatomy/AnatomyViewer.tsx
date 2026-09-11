@@ -23,7 +23,7 @@ type CategoryFilter = "all" | "head" | "torso" | "spine" | "limbs";
 
 export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerProps) {
   const [view, setView] = useState<"front" | "back">("front");
-  const [zoomLevel, setZoomLevel] = useState<number>(1);
+  const [zoomLevel, setZoomLevel] = useState<number>(1.25);
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
 
   const visibleRegions = useMemo(() => {
@@ -42,10 +42,10 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
 
   const activeImageUrl = view === "front" ? FRONT_IMAGE_URL : BACK_IMAGE_URL;
 
-  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.25, 2.25));
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.25, 1.25));
   const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.25, 0.75));
   const handleResetZoom = () => {
-    setZoomLevel(1);
+    setZoomLevel(1.25);
     setCategoryFilter("all");
   };
   const toggleView = () => setView((prev) => (prev === "front" ? "back" : "front"));
@@ -73,22 +73,20 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
           <button
             type="button"
             onClick={() => setView("front")}
-            className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center ${
-              view === "front"
+            className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center ${view === "front"
                 ? "bg-white text-[color:var(--color-clinic-ink)] shadow-xs border border-black/5 font-bold"
                 : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
-            }`}
+              }`}
           >
             Depan
           </button>
           <button
             type="button"
             onClick={() => setView("back")}
-            className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center ${
-              view === "back"
+            className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center ${view === "back"
                 ? "bg-white text-[color:var(--color-clinic-ink)] shadow-xs border border-black/5 font-bold"
                 : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
-            }`}
+              }`}
           >
             Belakang
           </button>
@@ -96,7 +94,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
       </div>
 
       {/* Interactive Category Filter Pills */}
-      <div className="mt-2.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs shrink-0 max-w-full min-w-0">
+      <div className="mt-2 flex flex-wrap items-center gap-1.5 pb-0.5 text-xs shrink-0 max-w-full min-w-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         <span className="text-[9px] sm:text-[10px] font-bold text-[color:var(--color-clinic-muted)] uppercase tracking-wider flex items-center gap-1 shrink-0 mr-0.5">
           <Filter className="h-3 w-3" /> Filter:
         </span>
@@ -112,11 +110,10 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             type="button"
             onClick={() => setCategoryFilter(cat.id as CategoryFilter)}
             aria-label={`Filter kategori ${cat.label}`}
-            className={`rounded-full px-2.5 py-0.5 text-[10px] sm:text-[11px] font-semibold whitespace-nowrap transition-all cursor-pointer ${
-              categoryFilter === cat.id
+            className={`rounded-full px-2.5 py-0.5 text-[10px] sm:text-[11px] font-semibold whitespace-nowrap transition-all cursor-pointer ${categoryFilter === cat.id
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-xs"
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            }`}
+              }`}
           >
             {cat.label}
           </button>
@@ -155,9 +152,9 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
           <button
             type="button"
             onClick={handleZoomIn}
-            disabled={zoomLevel >= 2.25}
+            disabled={zoomLevel >= 1.25}
             aria-label="Perbesar model anatomi"
-            title="Perbesar Canvas (Zoom In)"
+            title="Perbesar Canvas (Maksimal 125%)"
             className="grid h-8 w-8 min-h-[32px] min-w-[32px] place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition disabled:opacity-30 cursor-pointer"
           >
             <ZoomIn className="h-4 w-4" />
@@ -178,7 +175,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             type="button"
             onClick={handleResetZoom}
             aria-label="Reset ukuran model anatomi"
-            title="Reset Skala Zoom (100%)"
+            title="Reset Skala Zoom (Default 125%)"
             className="grid h-8 w-8 min-h-[32px] min-w-[32px] place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition cursor-pointer text-[10px] font-bold"
           >
             {Math.round(zoomLevel * 100)}%
@@ -204,7 +201,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
         >
           {/* Atomic Group Container: Aspect ratio 1:2 locked so image & hotspots never separate */}
           <div
-            style={{ height: "660px" }}
+            style={{ height: "460px" }}
             className="relative aspect-[1/2] w-auto max-w-full pointer-events-auto"
           >
             {/* Base Layer Anatomy SVG Image */}
@@ -232,6 +229,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
                     position={pos}
                     isSelected={selectedRegion?.id === region.id}
                     onSelect={onSelectRegion}
+                    zoomLevel={zoomLevel}
                   />
                 );
               })}
