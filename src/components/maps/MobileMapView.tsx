@@ -402,7 +402,7 @@ export function MobileMapView() {
     ? getWikimediaFallbackPhoto(selectedPharmacy.facilityType, selectedPharmacy.name?.charCodeAt(0) || 0)
     : undefined;
   const finalDescription = selectedPharmacy
-    ? getFacilityDescriptionByIndex(selectedPharmacy.placeId?.charCodeAt(0) || 0)
+    ? getFacilityDescriptionByIndex(selectedPharmacy.placeId?.charCodeAt(0) || selectedPharmacy.name?.charCodeAt(0) || 0)
     : "";
 
   return (
@@ -707,28 +707,17 @@ export function MobileMapView() {
           {/* Content */}
           <div className="overflow-y-auto px-4 pb-24 pt-3 max-h-[calc(75vh-55px)]">
             {/* Header */}
-            <div className="flex items-start justify-between gap-3 mb-4">
-              <div className="flex-1 min-w-0">
-                <span className="text-xs font-bold uppercase text-[#4a6fa5] flex items-center gap-1.5 mb-1">
-                  {selectedPharmacy.facilityType === "hospital" ? (
-                    <><Building2 className="h-3.5 w-3.5 text-red-500 shrink-0" /> RUMAH SAKIT</>
-                  ) : selectedPharmacy.facilityType === "clinic" ? (
-                    <><Stethoscope className="h-3.5 w-3.5 text-amber-500 shrink-0" /> KLINIK</>
-                  ) : (
-                    <><Pill className="h-3.5 w-3.5 text-blue-500 shrink-0" /> APOTEK</>
-                  )}
-                </span>
-                <h2 className="text-lg font-bold text-[#111111]">{selectedPharmacy.name}</h2>
-              </div>
-              <button
-                type="button"
-                onClick={handleCloseDetails}
-                className="p-1.5 rounded-full text-[#6B7280] hover:text-[#111111] hover:bg-slate-100 transition shrink-0"
-                aria-label="Tutup panel informasi (Rute tetap aktif)"
-                title="Tutup Panel"
-              >
-                <X className="h-5 w-5" />
-              </button>
+            <div className="mb-4">
+              <span className="text-xs font-bold uppercase text-[#4a6fa5] flex items-center gap-1.5 mb-1">
+                {selectedPharmacy.facilityType === "hospital" ? (
+                  <><Building2 className="h-3.5 w-3.5 text-red-500 shrink-0" /> RUMAH SAKIT</>
+                ) : selectedPharmacy.facilityType === "clinic" ? (
+                  <><Stethoscope className="h-3.5 w-3.5 text-amber-500 shrink-0" /> KLINIK</>
+                ) : (
+                  <><Pill className="h-3.5 w-3.5 text-blue-500 shrink-0" /> APOTEK</>
+                )}
+              </span>
+              <h2 className="text-lg font-bold text-[#111111]">{selectedPharmacy.name}</h2>
             </div>
 
             {/* Photo */}
