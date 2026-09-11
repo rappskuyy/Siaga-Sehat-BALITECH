@@ -74,7 +74,10 @@ export function SymptomSelectorCard({
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center gap-1 rounded-full bg-[#f1f5f9] px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold text-[color:var(--color-clinic-blue-dark)] hover:bg-[color:var(--color-clinic-blue-soft)] transition shrink-0 border border-black/5 cursor-pointer shadow-2xs"
+            disabled={isLoading}
+            className={`inline-flex items-center gap-1 rounded-full bg-[#f1f5f9] px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold text-[color:var(--color-clinic-blue-dark)] transition shrink-0 border border-black/5 shadow-2xs ${
+              isLoading ? "opacity-50 cursor-not-allowed pointer-events-none" : "hover:bg-[color:var(--color-clinic-blue-soft)] cursor-pointer"
+            }`}
             title="Pilih bagian tubuh yang lain"
           >
             <RotateCcw className="h-3 w-3" />
@@ -90,15 +93,21 @@ export function SymptomSelectorCard({
           <input
             type="text"
             value={searchQuery}
+            disabled={isLoading}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={`Cari gejala atau kondisi pada ${region.nameIndonesian.toLowerCase()}...`}
-            className="w-full rounded-2xl border border-black/10 bg-[#f8fafc] pl-10 pr-9 py-2 text-xs font-medium text-[color:var(--color-clinic-ink)] placeholder:text-[color:var(--color-clinic-muted)] focus:border-[color:var(--color-clinic-blue)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[color:var(--color-clinic-blue)]/20 transition"
+            className={`w-full rounded-2xl border border-black/10 bg-[#f8fafc] pl-10 pr-9 py-2 text-xs font-medium text-[color:var(--color-clinic-ink)] placeholder:text-[color:var(--color-clinic-muted)] focus:border-[color:var(--color-clinic-blue)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[color:var(--color-clinic-blue)]/20 transition ${
+              isLoading ? "opacity-60 cursor-not-allowed" : ""
+            }`}
           />
           {searchQuery && (
             <button
               type="button"
+              disabled={isLoading}
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 flex items-center justify-center transition cursor-pointer"
+              className={`absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 flex items-center justify-center transition ${
+                isLoading ? "opacity-50 cursor-not-allowed pointer-events-none" : "cursor-pointer"
+              }`}
             >
               <X className="h-3 w-3" />
             </button>
@@ -109,8 +118,11 @@ export function SymptomSelectorCard({
         <div className="flex items-center gap-2 border-b border-black/5 pb-2 text-xs overflow-x-auto no-scrollbar">
           <button
             type="button"
+            disabled={isLoading}
             onClick={() => setActiveTab("all")}
-            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all cursor-pointer ${activeTab === "all"
+            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all ${
+              isLoading ? "opacity-50 cursor-not-allowed pointer-events-none" : "cursor-pointer"
+            } ${activeTab === "all"
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-sm"
                 : "bg-[#f1f5f9] text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
               }`}
@@ -119,8 +131,11 @@ export function SymptomSelectorCard({
           </button>
           <button
             type="button"
+            disabled={isLoading}
             onClick={() => setActiveTab("symptoms")}
-            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all cursor-pointer ${activeTab === "symptoms"
+            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all ${
+              isLoading ? "opacity-50 cursor-not-allowed pointer-events-none" : "cursor-pointer"
+            } ${activeTab === "symptoms"
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-sm"
                 : "bg-[#f1f5f9] text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
               }`}
@@ -129,8 +144,11 @@ export function SymptomSelectorCard({
           </button>
           <button
             type="button"
+            disabled={isLoading}
             onClick={() => setActiveTab("conditions")}
-            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all cursor-pointer ${activeTab === "conditions"
+            className={`rounded-full px-3 py-1.5 font-semibold text-xs whitespace-nowrap transition-all ${
+              isLoading ? "opacity-50 cursor-not-allowed pointer-events-none" : "cursor-pointer"
+            } ${activeTab === "conditions"
                 ? "bg-[color:var(--color-clinic-blue)] text-white shadow-sm"
                 : "bg-[#f1f5f9] text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
               }`}
@@ -165,17 +183,21 @@ export function SymptomSelectorCard({
                   return (
                     <div
                       key={symptom.id}
-                      onClick={() => onToggleSymptom(symptom.name)}
+                      onClick={() => !isLoading && onToggleSymptom(symptom.name)}
                       role="checkbox"
                       aria-checked={isChecked}
-                      tabIndex={0}
+                      aria-disabled={isLoading}
+                      tabIndex={isLoading ? -1 : 0}
                       onKeyDown={(e) => {
+                        if (isLoading) return;
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
                           onToggleSymptom(symptom.name);
                         }
                       }}
-                      className={`group flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 rounded-xl border p-2.5 sm:p-3 cursor-pointer transition-all duration-150 select-none ${isChecked
+                      className={`group flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 rounded-xl border p-2.5 sm:p-3 transition-all duration-150 select-none ${
+                        isLoading ? "opacity-50 cursor-not-allowed pointer-events-none" : "cursor-pointer"
+                      } ${isChecked
                           ? "border-[color:var(--color-clinic-blue)] bg-[color:var(--color-clinic-blue-soft)]/25 text-[color:var(--color-clinic-ink)] shadow-xs ring-1 ring-[color:var(--color-clinic-blue)]/30"
                           : "border-black/5 bg-[#f8fafc] text-[color:var(--color-clinic-ink)] hover:border-[color:var(--color-clinic-blue)]/40 hover:bg-white"
                         }`}
@@ -229,17 +251,21 @@ export function SymptomSelectorCard({
                   return (
                     <div
                       key={condition.id}
-                      onClick={() => onToggleCondition(condition.name)}
+                      onClick={() => !isLoading && onToggleCondition(condition.name)}
                       role="checkbox"
                       aria-checked={isChecked}
-                      tabIndex={0}
+                      aria-disabled={isLoading}
+                      tabIndex={isLoading ? -1 : 0}
                       onKeyDown={(e) => {
+                        if (isLoading) return;
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
                           onToggleCondition(condition.name);
                         }
                       }}
-                      className={`group rounded-xl border p-2.5 sm:p-3 cursor-pointer transition-all duration-150 select-none ${isChecked
+                      className={`group rounded-xl border p-2.5 sm:p-3 transition-all duration-150 select-none ${
+                        isLoading ? "opacity-50 cursor-not-allowed pointer-events-none" : "cursor-pointer"
+                      } ${isChecked
                           ? "border-[color:var(--color-clinic-blue)] bg-[color:var(--color-clinic-blue-soft)]/30 shadow-xs ring-1 ring-[color:var(--color-clinic-blue)]/30"
                           : "border-black/5 bg-[#f8fafc] hover:bg-white hover:border-[color:var(--color-clinic-blue)]/40"
                         }`}
@@ -284,9 +310,12 @@ export function SymptomSelectorCard({
         <textarea
           rows={2}
           value={additionalNotes}
+          disabled={isLoading}
           onChange={(e) => onNotesChange(e.target.value)}
           placeholder="Tuliskan durasi sakit, faktor pemicu, atau detail gejala lainnya di sini..."
-          className="w-full rounded-2xl border border-black/10 bg-[#f8fafc] p-2.5 text-xs text-[color:var(--color-clinic-ink)] placeholder:text-[color:var(--color-clinic-muted)] focus:border-[color:var(--color-clinic-blue)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[color:var(--color-clinic-blue)]/20 transition resize-none"
+          className={`w-full rounded-2xl border border-black/10 bg-[#f8fafc] p-2.5 text-xs text-[color:var(--color-clinic-ink)] placeholder:text-[color:var(--color-clinic-muted)] focus:border-[color:var(--color-clinic-blue)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[color:var(--color-clinic-blue)]/20 transition resize-none ${
+            isLoading ? "opacity-60 cursor-not-allowed" : ""
+          }`}
         />
       </div>
 

@@ -107,7 +107,7 @@ async function chatWithOpenAI(
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: prompt },
       ],
-      max_tokens: 1800,
+      max_tokens: 3000,
     }),
   });
 

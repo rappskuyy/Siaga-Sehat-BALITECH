@@ -176,7 +176,7 @@ Tolong lakukan AI Health Assessment dan kembalikan JSON.`;
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt },
       ],
-      max_tokens: 1000,
+      max_tokens: 3500,
     }),
   });
 
@@ -243,7 +243,7 @@ Tolong lakukan AI Health Assessment dan kembalikan JSON.`;
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt },
       ],
-      max_tokens: 1000,
+      max_tokens: 3500,
     }),
   });
 
@@ -316,8 +316,23 @@ function extractJsonObject(text: string): string {
 }
 
 function parseResultJson(jsonString: string): AIAssessmentResult {
-  const cleaned = extractJsonObject(jsonString);
-  const raw = JSON.parse(cleaned);
+  let raw: any = {};
+  try {
+    const cleaned = extractJsonObject(jsonString);
+    raw = JSON.parse(cleaned);
+  } catch (err) {
+    console.warn("Gagal parse JSON langsung dari AI, mencoba perbaikan:", err);
+    try {
+      const start = jsonString.indexOf("{");
+      if (start >= 0) {
+        let fixed = jsonString.slice(start);
+        if (!fixed.endsWith("}")) fixed += "}";
+        raw = JSON.parse(fixed);
+      }
+    } catch {
+      raw = {};
+    }
+  }
 
   return {
     summary: raw.summary || "Penilaian kondisi awal berdasarkan gejala yang Anda pilih.",
