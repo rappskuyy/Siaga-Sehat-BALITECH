@@ -6,7 +6,6 @@ import {
   MousePointerClick,
   ZoomIn,
   ZoomOut,
-  RotateCw,
   Filter,
   Sparkles,
 } from "lucide-react";
@@ -48,7 +47,6 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
     setZoomLevel(1.3);
     setCategoryFilter("all");
   };
-  const toggleView = () => setView((prev) => (prev === "front" ? "back" : "front"));
 
   return (
     <div className="flex flex-col w-full h-full min-h-[540px] sm:min-h-[620px] lg:min-h-[660px] rounded-[20px] sm:rounded-[28px] bg-white p-3.5 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 select-none overflow-hidden min-w-0">
@@ -196,18 +194,6 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             className="grid h-8 w-8 min-h-[32px] min-w-[32px] place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition cursor-pointer text-[10px] font-bold"
           >
             {Math.round(zoomLevel * 100)}%
-          </button>
-
-          <div className="h-px bg-slate-200 my-0.5" />
-
-          <button
-            type="button"
-            onClick={toggleView}
-            aria-label="Putar tampilan model anatomi"
-            title="Putar Model (Depan / Belakang)"
-            className="grid h-8 w-8 min-h-[32px] min-w-[32px] place-items-center rounded-xl bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition cursor-pointer"
-          >
-            <RotateCw className="h-4 w-4" />
           </button>
         </div>
 
