@@ -4,41 +4,16 @@ import { ANATOMY_REGIONS } from "@/data/anatomyData";
 import { AnatomyHotspot } from "./AnatomyHotspot";
 import {
   MousePointerClick,
-  RotateCcw,
   ZoomIn,
   ZoomOut,
   RotateCw,
   Filter,
-  Check,
-  Brain,
-  Eye,
-  Wind,
-  Stethoscope,
-  Heart,
-  Flame,
-  Activity,
-  Bone,
-  Layers,
-  Footprints,
   Sparkles,
 } from "lucide-react";
 
 interface AnatomyViewerProps {
   selectedRegion: AnatomyRegion | null;
   onSelectRegion: (region: AnatomyRegion) => void;
-}
-
-function getRegionIcon(regionId: string) {
-  if (regionId.includes("kepala")) return <Brain className="h-4 w-4" />;
-  if (regionId.includes("mata")) return <Eye className="h-4 w-4" />;
-  if (regionId.includes("hidung")) return <Wind className="h-4 w-4" />;
-  if (regionId.includes("leher")) return <Stethoscope className="h-4 w-4" />;
-  if (regionId.includes("dada")) return <Heart className="h-4 w-4" />;
-  if (regionId.includes("perut")) return <Flame className="h-4 w-4" />;
-  if (regionId.includes("punggung")) return <Bone className="h-4 w-4" />;
-  if (regionId.includes("pinggul")) return <Layers className="h-4 w-4" />;
-  if (regionId.includes("kaki")) return <Footprints className="h-4 w-4" />;
-  return <Activity className="h-4 w-4" />;
 }
 
 const FRONT_IMAGE_URL = "/anatomy/human-anatomy-front.svg";
@@ -67,48 +42,38 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
 
   const activeImageUrl = view === "front" ? FRONT_IMAGE_URL : BACK_IMAGE_URL;
 
-  const handleZoomIn = () => {
-    setZoomLevel((prev) => Math.min(prev + 0.25, 2.25));
-  };
-
-  const handleZoomOut = () => {
-    setZoomLevel((prev) => Math.max(prev - 0.25, 0.75));
-  };
-
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.25, 2.25));
+  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.25, 0.75));
   const handleResetZoom = () => {
     setZoomLevel(1);
     setCategoryFilter("all");
   };
-
-  const toggleView = () => {
-    setView((prev) => (prev === "front" ? "back" : "front"));
-  };
+  const toggleView = () => setView((prev) => (prev === "front" ? "back" : "front"));
 
   return (
-    <div className="flex flex-col w-full h-[520px] sm:h-[620px] lg:h-[680px] rounded-[20px] sm:rounded-[28px] bg-white p-3 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 select-none overflow-hidden min-w-0">
+    <div className="flex flex-col w-full h-full min-h-[540px] sm:min-h-[620px] lg:min-h-[660px] rounded-[20px] sm:rounded-[28px] bg-white p-3.5 sm:p-5 md:p-6 shadow-[var(--shadow-clinic-lg)] border border-black/5 select-none overflow-hidden min-w-0">
       {/* Top Header Bar */}
       <div className="flex items-center justify-between gap-2 border-b border-black/5 pb-3 shrink-0 max-w-full min-w-0 overflow-hidden">
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          <div className="grid h-6 w-6 sm:h-7 sm:w-7 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white text-[11px] sm:text-xs font-bold shadow-xs shrink-0">
-            1
+          <div className="grid h-7 w-7 sm:h-8 sm:w-8 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white text-xs font-bold shadow-xs shrink-0">
+            2
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="font-display text-xs sm:text-base font-bold text-[color:var(--color-clinic-ink)] truncate">
               Model Anatomi Tubuh Interaktif
             </h2>
             <p className="text-[10px] sm:text-[11px] text-[color:var(--color-clinic-muted)] truncate hidden sm:block">
-              Perbesar model, putar tampak, atau pilih bagian tubuh
+              Perbesar model, putar tampak, atau pilih titik organ
             </p>
           </div>
         </div>
 
-        {/* Front / Back Segmented Switch */}
+        {/* Front / Back Switch */}
         <div className="flex items-center rounded-full bg-slate-100/90 p-0.5 border border-slate-200/80 shadow-inner shrink-0">
           <button
             type="button"
             onClick={() => setView("front")}
-            aria-label="Tampilan Depan Anatomi"
-            className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer min-h-[30px] sm:min-h-[36px] flex items-center ${
+            className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center ${
               view === "front"
                 ? "bg-white text-[color:var(--color-clinic-ink)] shadow-xs border border-black/5 font-bold"
                 : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
@@ -119,8 +84,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
           <button
             type="button"
             onClick={() => setView("back")}
-            aria-label="Tampilan Belakang Anatomi"
-            className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer min-h-[30px] sm:min-h-[36px] flex items-center ${
+            className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center ${
               view === "back"
                 ? "bg-white text-[color:var(--color-clinic-ink)] shadow-xs border border-black/5 font-bold"
                 : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
@@ -159,46 +123,35 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
         ))}
       </div>
 
-      {/* Guide hint & Mobile Quick Select Dropdown */}
-      <div className="mt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-1.5 text-xs text-slate-600 bg-slate-50/80 px-2.5 py-1.5 rounded-xl border border-slate-200/60 shrink-0 max-w-full overflow-hidden min-w-0">
-        <label htmlFor="organ-selector-dropdown" className="flex items-center gap-1.5 font-medium text-slate-700 min-w-0 cursor-pointer">
-          <MousePointerClick className="h-3.5 w-3.5 text-sky-600 shrink-0" />
-          <span className="text-[10px] sm:text-[11px] truncate">Klik organ atau pilih dari daftar:</span>
-        </label>
-
-        {/* Quick Organ Selector Dropdown */}
-        <select
-          id="organ-selector-dropdown"
-          name="organ-selector"
-          aria-label="Pilih Organ Tubuh"
-          value={selectedRegion?.id || ""}
-          onChange={(e) => {
-            const found = ANATOMY_REGIONS.find((r) => r.id === e.target.value);
-            if (found) onSelectRegion(found);
-          }}
-          className="w-full sm:w-auto max-w-full min-w-0 rounded-lg border border-slate-300 bg-white px-2 py-1 text-[11px] sm:text-xs font-semibold text-[color:var(--color-clinic-ink)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-clinic-blue)]/20 cursor-pointer shadow-2xs truncate"
-        >
-          <option value="" disabled>
-            -- Pilih Organ Tubuh --
-          </option>
-          {ANATOMY_REGIONS.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.nameIndonesian} ({r.symptoms.length} Gejala)
-            </option>
-          ))}
-        </select>
+      {/* Prominent Callout Banner encouraging clicks or showing active organ */}
+      <div className="mt-2 flex items-center justify-between gap-1.5 text-xs text-[color:var(--color-clinic-blue-dark)] bg-gradient-to-r from-[color:var(--color-clinic-blue-soft)]/60 via-[color:var(--color-clinic-blue-soft)]/30 to-white px-3 py-1.5 rounded-xl border border-[color:var(--color-clinic-blue)]/20 shrink-0 max-w-full overflow-hidden min-w-0 shadow-2xs">
+        <div className="flex items-center gap-1.5 font-bold min-w-0 truncate">
+          <Sparkles className="h-3.5 w-3.5 text-[color:var(--color-clinic-blue)] shrink-0 animate-pulse" />
+          <span className="text-[10px] sm:text-[11px] truncate">
+            {selectedRegion ? (
+              <>
+                Organ terpilih: <strong className="text-[color:var(--color-clinic-blue)] font-extrabold">{selectedRegion.nameIndonesian}</strong> ({selectedRegion.symptoms.length} gejala)
+              </>
+            ) : (
+              "Klik titik organ biru pada model untuk memilih"
+            )}
+          </span>
+        </div>
+        <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-semibold text-[color:var(--color-clinic-muted)] bg-white px-2 py-0.5 rounded-full border border-black/5 shrink-0">
+          <MousePointerClick className="h-3 w-3 text-sky-600" /> Interaktif
+        </span>
       </div>
 
       {/* Interactive Anatomy Viewport Container */}
-      <div className="relative mt-2.5 flex-1 w-full rounded-2xl bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0]/60 p-2 sm:p-3 border border-slate-200/60 shadow-inner flex flex-col justify-center items-center overflow-hidden select-none max-w-full min-w-0">
+      <div className="relative mt-2.5 flex-1 w-full rounded-2xl bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0]/60 p-2 sm:p-4 border border-slate-200/80 shadow-inner flex flex-col justify-center items-center overflow-hidden select-none max-w-full min-w-0">
         {/* Subtle Blueprint Dot Grid */}
-        <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[radial-gradient(#0f172a_1px,transparent_1px)] [background-size:20px_20px]" />
+        <div className="absolute inset-0 opacity-[0.05] pointer-events-none bg-[radial-gradient(#0f172a_1px,transparent_1px)] [background-size:20px_20px]" />
 
         {/* Soft Medical Vignette Spotlight */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-[450px] rounded-full bg-radial from-sky-200/30 via-sky-100/10 to-transparent blur-2xl pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-88 h-[480px] rounded-full bg-radial from-sky-300/35 via-sky-100/15 to-transparent blur-3xl pointer-events-none" />
 
         {/* Interactive Floating Canvas Action Controls (Zoom & Rotate) */}
-        <div className="absolute top-3 right-3 z-30 flex flex-col gap-1.5 bg-white/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200/80 shadow-md">
+        <div className="absolute top-3 right-3 z-30 flex flex-col gap-1.5 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200/80 shadow-md">
           <button
             type="button"
             onClick={handleZoomIn}
@@ -244,41 +197,45 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
           </button>
         </div>
 
-        {/* Relative wrapper matching image bounds with smooth transform scale */}
+        {/* Relative wrapper with smooth transform scale */}
         <div
-          className="relative inline-flex justify-center items-center transition-transform duration-300 ease-out max-w-full"
+          className="relative flex-1 h-full w-full flex justify-center items-center transition-transform duration-300 ease-out py-1 sm:py-2 min-h-0 overflow-visible"
           style={{ transform: `scale(${zoomLevel})` }}
         >
-          {/* Base Layer Anatomy SVG Image with fluid height and explicit dimensions */}
-          <img
-            key={view}
-            src={activeImageUrl}
-            width={300}
-            height={600}
-            alt={view === "front" ? "Anatomi Tubuh Tampak Depan" : "Anatomi Tubuh Tampak Belakang"}
-            className="h-[340px] sm:h-[460px] lg:h-[500px] w-auto max-w-full object-contain select-none drop-shadow-[0_12px_24px_rgba(15,23,42,0.12)] pointer-events-none transition-all duration-300"
-            loading={view === "front" ? "eager" : "lazy"}
-            fetchPriority={view === "front" ? "high" : "auto"}
-            decoding="async"
-            draggable={false}
-          />
+          {/* Atomic Group Container: Aspect ratio 1:2 locked so image & hotspots never separate */}
+          <div
+            style={{ height: "660px" }}
+            className="relative aspect-[1/2] w-auto max-w-full pointer-events-auto"
+          >
+            {/* Base Layer Anatomy SVG Image */}
+            <img
+              key={view}
+              src={activeImageUrl}
+              alt={view === "front" ? "Anatomi Tubuh Tampak Depan" : "Anatomi Tubuh Tampak Belakang"}
+              className="w-full h-full object-fill select-none drop-shadow-[0_16px_32px_rgba(15,23,42,0.14)] pointer-events-none transition-all duration-300 block"
+              loading={view === "front" ? "eager" : "lazy"}
+              fetchPriority={view === "front" ? "high" : "auto"}
+              decoding="async"
+              draggable={false}
+            />
 
-          {/* Absolute Hotspot Overlay Layer on Top of Anatomy Image */}
-          <div className="absolute inset-0 pointer-events-none">
-            {visibleRegions.map((region) => {
-              const pos = view === "front" ? region.frontPosition : region.backPosition;
-              if (!pos) return null;
+            {/* Absolute Hotspot Overlay Layer matching exact img bounding box */}
+            <div className="absolute inset-0 pointer-events-none">
+              {visibleRegions.map((region) => {
+                const pos = view === "front" ? region.frontPosition : region.backPosition;
+                if (!pos) return null;
 
-              return (
-                <AnatomyHotspot
-                  key={`${region.id}-${view}`}
-                  region={region}
-                  position={pos}
-                  isSelected={selectedRegion?.id === region.id}
-                  onSelect={onSelectRegion}
-                />
-              );
-            })}
+                return (
+                  <AnatomyHotspot
+                    key={`${region.id}-${view}`}
+                    region={region}
+                    position={pos}
+                    isSelected={selectedRegion?.id === region.id}
+                    onSelect={onSelectRegion}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

@@ -11,7 +11,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "head",
     description: "Area dahi, wajah, pelipis, dan otak bagian depan.",
     view: "front",
-    frontPosition: { x: 50.4, y: 10.0 },
+    frontPosition: { x: 50.9, y: 20.5 },
     symptoms: [
       { id: "sakit_kepala_depan", name: "Sakit kepala dahi & pelipis" },
       { id: "pusing_depan", name: "Pusing / Sensasi melayang" },
@@ -55,7 +55,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "head",
     description: "Organ penglihatan sensitif terhadap iritasi, infeksi, dan kelelahan.",
     view: "front",
-    frontPosition: { x: 46.2, y: 14.3 },
+    frontPosition: { x: 44.7, y: 22.5 },
     symptoms: [
       { id: "mata_merah", name: "Mata merah & berair" },
       { id: "mata_gatal", name: "Gatal atau perih pada kelopak mata" },
@@ -98,7 +98,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "head",
     description: "Saluran napas atas dan rongga pembau.",
     view: "front",
-    frontPosition: { x: 50.4, y: 16.9 },
+    frontPosition: { x: 50.9, y: 24.9 },
     symptoms: [
       { id: "hidung_tersumbat", name: "Hidung tersumbat / mampet" },
       { id: "bersin_bersin", name: "Bersin berulang kali" },
@@ -141,7 +141,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "head",
     description: "Area tenggorokan depan, pita suara, amandel, dan kelenjar tiroid.",
     view: "front",
-    frontPosition: { x: 50.5, y: 22.0 },
+    frontPosition: { x: 51.0, y: 29.5 },
     symptoms: [
       { id: "nyeri_menelan", name: "Nyeri atau perih saat menelan" },
       { id: "tenggorokan_kering", name: "Tenggorokan gatal / kering" },
@@ -183,7 +183,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "torso",
     description: "Rongga utama organ pernapasan (paru-paru) dan sirkulasi darah (jantung).",
     view: "front",
-    frontPosition: { x: 53.8, y: 28.9 },
+    frontPosition: { x: 50.8, y: 33.9 },
     symptoms: [
       { id: "nyeri_dada_hebat", name: "Nyeri dada seperti tertindih beban berat", isEmergencyWarning: true },
       { id: "sesak_napas", name: "Sesak napas / Kesulitan bernapas", isEmergencyWarning: true },
@@ -226,7 +226,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "torso",
     description: "Rongga abdomen yang menampung lambung, hati, usus, dan usus buntu.",
     view: "front",
-    frontPosition: { x: 50.5, y: 33.3 },
+    frontPosition: { x: 50.9, y: 39.0 },
     symptoms: [
       { id: "nyeri_ulu_hati", name: "Nyeri / perih di ulu hati" },
       { id: "kram_perut", name: "Kram atau melilit pada perut" },
@@ -270,7 +270,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "limbs",
     description: "Bagian depan lengan kiri, bisep, pergelangan tangan, dan telapak tangan kiri.",
     view: "front",
-    frontPosition: { x: 71.4, y: 37.0 },
+    frontPosition: { x: 65.9, y: 40.0 },
     symptoms: [
       { id: "pegal_lengan_depan_l", name: "Nyeri otot lengan depan kiri" },
       { id: "kesemutan_tangan_l", name: "Kesemutan atau kebas di jari tangan kiri" },
@@ -303,7 +303,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "limbs",
     description: "Bagian depan lengan kanan, bisep, pergelangan tangan, dan telapak tangan kanan.",
     view: "front",
-    frontPosition: { x: 29.8, y: 36.4 },
+    frontPosition: { x: 33.8, y: 40.4 },
     symptoms: [
       { id: "pegal_lengan_depan_r", name: "Nyeri otot lengan depan kanan" },
       { id: "kesemutan_tangan_r", name: "Kesemutan atau kebas di jari tangan kanan" },
@@ -327,7 +327,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "torso",
     description: "Area panggul depan, lipatan paha, dan sendi pinggul anterior.",
     view: "front",
-    frontPosition: { x: 55.3, y: 42.1 },
+    frontPosition: { x: 54.8, y: 43.6 },
     symptoms: [
       { id: "nyeri_panggul_depan", name: "Nyeri panggul atau selangkangan saat melangkah" },
       { id: "kaku_pinggul_depan", name: "Kaku sendi panggul depan saat berdiri" },
@@ -350,7 +350,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "limbs",
     description: "Tempurung lutut kiri, paha depan (kuadrisep), dan tulang kering kiri.",
     view: "front",
-    frontPosition: { x: 61.0, y: 60.1 },
+    frontPosition: { x: 59.5, y: 60.6 },
     symptoms: [
       { id: "nyeri_tempurung_l", name: "Nyeri / gemertak pada tempurung lutut kiri" },
       { id: "bengkak_lutut_l", name: "Pembengkakan sendi lutut kiri" },
@@ -398,7 +398,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "limbs",
     description: "Punggung kaki, sendi jempol kaki, dan pergelangan kaki depan.",
     view: "front",
-    frontPosition: { x: 62.5, y: 78.9 },
+    frontPosition: { x: 61.3, y: 73.0 },
     symptoms: [
       { id: "asam_urat_jempol", name: "Nyeri tajam & merah pada sendi jempol kaki" },
       { id: "bengkak_punggung_kaki", name: "Pembengkakan pada punggung kaki" },
@@ -426,7 +426,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "head",
     description: "Area tempurung kepala bagian belakang, saraf oksipital, dan dasar tengkorak.",
     view: "back",
-    backPosition: { x: 50.0, y: 8.5 },
+    backPosition: { x: 49.5, y: 21.0 },
     symptoms: [
       { id: "sakit_kepala_belakang", name: "Sakit kepala belakang terasa berat / tegang" },
       { id: "tengkuk_kaku", name: "Tengkuk leher kaku & pegal saat menoleh" },
@@ -459,7 +459,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "head",
     description: "Otot trapezius leher belakang dan ruas tulang leher servikal.",
     view: "back",
-    backPosition: { x: 49.5, y: 17.5 },
+    backPosition: { x: 49.5, y: 27.5 },
     symptoms: [
       { id: "kaku_kuduk_belakang", name: "Kaku kuduk leher belakang", isEmergencyWarning: true },
       { id: "pegal_trapezius", name: "Otot leher belakang & bahu kram tegang" },
@@ -491,7 +491,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "back",
     description: "Area tulang belikat, tulang punggung torakal, dan otot punggung atas.",
     view: "back",
-    backPosition: { x: 49.5, y: 26.0 },
+    backPosition: { x: 49.5, y: 34.5 },
     symptoms: [
       { id: "nyeri_punggung_atas", name: "Pegal / kaku di punggung atas & belikat" },
       { id: "kram_otot_belikat", name: "Kram otot belikat saat duduk lama" },
@@ -515,7 +515,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "limbs",
     description: "Bagian belakang lengan kiri, trisep, siku belakang, dan punggung tangan kiri.",
     view: "back",
-    backPosition: { x: 26.3, y: 38.1 },
+    backPosition: { x: 31.8, y: 39.1 },
     symptoms: [
       { id: "nyeri_siku_kiri", name: "Nyeri pada tonjolan siku belakang kiri" },
       { id: "pegal_trisep_kiri", name: "Nyeri otot trisep belakang lengan kiri" },
@@ -539,7 +539,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "limbs",
     description: "Bagian belakang lengan kanan, trisep, siku belakang, dan punggung tangan kanan.",
     view: "back",
-    backPosition: { x: 72.5, y: 38.2 },
+    backPosition: { x: 67.0, y: 39.7 },
     symptoms: [
       { id: "nyeri_siku_kanan", name: "Nyeri pada tonjolan siku belakang kanan" },
       { id: "pegal_trisep_kanan", name: "Nyeri otot trisep belakang lengan kanan" },
@@ -627,7 +627,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "limbs",
     description: "Hamstring kiri, lekuk lutut belakang kiri, dan otot betis kiri.",
     view: "back",
-    backPosition: { x: 39.1, y: 60.6 },
+    backPosition: { x: 39.6, y: 60.6 },
     symptoms: [
       { id: "kram_betis_l", name: "Kram betis kiri di malam hari" },
       { id: "nyeri_hamstring_l", name: "Nyeri otot paha belakang (hamstring) kiri" },
@@ -651,7 +651,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "limbs",
     description: "Hamstring kanan, lekuk lutut belakang kanan, dan otot betis kanan.",
     view: "back",
-    backPosition: { x: 59.2, y: 61.1 },
+    backPosition: { x: 58.7, y: 61.1 },
     symptoms: [
       { id: "kram_betis_r", name: "Kram betis kanan di malam hari" },
       { id: "nyeri_hamstring_r", name: "Nyeri otot paha belakang (hamstring) kanan" },
@@ -675,7 +675,7 @@ export const ANATOMY_REGIONS: AnatomyRegion[] = [
     category: "limbs",
     description: "Area tumit belakang, tendon achilles, dan telapak kaki belakang.",
     view: "back",
-    backPosition: { x: 60.6, y: 82.0 },
+    backPosition: { x: 59.5, y: 74.0 },
     symptoms: [
       { id: "nyeri_tumit_pagi", name: "Nyeri tumit menusuk saat pertama melangkah pagi" },
       { id: "nyeri_tendon_achilles", name: "Nyeri & kaku pada urat tendon achilles tumit" },
