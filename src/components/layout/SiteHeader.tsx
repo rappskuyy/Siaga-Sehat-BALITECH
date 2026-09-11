@@ -104,10 +104,9 @@ function SlideTabs() {
               updatePosition(i);
             }}
             className={`relative z-10 rounded-full px-4 py-1.5 transition-colors duration-200 cursor-pointer select-none
-              ${
-                isUnderPill
-                  ? "text-white font-semibold"
-                  : "text-[color:var(--color-clinic-ink)] font-medium hover:text-[color:var(--color-clinic-blue)]"
+              ${isUnderPill
+                ? "text-white font-semibold"
+                : "text-[color:var(--color-clinic-ink)] font-medium hover:text-[color:var(--color-clinic-blue)]"
               }
             `}
           >
@@ -268,11 +267,10 @@ export function SiteHeader() {
                     to={tab.path}
                     search={tab.search as any}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`rounded-xl px-3.5 py-2.5 text-sm transition-colors duration-200 ${
-                      isActive
+                    className={`rounded-xl px-3.5 py-2.5 text-sm transition-colors duration-200 ${isActive
                         ? "font-semibold text-[color:var(--color-clinic-blue)] bg-white"
                         : "font-medium text-[color:var(--color-clinic-ink)] hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
                     {tab.label}
                   </Link>
@@ -282,11 +280,10 @@ export function SiteHeader() {
                 <Link
                   to="/reminders"
                   onClick={() => setIsMenuOpen(false)}
-                  className={`rounded-xl px-3.5 py-2.5 text-sm transition-colors duration-200 ${
-                    currentPath.startsWith("/reminders")
+                  className={`rounded-xl px-3.5 py-2.5 text-sm transition-colors duration-200 ${currentPath.startsWith("/reminders")
                       ? "font-semibold text-[color:var(--color-clinic-blue)] bg-white"
                       : "font-medium text-[color:var(--color-clinic-ink)] hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   Notifikasi
                 </Link>

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import {
   X,
@@ -7,6 +7,8 @@ import {
   Check,
   Pill,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Clock,
   Tablet,
   Loader2,
@@ -29,6 +31,7 @@ import {
 interface Props {
   open: boolean;
   onClose: () => void;
+  initialDisease?: string | null;
 }
 
 type Step = "location" | "select_meds" | "configure" | "success";
@@ -72,7 +75,7 @@ function StepIndicator({ current }: { current: Step }) {
   );
 }
 
-export function MedicineReminderModal({ open, onClose }: Props) {
+export function MedicineReminderModal({ open, onClose, initialDisease }: Props) {
   const { meds, loading: medsLoading } = useLastConsultationMeds();
   const { reminders, createReminder } = useMedicineReminders();
 
@@ -80,9 +83,20 @@ export function MedicineReminderModal({ open, onClose }: Props) {
   const [location, setLocation] = useState<PurchaseLocation | null>(null);
   const [selectedMeds, setSelectedMeds] = useState<Set<string>>(new Set());
   const [selectedDisease, setSelectedDisease] = useState<string | null>(null);
+  const [showAllDiseases, setShowAllDiseases] = useState(false);
   const [configs, setConfigs] = useState<MedConfig[]>([]);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      if (initialDisease) {
+        setSelectedDisease(initialDisease);
+      }
+    } else {
+      setShowAllDiseases(false);
+    }
+  }, [open, initialDisease]);
 
   useEffect(() => {
     if (!open) return;
@@ -112,6 +126,7 @@ export function MedicineReminderModal({ open, onClose }: Props) {
     setLocation(null);
     setSelectedMeds(new Set());
     setSelectedDisease(null);
+    setShowAllDiseases(false);
     setConfigs([]);
     setErrorMsg(null);
   }, []);
@@ -135,11 +150,13 @@ export function MedicineReminderModal({ open, onClose }: Props) {
     });
   };
 
-  const normalizeDisease = (value: string) => value.trim().toLocaleLowerCase("id-ID");
+  const normalizeDisease = (value: string) =>
+    value.trim().replace(/[.,;:!?]+$/, "").toLocaleLowerCase("id-ID");
+
   const usedDiseases = new Set(
     reminders
       .map((reminder) => {
-        const match = reminder.catatan?.match(/^Untuk kondisi:\s*(.+?)(?:\.\s|$)/i);
+        const match = reminder.catatan?.match(/Untuk kondisi:\s*(.+?)(?:\.|\n|$)/i);
         return match?.[1] ? normalizeDisease(match[1]) : null;
       })
       .filter((disease): disease is string => Boolean(disease)),
@@ -149,14 +166,51 @@ export function MedicineReminderModal({ open, onClose }: Props) {
   );
   const hasUsedDisease = (disease: string) =>
     usedDiseases.has(normalizeDisease(disease)) ||
-    meds.some((med) => med.penyakit === disease && usedSourceIds.has(med.sourceId));
+    meds.some(
+      (med) =>
+        normalizeDisease(med.penyakit) === normalizeDisease(disease) &&
+        Boolean(med.sourceId) &&
+        usedSourceIds.has(med.sourceId),
+    );
+
   const diseases = Array.from(
-    new Set(meds.map((med) => med.penyakit)),
-  ).filter((disease) => !hasUsedDisease(disease));
-  const diseaseMeds = selectedDisease ? meds.filter((med) => med.penyakit === selectedDisease) : [];
+    meds
+      .filter((med) => Boolean(med.penyakit?.trim()) && !hasUsedDisease(med.penyakit))
+      .reduce((map, med) => {
+        const norm = normalizeDisease(med.penyakit);
+        if (norm && !map.has(norm)) {
+          map.set(norm, med.penyakit.trim());
+        }
+        return map;
+      }, new Map<string, string>())
+      .values(),
+  );
+
+  const visibleDiseases = useMemo(() => {
+    if (showAllDiseases || diseases.length <= 4) return diseases;
+    const base = diseases.slice(0, 4);
+    if (
+      selectedDisease &&
+      !base.some((d) => normalizeDisease(d) === normalizeDisease(selectedDisease))
+    ) {
+      const found = diseases.find(
+        (d) => normalizeDisease(d) === normalizeDisease(selectedDisease),
+      );
+      if (found) return [...base, found];
+    }
+    return base;
+  }, [diseases, showAllDiseases, selectedDisease]);
+
+  const diseaseMeds = selectedDisease
+    ? meds.filter((med) => normalizeDisease(med.penyakit) === normalizeDisease(selectedDisease))
+    : [];
 
   const handleProceedToConfig = () => {
-    const chosen = meds.filter((m) => selectedMeds.has(m.nama));
+    const chosen = meds.filter(
+      (m) =>
+        selectedMeds.has(m.nama) &&
+        (!selectedDisease || normalizeDisease(m.penyakit) === normalizeDisease(selectedDisease)),
+    );
     setConfigs(
       chosen.map((m) => ({
         med: m,
@@ -388,31 +442,61 @@ export function MedicineReminderModal({ open, onClose }: Props) {
               ) : (
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col gap-2">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--color-clinic-muted)]">
-                      Penyakit dari riwayat terbaru
-                    </p>
-                    {diseases.map((disease) => (
-                      <button
-                        key={disease}
-                        type="button"
-                        onClick={() => {
-                          setSelectedDisease(disease);
-                          setSelectedMeds(new Set());
-                        }}
-                        className={`flex items-center justify-between rounded-xl border-2 p-3 text-left transition ${
-                          selectedDisease === disease
-                            ? "border-[color:var(--color-clinic-blue)] bg-[color:var(--color-clinic-blue-soft)]"
-                            : "border-slate-100 bg-white hover:border-slate-200"
-                        }`}
-                      >
-                        <span className="min-w-0 pr-2 text-sm font-semibold text-[color:var(--color-clinic-ink)]">
-                          {disease}
-                        </span>
-                        <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-500">
-                          {meds.filter((med) => med.penyakit === disease).length} obat
-                        </span>
-                      </button>
-                    ))}
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--color-clinic-muted)]">
+                        Penyakit dari riwayat terbaru
+                      </p>
+                      {diseases.length > 4 && (
+                        <button
+                          type="button"
+                          onClick={() => setShowAllDiseases((prev) => !prev)}
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-[color:var(--color-clinic-blue)] hover:underline"
+                        >
+                          {showAllDiseases ? (
+                            <>
+                              <span>Tampilkan lebih sedikit</span>
+                              <ChevronUp className="h-3 w-3" />
+                            </>
+                          ) : (
+                            <>
+                              <span>Lihat Semua ({diseases.length})</span>
+                              <ChevronDown className="h-3 w-3" />
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                    {visibleDiseases.map((disease) => {
+                      const isSelected =
+                        selectedDisease != null &&
+                        normalizeDisease(selectedDisease) === normalizeDisease(disease);
+                      const medCount = meds.filter(
+                        (med) => normalizeDisease(med.penyakit) === normalizeDisease(disease),
+                      ).length;
+
+                      return (
+                        <button
+                          key={disease}
+                          type="button"
+                          onClick={() => {
+                            setSelectedDisease(disease);
+                            setSelectedMeds(new Set());
+                          }}
+                          className={`flex items-center justify-between rounded-xl border-2 p-3 text-left transition ${
+                            isSelected
+                              ? "border-[color:var(--color-clinic-blue)] bg-[color:var(--color-clinic-blue-soft)]"
+                              : "border-slate-100 bg-white hover:border-slate-200"
+                          }`}
+                        >
+                          <span className="min-w-0 pr-2 text-sm font-semibold text-[color:var(--color-clinic-ink)]">
+                            {disease}
+                          </span>
+                          <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-500">
+                            {medCount} obat
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
 
                   {selectedDisease && (

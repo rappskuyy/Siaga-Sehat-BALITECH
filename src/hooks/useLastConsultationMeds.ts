@@ -35,12 +35,14 @@ export function useLastConsultationMeds() {
           ? (row.obat_rekomendasi as Array<{ nama?: string; dosis?: string; catatan?: string }>)
           : [];
         for (const o of obats) {
-          if (!o.nama?.trim() || !row.nama_penyakit?.trim()) continue;
+          const namaTrimmed = o.nama?.trim();
+          const penyakitTrimmed = row.nama_penyakit?.trim();
+          if (!namaTrimmed || !penyakitTrimmed) continue;
           scanMeds.push({
-            nama: o.nama,
-            dosis: o.dosis ?? "",
-            catatan: o.catatan ?? "",
-            penyakit: row.nama_penyakit,
+            nama: namaTrimmed,
+            dosis: o.dosis?.trim() ?? "",
+            catatan: o.catatan?.trim() ?? "",
+            penyakit: penyakitTrimmed,
             sourceType: "scan",
             sourceId: row.id,
           });
@@ -48,10 +50,10 @@ export function useLastConsultationMeds() {
       }
     }
 
-    // Deduplicate by name (case-insensitive)
+    // Deduplicate by disease and medicine name (case-insensitive)
     const seen = new Set<string>();
     const unique = scanMeds.filter((m) => {
-      const key = `${m.penyakit.toLowerCase()}::${m.nama.toLowerCase()}`;
+      const key = `${m.penyakit.toLowerCase().trim()}::${m.nama.toLowerCase().trim()}`;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;

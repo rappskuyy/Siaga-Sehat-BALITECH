@@ -9,6 +9,18 @@ type Segment =
 const SEGMENTS: Segment[] = [
   { type: "text", text: "Kami menggabungkan " },
   { type: "text", text: "teknologi inovatif", className: "font-extrabold" },
+<<<<<<< Updated upstream
+=======
+  { type: "text", text: " " },
+  {
+    type: "node",
+    node: (
+      <span className="mx-1 inline-flex h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 -translate-y-0.5 sm:-translate-y-1 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] align-middle text-[color:var(--color-clinic-blue)] shadow-2xs">
+        <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
+      </span>
+    ),
+  },
+>>>>>>> Stashed changes
   { type: "text", text: " dengan pendekatan manusiawi untuk membuat setiap pasien " },
   { type: "text", text: "merasa percaya diri dan tenang.", className: "font-extrabold" },
 ];

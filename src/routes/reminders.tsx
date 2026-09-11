@@ -5,6 +5,8 @@ import {
   Bell,
   BellOff,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
   Clock,
   History,
   Pill,
@@ -41,8 +43,13 @@ function getScanFilter(value: string | undefined, fallbackDisease?: string) {
 }
 
 function reminderDisease(reminder: { catatan: string | null }) {
-  return reminder.catatan?.match(/^Untuk kondisi:\s*(.+?)(?:\.\s|$)/i)?.[1];
+  if (!reminder.catatan) return undefined;
+  const match = reminder.catatan.match(/Untuk kondisi:\s*(.+?)(?:\.|\n|$)/i);
+  return match?.[1]?.trim();
 }
+
+const normalizeDisease = (value: string) =>
+  value.trim().replace(/[.,;:!?]+$/, "").toLocaleLowerCase("id-ID");
 
 export const Route = createFileRoute("/reminders")({
   validateSearch: (search: Record<string, unknown>): RemindersSearch => ({
@@ -70,6 +77,9 @@ function RemindersPage() {
     useMedicineReminders();
   const { meds: recommendedMeds, loading: recommendedMedsLoading } = useLastConsultationMeds();
   const [modalOpen, setModalOpen] = useState(false);
+  const [selectedDiseaseForModal, setSelectedDiseaseForModal] = useState<string | null>(null);
+  const [showAllPending, setShowAllPending] = useState(false);
+  const [showAllReminders, setShowAllReminders] = useState(false);
   const [tab, setTab] = useState<"active" | "history">("active");
 
   const clearFilter = () => navigate({ to: "/reminders", search: {} });
@@ -82,8 +92,8 @@ function RemindersPage() {
             (r) =>
               (scanSelection.id && r.source_id === scanSelection.id) ||
               (scanSelection.disease &&
-                reminderDisease(r)?.toLocaleLowerCase("id-ID") ===
-                  scanSelection.disease.toLocaleLowerCase("id-ID")),
+                normalizeDisease(reminderDisease(r) || "") ===
+                  normalizeDisease(scanSelection.disease)),
           )
         : activeReminders,
     [activeReminders, scanFilter, scanSelection.id, scanSelection.disease],
@@ -95,8 +105,8 @@ function RemindersPage() {
             (r) =>
               (scanSelection.id && r.source_id === scanSelection.id) ||
               (scanSelection.disease &&
-                reminderDisease(r)?.toLocaleLowerCase("id-ID") ===
-                  scanSelection.disease.toLocaleLowerCase("id-ID")),
+                normalizeDisease(reminderDisease(r) || "") ===
+                  normalizeDisease(scanSelection.disease)),
           )
         : inactiveReminders,
     [inactiveReminders, scanFilter, scanSelection.id, scanSelection.disease],
@@ -106,7 +116,6 @@ function RemindersPage() {
     (r) => r.tablet_tersisa != null && r.tablet_tersisa <= 3 && r.tablet_tersisa > 0,
   ).length;
 
-  const normalizeDisease = (value: string) => value.trim().toLocaleLowerCase("id-ID");
   const usedDiseases = new Set(
     activeReminders
       .concat(inactiveReminders)
@@ -114,12 +123,28 @@ function RemindersPage() {
       .filter((disease): disease is string => Boolean(disease))
       .map(normalizeDisease),
   );
+  const usedSourceIds = new Set(
+    activeReminders
+      .concat(inactiveReminders)
+      .map((r) => r.source_id)
+      .filter((id): id is string => Boolean(id)),
+  );
   const pendingDiseases = Array.from(
-    new Map(
-      recommendedMeds
-        .filter((med) => !usedDiseases.has(normalizeDisease(med.penyakit)))
-        .map((med) => [normalizeDisease(med.penyakit), med.penyakit]),
-    ).values(),
+    recommendedMeds
+      .filter(
+        (med) =>
+          Boolean(med.penyakit?.trim()) &&
+          !usedDiseases.has(normalizeDisease(med.penyakit)) &&
+          (!med.sourceId || !usedSourceIds.has(med.sourceId)),
+      )
+      .reduce((map, med) => {
+        const norm = normalizeDisease(med.penyakit);
+        if (norm && !map.has(norm)) {
+          map.set(norm, med.penyakit.trim());
+        }
+        return map;
+      }, new Map<string, string>())
+      .values(),
   );
 
   if (!user) {
@@ -156,10 +181,13 @@ function RemindersPage() {
 
       {/* Page hero */}
       <div className="px-5 pt-6 sm:px-6 md:px-8 lg:px-10">
-        <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-3xl bg-[color:var(--color-clinic-blue)] px-6 py-6 shadow-md sm:px-8">
+        <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-3xl bg-gradient-to-br from-[#3b5e8c] via-[color:var(--color-clinic-blue)] to-[#2f4b73] px-6 py-6 shadow-md sm:px-8">
           <div
             className="pointer-events-none absolute inset-0 opacity-25"
-            style={{ background: "radial-gradient(60% 90% at 90% 0%, #2ee6c4, transparent)" }}
+            style={{
+              background:
+                "radial-gradient(75% 100% at 85% 15%, rgba(147, 197, 253, 0.45), transparent 70%), radial-gradient(50% 80% at 15% 90%, rgba(99, 102, 241, 0.2), transparent 60%)",
+            }}
           />
           <div className="relative z-10 flex items-center gap-3">
             <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/15 text-white backdrop-blur">
@@ -239,18 +267,41 @@ function RemindersPage() {
               </div>
               <Pill className="mt-1 h-5 w-5 shrink-0 text-[color:var(--color-clinic-blue)]" />
             </div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {pendingDiseases.map((disease) => (
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {(showAllPending ? pendingDiseases : pendingDiseases.slice(0, 4)).map((disease) => (
                 <button
                   key={disease}
                   type="button"
-                  onClick={() => setModalOpen(true)}
+                  onClick={() => {
+                    setSelectedDiseaseForModal(disease);
+                    setModalOpen(true);
+                  }}
                   className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[color:var(--color-clinic-blue)]/20 bg-[color:var(--color-clinic-blue-soft)] px-3 py-1.5 text-left text-xs font-semibold text-[color:var(--color-clinic-blue-dark)] transition hover:border-[color:var(--color-clinic-blue)]/50 hover:bg-[color:var(--color-clinic-blue)]/10"
                 >
                   <Plus className="h-3 w-3 shrink-0" />
                   <span className="truncate">{disease}</span>
                 </button>
               ))}
+
+              {pendingDiseases.length > 4 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllPending((prev) => !prev)}
+                  className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-[color:var(--color-clinic-muted)] transition hover:border-slate-300 hover:bg-slate-100 hover:text-[color:var(--color-clinic-ink)]"
+                >
+                  {showAllPending ? (
+                    <>
+                      <span>Sembunyikan</span>
+                      <ChevronUp className="h-3 w-3" />
+                    </>
+                  ) : (
+                    <>
+                      <span>Lihat Semua (+{pendingDiseases.length - 4})</span>
+                      <ChevronDown className="h-3 w-3" />
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </section>
         )}
@@ -360,7 +411,7 @@ function RemindersPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {activeList.map((r) => (
+            {(showAllReminders ? activeList : activeList.slice(0, 3)).map((r) => (
               <ReminderCard
                 key={r.id}
                 reminder={r}
@@ -370,6 +421,29 @@ function RemindersPage() {
                 onDeactivate={tab === "active" ? deactivateReminder : () => {}}
               />
             ))}
+
+            {activeList.length > 3 && (
+              <button
+                type="button"
+                onClick={() => setShowAllReminders((prev) => !prev)}
+                className="mt-1 flex items-center justify-center gap-1.5 rounded-2xl border border-slate-200/80 bg-white py-3 text-xs font-semibold text-[color:var(--color-clinic-blue)] shadow-xs transition hover:border-[color:var(--color-clinic-blue)]/30 hover:bg-[color:var(--color-clinic-blue-soft)]/50 active:scale-[0.99]"
+              >
+                {showAllReminders ? (
+                  <>
+                    <span>Tampilkan Lebih Sedikit</span>
+                    <ChevronUp className="h-4 w-4" />
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      Lihat Semua ({activeList.length}{" "}
+                      {tab === "active" ? "Pengingat Aktif" : "Riwayat Selesai"})
+                    </span>
+                    <ChevronDown className="h-4 w-4" />
+                  </>
+                )}
+              </button>
+            )}
           </div>
         )}
 
@@ -388,7 +462,14 @@ function RemindersPage() {
       </div>
 
       {/* Add reminder modal */}
-      <MedicineReminderModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <MedicineReminderModal
+        open={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setSelectedDiseaseForModal(null);
+        }}
+        initialDisease={selectedDiseaseForModal}
+      />
       <Footer />
     </main>
   );

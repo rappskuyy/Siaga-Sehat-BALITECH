@@ -1,6 +1,16 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, CheckCircle2, Bell, Clock, Calendar, Plus, ExternalLink } from "lucide-react";
+import {
+  X,
+  CheckCircle2,
+  Bell,
+  Clock,
+  Calendar,
+  Plus,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import type { MedicineReminder, ReminderLog } from "@/lib/supabase/types";
 import {
   formatDoseTime,
@@ -26,8 +36,11 @@ export function ActiveRemindersOverviewModal({
   onMarkTaken,
   onOpenSetup,
 }: Props) {
+  const [showAll, setShowAll] = useState(false);
+
   useEffect(() => {
     if (!open) return;
+    setShowAll(false);
     const scrollY = window.scrollY;
     const previousOverflow = document.body.style.overflow;
     const previousPosition = document.body.style.position;
@@ -51,6 +64,8 @@ export function ActiveRemindersOverviewModal({
 
   if (typeof document === "undefined") return null;
   if (!open) return null;
+
+  const visibleReminders = showAll ? activeReminders : activeReminders.slice(0, 3);
 
   return createPortal(
     <div
@@ -101,7 +116,7 @@ export function ActiveRemindersOverviewModal({
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              {activeReminders.map((reminder) => {
+              {visibleReminders.map((reminder) => {
                 const lastTaken = getLastTakenLabel(reminder.id, logs);
                 const nextDose = formatDoseTime(getNextDoseDate(reminder, logs));
                 const isDepleted = (reminder.tablet_tersisa ?? 0) === 0;
@@ -171,6 +186,26 @@ export function ActiveRemindersOverviewModal({
                   </div>
                 );
               })}
+
+              {activeReminders.length > 3 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAll((prev) => !prev)}
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-2 text-xs font-semibold text-[color:var(--color-clinic-blue)] hover:bg-[color:var(--color-clinic-blue-soft)]/50 transition"
+                >
+                  {showAll ? (
+                    <>
+                      <span>Tampilkan Lebih Sedikit</span>
+                      <ChevronUp className="h-3.5 w-3.5" />
+                    </>
+                  ) : (
+                    <>
+                      <span>Lihat Semua ({activeReminders.length} Obat)</span>
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           )}
         </div>
