@@ -59,6 +59,7 @@ export function AnatomyExplorer() {
 
   // Switch / Select region handler (Triggers Step 3: Tandai Gejala)
   const handleSelectRegion = (region: AnatomyRegion) => {
+    if (isLoading) return;
     scrollToTopStep();
     setSelectedRegion(region);
     setSelectedSymptoms([]);
@@ -75,12 +76,14 @@ export function AnatomyExplorer() {
 
   // Move to Model Anatomi (Step 2)
   const handleGoToModel = () => {
+    if (isLoading) return;
     scrollToTopStep();
     setActiveStep("model");
   };
 
   // Toggle symptom checkbox
   const handleToggleSymptom = (symptomName: string) => {
+    if (isLoading) return;
     setSelectedSymptoms((prev) =>
       prev.includes(symptomName)
         ? prev.filter((s) => s !== symptomName)
@@ -90,6 +93,7 @@ export function AnatomyExplorer() {
 
   // Toggle condition checkbox
   const handleToggleCondition = (conditionName: string) => {
+    if (isLoading) return;
     setSelectedConditions((prev) =>
       prev.includes(conditionName)
         ? prev.filter((c) => c !== conditionName)
@@ -99,6 +103,7 @@ export function AnatomyExplorer() {
 
   // Reset back to Panduan (Step 1)
   const handleReset = () => {
+    if (isLoading) return;
     scrollToTopStep();
     setSelectedRegion(null);
     setSelectedSymptoms([]);
@@ -111,6 +116,7 @@ export function AnatomyExplorer() {
 
   // Trigger AI assessment call (Step 4: Hasil AI)
   const handleAnalyze = async () => {
+    if (isLoading) return;
     if (!selectedRegion) {
       setErrorMessage("Silakan pilih bagian tubuh pada model anatomi terlebih dahulu.");
       return;
@@ -192,7 +198,10 @@ export function AnatomyExplorer() {
           <button
             type="button"
             onClick={handleReset}
-            className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1 sm:px-2.5 rounded-xl transition cursor-pointer ${stepNumber === 1
+            disabled={isLoading}
+            className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1 sm:px-2.5 rounded-xl transition ${
+              isLoading ? "opacity-50 cursor-not-allowed pointer-events-none" : "cursor-pointer"
+            } ${stepNumber === 1
                 ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
                 : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
               }`}
@@ -209,7 +218,10 @@ export function AnatomyExplorer() {
           <button
             type="button"
             onClick={handleGoToModel}
-            className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1 sm:px-2.5 rounded-xl transition cursor-pointer ${stepNumber === 2
+            disabled={isLoading}
+            className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1 sm:px-2.5 rounded-xl transition ${
+              isLoading ? "opacity-50 cursor-not-allowed pointer-events-none" : "cursor-pointer"
+            } ${stepNumber === 2
                 ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
                 : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
               }`}
@@ -227,7 +239,9 @@ export function AnatomyExplorer() {
           {/* Step 3: Tandai Gejala */}
           <button
             type="button"
+            disabled={isLoading}
             onClick={() => {
+              if (isLoading) return;
               if (selectedRegion) {
                 setActiveStep("symptoms");
                 scrollToTopStep();
@@ -235,7 +249,9 @@ export function AnatomyExplorer() {
                 toast.info("Silakan pilih organ pada model anatomi terlebih dahulu.");
               }
             }}
-            className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1 sm:px-2.5 rounded-xl transition cursor-pointer ${stepNumber === 3
+            className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1 sm:px-2.5 rounded-xl transition ${
+              isLoading ? "opacity-50 cursor-not-allowed pointer-events-none" : "cursor-pointer"
+            } ${stepNumber === 3
                 ? "bg-[color:var(--color-clinic-blue-soft)] text-[color:var(--color-clinic-blue-dark)] font-bold shadow-2xs border border-[color:var(--color-clinic-blue)]/20"
                 : "text-[color:var(--color-clinic-muted)] hover:text-[color:var(--color-clinic-ink)]"
               }`}

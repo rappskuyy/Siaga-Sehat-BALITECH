@@ -838,7 +838,7 @@ async function analyzeWithKoboiLLM(data: {
               ],
             },
           ],
-          max_tokens: 1500,
+          max_tokens: 3500,
           ...(useSchema
             ? {
                 response_format: {
