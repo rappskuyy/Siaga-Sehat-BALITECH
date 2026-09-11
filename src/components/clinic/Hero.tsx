@@ -103,8 +103,8 @@ export function Hero() {
                   alt="Dokter dengan stetoskop"
                   className="hidden min-[900px]:block animate-fade-up w-auto max-w-full object-contain pointer-events-none select-none"
                   style={{
-                    height: "617px",
-                    marginTop: "-60px",
+                    height: "940px",
+                    marginTop: "-230px",
                     animationDuration: "0.7s",
                   }}
                 />
@@ -113,8 +113,8 @@ export function Hero() {
                   alt="Dokter dengan stetoskop"
                   className="min-[900px]:hidden animate-fade-up w-auto max-w-full object-contain pointer-events-none select-none"
                   style={{
-                    height: "278px",
-                    marginTop: "-4px",
+                    height: "480px",
+                    marginTop: "-45px",
                     animationDuration: "0.7s",
                   }}
                 />
