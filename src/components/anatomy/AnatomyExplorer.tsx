@@ -283,11 +283,11 @@ export function AnatomyExplorer() {
       </div>
 
       {/* Main 2-Column Responsive Layout: Left (Guide / Symptoms / Result) & Right (Anatomy Viewer) */}
-      <div className="grid gap-5 lg:gap-6 lg:grid-cols-12 items-start min-w-0 max-w-full">
+      <div className="grid gap-5 lg:gap-6 lg:grid-cols-12 items-stretch min-w-0 max-w-full">
         {/* Left Column: Step 1 (Guide) OR Step 3 (Symptom Selector) OR Step 4 (AI Assessment Result) */}
         <div
           ref={selectorRef}
-          className={`lg:col-span-6 w-full flex flex-col min-w-0 overflow-hidden ${activeStep === "model" ? "hidden lg:flex" : "flex"
+          className={`lg:col-span-6 w-full flex flex-col h-full min-w-0 overflow-hidden ${activeStep === "model" ? "hidden lg:flex" : "flex"
             }`}
         >
           {errorMessage && (
@@ -341,7 +341,7 @@ export function AnatomyExplorer() {
         {/* Right Column: Step 2 Interactive Anatomy Viewer (Col Span 6) */}
         <div
           ref={modelRef}
-          className={`lg:col-span-6 w-full flex flex-col min-w-0 self-start lg:sticky lg:top-24 ${activeStep === "model" ? "flex" : "hidden lg:flex"
+          className={`lg:col-span-6 w-full flex flex-col h-full min-w-0 ${activeStep === "model" ? "flex" : "hidden lg:flex"
             }`}
         >
           <AnatomyViewer
