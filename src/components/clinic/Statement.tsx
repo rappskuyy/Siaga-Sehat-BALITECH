@@ -1,16 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, Sparkles } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { useInView } from "@/hooks/use-in-view";
-import raffasyaAvatar from "@/assets/Raffasya Javas Niscala Widjaja.avif?url";
-import ahmadAvatar from "@/assets/Ahmad Rhezki Prasetya.avif?url";
-import muhamadAvatar from "@/assets/Muhamad Fedliansyah Ilham.avif?url";
-
-const AVATARS = [
-  raffasyaAvatar,
-  ahmadAvatar,
-  muhamadAvatar,
-];
 
 type Segment =
   { type: "text"; text: string; className?: string } | { type: "node"; node: ReactNode };
@@ -18,34 +9,7 @@ type Segment =
 const SEGMENTS: Segment[] = [
   { type: "text", text: "Kami menggabungkan " },
   { type: "text", text: "teknologi inovatif", className: "font-extrabold" },
-  { type: "text", text: " " },
-  {
-    type: "node",
-    node: (
-      <span className="mx-1 inline-flex h-9 w-9 -translate-y-1 items-center justify-center rounded-full bg-[color:var(--color-clinic-blue-soft)] align-middle text-[color:var(--color-clinic-blue)]">
-        <Sparkles className="h-4 w-4" />
-      </span>
-    ),
-  },
   { type: "text", text: " dengan pendekatan manusiawi untuk membuat setiap pasien " },
-  {
-    type: "node",
-    node: (
-      <span className="mx-1 inline-flex -translate-y-1 items-center align-middle">
-        <span className="flex -space-x-2">
-          {AVATARS.map((a) => (
-            <img
-              key={a}
-              src={a}
-              alt=""
-              className="h-8 w-8 rounded-full border-2 border-white object-cover"
-            />
-          ))}
-        </span>
-      </span>
-    ),
-  },
-  { type: "text", text: " " },
   { type: "text", text: "merasa percaya diri dan tenang.", className: "font-extrabold" },
 ];
 
