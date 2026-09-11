@@ -450,49 +450,47 @@ export function ScanResultView({
                   </p>
                 ) : (
                   medicineList.map((item, i) => {
-                  const shoppingQuery = encodeURIComponent(
-                    `beli obat ${item.nama}${item.dosis ? ` ${item.dosis}` : ""}`
-                  );
-                  const shoppingUrl = `https://www.google.com/search?tbm=shop&q=${shoppingQuery}`;
+                    const searchQuery = encodeURIComponent(item.nama);
+                    const searchUrl = `https://www.google.com/search?q=${searchQuery}`;
 
-                  return (
-                    <div
-                      key={i}
-                      className="flex items-start justify-between gap-3 text-left pb-3 border-b border-white/15 last:border-0 last:pb-0"
-                    >
-                      <div className="flex flex-col gap-1 pr-1 min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="text-sm sm:text-base font-bold text-white leading-snug">
-                            {item.nama}
-                          </h4>
-                          {item.dosis && (
-                            <span className="text-xs font-semibold text-blue-100">
-                              • {item.dosis}
-                            </span>
+                    return (
+                      <div
+                        key={i}
+                        className="flex items-start justify-between gap-3 text-left pb-3 border-b border-white/15 last:border-0 last:pb-0"
+                      >
+                        <div className="flex flex-col gap-1 pr-1 min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4 className="text-sm sm:text-base font-bold text-white leading-snug">
+                              {item.nama}
+                            </h4>
+                            {item.dosis && (
+                              <span className="text-xs font-semibold text-blue-100">
+                                • {item.dosis}
+                              </span>
+                            )}
+                          </div>
+
+                          {item.note && (
+                            <p className="text-xs font-normal text-blue-100/90 leading-relaxed">
+                              {item.note}
+                            </p>
                           )}
                         </div>
 
-                        {item.note && (
-                          <p className="text-xs font-normal text-blue-100/90 leading-relaxed">
-                            {item.note}
-                          </p>
-                        )}
+                        <a
+                          href={searchUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white text-[color:var(--color-clinic-blue)] hover:bg-blue-50 hover:text-[color:var(--color-clinic-blue-dark)] hover:scale-105 active:scale-95 transition-all duration-150 shadow-2xs"
+                          title={`Cari ${item.nama} di Google`}
+                          aria-label={`Cari ${item.nama} di Google`}
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
                       </div>
-
-                      <a
-                        href={shoppingUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white text-[color:var(--color-clinic-blue)] hover:bg-blue-50 hover:text-[color:var(--color-clinic-blue-dark)] hover:scale-105 active:scale-95 transition-all duration-150 shadow-2xs"
-                        title={`Beli ${item.nama} di Google Shopping`}
-                        aria-label={`Beli ${item.nama} di Google Shopping`}
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
-                    </div>
-                  );
-                })
-              )}
+                    );
+                  })
+                )}
               </div>
             </div>
           </div>
@@ -609,34 +607,50 @@ export function ScanResultView({
                   Tidak ada saran obat herbal spesifik.
                 </div>
               ) : (
-                result.obat_herbal.map((herb, i) => (
-                  <div
-                    key={i}
-                    className="flex items-stretch justify-between border-b border-white/15 last:border-0"
-                  >
-                    {/* Left: Name + Description */}
-                    <div className="flex flex-col gap-1 px-4 sm:px-5 py-3.5 flex-1 min-w-0">
-                      <h4 className="text-sm sm:text-base font-extrabold uppercase tracking-wide text-white leading-tight">
-                        {herb.nama}
-                      </h4>
-                      <p className="text-xs text-blue-100/90 leading-relaxed">
-                        {herb.cara_pakai}
-                      </p>
-                    </div>
+                result.obat_herbal.map((herb, i) => {
+                  const searchQuery = encodeURIComponent(herb.nama);
+                  const searchUrl = `https://www.google.com/search?q=${searchQuery}`;
 
-                    {/* Right: Smart Icon Pill Badge */}
-                    <div className="flex items-center justify-center shrink-0 px-2.5">
-                      <div className="flex h-14 w-8 items-center justify-center rounded-full bg-white text-[color:var(--color-clinic-blue)] shadow-sm">
-                        {(() => {
-                          const HerbIcon = getHerbIcon(herb.nama);
-                          return (
-                            <HerbIcon className="h-4 w-4 text-[color:var(--color-clinic-blue)]" />
-                          );
-                        })()}
+                  return (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between border-b border-white/15 last:border-0 px-4 sm:px-5 py-3.5 gap-3"
+                    >
+                      {/* Left: Name + Description */}
+                      <div className="flex flex-col gap-1 pr-1 min-w-0 flex-1">
+                        <h4 className="text-sm sm:text-base font-extrabold uppercase tracking-wide text-white leading-tight">
+                          {herb.nama}
+                        </h4>
+                        <p className="text-xs text-blue-100/90 leading-relaxed">
+                          {herb.cara_pakai}
+                        </p>
+                      </div>
+
+                      {/* Right: Actions (Search Button + Icon Pill Badge) */}
+                      <div className="flex items-center gap-2 shrink-0">
+                        <a
+                          href={searchUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white text-[color:var(--color-clinic-blue)] hover:bg-blue-50 hover:text-[color:var(--color-clinic-blue-dark)] hover:scale-105 active:scale-95 transition-all duration-150 shadow-2xs"
+                          title={`Cari ${herb.nama} di Google`}
+                          aria-label={`Cari ${herb.nama} di Google`}
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+
+                        <div className="flex h-10 w-8 items-center justify-center rounded-full bg-white text-[color:var(--color-clinic-blue)] shadow-sm">
+                          {(() => {
+                            const HerbIcon = getHerbIcon(herb.nama);
+                            return (
+                              <HerbIcon className="h-4 w-4 text-[color:var(--color-clinic-blue)]" />
+                            );
+                          })()}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
