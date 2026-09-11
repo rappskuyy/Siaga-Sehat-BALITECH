@@ -103,9 +103,8 @@ export function Hero() {
                   alt="Dokter dengan stetoskop"
                   className="hidden min-[900px]:block animate-fade-up w-auto max-w-full object-contain pointer-events-none select-none"
                   style={{
-                    height: "980px",
-                    marginTop: "-270px",
-                    marginBottom: "-240px",
+                    height: "617px",
+                    marginTop: "-60px",
                     animationDuration: "0.7s",
                   }}
                 />
@@ -114,9 +113,8 @@ export function Hero() {
                   alt="Dokter dengan stetoskop"
                   className="min-[900px]:hidden animate-fade-up w-auto max-w-full object-contain pointer-events-none select-none"
                   style={{
-                    height: "500px",
-                    marginTop: "-60px",
-                    marginBottom: "-20px",
+                    height: "278px",
+                    marginTop: "-4px",
                     animationDuration: "0.7s",
                   }}
                 />
@@ -154,7 +152,7 @@ export function Hero() {
                   className="hidden min-[900px]:block p-2.5 shadow-xl"
                   style={{
                     top: "55px",
-                    left: "357px",
+                    left: "305px",
                     width: "159px",
                   }}
                   delay="0.5s"
@@ -181,8 +179,8 @@ export function Hero() {
                 <FloatingCard
                   className="hidden min-[900px]:block p-2.5 shadow-xl"
                   style={{
-                    top: "207px",
-                    left: "376px",
+                    top: "260px",
+                    left: "350px",
                     width: "154px",
                   }}
                   delay="1s"
