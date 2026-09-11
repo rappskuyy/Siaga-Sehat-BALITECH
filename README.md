@@ -138,54 +138,6 @@ src/
 └── assets/               # Logo, ilustrasi, foto
 ```
 
----
-
-## 🚀 Menjalankan Secara Lokal
-
-### Prasyarat
-- Node.js 20+
-- Akun [Supabase](https://supabase.com/) (untuk Auth & database)
-- API key [Google Gemini](https://ai.google.dev/) dan/atau [OpenAI](https://platform.openai.com/)
-- API key [Google Maps Platform](https://developers.google.com/maps) (opsional, untuk Nearby
-  Healthcare Finder)
-
-### 1. Clone & install dependencies
-```bash
-git clone <repo-url>
-cd Siaga-Sehat-BALITECH
-npm install
-```
-
-### 2. Konfigurasi environment variables
-Buat file `.env` di root proyek:
-```bash
-# Supabase
-VITE_SUPABASE_URL=https://xxxxx.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-
-# AI Provider (pilih salah satu / keduanya sebagai fallback)
-AI_PROVIDER=gemini            # "gemini" atau "openai"
-GEMINI_API_KEY=your-gemini-key
-OPENAI_API_KEY=your-openai-key
-
-# Google Maps (opsional)
-VITE_GOOGLE_MAPS_API_KEY=your-maps-key
-```
-
-### 3. Jalankan development server
-```bash
-npm run dev
-```
-
-### Perintah lain
-```bash
-npm run build        # Build untuk production
-npm run preview      # Preview hasil build
-npm run lint          # Jalankan ESLint
-npm run format         # Format kode dengan Prettier
-```
-
----
 
 ## 🤝 Kontribusi
 
