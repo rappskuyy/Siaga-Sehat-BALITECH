@@ -23,7 +23,7 @@ type CategoryFilter = "all" | "head" | "torso" | "spine" | "limbs";
 
 export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerProps) {
   const [view, setView] = useState<"front" | "back">("front");
-  const [zoomLevel, setZoomLevel] = useState<number>(1.25);
+  const [zoomLevel, setZoomLevel] = useState<number>(1.3);
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
 
   const visibleRegions = useMemo(() => {
@@ -42,10 +42,10 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
 
   const activeImageUrl = view === "front" ? FRONT_IMAGE_URL : BACK_IMAGE_URL;
 
-  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.25, 1.25));
-  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.25, 0.75));
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(Number((prev + 0.15).toFixed(2)), 1.3));
+  const handleZoomOut = () => setZoomLevel((prev) => Math.max(Number((prev - 0.15).toFixed(2)), 0.85));
   const handleResetZoom = () => {
-    setZoomLevel(1.25);
+    setZoomLevel(1.3);
     setCategoryFilter("all");
   };
   const toggleView = () => setView((prev) => (prev === "front" ? "back" : "front"));
@@ -147,14 +147,31 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
         {/* Soft Medical Vignette Spotlight */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-88 h-[480px] rounded-full bg-radial from-sky-300/35 via-sky-100/15 to-transparent blur-3xl pointer-events-none" />
 
+        {/* Floating Canvas Guide Cue: Upper-Right space between anatomy and zoom widget */}
+        {!selectedRegion && (
+          <div className="absolute top-8 sm:top-9 right-16 sm:right-20 z-20 hidden sm:flex items-center gap-2 rounded-2xl bg-white/95 backdrop-blur-md p-2 text-xs border-2 border-[color:var(--color-clinic-blue)] ring-2 ring-[color:var(--color-clinic-blue-soft)]/60 shadow-md shadow-[color:var(--color-clinic-blue)]/20 pointer-events-none select-none animate-in fade-in duration-300">
+            <div className="grid h-6 w-6 place-items-center rounded-xl bg-[color:var(--color-clinic-blue)] text-white shadow-xs shrink-0">
+              <MousePointerClick className="h-3.5 w-3.5 stroke-[2.5]" />
+            </div>
+            <div className="flex flex-col pr-1">
+              <span className="font-display font-bold text-[11px] leading-tight text-[color:var(--color-clinic-ink)]">
+                Klik Titik Organ
+              </span>
+              <span className="text-[9.5px] font-medium leading-tight text-[color:var(--color-clinic-muted)]">
+                Pilih titik biru untuk mulai
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Interactive Floating Canvas Action Controls (Zoom & Rotate) */}
         <div className="absolute top-3 right-3 z-30 flex flex-col gap-1.5 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200/80 shadow-md">
           <button
             type="button"
             onClick={handleZoomIn}
-            disabled={zoomLevel >= 1.25}
+            disabled={zoomLevel >= 1.3}
             aria-label="Perbesar model anatomi"
-            title="Perbesar Canvas (Maksimal 125%)"
+            title="Perbesar Canvas (Maksimal 130%)"
             className="grid h-8 w-8 min-h-[32px] min-w-[32px] place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition disabled:opacity-30 cursor-pointer"
           >
             <ZoomIn className="h-4 w-4" />
@@ -163,7 +180,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
           <button
             type="button"
             onClick={handleZoomOut}
-            disabled={zoomLevel <= 0.75}
+            disabled={zoomLevel <= 0.85}
             aria-label="Perkecil model anatomi"
             title="Perkecil Canvas (Zoom Out)"
             className="grid h-8 w-8 min-h-[32px] min-w-[32px] place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition disabled:opacity-30 cursor-pointer"
@@ -175,7 +192,7 @@ export function AnatomyViewer({ selectedRegion, onSelectRegion }: AnatomyViewerP
             type="button"
             onClick={handleResetZoom}
             aria-label="Reset ukuran model anatomi"
-            title="Reset Skala Zoom (Default 125%)"
+            title="Reset Skala Zoom (Default 130%)"
             className="grid h-8 w-8 min-h-[32px] min-w-[32px] place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-[color:var(--color-clinic-blue)] hover:text-white transition cursor-pointer text-[10px] font-bold"
           >
             {Math.round(zoomLevel * 100)}%

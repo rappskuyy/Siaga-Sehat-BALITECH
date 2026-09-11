@@ -13,6 +13,7 @@ import {
   Footprints,
   Check,
   ChevronRight,
+  MousePointerClick,
 } from "lucide-react";
 
 interface AnatomyHotspotProps {
@@ -85,43 +86,41 @@ export function AnatomyHotspot({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Precision Medical Hotspot Pin - Touch Ergonomic Target */}
+      {/* Precision Medical Hotspot Pin - Refined Subtle Glow */}
       <button
         type="button"
         onClick={() => onSelect(region)}
         aria-label={`Pilih ${region.nameIndonesian}. Terdapat ${symptomCount} gejala.`}
         className={`group relative flex items-center justify-center p-2 rounded-full transition-transform duration-200 focus:outline-none cursor-pointer ${
-          isSelected ? "scale-125 z-40" : "hover:scale-120 z-20"
+          isSelected ? "scale-120 z-40" : "hover:scale-115 z-20"
         }`}
-        style={{ transform: `scale(${isSelected ? pinScale * 1.25 : pinScale})` }}
+        style={{ transform: `scale(${isSelected ? pinScale * 1.2 : pinScale})` }}
       >
-        {/* Subtle Ambient Beacon Pulse */}
+        {/* Soft Ambient Beacon Pulse */}
         {isSelected ? (
-          <span className="absolute h-10 w-10 rounded-full bg-[color:var(--color-clinic-blue)]/35 animate-ping pointer-events-none" />
+          <span className="absolute -inset-1 rounded-full bg-[color:var(--color-clinic-blue)]/30 animate-pulse pointer-events-none" />
         ) : isHovered ? (
-          <span className="absolute h-9 w-9 rounded-full bg-[color:var(--color-clinic-blue)]/25 animate-pulse pointer-events-none" />
-        ) : (
-          <span className="absolute h-7 w-7 rounded-full bg-[color:var(--color-clinic-blue)]/20 animate-pulse pointer-events-none" />
-        )}
+          <span className="absolute -inset-1 rounded-full bg-[color:var(--color-clinic-blue)]/20 animate-pulse pointer-events-none" />
+        ) : null}
 
         {/* Outer Ring & Main Node */}
         <span
           className={`relative flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all duration-200 ${
             isSelected
-              ? "bg-[color:var(--color-clinic-blue)] border-white shadow-[0_0_16px_rgba(74,111,165,0.8)] ring-2 ring-[color:var(--color-clinic-blue)]"
+              ? "bg-[color:var(--color-clinic-blue)] border-white shadow-[0_0_14px_rgba(74,111,165,0.85)] ring-3 ring-[color:var(--color-clinic-blue-soft)]"
               : isHovered
-                ? "bg-[color:var(--color-clinic-blue)] border-white shadow-[0_0_12px_rgba(74,111,165,0.6)]"
-                : "bg-[color:var(--color-clinic-blue)] border-white shadow-md hover:bg-[color:var(--color-clinic-blue-dark)]"
+                ? "bg-[color:var(--color-clinic-blue)] border-white shadow-[0_0_12px_rgba(74,111,165,0.7)]"
+                : "bg-[color:var(--color-clinic-blue)] border-white shadow-[0_0_7px_rgba(74,111,165,0.45)] hover:bg-[color:var(--color-clinic-blue-dark)]"
           }`}
         >
-          {/* Inner Precision White Core */}
+          {/* Inner Precision Core */}
           <span
             className={`rounded-full transition-all duration-200 ${
               isSelected
                 ? "h-2 w-2 bg-white shadow-xs"
                 : isHovered
                   ? "h-2 w-2 bg-white"
-                  : "h-1.5 w-1.5 bg-white/95"
+                  : "h-1.5 w-1.5 bg-white"
             }`}
           />
         </span>
