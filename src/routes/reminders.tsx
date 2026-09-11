@@ -73,8 +73,15 @@ function RemindersPage() {
   const { user } = useAuth();
   const { scan: scanFilter, penyakit } = Route.useSearch();
   const navigate = useNavigate();
-  const { activeReminders, inactiveReminders, loading, markTaken, deactivateReminder, logs } =
-    useMedicineReminders();
+  const {
+    activeReminders,
+    inactiveReminders,
+    loading,
+    fetchReminders,
+    markTaken,
+    deactivateReminder,
+    logs,
+  } = useMedicineReminders();
   const { meds: recommendedMeds, loading: recommendedMedsLoading } = useLastConsultationMeds();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDiseaseForModal, setSelectedDiseaseForModal] = useState<string | null>(null);
@@ -467,6 +474,10 @@ function RemindersPage() {
         onClose={() => {
           setModalOpen(false);
           setSelectedDiseaseForModal(null);
+          fetchReminders();
+        }}
+        onSuccess={() => {
+          fetchReminders();
         }}
         initialDisease={selectedDiseaseForModal}
       />

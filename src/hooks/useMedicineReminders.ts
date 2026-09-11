@@ -3,6 +3,14 @@ import { supabase } from "@/lib/supabase/client";
 import type { MedicineReminder, MedicineReminderInsert, ReminderLogInsert, ReminderLog } from "@/lib/supabase/types";
 import { useAuth } from "@/lib/auth/auth-context";
 
+export const REMINDERS_UPDATED_EVENT = "siagasehat:reminders-updated";
+
+export function notifyRemindersUpdated() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(REMINDERS_UPDATED_EVENT));
+  }
+}
+
 export function useMedicineReminders() {
   const { user } = useAuth();
   const [reminders, setReminders] = useState<MedicineReminder[]>([]);
@@ -42,6 +50,43 @@ export function useMedicineReminders() {
     fetchReminders();
   }, [fetchReminders]);
 
+  // Listen to cross-component update events for instant sync across all hooks/modals
+  useEffect(() => {
+    const handleUpdate = () => {
+      fetchReminders();
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener(REMINDERS_UPDATED_EVENT, handleUpdate);
+      return () => {
+        window.removeEventListener(REMINDERS_UPDATED_EVENT, handleUpdate);
+      };
+    }
+  }, [fetchReminders]);
+
+  // Supabase realtime listener for database changes
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`medicine_reminders_${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "medicine_reminders",
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => {
+          fetchReminders();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, fetchReminders]);
+
   const createReminder = useCallback(
     async (payload: MedicineReminderInsert): Promise<MedicineReminder | null> => {
       if (!user) return null;
@@ -51,6 +96,7 @@ export function useMedicineReminders() {
         .select()
         .single();
       if (err) { setError(err.message); return null; }
+      notifyRemindersUpdated();
       await fetchReminders();
       return data as MedicineReminder;
     },
@@ -75,6 +121,7 @@ export function useMedicineReminders() {
             .eq("id", reminderId);
         }
       }
+      notifyRemindersUpdated();
       await fetchReminders();
     },
     [user, reminders, fetchReminders],
@@ -87,6 +134,7 @@ export function useMedicineReminders() {
         .from("medicine_reminders")
         .update({ is_active: false })
         .eq("id", reminderId);
+      notifyRemindersUpdated();
       await fetchReminders();
     },
     [user, fetchReminders],

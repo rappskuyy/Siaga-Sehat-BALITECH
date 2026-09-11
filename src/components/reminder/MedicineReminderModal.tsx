@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import type { RecommendedMed } from "@/hooks/useLastConsultationMeds";
 import { useLastConsultationMeds } from "@/hooks/useLastConsultationMeds";
-import { useMedicineReminders } from "@/hooks/useMedicineReminders";
+import { useMedicineReminders, notifyRemindersUpdated } from "@/hooks/useMedicineReminders";
 import type { MedicineReminderInsert, PurchaseLocation } from "@/lib/supabase/types";
 import {
   DOSIS_FREQUENCY_OPTIONS,
@@ -31,6 +31,7 @@ import {
 interface Props {
   open: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   initialDisease?: string | null;
 }
 
@@ -75,7 +76,7 @@ function StepIndicator({ current }: { current: Step }) {
   );
 }
 
-export function MedicineReminderModal({ open, onClose, initialDisease }: Props) {
+export function MedicineReminderModal({ open, onClose, onSuccess, initialDisease }: Props) {
   const { meds, loading: medsLoading } = useLastConsultationMeds();
   const { reminders, createReminder } = useMedicineReminders();
 
@@ -132,6 +133,8 @@ export function MedicineReminderModal({ open, onClose, initialDisease }: Props) 
   }, []);
 
   const handleClose = () => {
+    notifyRemindersUpdated();
+    onSuccess?.();
     reset();
     onClose();
   };
@@ -266,6 +269,8 @@ export function MedicineReminderModal({ open, onClose, initialDisease }: Props) 
           throw new Error("Reminder gagal disimpan");
         }
       }
+      notifyRemindersUpdated();
+      onSuccess?.();
       setStep("success");
     } catch {
       setErrorMsg("Terjadi kesalahan saat menyimpan. Coba lagi.");
