@@ -15,6 +15,9 @@ import {
   ShieldCheck,
   CheckCircle2,
   Heart,
+  Eye,
+  EyeOff,
+  AlertCircle,
 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -40,6 +43,10 @@ function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
+  const [shakePassword, setShakePassword] = useState(false);
   const [heightCm, setHeightCm] = useState("");
   const [weightKg, setWeightKg] = useState("");
   const [age, setAge] = useState("");
@@ -47,10 +54,25 @@ function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
+  const hasMinLength = password.length >= 8;
+  const hasCapital = /[A-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const isPasswordValid = hasMinLength && hasCapital && hasNumber;
+  const validCount = (hasMinLength ? 1 : 0) + (hasCapital ? 1 : 0) + (hasNumber ? 1 : 0);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setInfo(null);
+
+    if (!isPasswordValid) {
+      setPasswordTouched(true);
+      setShakePassword(true);
+      setTimeout(() => setShakePassword(false), 600);
+      setError("Kata sandi harus minimal 8 karakter, serta mengandung minimal 1 huruf kapital dan 1 angka.");
+      toast.error("Kata sandi belum memenuhi syarat", { id: "password-validation-error" });
+      return;
+    }
 
     if (!isSupabaseConfigured) {
       setError(
@@ -82,6 +104,7 @@ function RegisterPage() {
           ? "Email ini sudah terdaftar. Silakan masuk atau gunakan email lain."
           : signUpError.message;
       setError(translated);
+      toast.error(translated, { id: "register-signup-error" });
       return;
     }
 
@@ -89,7 +112,7 @@ function RegisterPage() {
     if (!data.session) {
       const successText = "Akun berhasil dibuat. Silakan cek email kamu untuk konfirmasi sebelum masuk.";
       window.sessionStorage.setItem("siagasehat_success_message", successText);
-      toast.success(successText, { duration: 5000 });
+      toast.success(successText, { id: "register-signup-success", duration: 5000 });
       navigate({ to: "/login" });
       return;
     }
@@ -269,20 +292,174 @@ function RegisterPage() {
               transition={{ delay: 0.24 }}
               className="flex flex-col gap-1.5"
             >
-              <Label htmlFor="password" className="text-white text-xs font-semibold">Kata Sandi</Label>
-              <div className="relative">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-white text-xs font-semibold">
+                  Kata Sandi
+                </Label>
+                {password && (
+                  <span
+                    className={`text-[11px] font-semibold transition-colors duration-300 ${
+                      validCount === 3
+                        ? "text-emerald-300"
+                        : validCount === 2
+                        ? "text-amber-300"
+                        : "text-rose-300"
+                    }`}
+                  >
+                    {validCount === 3
+                      ? "✓ Sandi Kuat"
+                      : validCount === 2
+                      ? "Sedang"
+                      : "Lemah"}
+                  </span>
+                )}
+              </div>
+
+              <motion.div
+                animate={shakePassword ? { x: [0, -12, 12, -8, 8, -4, 4, 0] } : {}}
+                transition={{ duration: 0.45, ease: "easeInOut" }}
+                className="relative"
+              >
                 <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <Input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
-                  minLength={6}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Minimal 6 karakter"
-                  className="h-11 rounded-xl pl-10 bg-white text-[color:var(--color-clinic-ink)] placeholder:text-slate-400 border-transparent shadow-xs focus:bg-white focus:ring-2 focus:ring-white/50 focus:border-white transition-all"
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (!passwordTouched) setPasswordTouched(true);
+                  }}
+                  onFocus={() => {
+                    setPasswordTouched(true);
+                    setPasswordFocused(true);
+                  }}
+                  onBlur={() => setPasswordFocused(false)}
+                  placeholder="Minimal 8 karakter (kapital & angka)"
+                  className={`h-11 rounded-xl pl-10 pr-11 bg-white text-[color:var(--color-clinic-ink)] placeholder:text-slate-400 border-2 shadow-xs focus:bg-white transition-all ${
+                    shakePassword
+                      ? "border-rose-400 ring-2 ring-rose-400/50"
+                      : passwordTouched && isPasswordValid
+                      ? "border-emerald-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-400/50"
+                      : passwordTouched && !isPasswordValid && password.length > 0
+                      ? "border-amber-300 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/50"
+                      : "border-transparent focus:ring-2 focus:ring-white/50 focus:border-white"
+                  }`}
                 />
-              </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none transition p-1 rounded-md"
+                  aria-label={showPassword ? "Sembunyikan sandi" : "Tampilkan sandi"}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </motion.div>
+
+              {/* Real-time Password Requirements Checklist & Animated Strength Bar */}
+              <AnimatePresence>
+                {passwordFocused && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="mt-1 flex flex-col gap-2 rounded-xl bg-white/15 p-3 backdrop-blur-md border border-white/30 shadow-xs"
+                  >
+                    {/* Strength Bar */}
+                    <div className="flex items-center gap-2 w-full">
+                      <div className="h-1.5 flex-1 rounded-full bg-white/25 overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{
+                            width: `${(validCount / 3) * 100}%`,
+                            backgroundColor:
+                              validCount === 3
+                                ? "#10b981"
+                                : validCount === 2
+                                ? "#f59e0b"
+                                : "#ef4444",
+                          }}
+                          transition={{ duration: 0.3 }}
+                          className="h-full rounded-full"
+                        />
+                      </div>
+                      <span className="text-[10px] text-white font-medium shrink-0">
+                        {validCount}/3 Syarat
+                      </span>
+                    </div>
+
+                    {/* Validation Rules */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                      {/* Rule 1: Min 8 chars */}
+                      <motion.div
+                        animate={{
+                          scale: hasMinLength ? [1, 1.05, 1] : 1,
+                        }}
+                        transition={{ duration: 0.2 }}
+                        className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all ${
+                          hasMinLength
+                            ? "bg-emerald-500/35 text-white border border-emerald-300/50 shadow-xs font-semibold"
+                            : "bg-white/10 text-white/80 border border-white/20"
+                        }`}
+                      >
+                        {hasMinLength ? (
+                          <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-200" />
+                        ) : (
+                          <span className="h-3.5 w-3.5 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-[9px] text-white/70">
+                            •
+                          </span>
+                        )}
+                        <span>Min. 8 Karakter</span>
+                      </motion.div>
+
+                      {/* Rule 2: At least 1 uppercase */}
+                      <motion.div
+                        animate={{
+                          scale: hasCapital ? [1, 1.05, 1] : 1,
+                        }}
+                        transition={{ duration: 0.2 }}
+                        className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all ${
+                          hasCapital
+                            ? "bg-emerald-500/35 text-white border border-emerald-300/50 shadow-xs font-semibold"
+                            : "bg-white/10 text-white/80 border border-white/20"
+                        }`}
+                      >
+                        {hasCapital ? (
+                          <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-200" />
+                        ) : (
+                          <span className="h-3.5 w-3.5 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-[9px] text-white/70">
+                            •
+                          </span>
+                        )}
+                        <span>1 Huruf Kapital</span>
+                      </motion.div>
+
+                      {/* Rule 3: At least 1 number */}
+                      <motion.div
+                        animate={{
+                          scale: hasNumber ? [1, 1.05, 1] : 1,
+                        }}
+                        transition={{ duration: 0.2 }}
+                        className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all ${
+                          hasNumber
+                            ? "bg-emerald-500/35 text-white border border-emerald-300/50 shadow-xs font-semibold"
+                            : "bg-white/10 text-white/80 border border-white/20"
+                        }`}
+                      >
+                        {hasNumber ? (
+                          <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-200" />
+                        ) : (
+                          <span className="h-3.5 w-3.5 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-[9px] text-white/70">
+                            •
+                          </span>
+                        )}
+                        <span>1 Angka (0-9)</span>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
 
             {/* Health stats row */}
@@ -345,15 +522,22 @@ function RegisterPage() {
 
             <AnimatePresence>
               {error && (
-                <motion.p
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="rounded-xl bg-rose-950/40 px-3.5 py-2.5 text-sm text-rose-200 border border-rose-400/40 backdrop-blur-sm"
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    x: [0, -8, 8, -6, 6, -3, 3, 0],
+                  }}
+                  exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                  transition={{ duration: 0.4 }}
+                  className="flex items-start gap-2.5 rounded-xl bg-rose-950/60 px-3.5 py-3 text-sm text-rose-200 border border-rose-400/50 backdrop-blur-md shadow-lg shadow-rose-950/30"
                   role="alert"
                 >
-                  {error}
-                </motion.p>
+                  <AlertCircle className="h-5 w-5 shrink-0 text-rose-400 mt-0.5" />
+                  <span className="leading-snug">{error}</span>
+                </motion.div>
               )}
               {info && (
                 <motion.p

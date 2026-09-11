@@ -67,14 +67,14 @@ export function WhyChooseUs() {
 
       <div className="relative mx-auto max-w-6xl">
         {/* Header */}
-        <Reveal className="mx-auto max-w-2xl text-center">
+        <Reveal className="relative flex flex-col items-start text-left">
           <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-clinic-blue-soft)] px-3.5 py-1 text-xs uppercase tracking-[0.25em] text-[color:var(--color-clinic-blue)] shadow-2xs">
             [ Keunggulan Platform ]
           </span>
           <h2 className="mt-3.5 font-display text-2xl font-extrabold leading-tight tracking-tight text-[color:var(--color-clinic-ink)] sm:text-3xl md:text-4xl lg:text-5xl">
             Mengapa memilih Siaga Sehat
           </h2>
-          <p className="mx-auto mt-3 max-w-lg text-xs leading-relaxed text-[color:var(--color-clinic-muted)] sm:text-sm md:text-base">
+          <p className="mt-3 max-w-xl text-xs leading-relaxed text-[color:var(--color-clinic-muted)] sm:text-sm md:text-base">
             Teknologi kesehatan pintar berbasis AI yang dirancang untuk membantu deteksi dini dan rekomendasi perawatan kesehatan Anda secara real-time.
           </p>
         </Reveal>

@@ -13,10 +13,10 @@ export function Hero() {
   return (
     <>
       <SiteHeader />
-      <section className="relative w-full overflow-hidden bg-white px-3.5 pt-3 pb-8 sm:px-6 sm:pt-4 md:px-8 md:pt-6 md:pb-12 lg:px-10 lg:pt-8 lg:pb-16 xl:pt-10 xl:pb-20">
+      <section className="relative w-full overflow-hidden bg-white px-4 pt-3 pb-6 sm:px-6 sm:pt-4 md:px-8 md:pt-6 md:pb-6 lg:px-10 lg:pt-8 lg:pb-8 xl:pt-10 xl:pb-8">
         {/* Body */}
-        <div className="relative mx-auto max-w-6xl xl:max-w-7xl w-full">
-          <div className="relative mt-4 grid gap-7 sm:mt-6 sm:gap-10 min-[900px]:grid-cols-[0.88fr_1.24fr_0.88fr] min-[900px]:items-start min-[900px]:gap-6 xl:grid-cols-[0.95fr_1.2fr_0.9fr] xl:gap-8">
+        <div className="relative mx-auto max-w-6xl w-full">
+          <div className="relative mt-4 grid gap-7 sm:mt-6 sm:gap-10 min-[900px]:grid-cols-[0.88fr_1.24fr_0.88fr] min-[900px]:items-start min-[900px]:gap-6">
             {/* Left column: headline + CTA + Tim Pengembang card */}
             <div className="relative z-10 flex flex-col justify-start">
               <h1 className="font-display text-[clamp(2.75rem,13vw,4rem)] font-extrabold leading-[0.9] tracking-tight text-[color:var(--color-clinic-ink)] sm:text-5xl md:text-6xl lg:text-[72px] xl:text-[80px]">
@@ -103,8 +103,9 @@ export function Hero() {
                   alt="Dokter dengan stetoskop"
                   className="hidden min-[900px]:block animate-fade-up w-auto max-w-full object-contain pointer-events-none select-none"
                   style={{
-                    height: "940px",
-                    marginTop: "-230px",
+                    height: "980px",
+                    marginTop: "-270px",
+                    marginBottom: "-240px",
                     animationDuration: "0.7s",
                   }}
                 />
@@ -113,8 +114,9 @@ export function Hero() {
                   alt="Dokter dengan stetoskop"
                   className="min-[900px]:hidden animate-fade-up w-auto max-w-full object-contain pointer-events-none select-none"
                   style={{
-                    height: "480px",
-                    marginTop: "-45px",
+                    height: "500px",
+                    marginTop: "-60px",
+                    marginBottom: "-20px",
                     animationDuration: "0.7s",
                   }}
                 />

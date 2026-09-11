@@ -129,51 +129,56 @@ export function FaqSection() {
       <span className="pointer-events-none absolute -left-20 bottom-0 h-72 w-72 rounded-full bg-[color:var(--color-siaga-scan)]/[0.06] blur-3xl" />
       <span className="pointer-events-none absolute -right-16 top-0 h-72 w-72 rounded-full bg-[color:var(--color-siaga-consult)]/[0.07] blur-3xl" />
 
-      <Reveal className="relative mx-auto max-w-2xl text-center">
-        <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs uppercase tracking-[0.25em] text-[color:var(--color-clinic-blue)] shadow-sm">
-          <HelpCircle className="h-3 w-3" />
-          Pertanyaan Umum
-        </span>
-        <h2 className="mt-4 font-display text-4xl font-extrabold leading-tight tracking-tight text-[color:var(--color-clinic-ink)] md:text-5xl">
-          Masih ragu? Ini yang paling sering ditanyakan
-        </h2>
-      </Reveal>
+      <div className="relative mx-auto max-w-6xl">
+        <Reveal className="relative flex flex-col items-start text-left">
+          <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs uppercase tracking-[0.25em] text-[color:var(--color-clinic-blue)] shadow-sm">
+            <HelpCircle className="h-3 w-3" />
+            [ Pertanyaan Umum ]
+          </span>
+          <h2 className="mt-4 font-display text-3xl font-extrabold leading-tight tracking-tight text-[color:var(--color-clinic-ink)] sm:text-4xl md:text-5xl">
+            Masih ragu? Ini yang paling sering ditanyakan
+          </h2>
+          <p className="mt-3 max-w-xl text-xs leading-relaxed text-[color:var(--color-clinic-muted)] sm:text-sm md:text-base">
+            Temukan jawaban atas pertanyaan umum seputar layanan kecerdasan buatan, akurasi skrining, dan privasi data SiagaSehat.
+          </p>
+        </Reveal>
 
-      {/* Category pills */}
-      <Reveal
-        delay="0.05s"
-        className="relative mx-auto mt-9 flex max-w-2xl flex-wrap items-center justify-center gap-2"
-      >
-        {CATEGORIES.map((c) => {
-          const isActive = c.key === category;
-          return (
-            <button
-              key={c.key}
-              type="button"
-              onClick={() => setCategory(c.key)}
-              className="inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-semibold transition-all duration-300"
-              style={{
-                backgroundColor: isActive ? c.color : "white",
-                color: isActive ? "white" : "var(--color-clinic-muted)",
-                borderColor: isActive ? c.color : "rgba(0,0,0,0.08)",
-              }}
-            >
-              <c.icon className="h-3.5 w-3.5" />
-              {c.label}
-            </button>
-          );
-        })}
-      </Reveal>
+        {/* Category pills */}
+        <Reveal
+          delay="0.05s"
+          className="relative mt-8 flex flex-wrap items-center justify-start gap-2"
+        >
+          {CATEGORIES.map((c) => {
+            const isActive = c.key === category;
+            return (
+              <button
+                key={c.key}
+                type="button"
+                onClick={() => setCategory(c.key)}
+                className="inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-semibold transition-all duration-300 cursor-pointer"
+                style={{
+                  backgroundColor: isActive ? c.color : "white",
+                  color: isActive ? "white" : "var(--color-clinic-muted)",
+                  borderColor: isActive ? c.color : "rgba(0,0,0,0.08)",
+                }}
+              >
+                <c.icon className="h-3.5 w-3.5" />
+                {c.label}
+              </button>
+            );
+          })}
+        </Reveal>
 
-      {/* Accordion list — crossfades when switching category */}
-      <div
-        key={category}
-        className="animate-fade-up relative mx-auto mt-8 flex max-w-2xl flex-col gap-3"
-        style={{ animationDuration: "0.4s" }}
-      >
-        {FAQS[category].map((item) => (
-          <AccordionItem key={item.q} q={item.q} a={item.a} accent={active.color} />
-        ))}
+        {/* Accordion list — crossfades when switching category */}
+        <div
+          key={category}
+          className="animate-fade-up relative mt-8 flex max-w-3xl flex-col gap-3"
+          style={{ animationDuration: "0.4s" }}
+        >
+          {FAQS[category].map((item) => (
+            <AccordionItem key={item.q} q={item.q} a={item.a} accent={active.color} />
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -21,6 +21,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth/auth-context";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { Footer } from "@/components/clinic/Footer";
+import penyakitJelas from "@/assets/penyakitjelas.webp?url";
+import penyakitBuram from "@/assets/penyakitburam.webp?url";
 
 // Lazy-load ScanResultView (and its heavy map/Leaflet dependencies) so initial mobile load is lightweight
 const ScanResultView = lazy(() =>
@@ -42,8 +44,8 @@ const PHOTO_DONT = [
 ];
 
 const PHOTO_GUIDE_IMAGES = {
-  good: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=700&auto=format&fit=crop&q=80",
-  bad: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=700&auto=format&fit=crop&q=80",
+  good: penyakitJelas,
+  bad: penyakitBuram,
 };
 
 function getFriendlyScanError(error: unknown) {
@@ -266,10 +268,10 @@ function ScannerPage() {
               </div>
 
               <div className="mt-4 flex flex-col gap-2">
-                {PHOTO_DO.map((text, index) => (
+                {PHOTO_DO.map((text) => (
                   <div
                     key={text}
-                    className={`flex items-start gap-2.5 rounded-xl bg-white p-2.5 sm:p-3 ${index > 1 ? "hidden sm:flex" : ""}`}
+                    className="flex items-start gap-2.5 rounded-xl bg-white p-2.5 sm:p-3"
                   >
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                     <span className="text-[11px] leading-relaxed text-[color:var(--color-clinic-ink)] sm:text-xs">
@@ -280,10 +282,10 @@ function ScannerPage() {
               </div>
 
               <div className="mt-2 flex flex-col gap-2">
-                {PHOTO_DONT.map((text, index) => (
+                {PHOTO_DONT.map((text) => (
                   <div
                     key={text}
-                    className={`flex items-start gap-2.5 rounded-xl bg-white/70 p-2.5 sm:p-3 ${index > 1 ? "hidden sm:flex" : ""}`}
+                    className="flex items-start gap-2.5 rounded-xl bg-white/70 p-2.5 sm:p-3"
                   >
                     <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
                     <span className="text-[11px] leading-relaxed text-[color:var(--color-clinic-muted)] sm:text-xs">
