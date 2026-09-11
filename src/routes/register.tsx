@@ -140,7 +140,6 @@ function RegisterPage() {
               transition={{ delay: 0.2 }}
               className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1 text-xs font-semibold text-[color:var(--color-clinic-blue-dark)] shadow-2xs border border-black/5"
             >
-              <Heart className="h-3.5 w-3.5 text-rose-500" />
               Bergabung dengan SiagaSehat
             </motion.span>
             <motion.h1
@@ -153,7 +152,7 @@ function RegisterPage() {
               <br />
               kesehatanmu yang
               <br />
-              lebih <span className="text-[color:var(--color-clinic-blue)]">cerdas</span>.
+              lebih <span className="text-[color:var(--color-clinic-blue)]">cerdas</span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 15 }}
