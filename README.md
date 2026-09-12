@@ -4,7 +4,7 @@
 
 ### Kesehatanmu, dipantau dengan lebih siaga.
 
-**SiagaSehat** adalah platform skrining kesehatan berbasis AI — deteksi dini kondisi kulit &
+**SiagaSehat** adalah platform skrining kesehatan berbasis AI untuk deteksi dini kondisi kulit &
 kesehatan lewat kamera, konsultasi digital interaktif, peta fasilitas kesehatan terdekat, hingga
 pengingat minum obat otomatis, semua dalam satu aplikasi.
 
@@ -19,12 +19,12 @@ pengingat minum obat otomatis, semua dalam satu aplikasi.
 
 ## 🩺 Tentang SiagaSehat
 
-> **Kami tidak hanya mengobati gejala** — kami peduli dengan setiap orang, didukung skrining AI
+> **Kami tidak hanya mengobati gejala**, kami peduli dengan setiap orang, didukung skrining AI
 > yang cepat dan akurat.
 
 SiagaSehat dibangun untuk menjembatani jarak antara "merasa ada yang salah dengan tubuh" dan
 "mendapat penanganan yang tepat". Lewat kombinasi computer vision, large language model, dan data
-fasilitas kesehatan real-time, pengguna bisa melakukan skrining awal kapan saja, di mana saja —
+fasilitas kesehatan real-time, pengguna bisa melakukan skrining awal kapan saja, di mana saja,
 lalu diarahkan ke langkah selanjutnya yang paling tepat: edukasi mandiri, konsultasi lanjutan, atau
 segera ke fasilitas kesehatan terdekat.
 
@@ -33,68 +33,55 @@ segera ke fasilitas kesehatan terdekat.
 ## ✨ Fitur Utama
 
 ### 📷 1. AI Image Scanner (`/scanner`)
-Skrining kesehatan visual berbasis Computer Vision AI dari foto yang diunggah atau diambil langsung lewat kamera:
-- **Objek Deteksi:** Ruam kulit, luka, mata merah, jerawat, kuku, lidah, hingga keluhan tenggorokan.
-- **Deteksi Bagian Tubuh Terintegrasi:** Memilih lokasi keluhan langsung pada diagram tubuh.
-- **Hasil Analisis Lengkap:** Kemungkinan kondisi medis, tingkat keyakinan (*confidence score*), estimasi tingkat risiko, kemungkinan penyebab, tanda bahaya, saran kapan harus ke dokter, serta tombol langsung untuk menambahkan ke pengingat obat.
+Skrining kesehatan awal dari foto yang diunggah atau diambil menggunakan kamera:
+- **Objek Analisis:** Ruam kulit, luka, mata merah, jerawat, kuku, lidah, dan tenggorokan.
+- **Deteksi Bagian Tubuh:** Memilih area keluhan langsung pada diagram tubuh.
+- **Hasil yang Diberikan:** Kemungkinan kondisi, estimasi tingkat risiko, kemungkinan penyebab, saran kapan perlu ke dokter, dan rekomendasi obat/herbal awal.
 
 ### 🤖 2. Konsultasi Medis AI (`/consultation`)
-Asisten kesehatan virtual interaktif 24/7 yang melakukan anamnesis terarah:
-- **Tanya-Jawab Cerdas:** Mengidentifikasi keluhan utama, usia, durasi gejala, riwayat penyakit keluarga, hingga riwayat alergi.
-- **Triage Medis:** Menyusun *Preliminary Analysis* (ringkasan kondisi), *Risk Assessment* (tingkat urgensi), serta *Health Recommendation* (panduan perawatan mandiri).
-- **Integrasi Anatomi:** Menerima data keluhan dari halaman eksplorasi anatomi tubuh.
+Asisten kesehatan virtual berbasis teks untuk tanya-jawab seputar keluhan:
+- **Tanya-Jawab Gejala:** Membantu menanyakan keluhan utama, usia, durasi gejala, dan riwayat kesehatan terkait.
+- **Hasil Ringkasan:** Menampilkan ringkasan awal kondisi, estimasi tingkat risiko, dan saran perawatan mandiri di rumah.
+- **Integrasi Pilihan Anatomi:** Menerima data keluhan yang dipilih dari halaman anatomi tubuh.
 
 ### 🧍 3. Visual Anatomi & Eksplorasi Gejala (`/anatomy`)
-Model tubuh manusia interaktif untuk membantu pengguna memetakan keluhan:
-- **Navigasi 3D Multi-Sudut:** Tampilan depan & belakang tubuh dengan fitur pembesaran (*zoom*).
-- **Pemilihan Gejala Terarah:** Menandai organ/bagian tubuh (kepala, dada, perut, punggung, tangan, kaki) lalu memilih gejala spesifik yang dirasakan.
-- **AI Symptom Assessment:** Menganalisis korelasi antar-gejala dan memberikan rekomendasi rujukan langkah selanjutnya.
+Model tubuh manusia interaktif untuk membantu pengguna yang sulit menjelaskan lokasi keluhannya:
+- **Model Tubuh Interaktif:** Tampilan tampak depan dan tampak belakang dengan opsi pembesaran (*zoom*).
+- **Pemilihan Gejala:** Menandai bagian tubuh (kepala, leher, dada, perut, punggung, tangan, kaki) lalu mencentang gejala yang dirasakan.
+- **Penilaian Awal AI:** Memberikan perkiraan kemungkinan kondisi berdasarkan kombinasi gejala yang dipilih.
 
 ### 📍 4. Peta Fasilitas Kesehatan & Apotek (`/maps`)
-Pencarian fasilitas kesehatan terdekat berbasis geolokasi GPS pengguna atau penempatan pin manual:
-- **Kategori Faskes:** Rumah Sakit Umum & Khusus, Puskesmas, Klinik Pratama, dan Apotek.
-- **Informasi Lengkap:** Estimasi jarak tempuh (km), jam operasional (layanan 24 jam/IGD), nomor kontak faskes, serta tombol navigasi rute langsung.
-- **Dukungan Multi-Engine:** OpenStreetMap Canvas, Leaflet, dan Google Maps Platform.
+Pencarian fasilitas kesehatan terdekat berdasarkan lokasi GPS perangkat atau pin manual di peta:
+- **Kategori Faskes:** Rumah Sakit, Puskesmas, Klinik, dan Apotek.
+- **Informasi yang Ditampilkan:** Jarak tempuh (km), alamat, jam operasional, nomor telepon faskes, dan rute navigasi.
+- **Peta Interaktif:** Didukung oleh OpenStreetMap, Leaflet, dan Google Maps Platform.
 
-### ⏰ 5. Pengingat Minum Obat — Medicine Reminder (`/reminders`)
-Sistem pengingat konsumsi obat otomatis untuk menjaga kepatuhan terapi:
-- **Setup Jadwal Cerdas:** Otomatis mengambil daftar obat dari riwayat scan/konsultasi terbaru atau input mandiri.
-- **Penjadwalan Dosis:** Pilihan frekuensi dosis (1x, 2x, 3x, 4x sehari) yang otomatis menghitung interval jam konsumsi.
-- **Pelacakan Stok & Kepatuhan:** Fitur tombol *"Sudah Minum Sekarang"*, penghitungan sisa tablet secara otomatis, peringatan stok menipis, dan log riwayat minum obat.
-- **Notifikasi Web & Status Popup:** Notifikasi peramban tepat waktu dan pop-up ringkasan obat aktif melalui ikon lonceng header.
+### ⏰ 5. Pengingat Minum Obat (`/reminders`)
+Pengingat waktu minum obat untuk membantu jadwal minum obat tetap teratur:
+- **Pengaturan Jadwal:** Menambahkan obat dari rekomendasi hasil scan/konsultasi atau input mandiri.
+- **Dosis & Frekuensi:** Pengaturan jumlah minum per hari (1x, 2x, 3x, 4x) yang otomatis mengatur interval jam.
+- **Pencatatan Riwayat:** Tombol *"Sudah Minum Sekarang"*, pengurangan sisa stok tablet otomatis, dan riwayat minum obat.
+- **Notifikasi Peramban:** Pengingat web saat jadwal tiba dan ringkasan status obat melalui ikon lonceng di navigasi.
 
-### 💊 6. Rekomendasi Obat Medis & Herbal Alami
-Panduan terapi awal yang terverifikasi dan aman:
-- **Obat Bebas (OTC):** Informasi fungsi, dosis per minum, dan aturan konsumsi obat umum (misal: Paracetamol, Antasida, Oralit).
-- **Herbal Alami:** Alternatif bahan herbal tradisional (misal: Jahe, Madu, Kunyit, Temulawak) beserta cara pengolahan dan manfaat kesehatannya.
+### 💊 6. Rekomendasi Obat Umum & Herbal
+Informasi edukatif seputar obat bebas dan tanaman herbal:
+- **Obat Bebas (OTC):** Informasi fungsi dan aturan minum obat umum (seperti Paracetamol, Antasida, Oralit).
+- **Herbal Tradisional:** Informasi bahan herbal (seperti Jahe, Madu, Kunyit, Temulawak) dan cara pengolahannya.
 
-### 📊 7. Profil & Rekam Medis Digital (`/profile`)
-Pusat manajemen riwayat kesehatan pribadi pengguna:
-- **Profil Fisik:** Data tinggi badan, berat badan, umur, dan estimasi otomatis Indeks Massa Tubuh (IMT / BMI).
-- **Grafik Tren Kesehatan:** Visualisasi frekuensi skrining dan riwayat kesehatan dari waktu ke waktu menggunakan Recharts.
-- **Arsip Riwayat Skrining:** Seluruh riwayat foto scan dan sesi konsultasi tersimpan rapi dan dapat dibuka kembali sebagai bahan rujukan dokter.
+### 📊 7. Profil & Riwayat Kesehatan (`/profile`)
+Halaman pengelolaan data kesehatan dan riwayat pemeriksaan pribadi:
+- **Data Kesehatan Dasar:** Tinggi badan, berat badan, usia, dan estimasi Indeks Massa Tubuh (IMT / BMI).
+- **Grafik Tren Kesehatan:** Menampilkan riwayat frekuensi pemeriksaan dan catatan kesehatan pengguna.
+- **Daftar Riwayat Skrining:** Riwayat scan dan konsultasi tersimpan agar dapat dibuka kembali saat dibutuhkan.
 
-### 🔐 8. Autentikasi & Keamanan Data (`/login` & `/register`)
-- **Autentikasi Aman:** Sistem akun berbasis Supabase Auth dengan sesi login yang persisten.
-- **Validasi Real-time:** Pengecekan kekuatan kata sandi otomatis (minimal 8 karakter, huruf kapital, dan angka).
-- **Row Level Security (RLS):** Data rekam medis dan pengingat obat dienkripsi serta diproteksi sehingga hanya dapat diakses oleh pemilik akun.
-
-<details>
-<summary><strong>🚧 Roadmap — fitur yang sedang direncanakan</strong></summary>
-
-<br/>
-
-Fitur berikut ada dalam visi produk SiagaSehat dan sedang/berpotensi dikembangkan lebih lanjut:
-
-- **🎤 Speech to Text** — input keluhan lewat suara (*voice input*) yang otomatis diubah menjadi teks percakapan konsultasi AI.
-- **📄 OCR Prescription Reader** — pemindaian lembar resep dokter berbasis OCR untuk otomatisasi jadwal pengingat obat.
-- **📚 Personalized Health Articles** — artikel edukasi kesehatan yang disesuaikan dengan riwayat keluhan pengguna.
-
-</details>
+### 🔐 8. Akun & Keamanan Data (`/login` & `/register`)
+- **Autentikasi Akun:** Masuk dan daftar akun menggunakan Supabase Auth.
+- **Validasi Kata Sandi:** Pengecekan syarat kata sandi (minimal 8 karakter, huruf kapital, dan angka).
+- **Perlindungan Data:** Data tersimpan aman dengan dukungan *Row Level Security (RLS)* Supabase.
 
 ---
 
-## 🛠️ Tumpukan Teknologi
+## 🛠️ Teknologi yang Digunakan
 
 | Layer | Teknologi |
 | --- | --- |
@@ -116,7 +103,7 @@ src/
 ├── components/
 │   ├── clinic/          # Landing page (Hero, Focus, Services, Footer, dst.)
 │   ├── scanner/         # AI Image Analysis, Body Pain Selector, hasil scan
-│   ├── anatomy/         # Anatomy Explorer 3D & assessment AI
+│   ├── anatomy/         # Anatomy Explorer & assessment AI
 │   ├── maps/            # Nearby Healthcare Finder
 │   ├── reminder/        # Medicine Reminder & notifikasi
 │   └── layout/          # Navbar (SiteHeader) & elemen layout bersama
@@ -143,12 +130,12 @@ Panduan lengkap tata cara penggunaan setiap fitur platform SiagaSehat dapat diak
 </div>
 
 Dokumen ini memuat:
-- 🚀 **Registrasi & Autentikasi** — Panduan membuat akun dan login.
-- 📷 **Scan AI & Skrining** — Cara foto kondisi fisik, deteksi bagian tubuh, dan memahami hasil.
-- 🤖 **Konsultasi AI** — Tanya jawab interaktif dengan asisten kesehatan AI.
-- 🧍 **Anatomy Explorer** — Memilih gejala pada model tubuh manusia.
-- 📍 **Peta Fasilitas Kesehatan** — Menemukan RS, Puskesmas, Klinik, dan Apotek terdekat.
-- ⏰ **Pengingat Obat** — Menjadwalkan pengingat, input dosis, dan mencatat kepatuhan.
+- 🚀 **Registrasi & Autentikasi** : Panduan membuat akun dan login.
+- 📷 **Scan AI & Skrining** : Cara foto kondisi fisik, deteksi bagian tubuh, dan memahami hasil.
+- 🤖 **Konsultasi AI** : Tanya jawab interaktif dengan asisten kesehatan AI.
+- 🧍 **Anatomy Explorer** : Memilih gejala pada model tubuh manusia.
+- 📍 **Peta Fasilitas Kesehatan** : Menemukan RS, Puskesmas, Klinik, dan Apotek terdekat.
+- ⏰ **Pengingat Obat** : Menjadwalkan pengingat, input dosis, dan mencatat kepatuhan.
 
 ---
 
@@ -161,6 +148,6 @@ agar kita bisa diskusikan arah pengembangannya.
 
 <div align="center">
 
-Dibuat dengan 🩵 untuk kesehatan yang lebih siaga — **SiagaSehat, Peduli Kesehatan.**
+Dibuat dengan 🩵 untuk kesehatan yang lebih siaga • **SiagaSehat, Peduli Kesehatan.**
 
 </div>

@@ -3,7 +3,7 @@
 <img src="./src/assets/Siaga Sehat.svg" alt="Logo SiagaSehat" width="340" />
 
 # 📖 Panduan Pengguna (User Manual)
-### **Platform Skrining & Asisten Kesehatan Cerdas SiagaSehat**
+### **Platform Skrining & Asisten Kesehatan SiagaSehat**
 
 [![Platform](https://img.shields.io/badge/Platform-Web_Responsive-4A6FA5?style=flat&logo=googlechrome&logoColor=white)](https://siagasehat.smkwikrama.sch.id)
 [![Status](https://img.shields.io/badge/Status-Live_Production-099268?style=flat&logo=vercel&logoColor=white)](https://siagasehat.smkwikrama.sch.id)
@@ -162,17 +162,17 @@ Fitur ini menganalisis foto keluhan fisik (seperti ruam kulit, jerawat, luka, ma
 
 > 🔗 **Tautan Halaman:** **[siagasehat.smkwikrama.sch.id/consultation](https://siagasehat.smkwikrama.sch.id/consultation)**
 
-Asisten dokter virtual interaktif 24/7 yang siap mendengarkan keluhan kesehatan Anda melalui percakapan teks terarah.
+Layanan tanya-jawab berbasis teks dengan model AI untuk membantu menganalisis keluhan kesehatan awal pengguna.
 
 #### Langkah Penggunaan:
 1. Buka menu **Konsultasi**.
-2. Ketikkan keluhan kesehatan pada kolom pesan (contoh: *"Sudah 2 hari demam dan tenggorokan sakit saat menelan"*), atau klik salah satu topik cepat yang disediakan.
-3. Jawab pertanyaan tindak lanjut yang diajukan AI (seperti durasi gejala, riwayat alergi, atau tensi darah jika diketahui).
-4. AI akan merangkum:
-   - **Analisis Awal** mengenai keluhan Anda.
-   - **Tingkat Risiko** kondisi kesehatan.
-   - **Langkah Penanganan Mandiri** yang aman dilakukan di rumah.
-   - **Rekomendasi Faskes** jika gejala memerlukan penanganan langsung.
+2. Ketikkan keluhan kesehatan pada kolom pesan (contoh: *"Sudah 2 hari demam dan tenggorokan sakit saat menelan"*), atau klik salah satu topik yang disediakan.
+3. Jawab pertanyaan tindak lanjut yang diajukan sistem (seperti durasi gejala, riwayat alergi, atau tensi darah).
+4. Sistem akan menyusun:
+   - **Analisis Awal** mengenai kemungkinan keluhan.
+   - **Estimasi Tingkat Risiko** kondisi kesehatan.
+   - **Saran Perawatan Mandiri** awal di rumah.
+   - **Rujukan Faskes** apabila gejala memerlukan penanganan langsung dokter.
 
 [⬆️ Kembali ke Daftar Isi](#daftar-isi)
 
@@ -183,16 +183,16 @@ Asisten dokter virtual interaktif 24/7 yang siap mendengarkan keluhan kesehatan 
 
 > 🔗 **Tautan Halaman:** **[siagasehat.smkwikrama.sch.id/anatomy](https://siagasehat.smkwikrama.sch.id/anatomy)**
 
-Menyediakan model anatomi tubuh manusia interaktif untuk membantu pengguna yang sulit mendeskripsikan lokasi keluhannya secara tulisan.
+Menyediakan model tubuh manusia interaktif (tampilan tampak depan dan tampak belakang) untuk membantu pengguna menandai lokasi keluhan fisik.
 
 #### 4 Tahap Pemeriksaan Anatomi:
-1. **Panduan:** Memahami cara kerja penandaan model tubuh.
+1. **Panduan:** Membaca petunjuk singkat penggunaan sebelum menandai tubuh.
 2. **Model Tubuh:** 
-   - Klik bagian tubuh yang sakit (kepala, leher, dada, perut, tangan, punggung, kaki, dsb.).
-   - Gunakan tombol **Tampak Depan / Tampak Belakang** untuk memutar model.
-   - Gunakan fitur **Zoom** untuk memperjelas area spesifik.
-3. **Pilih Gejala:** Centang gejala spesifik yang dirasakan pada bagian tubuh yang telah dipilih.
-4. **Hasil Skrining:** AI menganalisis korelasi antar-gejala dan memberikan estimasi kondisi serta saran tindakan.
+   - Klik bagian tubuh yang dikeluhkan (kepala, leher, dada, perut, tangan, punggung, kaki, dll.).
+   - Gunakan tombol **Tampak Depan / Tampak Belakang** untuk memilih sudut pandang.
+   - Gunakan fitur **Zoom** untuk memperjelas area yang dipilih.
+3. **Pilih Gejala:** Centang daftar gejala spesifik yang dirasakan pada bagian tubuh tersebut.
+4. **Hasil Skrining:** Sistem memberikan perkiraan kondisi awal berdasarkan kombinasi gejala yang dipilih dan menyarankan langkah selanjutnya.
 
 [⬆️ Kembali ke Daftar Isi](#daftar-isi)
 
@@ -306,7 +306,7 @@ Jika Anda memerlukan bantuan teknis, menemukan kendala, atau ingin memberikan ma
 
 <div align="center">
 
-**SiagaSehat — Peduli Kesehatan, Siaga Setiap Saat.**  
+**SiagaSehat • Peduli Kesehatan, Siaga Setiap Saat.**  
 *Karya Inovasi Siswa SMK Wikrama Bogor • Tim BALITECH (2026)*
 
 [⬆️ Kembali ke Paling Atas](#panduan-pengguna-user-manual)
