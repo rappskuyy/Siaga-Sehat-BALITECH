@@ -1,198 +1,304 @@
 <div align="center">
 
-<img src="./assets/Siaga_Sehat.svg" alt="Logo SiagaSehat" width="320" />
+<img src="./src/assets/Siaga Sehat.svg" alt="Logo SiagaSehat" width="340" />
 
-# Panduan Pengguna (User Manual)
-## Aplikasi SiagaSehat
+# 📖 Panduan Pengguna (User Manual)
+### **Platform Skrining & Asisten Kesehatan Cerdas SiagaSehat**
 
-Dokumen ini disusun sebagai panduan resmi penggunaan platform **SiagaSehat**, yang dapat diakses melalui **[siagasehat.smkwikrama.sch.id](https://siagasehat.smkwikrama.sch.id)**.
+[![Platform](https://img.shields.io/badge/Platform-Web_Responsive-0284C7?style=flat&logo=googlechrome&logoColor=white)](https://siagasehat.smkwikrama.sch.id)
+[![Status](https://img.shields.io/badge/Status-Live_Production-10B981?style=flat&logo=vercel&logoColor=white)](https://siagasehat.smkwikrama.sch.id)
+[![Versi](https://img.shields.io/badge/Versi_Dokumen-v1.0_(2026)-6366F1?style=flat)](./usermanual.md)
+[![Website](https://img.shields.io/badge/🌐_Buka_Website-siagasehat.smkwikrama.sch.id-2563EB?style=for-the-badge&logoColor=white)](https://siagasehat.smkwikrama.sch.id)
+
+---
+
+*Dokumen panduan resmi penggunaan seluruh fitur dan layanan platform **SiagaSehat**.*
 
 </div>
 
----
+<br/>
 
-## Daftar Isi
+<a id="daftar-isi"></a>
+## 📑 Daftar Isi Interaktif
 
-1. [Tentang SiagaSehat](#1-tentang-siagasehat)
-2. [Persyaratan Penggunaan](#2-persyaratan-penggunaan)
-3. [Memulai Penggunaan](#3-memulai-penggunaan)
-4. [Pendaftaran dan Masuk Akun](#4-pendaftaran-dan-masuk-akun)
-5. [Panduan Penggunaan Fitur](#5-panduan-penggunaan-fitur)
-   1. [Pemindaian Kesehatan Berbasis Kecerdasan Buatan (Scan AI)](#51-pemindaian-kesehatan-berbasis-kecerdasan-buatan-scan-ai)
-   2. [Konsultasi Kesehatan Berbasis Kecerdasan Buatan](#52-konsultasi-kesehatan-berbasis-kecerdasan-buatan)
-   3. [Eksplorasi Anatomi Tubuh](#53-eksplorasi-anatomi-tubuh)
-   4. [Peta Fasilitas Kesehatan Terdekat](#54-peta-fasilitas-kesehatan-terdekat)
-   5. [Pengingat Konsumsi Obat](#55-pengingat-konsumsi-obat)
-   6. [Profil dan Riwayat Kesehatan](#56-profil-dan-riwayat-kesehatan)
-6. [Pertanyaan yang Sering Diajukan](#6-pertanyaan-yang-sering-diajukan)
-7. [Bantuan dan Kontak](#7-bantuan-dan-kontak)
+Klik pada salah satu topik di bawah untuk langsung menuju panduan yang diinginkan:
+
+| Kategori | Menu Panduan | Tautan Cepat |
+| :--- | :--- | :--- |
+| 🏥 **Informasi Awal** | 📌 **1. Tentang SiagaSehat**<br/>💻 **2. Persyaratan Penggunaan**<br/>🚀 **3. Memulai Penggunaan** | [👉 Buka Bab 1](#1-tentang-siagasehat)<br/>[👉 Buka Bab 2](#2-persyaratan-penggunaan)<br/>[👉 Buka Bab 3](#3-memulai-penggunaan) |
+| 🔐 **Akun Pengguna** | 📝 **4. Pendaftaran & Masuk Akun**<br/>• 4.1 Registrasi Akun Baru<br/>• 4.2 Masuk ke Akun (Login)<br/>• 4.3 Keuntungan Memiliki Akun | [👉 Buka Bab 4](#4-pendaftaran-dan-masuk-akun) |
+| 📷 **Fitur AI & Skrining** | 🔍 **5.1 Pemindaian Kesehatan (Scan AI)**<br/>🤖 **5.2 Konsultasi Medis AI**<br/>🧍 **5.3 Eksplorasi Anatomi Tubuh** | [👉 Buka Scan AI](#51-pemindaian-kesehatan-berbasis-kecerdasan-buatan-scan-ai)<br/>[👉 Buka Konsultasi](#52-konsultasi-kesehatan-berbasis-kecerdasan-buatan)<br/>[👉 Buka Anatomi](#53-eksplorasi-anatomi-tubuh) |
+| 📍 **Layanan Kesehatan** | 🗺️ **5.4 Peta Fasilitas Kesehatan (Faskes)**<br/>⏰ **5.5 Pengingat Konsumsi Obat (Reminder)**<br/>📊 **5.6 Profil & Rekam Medis** | [👉 Buka Peta Faskes](#54-peta-fasilitas-kesehatan-terdekat)<br/>[👉 Buka Pengingat Obat](#55-pengingat-konsumsi-obat)<br/>[👉 Buka Profil](#56-profil-dan-riwayat-kesehatan) |
+| ❓ **Pusat Bantuan** | 💡 **6. Pertanyaan yang Sering Diajukan (FAQ)**<br/>📞 **7. Bantuan & Kontak Pengembang** | [👉 Buka FAQ](#6-pertanyaan-yang-sering-diajukan)<br/>[👉 Buka Kontak](#7-bantuan-dan-kontak) |
 
 ---
 
-## 1. Tentang SiagaSehat
+<a id="1-tentang-siagasehat"></a>
+## 📌 1. Tentang SiagaSehat
 
-SiagaSehat merupakan platform skrining kesehatan berbasis kecerdasan buatan yang dirancang untuk membantu pengguna mengenali kemungkinan kondisi kesehatan sejak dini. Melalui kombinasi teknologi pengenalan gambar, model bahasa besar, dan data fasilitas kesehatan secara langsung, pengguna dapat melakukan skrining awal kapan saja dan di mana saja, kemudian diarahkan pada langkah lanjutan yang sesuai, baik berupa edukasi mandiri, konsultasi lanjutan, maupun rujukan ke fasilitas kesehatan terdekat.
+**SiagaSehat** merupakan platform skrining kesehatan berbasis kecerdasan buatan (*Artificial Intelligence*) yang dirancang untuk membantu masyarakat mendeteksi dan mengenali kemungkinan kondisi kesehatan sejak dini.
 
-**Catatan penting:** Seluruh hasil analisis yang diberikan oleh SiagaSehat bersifat edukatif dan tidak dimaksudkan untuk menggantikan diagnosis dokter. Dalam kondisi darurat, pengguna disarankan untuk segera menghubungi instalasi gawat darurat (IGD) atau fasilitas kesehatan terdekat.
+Melalui perpaduan teknologi **Computer Vision**, **Large Language Model (Google Gemini)**, dan integrasi peta faskes secara *real-time*, pengguna dapat melakukan penilaian mandiri kapan pun dan di mana pun, sebelum memutuskan langkah medis selanjutnya.
 
----
+> [!IMPORTANT]
+> **Catatan Medis Penting:**
+> Seluruh analisis dan rekomendasi yang diberikan SiagaSehat bersifat **edukatif dan skrining awal (triase)**, bukan diagnosis medis mutlak. Dalam keadaan gawat darurat, segera hubungi Instalasi Gawat Darurat (IGD) atau fasilitas kesehatan terdekat.
 
-## 2. Persyaratan Penggunaan
-
-Untuk menggunakan SiagaSehat, pengguna memerlukan hal-hal berikut.
-
-- Perangkat dengan akses internet, baik telepon pintar (smartphone) maupun komputer/laptop.
-- Peramban (browser) yang telah diperbarui ke versi terbaru, misalnya Google Chrome, Mozilla Firefox, atau Safari.
-- Tidak diperlukan instalasi aplikasi tambahan karena SiagaSehat berjalan sepenuhnya melalui peramban web.
+[⬆️ Kembali ke Daftar Isi](#daftar-isi)
 
 ---
 
-## 3. Memulai Penggunaan
+<a id="2-persyaratan-penggunaan"></a>
+## 💻 2. Persyaratan Penggunaan
 
-1. Buka peramban pada perangkat yang digunakan.
-2. Kunjungi alamat **[siagasehat.smkwikrama.sch.id](https://siagasehat.smkwikrama.sch.id)**.
-3. Halaman beranda akan menampilkan ringkasan layanan yang tersedia beserta menu navigasi utama.
-4. Pengguna dapat langsung mencoba fitur skrining tanpa mendaftar akun terlebih dahulu, meskipun pembuatan akun disarankan untuk memperoleh pengalaman yang lebih lengkap.
+Platform SiagaSehat dapat diakses secara instan tanpa perlu instalasi aplikasi:
 
----
+* 📱 **Perangkat:** Komputer, Laptop, Tablet, atau Ponsel Pintar (*Android & iOS*).
+* 🌐 **Peramban (Browser):** Google Chrome, Mozilla Firefox, Microsoft Edge, Safari, atau peramban modern lainnya versi terbaru.
+* 📶 **Koneksi Internet:** Diperlukan untuk mengakses fitur AI dan pembaruan data faskes secara *real-time*.
+* 📷 **Izin Kamera (Opsional):** Untuk fitur *Scan AI* langsung dari kamera perangkat.
+* 📍 **Izin Lokasi/GPS (Opsional):** Untuk fitur pencarian Rumah Sakit & Apotek terdekat di sekitar pengguna.
 
-## 4. Pendaftaran dan Masuk Akun
-
-### 4.1 Membuat Akun Baru
-
-1. Pilih menu **Register** pada bagian navigasi, atau kunjungi langsung halaman **[Daftar](https://siagasehat.smkwikrama.sch.id/register)**.
-2. Isi kolom **Nama Lengkap**, **Alamat Surel (Email)**, dan **Kata Sandi**.
-3. Lengkapi kolom **Data Kesehatan** yang bersifat opsional, meliputi tinggi badan (cm), berat badan (kg), dan usia, agar rekomendasi yang diberikan sistem menjadi lebih sesuai dengan kondisi pengguna.
-4. Pilih tombol **Daftar Sekarang** untuk menyelesaikan proses pendaftaran.
-
-### 4.2 Masuk ke Akun
-
-1. Pilih menu **Login** pada bagian navigasi, atau kunjungi halaman **[Masuk](https://siagasehat.smkwikrama.sch.id/login)**.
-2. Masukkan alamat surel dan kata sandi yang telah terdaftar.
-3. Pilih tombol **Masuk** untuk mengakses akun.
-
-### 4.3 Manfaat Memiliki Akun
-
-Dengan memiliki akun terdaftar, pengguna memperoleh manfaat berikut.
-
-- Riwayat konsultasi kecerdasan buatan tersimpan secara otomatis.
-- Rekomendasi kesehatan yang lebih personal sesuai data yang dilengkapi.
-- Fitur pengingat konsumsi obat dapat diaktifkan.
-- Penggunaan fitur pemindaian (Scan AI) tanpa batas jumlah.
-
-Data pengguna disimpan dan dilindungi dengan mekanisme Row Level Security dari penyedia layanan basis data Supabase.
+[⬆️ Kembali ke Daftar Isi](#daftar-isi)
 
 ---
 
-## 5. Panduan Penggunaan Fitur
+<a id="3-memulai-penggunaan"></a>
+## 🚀 3. Memulai Penggunaan
 
-### 5.1 Pemindaian Kesehatan Berbasis Kecerdasan Buatan (Scan AI)
+1. Buka peramban pada perangkat Anda.
+2. Kunjungi alamat: **[siagasehat.smkwikrama.sch.id](https://siagasehat.smkwikrama.sch.id)**.
+3. Halaman beranda akan menyajikan gambaran umum layanan, ringkasan fitur, serta tombol akses cepat ke setiap menu.
+4. Anda dapat langsung menggunakan fitur publik (seperti Scan AI, Konsultasi, Anatomi, dan Peta) atau membuat akun untuk menyimpan riwayat rekam medis pribadi.
 
-Fitur ini digunakan untuk menganalisis kondisi kulit atau bagian tubuh tertentu melalui foto. Fitur dapat diakses melalui menu **Scan AI** pada navigasi, atau langsung melalui halaman **[/scanner](https://siagasehat.smkwikrama.sch.id/scanner)**.
-
-**Langkah penggunaan:**
-
-1. Pilih area unggah foto, kemudian seret dan lepas berkas foto, atau klik untuk memilih berkas dari perangkat. Format berkas yang didukung adalah JPG, PNG, dan WebP.
-2. Sebagai alternatif, pengguna dapat memilih opsi **Ambil Foto Langsung** untuk mengambil gambar menggunakan kamera perangkat secara langsung.
-3. Perhatikan panduan pengambilan foto berikut agar hasil analisis lebih akurat.
-   - Gunakan pencahayaan alami atau lampu yang terang dan merata.
-   - Ambil foto dari jarak dekat dengan fokus pada area yang menjadi keluhan.
-   - Gunakan latar belakang polos tanpa gangguan visual.
-   - Hindari penggunaan filter atau penyuntingan foto.
-   - Hindari foto yang buram, bergerak, atau tertutup bayangan.
-4. Pilih tombol **Scan Sekarang** untuk memulai proses analisis.
-5. Sistem akan menampilkan hasil berupa kemungkinan kondisi, tingkat keyakinan analisis, tingkat risiko, kemungkinan penyebab, serta saran penanganan awal.
-
-### 5.2 Konsultasi Kesehatan Berbasis Kecerdasan Buatan
-
-Fitur ini menyediakan sesi tanya jawab interaktif dengan asisten kesehatan berbasis kecerdasan buatan. Fitur dapat diakses melalui menu **Konsultasi Medis AI**, atau langsung melalui halaman **[/consultation](https://siagasehat.smkwikrama.sch.id/consultation)**.
-
-**Langkah penggunaan:**
-
-1. Ketik keluhan kesehatan pada kolom percakapan yang tersedia, atau pilih salah satu contoh keluhan yang telah disediakan sistem, misalnya demam disertai lemas, mual dan nyeri lambung, atau sakit kepala.
-2. Tekan tombol Enter atau tombol kirim untuk menyampaikan pesan.
-3. Jawab pertanyaan lanjutan yang diajukan oleh sistem, seperti usia, durasi gejala, serta riwayat kesehatan terkait.
-4. Sistem akan menyusun ringkasan kondisi awal, perkiraan tingkat risiko, dan rekomendasi langkah lanjutan yang perlu diambil pengguna.
-
-Fitur ini dapat diakses selama dua puluh empat jam. Meskipun demikian, apabila kondisi tergolong darurat, pengguna tetap disarankan untuk segera menghubungi fasilitas gawat darurat terdekat dan tidak semata-mata mengandalkan hasil konsultasi daring.
-
-### 5.3 Eksplorasi Anatomi Tubuh
-
-Fitur ini menampilkan model tubuh interaktif untuk membantu pengguna mengidentifikasi gejala berdasarkan lokasi keluhan pada tubuh. Fitur dapat diakses melalui menu **Visual Penyakit**, atau langsung melalui halaman **[/anatomy](https://siagasehat.smkwikrama.sch.id/anatomy)**.
-
-**Fitur ini terdiri atas empat tahap:**
-
-1. **Panduan** — membaca ringkasan singkat mengenai tata cara penggunaan sebelum memulai pemeriksaan.
-2. **Model Anatomi** — memilih titik pada model tubuh, baik pada tampilan depan maupun belakang, sesuai lokasi keluhan. Tombol Depan/Belakang digunakan untuk mengganti sudut pandang, sedangkan tombol Zoom digunakan untuk memperbesar tampilan model.
-3. **Gejala** — memilih gejala klinis atau keluhan spesifik yang dirasakan pada bagian tubuh yang telah ditandai.
-4. **Hasil** — sistem menampilkan kemungkinan kondisi, mendeteksi tanda-tanda kondisi darurat apabila ada, serta memberikan saran untuk melakukan rujukan ke dokter bila diperlukan.
-
-### 5.4 Peta Fasilitas Kesehatan Terdekat
-
-Fitur ini digunakan untuk menemukan lokasi fasilitas kesehatan di sekitar pengguna. Fitur dapat diakses melalui menu **Peta Faskes**, atau langsung melalui halaman **[/maps](https://siagasehat.smkwikrama.sch.id/maps)**.
-
-**Langkah penggunaan:**
-
-1. Berikan izin akses lokasi pada peramban ketika diminta, agar hasil pencarian menampilkan fasilitas yang sesuai dengan posisi pengguna.
-2. Sistem akan menampilkan daftar rumah sakit, klinik, pusat kesehatan masyarakat (puskesmas), dan apotek terdekat, lengkap dengan informasi jarak dan jam operasional.
-3. Gunakan informasi tersebut untuk menentukan fasilitas kesehatan yang sesuai kebutuhan, termasuk fasilitas dengan layanan gawat darurat selama dua puluh empat jam atau yang menerima BPJS Kesehatan.
-4. Ikuti petunjuk rute navigasi yang ditampilkan sistem menuju fasilitas yang dipilih.
-
-### 5.5 Pengingat Konsumsi Obat
-
-Fitur ini digunakan untuk mengatur pengingat waktu minum obat serta jadwal kontrol dan pemeriksaan kesehatan rutin. Fitur ini memerlukan akun yang telah masuk (login) untuk dapat digunakan.
-
-**Langkah penggunaan:**
-
-1. Masuk ke akun pengguna terlebih dahulu.
-2. Buka menu Pengingat pada aplikasi.
-3. Tambahkan jadwal baru dengan mengisi nama obat, waktu konsumsi, dan jumlah stok yang dimiliki.
-4. Sistem akan mengirimkan notifikasi secara otomatis sesuai jadwal yang telah ditentukan, sekaligus mencatat riwayat kepatuhan konsumsi obat dan sisa stok yang tersedia.
-
-### 5.6 Profil dan Riwayat Kesehatan
-
-Fitur ini menampilkan data pribadi serta riwayat penggunaan layanan kesehatan pengguna. Fitur dapat diakses melalui menu **Profile**, atau langsung melalui halaman **[/profile](https://siagasehat.smkwikrama.sch.id/profile)**.
-
-Pada halaman ini, pengguna dapat melakukan hal berikut.
-
-- Melihat dan memperbarui data dasar kesehatan, meliputi tinggi badan, berat badan, usia, dan estimasi indeks massa tubuh (IMT).
-- Menelusuri riwayat hasil pemindaian (Scan AI) dan konsultasi kecerdasan buatan yang disajikan dalam bentuk grafik perkembangan dari waktu ke waktu.
-- Menjadikan riwayat tersebut sebagai bahan pertimbangan atau bahan diskusi pada saat berkonsultasi dengan dokter.
+[⬆️ Kembali ke Daftar Isi](#daftar-isi)
 
 ---
 
-## 6. Pertanyaan yang Sering Diajukan
+<a id="4-pendaftaran-dan-masuk-akun"></a>
+## 🔐 4. Pendaftaran dan Masuk Akun
 
-**Apakah SiagaSehat dapat menggantikan peran dokter?**
+<div align="center">
 
-Tidak. SiagaSehat hanya berfungsi sebagai alat bantu triase awal, yaitu mengenali kemungkinan kondisi kesehatan beserta tingkat urgensinya, sehingga pengguna dapat menentukan langkah selanjutnya dengan lebih cepat. Untuk memperoleh diagnosis resmi dan penanganan medis, pengguna tetap perlu berkonsultasi dengan dokter yang memiliki izin praktik.
+[![Daftar Akun Baru](https://img.shields.io/badge/📝_Daftar_Akun_Baru-2563EB?style=for-the-badge&logoColor=white)](https://siagasehat.smkwikrama.sch.id/register)
+[![Masuk ke Akun](https://img.shields.io/badge/🔑_Masuk_Akun-0D9488?style=for-the-badge&logoColor=white)](https://siagasehat.smkwikrama.sch.id/login)
 
-**Apakah layanan ini dikenakan biaya?**
+</div>
 
-Fitur dasar, yaitu Scan AI dan Konsultasi AI, dapat digunakan tanpa biaya. Sebagian fitur lanjutan, seperti penyimpanan riwayat tanpa batas dan konsultasi langsung dengan dokter, disediakan melalui paket berbayar.
+### 4.1 Membuat Akun Baru (Register)
+1. Klik tombol **Daftar** pada bilah navigasi atas, atau buka halaman **[/register](https://siagasehat.smkwikrama.sch.id/register)**.
+2. Lengkapi formulir pendaftaran:
+   - **Nama Lengkap:** Nama panggilan atau nama lengkap Anda.
+   - **Email:** Alamat surel aktif untuk login.
+   - **Kata Sandi:** Minimal 8 karakter, mengandung minimal 1 huruf kapital dan 1 angka.
+3. *(Opsional)* Isi data kesehatan awal: **Tinggi Badan (cm)**, **Berat Badan (kg)**, dan **Usia** untuk perhitungan otomatis Indeks Massa Tubuh (IMT).
+4. Klik **Daftar Sekarang**.
 
-**Berapa lama waktu yang dibutuhkan untuk memperoleh hasil?**
+### 4.2 Masuk ke Akun (Login)
+1. Klik tombol **Masuk** di navigasi, atau buka **[/login](https://siagasehat.smkwikrama.sch.id/login)**.
+2. Masukkan email dan kata sandi yang telah didaftarkan.
+3. Klik tombol **Masuk ke Akun**.
 
-Secara umum, hasil pemindaian (Scan) diperoleh dalam waktu kurang dari tiga puluh detik, sedangkan balasan pada fitur Konsultasi AI ditampilkan hampir seketika. Kecepatan tersebut dapat dipengaruhi oleh kualitas koneksi internet yang digunakan.
+### 4.3 Keuntungan Memiliki Akun
+* 📈 **Rekam Medis Tersimpan:** Riwayat scan dan konsultasi tersimpan rapi dalam grafik tren kesehatan.
+* ⏰ **Pengingat Obat Aktif:** Fitur pengingat minum obat otomatis hanya dapat berjalan untuk pengguna terdaftar.
+* 🎯 **Rekomendasi Terpersonalisasi:** Penilaian AI disesuaikan dengan profil usia dan fisik Anda.
+* 🛡️ **Keamanan Data:** Terlindungi oleh enkripsi dan *Row Level Security (RLS)* Supabase.
+
+[⬆️ Kembali ke Daftar Isi](#daftar-isi)
 
 ---
 
-## 7. Bantuan dan Kontak
+<a id="5-panduan-penggunaan-fitur"></a>
+## ⚙️ 5. Panduan Penggunaan Fitur
 
-Apabila pengguna mengalami kendala teknis atau memiliki masukan terhadap layanan, tim pengembang dapat dihubungi melalui saluran berikut.
+---
 
-| Saluran | Tautan |
-|---|---|
-| WhatsApp | [wa.me/6285770485228](https://wa.me/6285770485228) |
-| LinkedIn Sekolah | [SMK Wikrama Bogor](https://www.linkedin.com/school/smkwikramabogor) |
-| Repositori GitHub | [Siaga-Sehat-BALITECH](https://github.com/rappskuyy/Siaga-Sehat-BALITECH) |
-| Profil Tim Pengembang | [Tim Pengembang BALITECH](https://siagasehat.smkwikrama.sch.id/dev) |
+<a id="51-pemindaian-kesehatan-berbasis-kecerdasan-buatan-scan-ai"></a>
+### 📷 5.1 Pemindaian Kesehatan Berbasis AI (Scan AI)
+
+> 🔗 **Tautan Halaman:** **[siagasehat.smkwikrama.sch.id/scanner](https://siagasehat.smkwikrama.sch.id/scanner)**
+
+Fitur ini menganalisis foto keluhan fisik (seperti ruam kulit, jerawat, luka, mata merah, kuku, lidah, atau tenggorokan) menggunakan kecerdasan buatan.
+
+```
+[Unggah/Ambil Foto] ➔ [Pilih Bagian Tubuh] ➔ [Analisis AI] ➔ [Hasil Skrining & Rekomendasi Obat]
+```
+
+#### Langkah Penggunaan:
+1. Masuk ke menu **Scan AI**.
+2. **Pilih Metode Input Foto:**
+   - *Unggah Berkas:* Tarik & lepas gambar atau pilih berkas dari galeri (format JPG, PNG, WebP).
+   - *Ambil Foto Langsung:* Izinkan akses kamera dan ambil foto area keluhan.
+3. **Tips Pengambilan Foto yang Akurat:**
+   - 💡 Pastikan pencahayaan terang dan merata.
+   - 🎯 Posisikan kamera dekat dan fokus pada area yang mengalami keluhan.
+   - 🚫 Hindari penggunaan filter kamera, foto buram, atau goyang.
+4. Klik **Scan Sekarang**.
+5. **Hasil Analisis yang Ditampilkan:**
+   - 🏷️ Nama kemungkinan kondisi medis.
+   - 📊 Tingkat keyakinan analisis (*Confidence Score*).
+   - ⚠️ Tingkat keparahan / bahaya.
+   - 💊 Rekomendasi obat umum & herbal yang aman.
+   - 🏥 Waktu yang disarankan untuk berkonsultasi ke dokter.
+   - 🔔 Tombol langsung untuk menjadwalkan obat ke fitur **Pengingat Obat**.
+
+[⬆️ Kembali ke Daftar Isi](#daftar-isi)
+
+---
+
+<a id="52-konsultasi-kesehatan-berbasis-kecerdasan-buatan"></a>
+### 🤖 5.2 Konsultasi Kesehatan Berbasis AI
+
+> 🔗 **Tautan Halaman:** **[siagasehat.smkwikrama.sch.id/consultation](https://siagasehat.smkwikrama.sch.id/consultation)**
+
+Asisten dokter virtual interaktif 24/7 yang siap mendengarkan keluhan kesehatan Anda melalui percakapan teks terarah.
+
+#### Langkah Penggunaan:
+1. Buka menu **Konsultasi**.
+2. Ketikkan keluhan kesehatan pada kolom pesan (contoh: *"Sudah 2 hari demam dan tenggorokan sakit saat menelan"*), atau klik salah satu topik cepat yang disediakan.
+3. Jawab pertanyaan tindak lanjut yang diajukan AI (seperti durasi gejala, riwayat alergi, atau tensi darah jika diketahui).
+4. AI akan merangkum:
+   - **Analisis Awal** mengenai keluhan Anda.
+   - **Tingkat Risiko** kondisi kesehatan.
+   - **Langkah Penanganan Mandiri** yang aman dilakukan di rumah.
+   - **Rekomendasi Faskes** jika gejala memerlukan penanganan langsung.
+
+[⬆️ Kembali ke Daftar Isi](#daftar-isi)
+
+---
+
+<a id="53-eksplorasi-anatomi-tubuh"></a>
+### 🧍 5.3 Eksplorasi Anatomi Tubuh (Visual Penyakit)
+
+> 🔗 **Tautan Halaman:** **[siagasehat.smkwikrama.sch.id/anatomy](https://siagasehat.smkwikrama.sch.id/anatomy)**
+
+Menyediakan model anatomi tubuh manusia interaktif untuk membantu pengguna yang sulit mendeskripsikan lokasi keluhannya secara tulisan.
+
+#### 4 Tahap Pemeriksaan Anatomi:
+1. **Panduan:** Memahami cara kerja penandaan model tubuh.
+2. **Model Tubuh:** 
+   - Klik bagian tubuh yang sakit (kepala, leher, dada, perut, tangan, punggung, kaki, dsb.).
+   - Gunakan tombol **Tampak Depan / Tampak Belakang** untuk memutar model.
+   - Gunakan fitur **Zoom** untuk memperjelas area spesifik.
+3. **Pilih Gejala:** Centang gejala spesifik yang dirasakan pada bagian tubuh yang telah dipilih.
+4. **Hasil Skrining:** AI menganalisis korelasi antar-gejala dan memberikan estimasi kondisi serta saran tindakan.
+
+[⬆️ Kembali ke Daftar Isi](#daftar-isi)
+
+---
+
+<a id="54-peta-fasilitas-kesehatan-terdekat"></a>
+### 📍 5.4 Peta Fasilitas Kesehatan Terdekat
+
+> 🔗 **Tautan Halaman:** **[siagasehat.smkwikrama.sch.id/maps](https://siagasehat.smkwikrama.sch.id/maps)**
+
+Menemukan fasilitas kesehatan di sekitar lokasi Anda secara instan menggunakan peta interaktif.
+
+#### Langkah Penggunaan:
+1. Buka menu **Peta Faskes**.
+2. Izinkan peramban mengakses lokasi perangkat (*GPS*).
+3. **Filter Kategori Faskes:**
+   - 🏥 Rumah Sakit Umum & Khusus
+   - 🏢 Puskesmas
+   - 🩺 Klinik Pratama & Mandiri
+   - 💊 Apotek Terdekat
+4. Klik salah satu faskes untuk melihat informasi detail: **Jarak tempuh (km)**, **Alamat lengkap**, **Jam operasional (termasuk faskes 24 jam)**, dan **Rute Navigasi**.
+
+[⬆️ Kembali ke Daftar Isi](#daftar-isi)
+
+---
+
+<a id="55-pengingat-konsumsi-obat"></a>
+### ⏰ 5.5 Pengingat Konsumsi Obat (Medicine Reminder)
+
+> 🔗 **Tautan Halaman:** **[siagasehat.smkwikrama.sch.id/reminders](https://siagasehat.smkwikrama.sch.id/reminders)**
+
+Membantu pengguna mematuhi jadwal minum obat yang diresepkan atau direkomendasikan dari hasil scan.
+
+#### Langkah Penggunaan:
+1. Pastikan Anda telah masuk ke akun SiagaSehat.
+2. Buka menu **Pengingat** atau klik ikon **Lonceng (🔔)** di pojok kanan atas.
+3. Klik tombol **Tambah Pengingat**:
+   - Pilih tempat pembelian (*Apotek* atau *Rumah Sakit*).
+   - Pilih penyakit dari riwayat scan terbaru.
+   - Centang obat yang dibeli.
+   - Tentukan jumlah tablet dan frekuensi minum (misal: *3x sehari / tiap 8 jam*).
+4. Klik **Aktifkan Pengingat** lalu **Selesai**.
+5. Jadwal obat akan otomatis aktif. Anda dapat mencatat kepatuhan dengan mengklik tombol **"Sudah Minum Sekarang"** ketika jadwal tiba untuk mengurangi sisa stok tablet secara otomatis.
+
+> [!TIP]
+> Notifikasi web akan berbunyi tepat waktu selama tab browser tetap terbuka di perangkat Anda.
+
+[⬆️ Kembali ke Daftar Isi](#daftar-isi)
+
+---
+
+<a id="56-profil-dan-riwayat-kesehatan"></a>
+### 📊 5.6 Profil dan Riwayat Kesehatan
+
+> 🔗 **Tautan Halaman:** **[siagasehat.smkwikrama.sch.id/profile](https://siagasehat.smkwikrama.sch.id/profile)**
+
+Halaman pusat data pribadi dan rekam medis digital pengguna.
+
+* 👤 **Informasi Pribadi:** Perbarui tinggi badan, berat badan, umur, dan lihat status Indeks Massa Tubuh (IMT).
+* 📈 **Grafik Tren Kesehatan:** Memantau riwayat frekuensi pemeriksaan dan status risiko kesehatan dari waktu ke waktu.
+* 🗂️ **Riwayat Scan & Konsultasi:** Seluruh hasil skrining masa lalu dapat dibuka kembali kapan saja sebagai referensi diskusi saat berobat ke dokter.
+
+[⬆️ Kembali ke Daftar Isi](#daftar-isi)
+
+---
+
+<a id="6-pertanyaan-yang-sering-diajukan"></a>
+## 💡 6. Pertanyaan yang Sering Diajukan (FAQ)
+
+<details>
+<summary><strong>1. Apakah hasil analisis SiagaSehat dapat menggantikan resep dokter?</strong></summary>
+<br/>
+<strong>Tidak.</strong> SiagaSehat berfungsi sebagai alat bantu skrining awal (triase mandiri). Informasi obat yang diberikan merupakan panduan umum dan obat bebas (OTC/herbal). Untuk obat keras atau resep khusus, Anda wajib berkonsultasi langsung dengan dokter.
+</details>
+
+<details>
+<summary><strong>2. Apakah data foto dan rekam medis saya aman?</strong></summary>
+<br/>
+<strong>Ya.</strong> Semua data pengguna dan foto riwayat dilindungi dengan enkripsi keamanan tingkat tinggi menggunakan basis data Supabase dengan kebijakan <em>Row Level Security (RLS)</em>, sehingga hanya akun Anda yang memiliki hak akses ke rekam medis tersebut.
+</details>
+
+<details>
+<summary><strong>3. Apakah layanan SiagaSehat berbayar?</strong></summary>
+<br/>
+Fitur utama seperti <strong>Scan AI, Konsultasi AI, Peta Faskes, Anatomi Tubuh, dan Pengingat Obat</strong> dapat digunakan secara <strong>gratis</strong> oleh seluruh masyarakat.
+</details>
+
+<details>
+<summary><strong>4. Mengapa peta faskes tidak mendeteksi lokasi saya?</strong></summary>
+<br/>
+Pastikan Anda telah mengaktifkan GPS pada perangkat dan memberikan izin lokasi (<em>Allow Location Permission</em>) pada peramban web saat pop-up izin muncul. Anda juga dapat memilih titik lokasi secara manual di peta.
+</details>
+
+[⬆️ Kembali ke Daftar Isi](#daftar-isi)
+
+---
+
+<a id="7-bantuan-dan-kontak"></a>
+## 📞 7. Bantuan dan Kontak Pengembang
+
+Jika Anda memerlukan bantuan teknis, menemukan kendala, atau ingin memberikan masukan untuk pengembangan SiagaSehat, silakan hubungi tim kami:
+
+| Saluran | Keterangan | Tautan Kontak |
+| :--- | :--- | :--- |
+| 💬 **WhatsApp Resmi** | Layanan pesan instan pengembang | [wa.me/6285770485228](https://wa.me/6285770485228) |
+| 💼 **LinkedIn Sekolah** | Profil resmi SMK Wikrama Bogor | [LinkedIn SMK Wikrama Bogor](https://www.linkedin.com/school/smkwikramabogor) |
+| 🐙 **GitHub Repository** | Repositori proyek & pelaporan bug | [GitHub Siaga-Sehat-BALITECH](https://github.com/rappskuyy/Siaga-Sehat-BALITECH) |
+| 👨‍💻 **Tim Pengembang** | Profil tim pengembang BALITECH | [Halaman Tim Pengembang](https://siagasehat.smkwikrama.sch.id/dev) |
 
 ---
 
 <div align="center">
 
-Dokumen ini disusun sebagai panduan resmi penggunaan SiagaSehat.
-Karya siswa SMK Wikrama Bogor, tim pengembang BALITECH.
+**SiagaSehat — Peduli Kesehatan, Siaga Setiap Saat.**  
+*Karya Inovasi Siswa SMK Wikrama Bogor • Tim BALITECH (2026)*
+
+[⬆️ Kembali ke Paling Atas](#panduan-pengguna-user-manual)
 
 </div>

@@ -69,7 +69,14 @@ export function ReminderBell({ variant = "dark", className = "" }: Props) {
       </button>
 
       {/* Setup wizard modal */}
-      <MedicineReminderModal open={setupOpen} onClose={() => setSetupOpen(false)} />
+      <MedicineReminderModal
+        open={setupOpen}
+        onClose={() => setSetupOpen(false)}
+        onSuccess={() => {
+          setSetupOpen(false);
+          setOverviewOpen(true);
+        }}
+      />
 
       {/* Overview status modal */}
       <ActiveRemindersOverviewModal

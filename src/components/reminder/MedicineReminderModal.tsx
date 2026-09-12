@@ -134,7 +134,9 @@ export function MedicineReminderModal({ open, onClose, onSuccess, initialDisease
 
   const handleClose = () => {
     notifyRemindersUpdated();
-    onSuccess?.();
+    if (step === "success") {
+      onSuccess?.();
+    }
     reset();
     onClose();
   };

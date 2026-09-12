@@ -82,7 +82,11 @@ function RemindersPage() {
     deactivateReminder,
     logs,
   } = useMedicineReminders();
-  const { meds: recommendedMeds, loading: recommendedMedsLoading } = useLastConsultationMeds();
+  const {
+    meds: recommendedMeds,
+    loading: recommendedMedsLoading,
+    refetch: refetchRecommendedMeds,
+  } = useLastConsultationMeds();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDiseaseForModal, setSelectedDiseaseForModal] = useState<string | null>(null);
   const [showAllPending, setShowAllPending] = useState(false);
@@ -475,9 +479,14 @@ function RemindersPage() {
           setModalOpen(false);
           setSelectedDiseaseForModal(null);
           fetchReminders();
+          refetchRecommendedMeds();
         }}
         onSuccess={() => {
+          setModalOpen(false);
+          setSelectedDiseaseForModal(null);
+          setTab("active");
           fetchReminders();
+          refetchRecommendedMeds();
         }}
         initialDisease={selectedDiseaseForModal}
       />

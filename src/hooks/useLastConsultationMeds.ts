@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/auth-context";
+import { REMINDERS_UPDATED_EVENT } from "@/hooks/useMedicineReminders";
 
 export interface RecommendedMed {
   nama: string;
@@ -63,9 +64,27 @@ export function useLastConsultationMeds() {
     setLoading(false);
   }, [user]);
 
+  const fetchMedsRef = useRef(fetchMeds);
+  useEffect(() => {
+    fetchMedsRef.current = fetchMeds;
+  }, [fetchMeds]);
+
   useEffect(() => {
     fetchMeds();
   }, [fetchMeds]);
 
+  useEffect(() => {
+    const handleUpdate = () => {
+      fetchMedsRef.current();
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener(REMINDERS_UPDATED_EVENT, handleUpdate);
+      return () => {
+        window.removeEventListener(REMINDERS_UPDATED_EVENT, handleUpdate);
+      };
+    }
+  }, []);
+
   return { meds, loading, refetch: fetchMeds };
 }
+

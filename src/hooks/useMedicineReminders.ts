@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { MedicineReminder, MedicineReminderInsert, ReminderLogInsert, ReminderLog } from "@/lib/supabase/types";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -46,6 +46,11 @@ export function useMedicineReminders() {
     setLoading(false);
   }, [user]);
 
+  const fetchRemindersRef = useRef(fetchReminders);
+  useEffect(() => {
+    fetchRemindersRef.current = fetchReminders;
+  }, [fetchReminders]);
+
   useEffect(() => {
     fetchReminders();
   }, [fetchReminders]);
@@ -53,7 +58,7 @@ export function useMedicineReminders() {
   // Listen to cross-component update events for instant sync across all hooks/modals
   useEffect(() => {
     const handleUpdate = () => {
-      fetchReminders();
+      fetchRemindersRef.current();
     };
     if (typeof window !== "undefined") {
       window.addEventListener(REMINDERS_UPDATED_EVENT, handleUpdate);
@@ -61,13 +66,14 @@ export function useMedicineReminders() {
         window.removeEventListener(REMINDERS_UPDATED_EVENT, handleUpdate);
       };
     }
-  }, [fetchReminders]);
+  }, []);
 
-  // Supabase realtime listener for database changes
+  // Supabase realtime listener for database changes (with unique channel per instance)
   useEffect(() => {
-    if (!user) return;
+    if (!user?.id) return;
+    const channelId = `medicine_reminders_${user.id}_${Math.random().toString(36).slice(2, 9)}`;
     const channel = supabase
-      .channel(`medicine_reminders_${user.id}`)
+      .channel(channelId)
       .on(
         "postgres_changes",
         {
@@ -77,7 +83,7 @@ export function useMedicineReminders() {
           filter: `user_id=eq.${user.id}`,
         },
         () => {
-          fetchReminders();
+          fetchRemindersRef.current();
         },
       )
       .subscribe();
@@ -85,7 +91,7 @@ export function useMedicineReminders() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, fetchReminders]);
+  }, [user?.id]);
 
   const createReminder = useCallback(
     async (payload: MedicineReminderInsert): Promise<MedicineReminder | null> => {

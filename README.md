@@ -17,8 +17,6 @@ pengingat minum obat otomatis, semua dalam satu aplikasi.
 
 </div>
 
----
-
 ## 🩺 Tentang SiagaSehat
 
 > **Kami tidak hanya mengobati gejala** — kami peduli dengan setiap orang, didukung skrining AI
@@ -138,6 +136,28 @@ src/
 └── assets/               # Logo, ilustrasi, foto
 ```
 
+
+---
+
+## 📖 Panduan Pengguna (User Manual)
+
+Panduan lengkap tata cara penggunaan setiap fitur platform SiagaSehat dapat diakses melalui tombol berikut:
+
+<div align="center">
+
+[![Buka User Manual](https://img.shields.io/badge/📖_Buka_Panduan_Pengguna_(User_Manual)-2563EB?style=for-the-badge&logoColor=white)](./usermanual.md)
+
+</div>
+
+Dokumen ini memuat:
+- 🚀 **Registrasi & Autentikasi** — Panduan membuat akun dan login.
+- 📷 **Scan AI & Skrining** — Cara foto kondisi fisik, deteksi bagian tubuh, dan memahami hasil.
+- 🤖 **Konsultasi AI** — Tanya jawab interaktif dengan asisten kesehatan AI.
+- 🧍 **Anatomy Explorer** — Memilih gejala pada model tubuh manusia.
+- 📍 **Peta Fasilitas Kesehatan** — Menemukan RS, Puskesmas, Klinik, dan Apotek terdekat.
+- ⏰ **Pengingat Obat** — Menjadwalkan pengingat, input dosis, dan mencatat kepatuhan.
+
+---
 
 ## 🤝 Kontribusi
 
