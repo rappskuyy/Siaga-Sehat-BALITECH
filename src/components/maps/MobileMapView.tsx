@@ -406,7 +406,7 @@ export function MobileMapView() {
     : "";
 
   return (
-    <div className="fixed inset-0 w-full h-screen bg-white overflow-hidden flex flex-col lg:hidden">
+    <div className="fixed inset-0 w-full h-[100dvh] min-h-[100dvh] bg-white overflow-hidden flex flex-col lg:hidden">
       <h1 className="sr-only">Peta Fasilitas Kesehatan, Rumah Sakit, Klinik, dan Apotek Terdekat</h1>
 
       {/* Full Screen OpenStreetMap */}
@@ -422,7 +422,7 @@ export function MobileMapView() {
         />
 
         {/* Top Search Bar - Floating */}
-        <div className="absolute top-3 left-3 right-3 z-40">
+        <div className="absolute top-[max(0.75rem,env(safe-area-inset-top))] left-3 right-3 z-40">
           <form onSubmit={handleAddressSearch} className="flex gap-2 items-center">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B7280] pointer-events-none" />
@@ -490,7 +490,7 @@ export function MobileMapView() {
         </div>
 
         {/* Category Filter Bubbles */}
-        <div className="absolute top-16 left-3 right-3 z-40 flex gap-1.5 overflow-x-auto pb-1 no-scrollbar items-center">
+        <div className="absolute top-[calc(3.75rem+env(safe-area-inset-top,0px))] left-3 right-3 z-40 flex gap-1.5 overflow-x-auto pb-1 no-scrollbar items-center">
           {[
             { id: "all", label: "Semua", icon: Building2 },
             { id: "hospital", label: "Rumah Sakit", icon: Building2 },
@@ -527,7 +527,7 @@ export function MobileMapView() {
 
         {/* Active Route Floating Card Banner */}
         {selectedPharmacy && routeInfo && !showDetailsPanel && (
-          <div className="absolute top-28 left-3 right-3 z-40 animate-fade-in">
+          <div className="absolute top-[calc(6.5rem+env(safe-area-inset-top,0px))] left-3 right-3 z-40 animate-fade-in">
             <div className="bg-[#4a6fa5] text-white px-3.5 py-2.5 rounded-2xl shadow-xl flex items-center justify-between gap-2 border border-white/20 backdrop-blur-md">
               <div className="flex items-center gap-2.5 overflow-hidden">
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
@@ -570,7 +570,7 @@ export function MobileMapView() {
         {showLocationList && !showDetailsPanel && filteredPharmacies.length > 0 && (
           <div
             ref={listSheetRef}
-            className="absolute bottom-[112px] left-3 right-3 z-40 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-[#E5E7EB] shadow-2xl max-h-[250px] flex flex-col will-change-transform translate-y-0"
+            className="absolute bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] left-3 right-3 z-40 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-[#E5E7EB] shadow-2xl max-h-[48dvh] flex flex-col will-change-transform translate-y-0"
           >
             {/* Scroll/Drag Handle Bar to Close Location List */}
             <div
@@ -602,7 +602,7 @@ export function MobileMapView() {
                 Daftar Lokasi Terdekat ({filteredPharmacies.length})
               </h2>
             </div>
-            <div className="overflow-y-auto space-y-2 pr-1 max-h-[160px]">
+            <div className="overflow-y-auto space-y-2 pr-1 max-h-[calc(48dvh-80px)]">
               {filteredPharmacies.map((facility) => {
                 const isSelected = selectedPharmacy?.id === facility.id;
                 const isHosp = facility.facilityType === "hospital";
@@ -651,9 +651,9 @@ export function MobileMapView() {
           </div>
         )}
 
-        {/* Floating Toggle Button (Bottom Left) when list is hidden */}
+        {/* Floating Toggle Button (Bottom Left) when list is hidden - Safely elevated above bottom nav */}
         {!showLocationList && !showDetailsPanel && (
-          <div className="absolute bottom-[112px] left-3 z-40">
+          <div className="absolute bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] left-3 z-30">
             <button
               onClick={() => setShowLocationList(true)}
               aria-label={`Buka daftar ${filteredPharmacies.length} lokasi terdekat`}
@@ -665,12 +665,12 @@ export function MobileMapView() {
           </div>
         )}
 
-        {/* Recenter GPS Floating Button (Bottom Right) */}
+        {/* Recenter GPS Floating Button (Bottom Right) - Safely elevated above bottom nav */}
         {!showDetailsPanel && (
-          <div className="absolute bottom-[112px] right-3 z-40">
+          <div className="absolute bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] right-3 z-30">
             <button
               onClick={() => getUserGeolocation(true)}
-              className="p-3 min-w-[44px] min-h-[44px] rounded-full bg-[#4a6fa5] text-white border-2 border-white shadow-xl hover:bg-[#35517d] transition active:scale-90 flex items-center justify-center"
+              className="p-3 min-w-[46px] min-h-[46px] rounded-full bg-[#4a6fa5] text-white border-2 border-white shadow-xl hover:bg-[#35517d] transition active:scale-90 flex items-center justify-center"
               title="Lokasi Presisi Saya"
               aria-label="Pusatkan ke lokasi saya saat ini"
             >
@@ -680,11 +680,11 @@ export function MobileMapView() {
         )}
       </div>
 
-      {/* Details Panel - Compact Bottom Sheet (Lowered so map remains clearly visible) */}
+      {/* Details Panel - Premium Bottom Sheet with high accessibility and full description */}
       {selectedPharmacy && showDetailsPanel && (
         <div
           ref={detailSheetRef}
-          className="absolute bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl border-t border-[#E5E7EB] shadow-2xl flex flex-col max-h-[46vh] will-change-transform translate-y-0 animate-in slide-in-from-bottom-full duration-300 backdrop-blur-md"
+          className="absolute bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl border-t border-[#E5E7EB] shadow-2xl flex flex-col max-h-[72dvh] will-change-transform translate-y-0 animate-in slide-in-from-bottom-full duration-300"
         >
           {/* Scroll / Drag Handle Bar to Close Details Panel */}
           <div
@@ -694,7 +694,7 @@ export function MobileMapView() {
             onClick={() => {
               if (detailCurrentY.current < 5) handleCloseDetails();
             }}
-            className="w-full py-2.5 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing active:bg-slate-100 rounded-t-3xl shrink-0 select-none border-b border-gray-100 touch-none"
+            className="w-full py-2.5 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing active:bg-slate-100 rounded-t-3xl shrink-0 select-none border-b border-gray-100 touch-none bg-white"
             title="Geser ke Bawah untuk Menutup"
             role="button"
             tabIndex={0}
@@ -704,9 +704,9 @@ export function MobileMapView() {
             <span className="text-[10px] font-semibold text-gray-400 mt-0.5">Geser ke bawah untuk menutup</span>
           </div>
 
-          {/* Content */}
-          <div className="overflow-y-auto px-4 pb-20 pt-2.5 max-h-[calc(46vh-40px)] scrollbar-thin scrollbar-thumb-[#4a6fa5]/20">
-            {/* Header with Category Badge, Rating, & Close Button */}
+          {/* Scrollable Content */}
+          <div className="overflow-y-auto px-4 pt-3 pb-2 flex-1 scrollbar-thin scrollbar-thumb-[#4a6fa5]/20">
+            {/* Header with Category Badge, Rating */}
             <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
               <span className={`text-[10px] font-extrabold uppercase tracking-wide px-2.5 py-0.5 rounded-full border shadow-2xs flex items-center gap-1 ${
                 selectedPharmacy.facilityType === "hospital"
@@ -735,7 +735,7 @@ export function MobileMapView() {
 
             {/* Title & Distance */}
             <div className="flex items-start justify-between gap-2 mb-2">
-              <h2 className="text-sm sm:text-base font-bold text-[#111111] line-clamp-1 leading-snug">
+              <h2 className="text-sm sm:text-base font-bold text-[#111111] leading-snug">
                 {selectedPharmacy.name}
               </h2>
               <span className="text-xs font-extrabold text-[#4a6fa5] shrink-0">
@@ -766,9 +766,9 @@ export function MobileMapView() {
             </div>
 
             {/* Address */}
-            <p className="text-xs text-[#6B7280] flex items-start gap-1.5 mb-2.5 leading-relaxed">
+            <p className="text-xs text-[#6B7280] flex items-start gap-1.5 mb-2 leading-relaxed">
               <MapPin className="h-3.5 w-3.5 text-[#4a6fa5] shrink-0 mt-0.5" />
-              <span className="line-clamp-2">
+              <span>
                 {selectedPharmacy.address || `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
               </span>
             </p>
@@ -792,20 +792,24 @@ export function MobileMapView() {
               )}
             </div>
 
-            {/* Description / Review snippet */}
+            {/* Description / Review snippet - Elevated & Full text without any truncation */}
             {finalDescription && (
-              <p className="text-[11px] text-gray-500 italic bg-slate-50 p-2 rounded-xl mb-3 border border-gray-100 line-clamp-2">
-                &ldquo;{finalDescription}&rdquo;
-              </p>
+              <div className="p-3 bg-slate-50 rounded-xl mb-2 border border-gray-100">
+                <p className="text-xs text-gray-700 italic leading-relaxed">
+                  &ldquo;{finalDescription}&rdquo;
+                </p>
+              </div>
             )}
+          </div>
 
-            {/* Navigation Button */}
+          {/* Fixed CTA Action Bar at Bottom of Sheet - Never cut off by gesture/navigation bars */}
+          <div className="p-3 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))] bg-white border-t border-gray-100 shrink-0">
             <a
               href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPharmacy.lat},${selectedPharmacy.lon}`}
               target="_blank"
               rel="noreferrer"
               aria-label="Buka petunjuk arah di aplikasi Google Maps"
-              className="w-full py-2.5 min-h-[42px] rounded-xl bg-[#4a6fa5] hover:bg-[#35517d] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer mt-1"
+              className="w-full py-3 min-h-[46px] rounded-xl bg-[#4a6fa5] hover:bg-[#35517d] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer active:scale-[0.99]"
             >
               <Navigation className="h-4 w-4" />
               <span>Buka Navigasi Google Maps</span>
@@ -815,8 +819,8 @@ export function MobileMapView() {
         </div>
       )}
 
-      {/* Mobile Bottom Navigation Bar */}
-      <nav aria-label="Navigasi Utama Mobile" className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#E5E7EB] py-1.5 px-4 flex lg:hidden items-center justify-around shadow-lg">
+      {/* Mobile Bottom Navigation Bar - Elevated with safe-area-inset-bottom */}
+      <nav aria-label="Navigasi Utama Mobile" className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#E5E7EB] pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] px-4 flex lg:hidden items-center justify-around shadow-lg">
         <Link
           to="/"
           aria-label="Menuju halaman Beranda"

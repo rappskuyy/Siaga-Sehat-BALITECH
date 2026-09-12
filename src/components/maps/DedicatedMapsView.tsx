@@ -841,7 +841,7 @@ export function DedicatedMapsView() {
       {/* ========================================================================= */}
       {/* 03. MOBILE BOTTOM NAVIGATION BAR                                          */}
       {/* ========================================================================= */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#E5E7EB] py-2 px-4 flex lg:hidden items-center justify-around shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#E5E7EB] pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-4 flex lg:hidden items-center justify-around shadow-lg">
         <Link
           to="/"
           className="flex flex-col items-center gap-0.5 text-[#6B7280] hover:text-[#4a6fa5] transition"

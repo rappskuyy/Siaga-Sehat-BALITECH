@@ -911,9 +911,9 @@ export function PharmacyMap({ dangerLevel = "rendah", conditionName }: PharmacyM
 
                 {/* Description / Review snippet */}
                 {(finalDescription || finalReviewText) && (
-                  <div className="mb-3 p-2 bg-blue-50/60 border border-blue-200/80 rounded-xl text-[11px] text-[#35517d] flex items-start gap-1.5">
+                  <div className="mb-3 p-2.5 bg-blue-50/60 border border-blue-200/80 rounded-xl text-xs text-[#35517d] flex items-start gap-1.5">
                     <MessageSquare className="h-3.5 w-3.5 text-[#4a6fa5] shrink-0 mt-0.5" />
-                    <p className="italic leading-relaxed line-clamp-2">{finalDescription || `"${finalReviewText}"`}</p>
+                    <p className="italic leading-relaxed">{finalDescription || `"${finalReviewText}"`}</p>
                   </div>
                 )}
 
