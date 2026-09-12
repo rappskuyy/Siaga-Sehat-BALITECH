@@ -5,10 +5,10 @@
 # 📖 Panduan Pengguna (User Manual)
 ### **Platform Skrining & Asisten Kesehatan Cerdas SiagaSehat**
 
-[![Platform](https://img.shields.io/badge/Platform-Web_Responsive-0284C7?style=flat&logo=googlechrome&logoColor=white)](https://siagasehat.smkwikrama.sch.id)
-[![Status](https://img.shields.io/badge/Status-Live_Production-10B981?style=flat&logo=vercel&logoColor=white)](https://siagasehat.smkwikrama.sch.id)
-[![Versi](https://img.shields.io/badge/Versi_Dokumen-v1.0_(2026)-6366F1?style=flat)](./usermanual.md)
-[![Website](https://img.shields.io/badge/🌐_Buka_Website-siagasehat.smkwikrama.sch.id-2563EB?style=for-the-badge&logoColor=white)](https://siagasehat.smkwikrama.sch.id)
+[![Platform](https://img.shields.io/badge/Platform-Web_Responsive-4A6FA5?style=flat&logo=googlechrome&logoColor=white)](https://siagasehat.smkwikrama.sch.id)
+[![Status](https://img.shields.io/badge/Status-Live_Production-099268?style=flat&logo=vercel&logoColor=white)](https://siagasehat.smkwikrama.sch.id)
+[![Versi](https://img.shields.io/badge/Versi_Dokumen-v1.0_(2026)-35517D?style=flat)](./usermanual.md)
+[![Website](https://img.shields.io/badge/🌐_Buka_Website-siagasehat.smkwikrama.sch.id-4A6FA5?style=for-the-badge&logoColor=white)](https://siagasehat.smkwikrama.sch.id)
 
 ---
 
@@ -19,17 +19,24 @@
 <br/>
 
 <a id="daftar-isi"></a>
-## 📑 Daftar Isi Interaktif
+## 📑 Daftar Isi
 
-Klik pada salah satu topik di bawah untuk langsung menuju panduan yang diinginkan:
-
-| Kategori | Menu Panduan | Tautan Cepat |
-| :--- | :--- | :--- |
-| 🏥 **Informasi Awal** | 📌 **1. Tentang SiagaSehat**<br/>💻 **2. Persyaratan Penggunaan**<br/>🚀 **3. Memulai Penggunaan** | [👉 Buka Bab 1](#1-tentang-siagasehat)<br/>[👉 Buka Bab 2](#2-persyaratan-penggunaan)<br/>[👉 Buka Bab 3](#3-memulai-penggunaan) |
-| 🔐 **Akun Pengguna** | 📝 **4. Pendaftaran & Masuk Akun**<br/>• 4.1 Registrasi Akun Baru<br/>• 4.2 Masuk ke Akun (Login)<br/>• 4.3 Keuntungan Memiliki Akun | [👉 Buka Bab 4](#4-pendaftaran-dan-masuk-akun) |
-| 📷 **Fitur AI & Skrining** | 🔍 **5.1 Pemindaian Kesehatan (Scan AI)**<br/>🤖 **5.2 Konsultasi Medis AI**<br/>🧍 **5.3 Eksplorasi Anatomi Tubuh** | [👉 Buka Scan AI](#51-pemindaian-kesehatan-berbasis-kecerdasan-buatan-scan-ai)<br/>[👉 Buka Konsultasi](#52-konsultasi-kesehatan-berbasis-kecerdasan-buatan)<br/>[👉 Buka Anatomi](#53-eksplorasi-anatomi-tubuh) |
-| 📍 **Layanan Kesehatan** | 🗺️ **5.4 Peta Fasilitas Kesehatan (Faskes)**<br/>⏰ **5.5 Pengingat Konsumsi Obat (Reminder)**<br/>📊 **5.6 Profil & Rekam Medis** | [👉 Buka Peta Faskes](#54-peta-fasilitas-kesehatan-terdekat)<br/>[👉 Buka Pengingat Obat](#55-pengingat-konsumsi-obat)<br/>[👉 Buka Profil](#56-profil-dan-riwayat-kesehatan) |
-| ❓ **Pusat Bantuan** | 💡 **6. Pertanyaan yang Sering Diajukan (FAQ)**<br/>📞 **7. Bantuan & Kontak Pengembang** | [👉 Buka FAQ](#6-pertanyaan-yang-sering-diajukan)<br/>[👉 Buka Kontak](#7-bantuan-dan-kontak) |
+- 📌 [**1. Tentang SiagaSehat**](#1-tentang-siagasehat)
+- 💻 [**2. Persyaratan Penggunaan**](#2-persyaratan-penggunaan)
+- 🚀 [**3. Memulai Penggunaan**](#3-memulai-penggunaan)
+- 🔐 [**4. Pendaftaran dan Masuk Akun**](#4-pendaftaran-dan-masuk-akun)
+  - 📝 [4.1 Membuat Akun Baru (Register)](#41-membuat-akun-baru-register)
+  - 🔑 [4.2 Masuk ke Akun (Login)](#42-masuk-ke-akun-login)
+  - 🛡️ [4.3 Keuntungan Memiliki Akun](#43-keuntungan-memiliki-akun)
+- ⚙️ [**5. Panduan Penggunaan Fitur**](#5-panduan-penggunaan-fitur)
+  - 📷 [5.1 Pemindaian Kesehatan Berbasis AI (Scan AI)](#51-pemindaian-kesehatan-berbasis-kecerdasan-buatan-scan-ai)
+  - 🤖 [5.2 Konsultasi Kesehatan Berbasis AI](#52-konsultasi-kesehatan-berbasis-kecerdasan-buatan)
+  - 🧍 [5.3 Eksplorasi Anatomi Tubuh (Visual Penyakit)](#53-eksplorasi-anatomi-tubuh)
+  - 📍 [5.4 Peta Fasilitas Kesehatan Terdekat](#54-peta-fasilitas-kesehatan-terdekat)
+  - ⏰ [5.5 Pengingat Konsumsi Obat (Medicine Reminder)](#55-pengingat-konsumsi-obat)
+  - 📊 [5.6 Profil dan Riwayat Kesehatan](#56-profil-dan-riwayat-kesehatan)
+- 💡 [**6. Pertanyaan yang Sering Diajukan (FAQ)**](#6-pertanyaan-yang-sering-diajukan)
+- 📞 [**7. Bantuan dan Kontak Pengembang**](#7-bantuan-dan-kontak)
 
 ---
 
@@ -80,11 +87,12 @@ Platform SiagaSehat dapat diakses secara instan tanpa perlu instalasi aplikasi:
 
 <div align="center">
 
-[![Daftar Akun Baru](https://img.shields.io/badge/📝_Daftar_Akun_Baru-2563EB?style=for-the-badge&logoColor=white)](https://siagasehat.smkwikrama.sch.id/register)
-[![Masuk ke Akun](https://img.shields.io/badge/🔑_Masuk_Akun-0D9488?style=for-the-badge&logoColor=white)](https://siagasehat.smkwikrama.sch.id/login)
+[![Daftar Akun Baru](https://img.shields.io/badge/📝_Daftar_Akun_Baru-4A6FA5?style=for-the-badge&logoColor=white)](https://siagasehat.smkwikrama.sch.id/register)
+[![Masuk ke Akun](https://img.shields.io/badge/🔑_Masuk_Akun-35517D?style=for-the-badge&logoColor=white)](https://siagasehat.smkwikrama.sch.id/login)
 
 </div>
 
+<a id="41-membuat-akun-baru-register"></a>
 ### 4.1 Membuat Akun Baru (Register)
 1. Klik tombol **Daftar** pada bilah navigasi atas, atau buka halaman **[/register](https://siagasehat.smkwikrama.sch.id/register)**.
 2. Lengkapi formulir pendaftaran:
@@ -94,11 +102,13 @@ Platform SiagaSehat dapat diakses secara instan tanpa perlu instalasi aplikasi:
 3. *(Opsional)* Isi data kesehatan awal: **Tinggi Badan (cm)**, **Berat Badan (kg)**, dan **Usia** untuk perhitungan otomatis Indeks Massa Tubuh (IMT).
 4. Klik **Daftar Sekarang**.
 
+<a id="42-masuk-ke-akun-login"></a>
 ### 4.2 Masuk ke Akun (Login)
 1. Klik tombol **Masuk** di navigasi, atau buka **[/login](https://siagasehat.smkwikrama.sch.id/login)**.
 2. Masukkan email dan kata sandi yang telah didaftarkan.
 3. Klik tombol **Masuk ke Akun**.
 
+<a id="43-keuntungan-memiliki-akun"></a>
 ### 4.3 Keuntungan Memiliki Akun
 * 📈 **Rekam Medis Tersimpan:** Riwayat scan dan konsultasi tersimpan rapi dalam grafik tren kesehatan.
 * ⏰ **Pengingat Obat Aktif:** Fitur pengingat minum obat otomatis hanya dapat berjalan untuk pengguna terdaftar.
@@ -287,7 +297,7 @@ Jika Anda memerlukan bantuan teknis, menemukan kendala, atau ingin memberikan ma
 
 | Saluran | Keterangan | Tautan Kontak |
 | :--- | :--- | :--- |
-| 💬 **WhatsApp Resmi** | Layanan pesan instan pengembang | [wa.me/6285770485228](https://wa.me/6285770485228) |
+| 💬 **WhatsApp Resmi** | Layanan pesan instan pengembang | [+62 857-7048-5228](https://wa.me/6285770485228) |
 | 💼 **LinkedIn Sekolah** | Profil resmi SMK Wikrama Bogor | [LinkedIn SMK Wikrama Bogor](https://www.linkedin.com/school/smkwikramabogor) |
 | 🐙 **GitHub Repository** | Repositori proyek & pelaporan bug | [GitHub Siaga-Sehat-BALITECH](https://github.com/rappskuyy/Siaga-Sehat-BALITECH) |
 | 👨‍💻 **Tim Pengembang** | Profil tim pengembang BALITECH | [Halaman Tim Pengembang](https://siagasehat.smkwikrama.sch.id/dev) |

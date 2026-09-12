@@ -8,12 +8,12 @@
 kesehatan lewat kamera, konsultasi digital interaktif, peta fasilitas kesehatan terdekat, hingga
 pengingat minum obat otomatis, semua dalam satu aplikasi.
 
-[![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](https://react.dev)
-[![TanStack Start](https://img.shields.io/badge/TanStack-Start-FF4154?logo=react-router&logoColor=white)](https://tanstack.com/start)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
-[![Gemini](https://img.shields.io/badge/Gemini-AI-8E75B2?logo=googlegemini&logoColor=white)](https://ai.google.dev/)
+[![React](https://img.shields.io/badge/React-19-4A6FA5?logo=react&logoColor=white)](https://react.dev)
+[![TanStack Start](https://img.shields.io/badge/TanStack-Start-35517D?logo=react-router&logoColor=white)](https://tanstack.com/start)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-4A6FA5?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-35517D?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-099268?logo=supabase&logoColor=white)](https://supabase.com/)
+[![Gemini](https://img.shields.io/badge/Gemini-AI-4A6FA5?logo=googlegemini&logoColor=white)](https://ai.google.dev/)
 
 </div>
 
@@ -32,55 +32,52 @@ segera ke fasilitas kesehatan terdekat.
 
 ## ✨ Fitur Utama
 
-### 📷 AI Image Analysis
-Analisis gambar berbasis AI dari foto yang diunggah pengguna, untuk membantu skrining awal
-berbagai kondisi:
+### 📷 1. AI Image Scanner (`/scanner`)
+Skrining kesehatan visual berbasis Computer Vision AI dari foto yang diunggah atau diambil langsung lewat kamera:
+- **Objek Deteksi:** Ruam kulit, luka, mata merah, jerawat, kuku, lidah, hingga keluhan tenggorokan.
+- **Deteksi Bagian Tubuh Terintegrasi:** Memilih lokasi keluhan langsung pada diagram tubuh.
+- **Hasil Analisis Lengkap:** Kemungkinan kondisi medis, tingkat keyakinan (*confidence score*), estimasi tingkat risiko, kemungkinan penyebab, tanda bahaya, saran kapan harus ke dokter, serta tombol langsung untuk menambahkan ke pengingat obat.
 
-| Objek yang dianalisis | Hasil yang diberikan |
-| --- | --- |
-| Ruam kulit · Luka · Mata merah · Jerawat · Kuku · Lidah · Tenggorokan | Kemungkinan kondisi · Tingkat keyakinan · Penyebab · Gejala · Tingkat bahaya · Kapan harus ke dokter |
+### 🤖 2. Konsultasi Medis AI (`/consultation`)
+Asisten kesehatan virtual interaktif 24/7 yang melakukan anamnesis terarah:
+- **Tanya-Jawab Cerdas:** Mengidentifikasi keluhan utama, usia, durasi gejala, riwayat penyakit keluarga, hingga riwayat alergi.
+- **Triage Medis:** Menyusun *Preliminary Analysis* (ringkasan kondisi), *Risk Assessment* (tingkat urgensi), serta *Health Recommendation* (panduan perawatan mandiri).
+- **Integrasi Anatomi:** Menerima data keluhan dari halaman eksplorasi anatomi tubuh.
 
-### 🤖 AI Health Consultation
-Asisten kesehatan virtual yang melakukan tanya-jawab interaktif — menanyakan usia, lama gejala,
-tekanan darah, hingga riwayat penyakit — lalu menyusun:
+### 🧍 3. Visual Anatomi & Eksplorasi Gejala (`/anatomy`)
+Model tubuh manusia interaktif untuk membantu pengguna memetakan keluhan:
+- **Navigasi 3D Multi-Sudut:** Tampilan depan & belakang tubuh dengan fitur pembesaran (*zoom*).
+- **Pemilihan Gejala Terarah:** Menandai organ/bagian tubuh (kepala, dada, perut, punggung, tangan, kaki) lalu memilih gejala spesifik yang dirasakan.
+- **AI Symptom Assessment:** Menganalisis korelasi antar-gejala dan memberikan rekomendasi rujukan langkah selanjutnya.
 
-- **Preliminary Analysis** — ringkasan awal kondisi
-- **Risk Assessment** — estimasi tingkat risiko
-- **Health Recommendation** — langkah lanjutan yang disarankan
+### 📍 4. Peta Fasilitas Kesehatan & Apotek (`/maps`)
+Pencarian fasilitas kesehatan terdekat berbasis geolokasi GPS pengguna atau penempatan pin manual:
+- **Kategori Faskes:** Rumah Sakit Umum & Khusus, Puskesmas, Klinik Pratama, dan Apotek.
+- **Informasi Lengkap:** Estimasi jarak tempuh (km), jam operasional (layanan 24 jam/IGD), nomor kontak faskes, serta tombol navigasi rute langsung.
+- **Dukungan Multi-Engine:** OpenStreetMap Canvas, Leaflet, dan Google Maps Platform.
 
-### 🧍 Body Pain Detector
-Model tubuh manusia interaktif. Pengguna cukup memilih lokasi nyeri — kepala, dada, perut, kaki,
-tangan, leher — dan AI membantu memperkirakan area yang kemungkinan menjadi sumber keluhan.
+### ⏰ 5. Pengingat Minum Obat — Medicine Reminder (`/reminders`)
+Sistem pengingat konsumsi obat otomatis untuk menjaga kepatuhan terapi:
+- **Setup Jadwal Cerdas:** Otomatis mengambil daftar obat dari riwayat scan/konsultasi terbaru atau input mandiri.
+- **Penjadwalan Dosis:** Pilihan frekuensi dosis (1x, 2x, 3x, 4x sehari) yang otomatis menghitung interval jam konsumsi.
+- **Pelacakan Stok & Kepatuhan:** Fitur tombol *"Sudah Minum Sekarang"*, penghitungan sisa tablet secara otomatis, peringatan stok menipis, dan log riwayat minum obat.
+- **Notifikasi Web & Status Popup:** Notifikasi peramban tepat waktu dan pop-up ringkasan obat aktif melalui ikon lonceng header.
 
-### 💊 Medicine Recommendation
-Rekomendasi obat umum & herbal berdasarkan hasil skrining awal, misalnya:
+### 💊 6. Rekomendasi Obat Medis & Herbal Alami
+Panduan terapi awal yang terverifikasi dan aman:
+- **Obat Bebas (OTC):** Informasi fungsi, dosis per minum, dan aturan konsumsi obat umum (misal: Paracetamol, Antasida, Oralit).
+- **Herbal Alami:** Alternatif bahan herbal tradisional (misal: Jahe, Madu, Kunyit, Temulawak) beserta cara pengolahan dan manfaat kesehatannya.
 
-- **Obat Umum** — Paracetamol, Oralit
-- **Herbal** — Jahe, Madu, Kunyit
+### 📊 7. Profil & Rekam Medis Digital (`/profile`)
+Pusat manajemen riwayat kesehatan pribadi pengguna:
+- **Profil Fisik:** Data tinggi badan, berat badan, umur, dan estimasi otomatis Indeks Massa Tubuh (IMT / BMI).
+- **Grafik Tren Kesehatan:** Visualisasi frekuensi skrining dan riwayat kesehatan dari waktu ke waktu menggunakan Recharts.
+- **Arsip Riwayat Skrining:** Seluruh riwayat foto scan dan sesi konsultasi tersimpan rapi dan dapat dibuka kembali sebagai bahan rujukan dokter.
 
-> ⚠️ Informasi ini bukan pengganti konsultasi dokter.
-
-### 📍 Nearby Healthcare Finder
-Menemukan fasilitas kesehatan terdekat lewat Google Maps — Rumah Sakit, Klinik, Puskesmas, dan
-Apotek — lengkap dengan jarak, jam operasional, dan sumber data (Google / OpenStreetMap / AI
-fallback).
-
-### 📄 AI Health Report
-Seluruh hasil skrining tersimpan sebagai riwayat kesehatan pribadi: tanggal pemeriksaan, hasil
-analisis, dan perkembangan kondisi dari waktu ke waktu — disajikan dalam bentuk grafik pada halaman
-Profil.
-
-### ⏰ Medicine Reminder
-Notifikasi & pengingat otomatis untuk minum obat, kontrol kesehatan, dan pemeriksaan rutin —
-lengkap dengan pelacakan stok tablet dan riwayat kepatuhan minum obat.
-
-### 🗺️ Anatomy Explorer
-Peta tubuh 3D interaktif untuk menelusuri sistem tubuh, memilih gejala berdasarkan bagian tubuh,
-dan mendapat penilaian AI awal atas kombinasi gejala yang dipilih.
-
-### 🔐 Akun & Riwayat Kesehatan
-Profil pengguna dengan data kesehatan dasar (tinggi, berat, umur, estimasi BMI), riwayat scan AI,
-serta autentikasi aman berbasis Supabase.
+### 🔐 8. Autentikasi & Keamanan Data (`/login` & `/register`)
+- **Autentikasi Aman:** Sistem akun berbasis Supabase Auth dengan sesi login yang persisten.
+- **Validasi Real-time:** Pengecekan kekuatan kata sandi otomatis (minimal 8 karakter, huruf kapital, dan angka).
+- **Row Level Security (RLS):** Data rekam medis dan pengingat obat dienkripsi serta diproteksi sehingga hanya dapat diakses oleh pemilik akun.
 
 <details>
 <summary><strong>🚧 Roadmap — fitur yang sedang direncanakan</strong></summary>
@@ -89,13 +86,9 @@ serta autentikasi aman berbasis Supabase.
 
 Fitur berikut ada dalam visi produk SiagaSehat dan sedang/berpotensi dikembangkan lebih lanjut:
 
-- **🎤 Speech to Text** — pengguna cukup bicara mengenai gejala yang dirasakan
-  (_"Sudah dua hari tenggorokan saya sakit dan demam."_), suara diubah menjadi teks lalu dianalisis
-  AI.
-- **📄 OCR Prescription Reader** — membaca resep dokter lewat OCR dan menampilkan nama obat, fungsi,
-  serta aturan pakainya.
-- **📚 Health Education** — edukasi kesehatan yang dipersonalisasi dari hasil skrining: cara
-  pencegahan, makanan yang dianjurkan/dihindari, dan kebiasaan sehat.
+- **🎤 Speech to Text** — input keluhan lewat suara (*voice input*) yang otomatis diubah menjadi teks percakapan konsultasi AI.
+- **📄 OCR Prescription Reader** — pemindaian lembar resep dokter berbasis OCR untuk otomatisasi jadwal pengingat obat.
+- **📚 Personalized Health Articles** — artikel edukasi kesehatan yang disesuaikan dengan riwayat keluhan pengguna.
 
 </details>
 
@@ -145,7 +138,7 @@ Panduan lengkap tata cara penggunaan setiap fitur platform SiagaSehat dapat diak
 
 <div align="center">
 
-[![Buka User Manual](https://img.shields.io/badge/📖_Buka_Panduan_Pengguna_(User_Manual)-2563EB?style=for-the-badge&logoColor=white)](./usermanual.md)
+[![Buka User Manual](https://img.shields.io/badge/📖_Buka_Panduan_Pengguna_(User_Manual)-4A6FA5?style=for-the-badge&logoColor=white)](./usermanual.md)
 
 </div>
 
