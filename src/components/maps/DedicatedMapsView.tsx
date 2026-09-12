@@ -715,29 +715,29 @@ export function DedicatedMapsView() {
 
               {/* In-Frame Floating Detail Card (Overlaid directly on the map canvas) */}
               {selectedPharmacy && showDetailPanel && (
-                <div className="absolute top-3 right-3 bottom-3 z-30 w-[calc(100%-24px)] sm:w-[380px] xl:w-[410px] max-h-[calc(100%-24px)] bg-white/98 border border-[#E5E7EB] rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col overflow-y-auto animate-in fade-in slide-in-from-right-4 duration-300 backdrop-blur-md scrollbar-thin scrollbar-thumb-[#4a6fa5]/20">
+                <div className="absolute bottom-2 inset-x-2 sm:inset-auto sm:top-3 sm:right-3 sm:bottom-3 z-30 w-auto sm:w-[380px] xl:w-[410px] max-h-[48%] sm:max-h-[calc(100%-24px)] bg-white/98 border border-[#E5E7EB] rounded-3xl p-3.5 sm:p-5 shadow-2xl flex flex-col overflow-y-auto animate-in fade-in slide-in-from-bottom-4 sm:slide-in-from-right-4 duration-300 backdrop-blur-md scrollbar-thin scrollbar-thumb-[#4a6fa5]/20">
                   {/* Category Badge & Rating Header */}
-                  <div className="flex items-center justify-between gap-2 mb-3 shrink-0">
+                  <div className="flex items-center justify-between gap-2 mb-2.5 shrink-0">
                     <span
-                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide border shadow-xs ${
+                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide border shadow-2xs ${
                         selectedPharmacy.facilityType === "hospital"
-                          ? "bg-red-500 text-white border-red-600"
+                          ? "bg-red-50 text-red-600 border-red-200"
                           : selectedPharmacy.facilityType === "clinic"
-                            ? "bg-[#F59E0B] text-white border-amber-600"
-                            : "bg-[#4a6fa5] text-white border-blue-600"
+                            ? "bg-amber-50 text-amber-600 border-amber-200"
+                            : "bg-blue-50 text-blue-600 border-blue-200"
                       }`}
                     >
                       {selectedPharmacy.facilityType === "hospital" ? (
-                        <><Building2 className="h-3 w-3 inline mr-1 shrink-0" /> RUMAH SAKIT</>
+                        <><Building2 className="h-3 w-3 inline mr-1 shrink-0 text-red-500" /> RUMAH SAKIT</>
                       ) : selectedPharmacy.facilityType === "clinic" ? (
-                        <><Stethoscope className="h-3 w-3 inline mr-1 shrink-0" /> KLINIK</>
+                        <><Stethoscope className="h-3 w-3 inline mr-1 shrink-0 text-amber-500" /> KLINIK</>
                       ) : (
-                        <><Pill className="h-3 w-3 inline mr-1 shrink-0" /> APOTEK</>
+                        <><Pill className="h-3 w-3 inline mr-1 shrink-0 text-blue-500" /> APOTEK</>
                       )}
                     </span>
 
-                    <div className="flex items-center gap-2">
-                      <div className="bg-amber-50 text-amber-900 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-2xs">
+                    <div className="flex items-center gap-1.5">
+                      <div className="bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-2xs">
                         <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                         <span>
                           {selectedPharmacy.rating ? Number(selectedPharmacy.rating).toFixed(1) : "4.8"}
@@ -750,8 +750,9 @@ export function DedicatedMapsView() {
                       <button
                         type="button"
                         onClick={() => setShowDetailPanel(false)}
-                        className="text-[#6B7280] hover:text-[#111111] p-1.5 rounded-full hover:bg-slate-100 shrink-0 transition cursor-pointer"
+                        className="hidden sm:flex text-[#6B7280] hover:text-[#111111] p-1 rounded-full hover:bg-slate-100 shrink-0 transition cursor-pointer"
                         title="Tutup Panel Detail (Rute Tetap Aktif)"
+                        aria-label="Tutup panel rincian"
                       >
                         <X className="h-4.5 w-4.5" />
                       </button>
@@ -759,7 +760,7 @@ export function DedicatedMapsView() {
                   </div>
 
                   {/* Clean Full Photo Header */}
-                  <div className="relative h-36 sm:h-40 w-full rounded-2xl overflow-hidden mb-3 border border-[#E5E7EB] bg-slate-100 shrink-0 shadow-xs">
+                  <div className="relative h-24 sm:h-36 w-full rounded-xl sm:rounded-2xl overflow-hidden mb-2.5 sm:mb-3 border border-[#E5E7EB] bg-slate-100 shrink-0 shadow-2xs">
                     <img
                       src={finalPhotoUrl || getWikimediaFallbackPhoto(selectedPharmacy.facilityType, selectedPharmacy.name.charCodeAt(0) || 0)}
                       alt={selectedPharmacy.name}
@@ -773,13 +774,20 @@ export function DedicatedMapsView() {
                   </div>
 
                   {/* Title & Address */}
-                  <div className="mb-3">
-                    <h3 className="text-base sm:text-lg font-bold text-[#111111] leading-snug">
-                      {selectedPharmacy.name}
-                    </h3>
-                    <p className="text-xs text-[#6B7280] mt-1.5 leading-relaxed flex items-start gap-1">
+                  <div className="mb-2.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="text-sm sm:text-base font-bold text-[#111111] leading-snug line-clamp-1">
+                        {selectedPharmacy.name}
+                      </h3>
+                      <span className="text-xs font-extrabold text-[#4a6fa5] shrink-0">
+                        {selectedPharmacy.distanceKm < 1
+                          ? `${(selectedPharmacy.distanceKm * 1000).toFixed(0)} m`
+                          : `${selectedPharmacy.distanceKm.toFixed(1)} km`}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#6B7280] mt-1 leading-relaxed flex items-start gap-1">
                       <MapPin className="h-3.5 w-3.5 text-[#4a6fa5] shrink-0 mt-0.5" />
-                      <span>
+                      <span className="line-clamp-2">
                         {selectedPharmacy.address ||
                           `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
                       </span>
@@ -787,16 +795,11 @@ export function DedicatedMapsView() {
                   </div>
 
                   {/* Operational Hours & Phone Contact */}
-                  <div className="mt-1 pt-3 border-t border-[#E5E7EB] flex flex-col gap-1.5 text-xs mb-3">
+                  <div className="mt-1 pt-2.5 border-t border-[#E5E7EB] flex flex-col gap-1.5 text-xs mb-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1.5 text-[#4a6fa5] font-semibold">
+                      <span className="flex items-center gap-1.5 text-[#4a6fa5] font-semibold text-[11px]">
                         <Clock className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
                         {selectedPharmacy.openingHoursText || "Buka 24 Jam (IGD Siaga)"}
-                      </span>
-                      <span className="font-extrabold text-[#111111]">
-                        {selectedPharmacy.distanceKm < 1
-                          ? `${(selectedPharmacy.distanceKm * 1000).toFixed(0)} m`
-                          : `${selectedPharmacy.distanceKm.toFixed(2)} km`}
                       </span>
                     </div>
 
@@ -809,21 +812,23 @@ export function DedicatedMapsView() {
                   </div>
 
                   {/* Review Comment Snippet */}
-                  <div className="mb-4 p-3 bg-blue-50/60 border border-blue-200/80 rounded-2xl text-xs text-[#35517d] flex items-start gap-2">
-                    <MessageSquare className="h-4 w-4 text-[#4a6fa5] shrink-0 mt-0.5" />
-                    <p className="italic leading-relaxed">&quot;{finalReviewText}&quot;</p>
-                  </div>
+                  {finalReviewText && (
+                    <div className="mb-3 p-2 bg-blue-50/60 border border-blue-200/80 rounded-xl text-[11px] text-[#35517d] flex items-start gap-1.5">
+                      <MessageSquare className="h-3.5 w-3.5 text-[#4a6fa5] shrink-0 mt-0.5" />
+                      <p className="italic leading-relaxed line-clamp-2">&quot;{finalReviewText}&quot;</p>
+                    </div>
+                  )}
 
                   {/* Direct Google Maps Navigation Primary CTA Button */}
                   <a
                     href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPharmacy.lat},${selectedPharmacy.lon}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full h-11 bg-[#4a6fa5] hover:bg-[#35517d] text-white font-extrabold text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer mt-auto shrink-0"
+                    className="w-full h-10 sm:h-11 bg-[#4a6fa5] hover:bg-[#35517d] text-white font-extrabold text-xs sm:text-sm rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer mt-auto shrink-0"
                   >
                     <Navigation className="h-4 w-4" />
                     <span>Buka Navigasi Google Maps</span>
-                    <ExternalLink className="h-4 w-4" />
+                    <ExternalLink className="h-3.5 w-3.5" />
                   </a>
                 </div>
               )}

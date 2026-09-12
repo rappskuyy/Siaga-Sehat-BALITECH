@@ -680,11 +680,11 @@ export function MobileMapView() {
         )}
       </div>
 
-      {/* Details Panel - Bottom Sheet */}
+      {/* Details Panel - Compact Bottom Sheet (Lowered so map remains clearly visible) */}
       {selectedPharmacy && showDetailsPanel && (
         <div
           ref={detailSheetRef}
-          className="absolute bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl border-t border-[#E5E7EB] shadow-2xl flex flex-col max-h-[75vh] will-change-transform translate-y-0 animate-in slide-in-from-bottom-full duration-300"
+          className="absolute bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl border-t border-[#E5E7EB] shadow-2xl flex flex-col max-h-[46vh] will-change-transform translate-y-0 animate-in slide-in-from-bottom-full duration-300 backdrop-blur-md"
         >
           {/* Scroll / Drag Handle Bar to Close Details Panel */}
           <div
@@ -694,39 +694,64 @@ export function MobileMapView() {
             onClick={() => {
               if (detailCurrentY.current < 5) handleCloseDetails();
             }}
-            className="w-full py-3.5 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing active:bg-slate-100 rounded-t-3xl shrink-0 select-none border-b border-gray-100 touch-none"
+            className="w-full py-2.5 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing active:bg-slate-100 rounded-t-3xl shrink-0 select-none border-b border-gray-100 touch-none"
             title="Geser ke Bawah untuk Menutup"
             role="button"
             tabIndex={0}
             aria-label="Tutup panel rincian fasilitas"
           >
-            <div className="w-14 h-1.5 bg-slate-300 hover:bg-[#4a6fa5] rounded-full transition-colors" />
-            <span className="text-[10px] font-semibold text-gray-400 mt-1">Geser ke bawah untuk menutup</span>
+            <div className="w-12 h-1.5 bg-slate-300 hover:bg-[#4a6fa5] rounded-full transition-colors" />
+            <span className="text-[10px] font-semibold text-gray-400 mt-0.5">Geser ke bawah untuk menutup</span>
           </div>
 
           {/* Content */}
-          <div className="overflow-y-auto px-4 pb-24 pt-3 max-h-[calc(75vh-55px)]">
-            {/* Header */}
-            <div className="mb-4">
-              <span className="text-xs font-bold uppercase text-[#4a6fa5] flex items-center gap-1.5 mb-1">
+          <div className="overflow-y-auto px-4 pb-20 pt-2.5 max-h-[calc(46vh-40px)] scrollbar-thin scrollbar-thumb-[#4a6fa5]/20">
+            {/* Header with Category Badge, Rating, & Close Button */}
+            <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
+              <span className={`text-[10px] font-extrabold uppercase tracking-wide px-2.5 py-0.5 rounded-full border shadow-2xs flex items-center gap-1 ${
+                selectedPharmacy.facilityType === "hospital"
+                  ? "bg-red-50 text-red-600 border-red-200"
+                  : selectedPharmacy.facilityType === "clinic"
+                    ? "bg-amber-50 text-amber-600 border-amber-200"
+                    : "bg-blue-50 text-blue-600 border-blue-200"
+              }`}>
                 {selectedPharmacy.facilityType === "hospital" ? (
-                  <><Building2 className="h-3.5 w-3.5 text-red-500 shrink-0" /> RUMAH SAKIT</>
+                  <><Building2 className="h-3 w-3 text-red-500 shrink-0" /> RUMAH SAKIT</>
                 ) : selectedPharmacy.facilityType === "clinic" ? (
-                  <><Stethoscope className="h-3.5 w-3.5 text-amber-500 shrink-0" /> KLINIK</>
+                  <><Stethoscope className="h-3 w-3 text-amber-500 shrink-0" /> KLINIK</>
                 ) : (
-                  <><Pill className="h-3.5 w-3.5 text-blue-500 shrink-0" /> APOTEK</>
+                  <><Pill className="h-3 w-3 text-blue-500 shrink-0" /> APOTEK</>
                 )}
               </span>
-              <h2 className="text-lg font-bold text-[#111111]">{selectedPharmacy.name}</h2>
+
+              <div className="bg-amber-50 text-amber-900 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-2xs">
+                <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400 shrink-0" />
+                <span>{selectedPharmacy.rating ? Number(selectedPharmacy.rating).toFixed(1) : "4.8"}</span>
+                <span className="text-[10px] text-amber-700 font-normal">
+                  ({selectedPharmacy.userRatingsTotal || "128"})
+                </span>
+              </div>
             </div>
 
-            {/* Photo */}
-            <div className="relative h-44 w-full rounded-2xl overflow-hidden mb-4 bg-slate-100 border border-[#E5E7EB] shadow-xs">
+            {/* Title & Distance */}
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <h2 className="text-sm sm:text-base font-bold text-[#111111] line-clamp-1 leading-snug">
+                {selectedPharmacy.name}
+              </h2>
+              <span className="text-xs font-extrabold text-[#4a6fa5] shrink-0">
+                {selectedPharmacy.distanceKm < 1
+                  ? `${(selectedPharmacy.distanceKm * 1000).toFixed(0)} m`
+                  : `${selectedPharmacy.distanceKm.toFixed(1)} km`}
+              </span>
+            </div>
+
+            {/* Compact Photo Banner */}
+            <div className="relative h-24 sm:h-28 w-full rounded-xl overflow-hidden mb-2.5 bg-slate-100 border border-[#E5E7EB] shadow-2xs shrink-0">
               <img
                 src={finalPhotoUrl || getWikimediaFallbackPhoto(selectedPharmacy.facilityType, selectedPharmacy.name.charCodeAt(0) || 0)}
                 alt={selectedPharmacy.name}
                 width="360"
-                height="176"
+                height="112"
                 loading="lazy"
                 decoding="async"
                 referrerPolicy="no-referrer"
@@ -740,53 +765,38 @@ export function MobileMapView() {
               />
             </div>
 
-            {/* Rating */}
-            <div className="flex items-center gap-2 mb-4 pb-4 border-b border-[#E5E7EB]">
-              <Star className="h-4 w-4 fill-amber-400 text-amber-400 shrink-0" />
-              <span className="font-bold text-[#111111]">{selectedPharmacy.rating ? Number(selectedPharmacy.rating).toFixed(1) : "4.8"}</span>
-              <span className="text-xs text-[#6B7280]">
-                ({selectedPharmacy.userRatingsTotal || "128"} ulasan)
-              </span>
-            </div>
-
             {/* Address */}
-            <div className="mb-4">
-              <p className="text-xs text-[#6B7280] font-medium mb-1">Lokasi</p>
-              <p className="text-sm text-[#111111] flex items-start gap-1.5">
-                <MapPin className="h-4 w-4 text-[#4a6fa5] shrink-0 mt-0.5" />
-                <span>
-                  {selectedPharmacy.address || `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
-                </span>
-              </p>
-            </div>
-
-            {/* Description */}
-            <div className="mb-4">
-              <p className="text-xs text-[#6B7280] font-medium mb-2">Deskripsi</p>
-              <p className="text-sm text-[#111111] leading-relaxed">{finalDescription}</p>
-            </div>
-
-            {/* Hours & Distance */}
-            <div className="mb-4 p-3 bg-[#eef2f8] rounded-xl flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-emerald-500" />
-                <span className="text-xs font-semibold text-[#4a6fa5]">
-                  {selectedPharmacy.openingHoursText || "Buka 24 Jam"}
-                </span>
-              </div>
-              <span className="text-sm font-bold text-[#111111]">
-                {selectedPharmacy.distanceKm < 1
-                  ? `${(selectedPharmacy.distanceKm * 1000).toFixed(0)} m`
-                  : `${selectedPharmacy.distanceKm.toFixed(2)} km`}
+            <p className="text-xs text-[#6B7280] flex items-start gap-1.5 mb-2.5 leading-relaxed">
+              <MapPin className="h-3.5 w-3.5 text-[#4a6fa5] shrink-0 mt-0.5" />
+              <span className="line-clamp-2">
+                {selectedPharmacy.address || `Jl. Sekitar (${selectedPharmacy.lat.toFixed(4)}, ${selectedPharmacy.lon.toFixed(4)})`}
               </span>
+            </p>
+
+            {/* Hours & Phone Bar */}
+            <div className="mb-2.5 p-2 bg-[#eef2f8] rounded-xl flex items-center justify-between text-xs">
+              <div className="flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                <span className="font-semibold text-[#4a6fa5] text-[11px]">
+                  {selectedPharmacy.openingHoursText || (selectedPharmacy.facilityType === "hospital" ? "Buka 24 Jam (IGD)" : "Buka 24 Jam")}
+                </span>
+              </div>
+              {selectedPharmacy.phone && (
+                <a
+                  href={`tel:${selectedPharmacy.phone}`}
+                  className="text-[11px] text-[#4a6fa5] font-semibold flex items-center gap-1 hover:underline"
+                >
+                  <Phone className="h-3 w-3 shrink-0" />
+                  <span>{selectedPharmacy.phone}</span>
+                </a>
+              )}
             </div>
 
-            {/* Phone */}
-            {selectedPharmacy.phone && (
-              <div className="mb-4 p-3 bg-slate-50 rounded-xl flex items-center gap-2">
-                <Phone className="h-4 w-4 text-[#4a6fa5]" />
-                <span className="text-sm text-[#111111] font-medium">{selectedPharmacy.phone}</span>
-              </div>
+            {/* Description / Review snippet */}
+            {finalDescription && (
+              <p className="text-[11px] text-gray-500 italic bg-slate-50 p-2 rounded-xl mb-3 border border-gray-100 line-clamp-2">
+                &ldquo;{finalDescription}&rdquo;
+              </p>
             )}
 
             {/* Navigation Button */}
@@ -795,11 +805,11 @@ export function MobileMapView() {
               target="_blank"
               rel="noreferrer"
               aria-label="Buka petunjuk arah di aplikasi Google Maps"
-              className="w-full py-3 min-h-[48px] rounded-2xl bg-[#4a6fa5] hover:bg-[#35517d] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition"
+              className="w-full py-2.5 min-h-[42px] rounded-xl bg-[#4a6fa5] hover:bg-[#35517d] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer mt-1"
             >
               <Navigation className="h-4 w-4" />
-              Navigasi Google Maps
-              <ExternalLink className="h-4 w-4" />
+              <span>Buka Navigasi Google Maps</span>
+              <ExternalLink className="h-3.5 w-3.5" />
             </a>
           </div>
         </div>

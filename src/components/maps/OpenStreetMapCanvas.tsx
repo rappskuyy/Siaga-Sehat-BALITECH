@@ -257,10 +257,20 @@ export function OpenStreetMapCanvas({
         }).addTo(map);
         routeForegroundRef.current = foreground;
 
-        // Fit Map Bounds to Route
-        map.fitBounds(foreground.getBounds(), { padding: [50, 50] });
+        // Fit Map Bounds to Route with bottom offset on mobile so route is not covered by bottom sheet
+        const isMobileScreen = typeof window !== "undefined" && window.innerWidth < 768;
+        map.fitBounds(foreground.getBounds(), {
+          paddingTopLeft: [24, 24],
+          paddingBottomRight: isMobileScreen ? [24, 170] : [48, 48],
+        });
       } else if (selectedPharmacy) {
-        map.panTo([selectedPharmacy.lat, selectedPharmacy.lon]);
+        const isMobileScreen = typeof window !== "undefined" && window.innerWidth < 768;
+        if (isMobileScreen) {
+          // Pan slightly south on mobile so the selected facility pin is positioned in the upper visible area
+          map.panTo([selectedPharmacy.lat - 0.0035, selectedPharmacy.lon]);
+        } else {
+          map.panTo([selectedPharmacy.lat, selectedPharmacy.lon]);
+        }
       } else if (userLocation) {
         map.panTo(userLocation);
       }
